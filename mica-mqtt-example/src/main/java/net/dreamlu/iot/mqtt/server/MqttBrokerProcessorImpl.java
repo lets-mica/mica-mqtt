@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.example;
+package net.dreamlu.iot.mqtt.server;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

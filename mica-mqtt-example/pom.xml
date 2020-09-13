@@ -32,7 +32,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>net.dreamlu.iot.mqtt.example.MqttServerTest</mainClass>
+                            <mainClass>net.dreamlu.iot.mqtt.server.MqttServerTest</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

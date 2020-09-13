@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.example;
+package net.dreamlu.iot.mqtt.server;
 
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.server.MqttServerAioHandler;
