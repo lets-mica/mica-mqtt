@@ -133,10 +133,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 	public void processPingReq(ChannelContext context) {
 		String clientId = context.getBsId();
 		log.debug("PINGREQ - clientId: {}", clientId);
-		MqttMessage message = MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0),
-			null, null);
-		Tio.send(context, message);
+		Tio.send(context, MqttMessage.PINGRESP);
 	}
 
 	@Override
