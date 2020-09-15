@@ -27,7 +27,7 @@ public class MqttClientTest {
 	public static void main(String[] args) throws Exception {
 		MqttClientProcessor processor = new MqttClientProcessorImpl();
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(processor);
-		ClientAioListener clientAioListener = new MqttClientAioListener("MqttClientTest", "admin", "123456");
+		ClientAioListener clientAioListener = new MqttClientAioListener("MqttClientTest", "admin", "123456".getBytes());
 		ReconnConf reconnConf = new ReconnConf();
 		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
 

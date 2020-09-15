@@ -32,9 +32,9 @@ import java.nio.charset.StandardCharsets;
 public class MqttClientAioListener extends DefaultClientAioListener {
 	private final String clientId;
 	private final String username;
-	private final String password;
+	private final byte[] password;
 
-	public MqttClientAioListener(String clientId, String username, String password) {
+	public MqttClientAioListener(String clientId, String username, byte[] password) {
 		this.clientId = clientId;
 		this.username = username;
 		this.password = password;
@@ -47,7 +47,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 			MqttConnectMessage message = MqttMessageBuilders.connect()
 				.clientId(clientId)
 				.username(username)
-				.password(password.getBytes(StandardCharsets.UTF_8))
+				.password(password)
 				.build();
 			Tio.send(context, message);
 		}

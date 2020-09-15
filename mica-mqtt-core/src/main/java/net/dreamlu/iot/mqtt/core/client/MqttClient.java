@@ -27,6 +27,6 @@ public class MqttClient {
 	// 2. 重连配置
 	// 3. 客户端信息 clientId、userName、pwd
 	// 4. 自定义消息处理
-	// 5. sub 的 topic 和 监听的配置
+	// 5. sub 的 topic 和 监听的配置，sub 是自定义业务处理器的行为，不应该在这里面配置
 
 }
