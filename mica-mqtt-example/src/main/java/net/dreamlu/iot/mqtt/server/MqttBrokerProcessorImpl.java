@@ -18,8 +18,7 @@ import java.util.stream.Collectors;
  * @author L.cm
  */
 public class MqttBrokerProcessorImpl implements MqttServerProcessor {
-	private static Logger log = LoggerFactory.getLogger(MqttBrokerProcessorImpl.class);
-	private static final String MQTT_CLIENT_ID_KEY = "mqttClientId";
+	private static final Logger log = LoggerFactory.getLogger(MqttBrokerProcessorImpl.class);
 
 	@Override
 	public void processConnect(ChannelContext context, MqttConnectMessage mqttMessage) {
@@ -44,7 +43,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 			return;
 		}
 		// 3. 设置 clientId
-		context.set(MQTT_CLIENT_ID_KEY, clientId);
+		context.setBsId(clientId);
 		// 4. 返回 ack
 		MqttMessage message = MqttMessageBuilders.connAck()
 			.returnCode(MqttConnectReturnCode.CONNECTION_ACCEPTED)
@@ -63,7 +62,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 
 	@Override
 	public void processPublish(ChannelContext context, MqttPublishMessage message) {
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("PUBLISH - clientId: {}", clientId);
 		MqttFixedHeader fixedHeader = message.fixedHeader();
 		ByteBuffer payload = message.payload();
@@ -75,13 +74,13 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 	@Override
 	public void processPubAck(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		int messageId = variableHeader.messageId();
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("PUBACK - clientId: {}, messageId: {}", clientId, messageId);
 	}
 
 	@Override
 	public void processPubRec(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("PUBREC - clientId: {}, messageId: {}", clientId, variableHeader.messageId());
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_MOST_ONCE, false, 0),
@@ -91,7 +90,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 
 	@Override
 	public void processPubRel(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("PUBREL - clientId: {}, messageId: {}", clientId, variableHeader.messageId());
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0),
@@ -102,7 +101,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 	@Override
 	public void processPubComp(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		int messageId = variableHeader.messageId();
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("PUBCOMP - clientId: {}, messageId: {}", clientId, messageId);
 	}
 
@@ -122,7 +121,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 
 	@Override
 	public void processUnSubscribe(ChannelContext context, MqttUnsubscribeMessage mqttMessage) {
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("UnSubscribe - clientId: {}", clientId);
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.UNSUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
@@ -132,7 +131,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 
 	@Override
 	public void processPingReq(ChannelContext context) {
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("PINGREQ - clientId: {}", clientId);
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PINGRESP, false, MqttQoS.AT_MOST_ONCE, false, 0),
@@ -142,7 +141,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 
 	@Override
 	public void processDisConnect(ChannelContext context) {
-		String clientId = (String) context.get(MQTT_CLIENT_ID_KEY);
+		String clientId = context.getBsId();
 		log.debug("DISCONNECT - clientId: {}", clientId);
 		context.setClosed(true);
 	}

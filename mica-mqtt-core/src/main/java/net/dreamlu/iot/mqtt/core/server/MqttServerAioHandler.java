@@ -33,7 +33,7 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 public class MqttServerAioHandler implements ServerAioHandler {
-	private static Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
 	private final MqttServerProcessor processor;
@@ -96,8 +96,6 @@ public class MqttServerAioHandler implements ServerAioHandler {
 		// 2. 单独处理 CONNECT 的消息
 		// 3. 其他消息先判断是否连接、认证过
 		// TODO L.cm 还是设计 filter 去处理该问题？？？
-		// TODO L.cm t-io 的 bsid 是否可以用它来绑定 clientId
-
 		switch (messageType) {
 			case CONNECT:
 				processor.processConnect(context, (MqttConnectMessage) mqttMessage);
