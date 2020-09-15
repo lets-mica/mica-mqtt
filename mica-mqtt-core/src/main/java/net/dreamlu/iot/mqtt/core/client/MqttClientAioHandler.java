@@ -42,7 +42,7 @@ public class MqttClientAioHandler implements ClientAioHandler {
 	public MqttClientAioHandler(MqttClientProcessor processor) {
 		this.mqttDecoder = MqttDecoder.INSTANCE;
 		this.mqttEncoder = MqttEncoder.INSTANCE;
-		this.processor =processor;
+		this.processor = processor;
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class MqttClientAioHandler implements ClientAioHandler {
 		// 1. 先判断 mqtt 消息解析是否正常
 		DecoderResult decoderResult = message.decoderResult();
 		if (decoderResult.isFailure()) {
-			processFailure(context, message);
+			processFailure(message);
 			return;
 		}
 		MqttFixedHeader fixedHeader = message.fixedHeader();
@@ -105,10 +105,9 @@ public class MqttClientAioHandler implements ClientAioHandler {
 	/**
 	 * 处理失败
 	 *
-	 * @param context     ChannelContext
 	 * @param mqttMessage MqttMessage
 	 */
-	private void processFailure(ChannelContext context, MqttMessage mqttMessage) {
+	private void processFailure(MqttMessage mqttMessage) {
 		// 客户端失败，我认为日志记录异常就行了
 		Throwable cause = mqttMessage.decoderResult().getCause();
 		log.error(cause.getMessage(), cause);

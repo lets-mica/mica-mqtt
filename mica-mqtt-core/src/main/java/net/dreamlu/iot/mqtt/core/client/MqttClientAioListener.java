@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.codec.MqttConnectMessage;
 import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import org.tio.client.DefaultClientAioListener;
@@ -30,11 +29,16 @@ import java.nio.charset.StandardCharsets;
  *
  * @author L.cm
  */
-@RequiredArgsConstructor
 public class MqttClientAioListener extends DefaultClientAioListener {
 	private final String clientId;
 	private final String username;
 	private final String password;
+
+	public MqttClientAioListener(String clientId, String username, String password) {
+		this.clientId = clientId;
+		this.username = username;
+		this.password = password;
+	}
 
 	@Override
 	public void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) {

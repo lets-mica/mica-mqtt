@@ -33,7 +33,7 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 public class MqttServerAioHandler implements ServerAioHandler {
-	private static final Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
+	private static Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
 	private final MqttServerProcessor processor;
@@ -93,11 +93,14 @@ public class MqttServerAioHandler implements ServerAioHandler {
 		MqttFixedHeader fixedHeader = mqttMessage.fixedHeader();
 		MqttMessageType messageType = fixedHeader.messageType();
 		log.debug("MqttMessageType:{}", messageType);
+		// 2. 单独处理 CONNECT 的消息
+		// 3. 其他消息先判断是否连接、认证过
+		// TODO L.cm 还是设计 filter 去处理该问题？？？
+		// TODO L.cm t-io 的 bsid 是否可以用它来绑定 clientId
+
 		switch (messageType) {
 			case CONNECT:
 				processor.processConnect(context, (MqttConnectMessage) mqttMessage);
-				break;
-			case CONNACK:
 				break;
 			case PUBLISH:
 				processor.processPublish(context, (MqttPublishMessage) mqttMessage);
@@ -117,17 +120,11 @@ public class MqttServerAioHandler implements ServerAioHandler {
 			case SUBSCRIBE:
 				processor.processSubscribe(context, (MqttSubscribeMessage) mqttMessage);
 				break;
-			case SUBACK:
-				break;
 			case UNSUBSCRIBE:
 				processor.processUnSubscribe(context, (MqttUnsubscribeMessage) mqttMessage);
 				break;
-			case UNSUBACK:
-				break;
 			case PINGREQ:
 				processor.processPingReq(context);
-				break;
-			case PINGRESP:
 				break;
 			case DISCONNECT:
 				processor.processDisConnect(context);
@@ -161,6 +158,9 @@ public class MqttServerAioHandler implements ServerAioHandler {
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
+		} else if (cause instanceof DecoderException) {
+			log.error(cause.getMessage(), cause);
+			// 消息解码异常，
 		} else {
 			log.error(cause.getMessage(), cause);
 			// 发送断开连接，是否强制关闭客户端连接？？？

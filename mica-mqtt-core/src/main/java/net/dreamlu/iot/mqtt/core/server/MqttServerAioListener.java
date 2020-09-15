@@ -27,7 +27,8 @@ import org.tio.core.DefaultAioListener;
 public class MqttServerAioListener extends DefaultAioListener {
 
 	@Override
-	public boolean onHeartbeatTimeout(ChannelContext channelContext, Long interval, int heartbeatTimeoutCount) {
+	public boolean onHeartbeatTimeout(ChannelContext context, Long interval, int heartbeatTimeoutCount) {
+		// TODO L.cm 微调此处，三次超时时断开，避免长时间占用服务器连接
 		return true;
 	}
 

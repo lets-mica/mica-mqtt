@@ -1,9 +1,9 @@
 package net.dreamlu.iot.mqtt.server;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
@@ -17,9 +17,8 @@ import java.util.stream.Collectors;
  *
  * @author L.cm
  */
-@Slf4j
-@RequiredArgsConstructor
 public class MqttBrokerProcessorImpl implements MqttServerProcessor {
+	private static Logger log = LoggerFactory.getLogger(MqttBrokerProcessorImpl.class);
 	private static final String MQTT_CLIENT_ID_KEY = "mqttClientId";
 
 	@Override
