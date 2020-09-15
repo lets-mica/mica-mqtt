@@ -26,6 +26,7 @@ import org.tio.core.exception.AioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.server.AcceptCompletionHandler;
 import org.tio.server.intf.ServerAioHandler;
+import org.tio.utils.hutool.StrUtil;
 
 import java.nio.ByteBuffer;
 
@@ -90,16 +91,22 @@ public class MqttServerAioHandler implements ServerAioHandler {
 			processFailure(context, mqttMessage);
 			return;
 		}
+		log.debug("MqttMessage:{}", mqttMessage);
 		MqttFixedHeader fixedHeader = mqttMessage.fixedHeader();
 		MqttMessageType messageType = fixedHeader.messageType();
-		log.debug("MqttMessageType:{}", messageType);
 		// 2. 单独处理 CONNECT 的消息
-		// 3. 其他消息先判断是否连接、认证过
-		// TODO L.cm 还是设计 filter 去处理该问题？？？
+		if (MqttMessageType.CONNECT == messageType) {
+			processor.processConnect(context, (MqttConnectMessage) mqttMessage);
+			return;
+		}
+		// 3. 客户端 id 是创建连接之后才有的，如果客户端 id 为空，直接关闭
+		String clientId = context.getBsId();
+		if (StrUtil.isBlank(clientId)) {
+			context.setClosed(true);
+			return;
+		}
+		// 4. 按类型的消息处理
 		switch (messageType) {
-			case CONNECT:
-				processor.processConnect(context, (MqttConnectMessage) mqttMessage);
-				break;
 			case PUBLISH:
 				processor.processPublish(context, (MqttPublishMessage) mqttMessage);
 				break;
@@ -148,6 +155,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
+			context.setClosed(true);
 		} else if (cause instanceof MqttIdentifierRejectedException) {
 			log.error(cause.getMessage());
 			// 不合格的 clientId
@@ -156,13 +164,13 @@ public class MqttServerAioHandler implements ServerAioHandler {
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
+			context.setClosed(true);
 		} else if (cause instanceof DecoderException) {
 			log.error(cause.getMessage(), cause);
-			// 消息解码异常，
+			// 消息解码异常，怎么处理？只打印异常？
 		} else {
 			log.error(cause.getMessage(), cause);
 			// 发送断开连接，是否强制关闭客户端连接？？？
-			Tio.send(context, MqttMessage.DISCONNECT);
 		}
 	}
 
