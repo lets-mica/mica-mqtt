@@ -16,6 +16,9 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import org.tio.client.TioClient;
+import org.tio.core.ChannelContext;
+
 /**
  * mqtt 客户端
  *
@@ -23,10 +26,21 @@ package net.dreamlu.iot.mqtt.core.client;
  */
 public class MqttClient {
 
-	// 1. 服务端信息 ip、端口、timeout，考虑 ssl
-	// 2. 重连配置
-	// 3. 客户端信息 clientId、userName、pwd
-	// 4. 自定义消息处理
-	// 5. sub 的 topic 和 监听的配置，sub 是自定义业务处理器的行为，不应该在这里面配置
+	private MqttClientConfig clientConfig;
+	private MqttClientProcessor processor;
+	private TioClient tioClient;
+	private ChannelContext context;
+
+	public void connect() {
+
+	}
+
+	public void disconnect() {
+
+	}
+
+	public boolean stop() {
+		return false;
+	}
 
 }

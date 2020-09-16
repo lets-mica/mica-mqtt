@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -27,7 +29,7 @@ import java.util.Objects;
  */
 public final class MqttWillMessage {
 	private final String topic;
-	private final String message;
+	private final byte[] message;
 	/**
 	 * 遗嘱消息保留标志
 	 */
@@ -37,7 +39,7 @@ public final class MqttWillMessage {
 	 */
 	private final MqttQoS qos;
 
-	private MqttWillMessage(String topic, String message, boolean retain, MqttQoS qos) {
+	private MqttWillMessage(String topic, byte[] message, boolean retain, MqttQoS qos) {
 		this.topic = topic;
 		this.message = message;
 		this.retain = retain;
@@ -48,7 +50,7 @@ public final class MqttWillMessage {
 		return topic;
 	}
 
-	public String getMessage() {
+	public byte[] getMessage() {
 		return message;
 	}
 
@@ -66,7 +68,7 @@ public final class MqttWillMessage {
 
 	public static final class Builder {
 		private String topic;
-		private String message;
+		private byte[] message;
 		private boolean retain;
 		private MqttQoS qos;
 
@@ -75,8 +77,13 @@ public final class MqttWillMessage {
 			return this;
 		}
 
-		public Builder message(String message) {
+		public Builder message(byte[] message) {
 			this.message = Objects.requireNonNull(message);
+			return this;
+		}
+
+		public Builder messageText(String message) {
+			this.message = Objects.requireNonNull(message).getBytes(StandardCharsets.UTF_8);
 			return this;
 		}
 
@@ -119,7 +126,7 @@ public final class MqttWillMessage {
 	public String toString() {
 		return "MqttWillMessage{" +
 			"topic='" + topic + '\'' +
-			", message='" + message + '\'' +
+			", message='" + Arrays.toString(message) + '\'' +
 			", retain=" + retain +
 			", qos=" + qos +
 			'}';

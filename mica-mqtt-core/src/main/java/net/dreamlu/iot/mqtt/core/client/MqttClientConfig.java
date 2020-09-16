@@ -41,7 +41,7 @@ public class MqttClientConfig {
 	/**
 	 * Keep Alive (s)
 	 */
-	private Integer keepAliveSecs;
+	private int keepAliveSecs = 60;
 	/**
 	 * SSL配置
 	 */
@@ -83,4 +83,107 @@ public class MqttClientConfig {
 	 */
 	private MqttWillMessage willMessage;
 
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public Integer getTimeout() {
+		return timeout;
+	}
+
+	public void setTimeout(Integer timeout) {
+		this.timeout = timeout;
+	}
+
+	public Integer getKeepAliveSecs() {
+		return keepAliveSecs;
+	}
+
+	public void setKeepAliveSecs(Integer keepAliveSecs) {
+		this.keepAliveSecs = keepAliveSecs;
+	}
+
+	public SslConfig getSslConfig() {
+		return sslConfig;
+	}
+
+	public void setSslConfig(SslConfig sslConfig) {
+		this.sslConfig = sslConfig;
+	}
+
+	public boolean isReconnect() {
+		return reconnect;
+	}
+
+	public void setReconnect(boolean reconnect) {
+		this.reconnect = reconnect;
+	}
+
+	public Long getReInterval() {
+		return reInterval;
+	}
+
+	public void setReInterval(Long reInterval) {
+		this.reInterval = reInterval;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
+	}
+
+	public MqttVersion getProtocolVersion() {
+		return protocolVersion;
+	}
+
+	public void setProtocolVersion(MqttVersion protocolVersion) {
+		this.protocolVersion = protocolVersion;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public boolean isCleanSession() {
+		return cleanSession;
+	}
+
+	public void setCleanSession(boolean cleanSession) {
+		this.cleanSession = cleanSession;
+	}
+
+	public MqttWillMessage getWillMessage() {
+		return willMessage;
+	}
+
+	public void setWillMessage(MqttWillMessage willMessage) {
+		this.willMessage = willMessage;
+	}
 }

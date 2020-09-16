@@ -3,6 +3,7 @@ package net.dreamlu.iot.mqtt.client;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.client.MqttClientAioHandler;
 import net.dreamlu.iot.mqtt.core.client.MqttClientAioListener;
+import net.dreamlu.iot.mqtt.core.client.MqttClientConfig;
 import net.dreamlu.iot.mqtt.core.client.MqttClientProcessor;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
@@ -27,7 +28,13 @@ public class MqttClientTest {
 	public static void main(String[] args) throws Exception {
 		MqttClientProcessor processor = new MqttClientProcessorImpl();
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(processor);
-		ClientAioListener clientAioListener = new MqttClientAioListener("MqttClientTest", "admin", "123456".getBytes());
+		// 暂时用 set 后期抽成 builder
+		MqttClientConfig clientConfig = new MqttClientConfig();
+		clientConfig.setClientId("MqttClientTest");
+		clientConfig.setUsername("admin");
+		clientConfig.setPassword("123456");
+		//
+		ClientAioListener clientAioListener = new MqttClientAioListener(clientConfig);
 		ReconnConf reconnConf = new ReconnConf();
 		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
 

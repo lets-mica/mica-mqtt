@@ -16,11 +16,14 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.MqttConnectMessage;
 import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import org.tio.client.DefaultClientAioListener;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
+import org.tio.utils.hutool.StrUtil;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 /**
  * mqtt 客户端监听器
@@ -28,26 +31,38 @@ import org.tio.core.Tio;
  * @author L.cm
  */
 public class MqttClientAioListener extends DefaultClientAioListener {
-	private final String clientId;
-	private final String username;
-	private final byte[] password;
+	private final MqttClientConfig clientConfig;
+	private final MqttWillMessage willMessage;
 
-	public MqttClientAioListener(String clientId, String username, byte[] password) {
-		this.clientId = clientId;
-		this.username = username;
-		this.password = password;
+	public MqttClientAioListener(MqttClientConfig clientConfig) {
+		this.clientConfig = Objects.requireNonNull(clientConfig);
+		this.willMessage = clientConfig.getWillMessage();
 	}
 
 	@Override
 	public void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) {
 		if (isConnected) {
 			// 1. 建立连接后发送 mqtt 连接的消息
-			MqttConnectMessage message = MqttMessageBuilders.connect()
-				.clientId(clientId)
-				.username(username)
-				.password(password)
-				.build();
-			Tio.send(context, message);
+			MqttMessageBuilders.ConnectBuilder builder = MqttMessageBuilders.connect()
+				.clientId(clientConfig.getClientId())
+				.username(clientConfig.getUsername())
+				.keepAlive(clientConfig.getKeepAliveSecs())
+				.cleanSession(clientConfig.isCleanSession())
+				.protocolVersion(clientConfig.getProtocolVersion())
+				.willFlag(willMessage != null);
+			// 密码
+			String password = clientConfig.getPassword();
+			if (StrUtil.isNotBlank(password)) {
+				builder.password(password.getBytes(StandardCharsets.UTF_8));
+			}
+			// 遗嘱消息
+			if (willMessage != null) {
+				builder.willTopic(willMessage.getTopic())
+					.willMessage(willMessage.getMessage())
+					.willRetain(willMessage.isRetain())
+					.willQoS(willMessage.getQos());
+			}
+			Tio.send(context, builder.build());
 		}
 	}
 
