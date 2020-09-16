@@ -140,7 +140,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 	public void processDisConnect(ChannelContext context) {
 		String clientId = context.getBsId();
 		log.debug("DISCONNECT - clientId: {}", clientId);
-		context.setClosed(true);
+		Tio.close(context, "MqttIdentifierRejected");
 	}
 
 }

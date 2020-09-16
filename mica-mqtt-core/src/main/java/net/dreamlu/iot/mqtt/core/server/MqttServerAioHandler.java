@@ -148,23 +148,21 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	private void processFailure(ChannelContext context, MqttMessage mqttMessage) {
 		Throwable cause = mqttMessage.decoderResult().getCause();
 		if (cause instanceof MqttUnacceptableProtocolVersionException) {
-			log.error(cause.getMessage());
 			// 不支持的协议版本
 			MqttConnAckMessage message = MqttMessageBuilders.connAck()
 				.returnCode(MqttConnectReturnCode.CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION)
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
-			context.setClosed(true);
+			Tio.close(context, cause, "MqttUnacceptableProtocolVersion");
 		} else if (cause instanceof MqttIdentifierRejectedException) {
-			log.error(cause.getMessage());
 			// 不合格的 clientId
 			MqttConnAckMessage message = MqttMessageBuilders.connAck()
 				.returnCode(MqttConnectReturnCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED)
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
-			context.setClosed(true);
+			Tio.close(context, cause, "MqttIdentifierRejected");
 		} else if (cause instanceof DecoderException) {
 			log.error(cause.getMessage(), cause);
 			// 消息解码异常，怎么处理？只打印异常？
