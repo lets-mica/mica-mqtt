@@ -16,8 +16,10 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttMessage;
+import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
-import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 
 /**
  * mqtt 客户端
@@ -29,18 +31,51 @@ public class MqttClient {
 	private MqttClientConfig clientConfig;
 	private MqttClientProcessor processor;
 	private TioClient tioClient;
-	private ChannelContext context;
+	private ClientChannelContext clientContext;
+
+	// TODO add subscribe
 
 	public void connect() {
 
 	}
 
-	public void disconnect() {
-
+	/**
+	 * 重连
+	 *
+	 * @throws Exception 异常
+	 */
+	public void reconnect() throws Exception {
+		checkState();
+		tioClient.reconnect(clientContext, clientConfig.getTimeout());
 	}
 
+	/**
+	 * 断开 mqtt 连接
+	 */
+	public void disconnect() {
+		checkState();
+		Tio.send(clientContext, MqttMessage.DISCONNECT);
+	}
+
+	/**
+	 * 停止客户端
+	 *
+	 * @return 是否停止成功
+	 */
 	public boolean stop() {
-		return false;
+		checkState();
+		return tioClient.stop();
+	}
+
+	public ClientChannelContext getClientContext() {
+		checkState();
+		return clientContext;
+	}
+
+	private void checkState() {
+		if (clientContext == null) {
+			throw new IllegalStateException("您需要先 connect。");
+		}
 	}
 
 }
