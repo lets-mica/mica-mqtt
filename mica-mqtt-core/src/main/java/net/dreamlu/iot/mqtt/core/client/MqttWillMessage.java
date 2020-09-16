@@ -28,7 +28,13 @@ import java.util.Objects;
 public final class MqttWillMessage {
 	private final String topic;
 	private final String message;
+	/**
+	 * 遗嘱消息保留标志
+	 */
 	private final boolean retain;
+	/**
+	 * 如果遗嘱标志被设置为 false，遗嘱 QoS 也必须设置为 0。 如果遗嘱标志被设置为 true，遗嘱 QoS 的值可以等于 0，1，2。
+	 */
 	private final MqttQoS qos;
 
 	private MqttWillMessage(String topic, String message, boolean retain, MqttQoS qos) {
@@ -85,7 +91,7 @@ public final class MqttWillMessage {
 		}
 
 		public MqttWillMessage build() {
-			return new MqttWillMessage(topic, message, retain, qos);
+			return new MqttWillMessage(this.topic, this.message, this.retain, this.qos);
 		}
 	}
 

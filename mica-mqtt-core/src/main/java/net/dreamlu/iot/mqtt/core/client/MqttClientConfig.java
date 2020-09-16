@@ -39,6 +39,10 @@ public class MqttClientConfig {
 	 */
 	private Integer timeout;
 	/**
+	 * Keep Alive (s)
+	 */
+	private Integer keepAliveSecs;
+	/**
 	 * SSL配置
 	 */
 	protected SslConfig sslConfig;
@@ -68,6 +72,10 @@ public class MqttClientConfig {
 	private String password = null;
 	/**
 	 * 清除会话
+	 * <p>
+	 * false 表示如果订阅的客户机断线了，那么要保存其要推送的消息，如果其重新连接时，则将这些消息推送。
+	 * true 表示消除，表示客户机是第一次连接，消息所以以前的连接信息。
+	 * </p>
 	 */
 	private boolean cleanSession = true;
 	/**

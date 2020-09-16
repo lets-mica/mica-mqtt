@@ -22,8 +22,6 @@ import org.tio.client.DefaultClientAioListener;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 
-import java.nio.charset.StandardCharsets;
-
 /**
  * mqtt 客户端监听器
  *
