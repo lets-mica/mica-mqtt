@@ -97,6 +97,9 @@ public final class MqttClientCreator {
 	 */
 	private MqttClientProcessor processor;
 
+	MqttClientCreator() {
+	}
+
 	protected String getIp() {
 		return ip;
 	}
