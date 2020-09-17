@@ -154,6 +154,11 @@ public final class MqttClient {
 		return tioClient.stop();
 	}
 
+	/**
+	 * 获取 ClientChannelContext
+	 *
+	 * @return ClientChannelContext
+	 */
 	public ClientChannelContext getContext() {
 		return context;
 	}
