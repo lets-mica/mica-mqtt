@@ -11,10 +11,12 @@
 - 继续抽象，方便使用。
 - 实现 `mqtt-broker` 功能。
 
-## 参考
+## 参考vs借鉴
 - [netty codec-mqtt](https://github.com/netty/netty/tree/4.1/codec-mqtt)
+- [jmqtt](https://github.com/Cicizz/jmqtt)
 - [iot-mqtt-server](https://gitee.com/recallcode/iot-mqtt-server)
 - [moquette](https://github.com/moquette-io/moquette)
+- [netty-mqtt-client](https://github.com/jetlinks/netty-mqtt-client)
 
 ## 工具
 - [mqttx 优雅的跨平台 MQTT 5.0 客户端工具](https://mqttx.app/cn/)

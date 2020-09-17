@@ -54,6 +54,6 @@ public class MqttServerTest {
 		}, 1000, 2000);
 
 		// 启动
-		tioServer.start("127.0.0.1", socketPort);
+		tioServer.start("0.0.0.0", socketPort);
 	}
 }

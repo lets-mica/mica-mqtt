@@ -16,27 +16,116 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.MqttMessage;
+import net.dreamlu.iot.mqtt.codec.*;
+import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.core.Tio;
+
+import java.nio.ByteBuffer;
 
 /**
  * mqtt 客户端
  *
  * @author L.cm
  */
-public class MqttClient {
+public final class MqttClient {
+	private final TioClient tioClient;
+	private final MqttClientCreator config;
+	private final ClientChannelContext context;
 
-	private MqttClientConfig clientConfig;
-	private MqttClientProcessor processor;
-	private TioClient tioClient;
-	private ClientChannelContext clientContext;
+	public static MqttClientCreator create() {
+		return new MqttClientCreator();
+	}
 
-	// TODO add subscribe
+	MqttClient(TioClient tioClient, MqttClientCreator config, ClientChannelContext context) {
+		this.tioClient = tioClient;
+		this.config = config;
+		this.context = context;
+	}
 
-	public void connect() {
+	/**
+	 * 订阅
+	 *
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String topicFilter, MqttMessageListener listener) {
+		return this;
+	}
 
+	/**
+	 * 订阅
+	 *
+	 * @param topicFilter topicFilter
+	 * @param qos         MqttQoS
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String topicFilter, MqttQoS qos, MqttMessageListener listener) {
+		return this;
+	}
+
+	/**
+	 * 取消订阅
+	 *
+	 * @param topicFilter topicFilter
+	 * @return MqttClient
+	 */
+	public MqttClient unSubscribe(String topicFilter) {
+		return this;
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @return 是否发送成功
+	 */
+	public Boolean publish(String topic, ByteBuffer payload) {
+		return publish(topic, payload, MqttQoS.AT_MOST_ONCE);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @return 是否发送成功
+	 */
+	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
+		return publish(topic, payload, qos, false);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public Boolean publish(String topic, ByteBuffer payload, boolean retain) {
+		return publish(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		MqttPublishMessage message = (MqttPublishMessage) MqttMessageFactory.newMessage(
+			new MqttFixedHeader(MqttMessageType.PUBLISH, false, qos, retain, 0),
+			new MqttPublishVariableHeader(topic, 0), payload);
+		return Tio.send(context, message);
 	}
 
 	/**
@@ -44,17 +133,16 @@ public class MqttClient {
 	 *
 	 * @throws Exception 异常
 	 */
-	public void reconnect() throws Exception {
-		checkState();
-		tioClient.reconnect(clientContext, clientConfig.getTimeout());
+	public MqttClient reconnect() throws Exception {
+		tioClient.reconnect(context, config.getTimeout());
+		return this;
 	}
 
 	/**
 	 * 断开 mqtt 连接
 	 */
 	public void disconnect() {
-		checkState();
-		Tio.send(clientContext, MqttMessage.DISCONNECT);
+		Tio.send(context, MqttMessage.DISCONNECT);
 	}
 
 	/**
@@ -63,19 +151,11 @@ public class MqttClient {
 	 * @return 是否停止成功
 	 */
 	public boolean stop() {
-		checkState();
 		return tioClient.stop();
 	}
 
-	public ClientChannelContext getClientContext() {
-		checkState();
-		return clientContext;
-	}
-
-	private void checkState() {
-		if (clientContext == null) {
-			throw new IllegalStateException("您需要先 connect。");
-		}
+	public ClientChannelContext getContext() {
+		return context;
 	}
 
 }

@@ -31,10 +31,10 @@ import java.util.Objects;
  * @author L.cm
  */
 public class MqttClientAioListener extends DefaultClientAioListener {
-	private final MqttClientConfig clientConfig;
+	private final MqttClientCreator clientConfig;
 	private final MqttWillMessage willMessage;
 
-	public MqttClientAioListener(MqttClientConfig clientConfig) {
+	public MqttClientAioListener(MqttClientCreator clientConfig) {
 		this.clientConfig = Objects.requireNonNull(clientConfig);
 		this.willMessage = clientConfig.getWillMessage();
 	}

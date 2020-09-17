@@ -1,18 +1,6 @@
 package net.dreamlu.iot.mqtt.client;
 
-import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.core.client.MqttClientAioHandler;
-import net.dreamlu.iot.mqtt.core.client.MqttClientAioListener;
-import net.dreamlu.iot.mqtt.core.client.MqttClientConfig;
-import net.dreamlu.iot.mqtt.core.client.MqttClientProcessor;
-import org.tio.client.ClientChannelContext;
-import org.tio.client.ClientTioConfig;
-import org.tio.client.ReconnConf;
-import org.tio.client.TioClient;
-import org.tio.client.intf.ClientAioHandler;
-import org.tio.client.intf.ClientAioListener;
-import org.tio.core.Node;
-import org.tio.core.Tio;
+import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
 import java.nio.ByteBuffer;
 import java.util.Timer;
@@ -26,31 +14,19 @@ import java.util.TimerTask;
 public class MqttClientTest {
 
 	public static void main(String[] args) throws Exception {
-		MqttClientProcessor processor = new MqttClientProcessorImpl();
-		ClientAioHandler clientAioHandler = new MqttClientAioHandler(processor);
-		// 暂时用 set 后期抽成 builder
-		MqttClientConfig clientConfig = new MqttClientConfig();
-		clientConfig.setClientId("MqttClientTest");
-		clientConfig.setUsername("admin");
-		clientConfig.setPassword("123456");
-		//
-		ClientAioListener clientAioListener = new MqttClientAioListener(clientConfig);
-		ReconnConf reconnConf = new ReconnConf();
-		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
-
-		TioClient tioClient = new TioClient(tioConfig);
-		ClientChannelContext context = tioClient.connect(new Node("127.0.0.1", 1883), 1000);
+		// 初始化 mqtt 客户端
+		MqttClient client = MqttClient.create()
+			.clientId("MqttClientTest")
+			.username("admin")
+			.password("123456")
+			.processor(new MqttClientProcessorImpl())
+			.connect();
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				if (!context.isClosed) {
-					MqttPublishMessage message = (MqttPublishMessage) MqttMessageFactory.newMessage(
-						new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.AT_MOST_ONCE, false, 0),
-						new MqttPublishVariableHeader("testtopicxx", 0), ByteBuffer.wrap("mica最牛皮".getBytes()));
-					Tio.send(context, message);
-				}
+				client.publish("testtopicxx", ByteBuffer.wrap("mica最牛皮".getBytes()));
 			}
 		}, 1000, 2000);
 
