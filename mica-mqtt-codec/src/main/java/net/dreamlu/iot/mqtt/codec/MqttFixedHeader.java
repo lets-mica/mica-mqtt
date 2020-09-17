@@ -24,6 +24,9 @@ import java.util.Objects;
  */
 public final class MqttFixedHeader {
 	private final MqttMessageType messageType;
+	/**
+	 * 重发标识，对于QoS 0的消息，DUP标志必须设置为0
+	 */
 	private final boolean isDup;
 	private final MqttQoS qosLevel;
 	private final boolean isRetain;

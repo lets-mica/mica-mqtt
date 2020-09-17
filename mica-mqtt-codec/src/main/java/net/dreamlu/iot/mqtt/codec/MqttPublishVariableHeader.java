@@ -21,6 +21,9 @@ package net.dreamlu.iot.mqtt.codec;
  */
 public final class MqttPublishVariableHeader {
 	private final String topicName;
+	/**
+	 * 报文标识符，只有当 QoS 等级是 1 或 2 时，才能出现在 PUBLISH 报文中
+	 */
 	private final int packetId;
 
 	public MqttPublishVariableHeader(String topicName, int packetId) {
