@@ -238,7 +238,7 @@ public final class MqttClientCreator {
 		String clientId = getClientId();
 		if (StrUtil.isBlank(clientId)) {
 			// 默认为：MICA-MQTT- 前缀和 36进制的毫秒数
-			this.clientId("MICA-MQTT-" + Long.toString(System.currentTimeMillis(), 62));
+			this.clientId("MICA-MQTT-" + Long.toString(System.currentTimeMillis(), 36));
 		}
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(Objects.requireNonNull(this.processor));
