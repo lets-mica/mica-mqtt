@@ -16,34 +16,22 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.MqttMessageIdVariableHeader;
+import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * mqtt 客户端的消息 id
+ * 客户端订阅管理
  *
  * @author L.cm
  */
-public enum MqttClientMessageId {
+public class MqttClientSubManage {
 	/**
-	 * 实例
+	 * 订阅的数据承载
 	 */
-	INSTANCE(new AtomicInteger(1));
-
-	private final AtomicInteger value;
-
-	MqttClientMessageId(AtomicInteger value) {
-		this.value = value;
-	}
-
-	public MqttMessageIdVariableHeader getMessageId() {
-		this.value.compareAndSet(0xffff, 1);
-		return MqttMessageIdVariableHeader.from(this.value.getAndIncrement());
-	}
-
-	public static MqttMessageIdVariableHeader getId() {
-		return INSTANCE.getMessageId();
-	}
+	private final Map<String, MqttMessageListener> subscribing = new LinkedHashMap<>();
+	private final Map<Integer, String> messageIdTopics = new LinkedHashMap<>();
+	private final Map<String, String> subscribed = new LinkedHashMap<>();
 
 }

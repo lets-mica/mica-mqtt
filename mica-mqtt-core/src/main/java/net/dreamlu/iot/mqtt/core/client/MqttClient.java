@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.core.Tio;
@@ -42,29 +41,6 @@ public final class MqttClient {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.context = context;
-	}
-
-	/**
-	 * 订阅
-	 *
-	 * @param topicFilter topicFilter
-	 * @param listener    MqttMessageListener
-	 * @return MqttClient
-	 */
-	public MqttClient subscribe(String topicFilter, MqttMessageListener listener) {
-		return this;
-	}
-
-	/**
-	 * 订阅
-	 *
-	 * @param topicFilter topicFilter
-	 * @param qos         MqttQoS
-	 * @param listener    MqttMessageListener
-	 * @return MqttClient
-	 */
-	public MqttClient subscribe(String topicFilter, MqttQoS qos, MqttMessageListener listener) {
-		return this;
 	}
 
 	/**

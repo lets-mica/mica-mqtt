@@ -18,7 +18,6 @@ public class MqttClientTest {
 		MqttClient client = MqttClient.create()
 			.username("admin")
 			.password("123456")
-			.processor(new MqttClientProcessorImpl())
 			.connect();
 
 		Timer timer = new Timer();
