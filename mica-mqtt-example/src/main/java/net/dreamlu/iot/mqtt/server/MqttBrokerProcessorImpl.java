@@ -46,7 +46,7 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 		context.setBsId(clientId);
 		// 4. 返回 ack
 		MqttMessage message = MqttMessageBuilders.connAck()
-			.returnCode(MqttConnectReturnCode.CONNECTION_ACCEPTED)
+			.returnCode(MqttConnectReturnCode.CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION)
 			.sessionPresent(false)
 			.build();
 		Tio.send(context, message);

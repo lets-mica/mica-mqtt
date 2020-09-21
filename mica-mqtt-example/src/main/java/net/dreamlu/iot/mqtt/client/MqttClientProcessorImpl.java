@@ -3,6 +3,7 @@ package net.dreamlu.iot.mqtt.client;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.client.MqttClientProcessor;
 import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
 
@@ -15,7 +16,21 @@ public class MqttClientProcessorImpl implements MqttClientProcessor {
 
 	@Override
 	public void processConAck(ChannelContext context, MqttConnAckMessage message) {
-		System.out.println(message);
+		MqttConnectReturnCode returnCode = message.variableHeader().connectReturnCode();
+		switch (message.variableHeader().connectReturnCode()) {
+			case CONNECTION_ACCEPTED:
+				System.out.println("MQTT 连接成功！");
+				break;
+			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:
+			case CONNECTION_REFUSED_IDENTIFIER_REJECTED:
+			case CONNECTION_REFUSED_NOT_AUTHORIZED:
+			case CONNECTION_REFUSED_SERVER_UNAVAILABLE:
+			case CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION:
+			default:
+				Tio.close(context, "MqttClient connect error.");
+				context.setClosed(true);
+				throw new IllegalStateException("MqttClient connect error ReturnCode:" + returnCode);
+		}
 	}
 
 	@Override
