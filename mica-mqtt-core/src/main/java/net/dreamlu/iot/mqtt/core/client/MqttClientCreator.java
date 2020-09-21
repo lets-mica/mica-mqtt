@@ -228,6 +228,8 @@ public final class MqttClientCreator {
 		return willMessage(builder.build());
 	}
 
+	// TODO L.cm subscribe 订阅移动到此处，内置 MqttClientProcessor，完成订阅的逻辑
+
 	public MqttClientCreator processor(MqttClientProcessor processor) {
 		this.processor = Objects.requireNonNull(processor);
 		return this;
