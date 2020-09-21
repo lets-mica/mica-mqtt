@@ -141,8 +141,12 @@ public final class MqttClient {
 	/**
 	 * 断开 mqtt 连接
 	 */
-	public void disconnect() {
-		Tio.send(context, MqttMessage.DISCONNECT);
+	public boolean disconnect() {
+		boolean result = Tio.send(context, MqttMessage.DISCONNECT);
+		if (result) {
+			Tio.close(context, "MqttClient disconnect.");
+		}
+		return result;
 	}
 
 	/**
@@ -151,6 +155,8 @@ public final class MqttClient {
 	 * @return 是否停止成功
 	 */
 	public boolean stop() {
+		// 先断开连接
+		this.disconnect();
 		return tioClient.stop();
 	}
 

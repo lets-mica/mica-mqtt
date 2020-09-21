@@ -16,7 +16,6 @@ public class MqttClientTest {
 	public static void main(String[] args) throws Exception {
 		// 初始化 mqtt 客户端
 		MqttClient client = MqttClient.create()
-			.clientId("MqttClientTest")
 			.username("admin")
 			.password("123456")
 			.processor(new MqttClientProcessorImpl())

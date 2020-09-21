@@ -25,6 +25,7 @@ import org.tio.client.intf.ClientAioHandler;
 import org.tio.client.intf.ClientAioListener;
 import org.tio.core.Node;
 import org.tio.core.ssl.SslConfig;
+import org.tio.utils.hutool.StrUtil;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -233,10 +234,16 @@ public final class MqttClientCreator {
 	}
 
 	public MqttClient connect() throws Exception {
-		// 1. 初始化 mqtt 处理器
+		// 1. 生成 默认的 clientId
+		String clientId = getClientId();
+		if (StrUtil.isBlank(clientId)) {
+			// 默认为：MICA-MQTT- 前缀和 36进制的毫秒数
+			this.clientId("MICA-MQTT-" + Long.toString(System.currentTimeMillis(), 62));
+		}
+		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(Objects.requireNonNull(this.processor));
 		ClientAioListener clientAioListener = new MqttClientAioListener(this);
-		// 2. 重连
+		// 3. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
 			if (reInterval != null && reInterval > 0) {
@@ -245,7 +252,7 @@ public final class MqttClientCreator {
 				reconnConf = new ReconnConf();
 			}
 		}
-		// tioClient
+		// 4. tioClient
 		TioClient tioClient = new TioClient(new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf));
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
 		return new MqttClient(tioClient, this, context);
