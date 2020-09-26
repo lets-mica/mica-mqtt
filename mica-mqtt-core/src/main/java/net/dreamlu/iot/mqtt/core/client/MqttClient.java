@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
+import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.core.Tio;
@@ -32,15 +33,56 @@ public final class MqttClient {
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
 	private final ClientChannelContext context;
+	private final MqttClientSubManage subManage;
 
 	public static MqttClientCreator create() {
 		return new MqttClientCreator();
 	}
 
-	MqttClient(TioClient tioClient, MqttClientCreator config, ClientChannelContext context) {
+	MqttClient(TioClient tioClient,
+			   MqttClientCreator config,
+			   ClientChannelContext context,
+			   MqttClientSubManage subManage) {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.context = context;
+		this.subManage = subManage;
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subQos0(String topicFilter, MqttMessageListener listener) {
+		// TODO L.cm 对 topicFilter 校验
+		return this;
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subQos1(String topicFilter, MqttMessageListener listener) {
+		// TODO L.cm 对 topicFilter 校验
+		return this;
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subQos2(String topicFilter, MqttMessageListener listener) {
+		// TODO L.cm 对 topicFilter 校验
+		return this;
 	}
 
 	/**

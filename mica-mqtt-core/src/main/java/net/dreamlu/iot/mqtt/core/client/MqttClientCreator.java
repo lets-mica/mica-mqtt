@@ -16,10 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
-import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
-import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
@@ -30,8 +27,6 @@ import org.tio.core.Node;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -98,11 +93,6 @@ public final class MqttClientCreator {
 	 * 遗嘱消息
 	 */
 	private MqttWillMessage willMessage;
-	private MqttClientSubManage subManage;
-
-	MqttClientCreator() {
-		this.subManage = new MqttClientSubManage();
-	}
 
 	protected String getIp() {
 		return ip;
@@ -227,31 +217,6 @@ public final class MqttClientCreator {
 		return willMessage(builder.build());
 	}
 
-	/**
-	 * 订阅
-	 *
-	 * @param topicFilter topicFilter
-	 * @param listener    MqttMessageListener
-	 * @return MqttClient
-	 */
-	public MqttClientCreator subscribe(String topicFilter, MqttMessageListener listener) {
-		// TODO L.cm 对 topicFilter 校验
-		return this;
-	}
-
-	/**
-	 * 订阅
-	 *
-	 * @param topicFilter topicFilter
-	 * @param qos         MqttQoS
-	 * @param listener    MqttMessageListener
-	 * @return MqttClient
-	 */
-	public MqttClientCreator subscribe(String topicFilter, MqttQoS qos, MqttMessageListener listener) {
-		// TODO L.cm 对 topicFilter 校验
-		return this;
-	}
-
 	public MqttClient connect() throws Exception {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
@@ -259,6 +224,7 @@ public final class MqttClientCreator {
 			// 默认为：MICA-MQTT- 前缀和 36进制的毫秒数
 			this.clientId("MICA-MQTT-" + Long.toString(System.currentTimeMillis(), 36));
 		}
+		MqttClientSubManage subManage = new MqttClientSubManage();
 		// 客户端处理器
 		MqttClientProcessor processor = new DefaultMqttClientProcessor(subManage);
 		// 2. 初始化 mqtt 处理器
@@ -276,7 +242,7 @@ public final class MqttClientCreator {
 		// 4. tioClient
 		TioClient tioClient = new TioClient(new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf));
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
-		return new MqttClient(tioClient, this, context);
+		return new MqttClient(tioClient, this, context, subManage);
 	}
 
 }

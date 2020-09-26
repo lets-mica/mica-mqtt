@@ -17,6 +17,8 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 
@@ -28,6 +30,7 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 public class DefaultMqttClientProcessor implements MqttClientProcessor {
+	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
 	private final MqttClientSubManage subManage;
 
 	public DefaultMqttClientProcessor(MqttClientSubManage subManage) {
@@ -39,7 +42,7 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 		MqttConnectReturnCode returnCode = message.variableHeader().connectReturnCode();
 		switch (message.variableHeader().connectReturnCode()) {
 			case CONNECTION_ACCEPTED:
-				System.out.println("MQTT 连接成功！");
+				logger.info("MQTT 连接成功！");
 				break;
 			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:
 			case CONNECTION_REFUSED_IDENTIFIER_REJECTED:
