@@ -11,6 +11,11 @@
 - 继续抽象，方便使用。
 - 实现 `mqtt-broker` 功能。
 
+## 说明
+由于精力有限，今年都没太多时间来折腾该项目。
+
+另外可以参考 zbus 来处理消息或者实现内部的集群。
+
 ## 参考vs借鉴
 - [netty codec-mqtt](https://github.com/netty/netty/tree/4.1/codec-mqtt)
 - [jmqtt](https://github.com/Cicizz/jmqtt)

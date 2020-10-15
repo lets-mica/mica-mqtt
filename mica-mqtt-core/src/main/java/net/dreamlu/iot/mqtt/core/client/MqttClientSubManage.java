@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
+import net.dreamlu.iot.mqtt.core.util.MultiValueMap;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class MqttClientSubManage {
 	/**
 	 * 订阅的数据承载
 	 */
-	private final Map<String, MqttMessageListener> subscribing = new LinkedHashMap<>();
+	private final MultiValueMap<String, MqttMessageListener> subscribing = new MultiValueMap<>();
 	private final Map<Integer, String> messageIdTopics = new LinkedHashMap<>();
 	private final Map<String, String> subscribed = new LinkedHashMap<>();
 
