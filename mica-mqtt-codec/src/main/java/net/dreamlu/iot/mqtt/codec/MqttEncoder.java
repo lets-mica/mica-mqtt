@@ -17,11 +17,9 @@
 package net.dreamlu.iot.mqtt.codec;
 
 import org.tio.core.ChannelContext;
-import org.tio.utils.hutool.FastByteBuffer;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -557,7 +555,6 @@ public final class MqttEncoder {
 		writeBuffer.writeVarLengthInt(propertiesBytes.length);
 		writeBuffer.writeBytes(propertiesBytes);
 		return writeBuffer.toArray();
-//		return writeBuffer.toArray();
 	}
 
 	private static int getFixedHeaderByte1(MqttFixedHeader header) {
@@ -584,11 +581,6 @@ public final class MqttEncoder {
 		} while (num > 0);
 	}
 
-	private static void writeEagerUTF8String(WriteBuffer buf, String s) {
-		final int utf8Length = buf.writeUtf8(s);
-		buf.writeShort((short) utf8Length);
-	}
-
 	private static int getVariableLengthInt(int num) {
 		int count = 0;
 		do {
@@ -596,6 +588,16 @@ public final class MqttEncoder {
 			count++;
 		} while (num > 0);
 		return count;
+	}
+
+	private static void writeEagerUTF8String(WriteBuffer buf, String s) {
+		if (s == null) {
+			buf.writeShort((short) 0);
+		} else {
+			byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+			buf.writeShort((short) bytes.length);
+			buf.writeBytes(bytes);
+		}
 	}
 
 	private static byte[] encodeStringUtf8(String s) {

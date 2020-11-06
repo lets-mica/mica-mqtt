@@ -45,16 +45,15 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 		// 3. 设置 clientId
 		context.setBsId(clientId);
 		// 4. 返回 ack
-//		MqttProperties mqttProperties = new MqttProperties();
-//
-//		MqttProperties.UserProperties userProperty = new MqttProperties.UserProperties();
-//		userProperty.add("xxxxxxxxxx", "xxxx");
-//		mqttProperties.add(userProperty);
+		MqttProperties mqttProperties = new MqttProperties();
+		MqttProperties.UserProperties userProperty = new MqttProperties.UserProperties();
+		userProperty.add("xxxxxxxxxx", "xxxx");
+		mqttProperties.add(userProperty);
 
 		MqttMessage message = MqttMessageBuilders.connAck()
 			.returnCode(MqttConnectReturnCode.CONNECTION_ACCEPTED)
 			.sessionPresent(false)
-//			.properties(mqttProperties)
+			.properties(mqttProperties)
 			.build();
 		Tio.send(context, message);
 	}
