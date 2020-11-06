@@ -5,7 +5,7 @@
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -18,9 +18,9 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * Variable Header containing only Message Id
- * See <a href="http://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#msg-id">MQTTV3.1/msg-id</a>
+ * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#msg-id">MQTTV3.1/msg-id</a>
  */
-public final class MqttMessageIdVariableHeader {
+public class MqttMessageIdVariableHeader {
 	private final int messageId;
 
 	public static MqttMessageIdVariableHeader from(int messageId) {
@@ -30,7 +30,7 @@ public final class MqttMessageIdVariableHeader {
 		return new MqttMessageIdVariableHeader(messageId);
 	}
 
-	private MqttMessageIdVariableHeader(int messageId) {
+	protected MqttMessageIdVariableHeader(int messageId) {
 		this.messageId = messageId;
 	}
 
@@ -40,9 +40,16 @@ public final class MqttMessageIdVariableHeader {
 
 	@Override
 	public String toString() {
-		return "MqttMessageIdVariableHeader{" +
+		return "MqttMessageIdVariableHeader[" +
 			"messageId=" + messageId +
-			'}';
+			']';
 	}
 
+	public MqttMessageIdAndPropertiesVariableHeader withEmptyProperties() {
+		return new MqttMessageIdAndPropertiesVariableHeader(messageId, MqttProperties.NO_PROPERTIES);
+	}
+
+	MqttMessageIdAndPropertiesVariableHeader withDefaultEmptyProperties() {
+		return withEmptyProperties();
+	}
 }

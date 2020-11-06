@@ -5,7 +5,7 @@
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -28,7 +28,7 @@ public class MqttMessage extends Packet {
 	private final DecoderResult decoderResult;
 
 	// Constants for fixed-header only message types with all flags set to 0 (see
-	// http://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_2.2_-)
+	// https://docs.oasis-open.org/mqtt/mqtt/v3.1.1/os/mqtt-v3.1.1-os.html#_Table_2.2_-)
 	public static final MqttMessage PINGREQ = new MqttMessage(new MqttFixedHeader(MqttMessageType.PINGREQ, false,
 		MqttQoS.AT_MOST_ONCE, false, 0));
 
@@ -50,10 +50,11 @@ public class MqttMessage extends Packet {
 		this(mqttFixedHeader, variableHeader, payload, DecoderResult.SUCCESS);
 	}
 
-	public MqttMessage(MqttFixedHeader mqttFixedHeader,
-					   Object variableHeader,
-					   Object payload,
-					   DecoderResult decoderResult) {
+	public MqttMessage(
+		MqttFixedHeader mqttFixedHeader,
+		Object variableHeader,
+		Object payload,
+		DecoderResult decoderResult) {
 		this.mqttFixedHeader = mqttFixedHeader;
 		this.variableHeader = variableHeader;
 		this.payload = payload;
@@ -78,11 +79,10 @@ public class MqttMessage extends Packet {
 
 	@Override
 	public String toString() {
-		return "MqttMessage{" +
-			"fixedHeader=" + mqttFixedHeader +
-			", variableHeader=" + variableHeader +
-			", payload=" + payload +
-			'}';
+		return "MqttMessage[" +
+			"fixedHeader=" + (fixedHeader() != null ? fixedHeader().toString() : "") +
+			", variableHeader=" + (variableHeader() != null ? variableHeader.toString() : "") +
+			", payload=" + (payload() != null ? payload.toString() : "") +
+			']';
 	}
-
 }

@@ -52,16 +52,16 @@ public class MqttClientAioHandler implements ClientAioHandler {
 
 	@Override
 	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws AioDecodeException {
-		return mqttDecoder.decode(buffer);
+		return mqttDecoder.decode(channelContext, buffer);
 	}
 
 	@Override
 	public ByteBuffer encode(Packet packet, TioConfig tioConfig, ChannelContext channelContext) {
-		return mqttEncoder.doEncode((MqttMessage) packet);
+		return mqttEncoder.doEncode(channelContext, (MqttMessage) packet);
 	}
 
 	@Override
-	public void handler(Packet packet, ChannelContext context) throws Exception {
+	public void handler(Packet packet, ChannelContext context) {
 		MqttMessage message = (MqttMessage) packet;
 		// 1. 先判断 mqtt 消息解析是否正常
 		DecoderResult decoderResult = message.decoderResult();

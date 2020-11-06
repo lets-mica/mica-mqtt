@@ -5,7 +5,7 @@
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -21,12 +21,18 @@ package net.dreamlu.iot.mqtt.codec;
  * This is part of the {@link MqttSubscribePayload}
  */
 public final class MqttTopicSubscription {
+
 	private final String topicFilter;
-	private final MqttQoS qualityOfService;
+	private final MqttSubscriptionOption option;
 
 	public MqttTopicSubscription(String topicFilter, MqttQoS qualityOfService) {
 		this.topicFilter = topicFilter;
-		this.qualityOfService = qualityOfService;
+		this.option = MqttSubscriptionOption.onlyFromQos(qualityOfService);
+	}
+
+	public MqttTopicSubscription(String topicFilter, MqttSubscriptionOption option) {
+		this.topicFilter = topicFilter;
+		this.option = option;
 	}
 
 	public String topicName() {
@@ -34,15 +40,19 @@ public final class MqttTopicSubscription {
 	}
 
 	public MqttQoS qualityOfService() {
-		return qualityOfService;
+		return option.qos();
+	}
+
+	public MqttSubscriptionOption option() {
+		return option;
 	}
 
 	@Override
 	public String toString() {
-		return "MqttTopicSubscription{" +
-			"topicFilter='" + topicFilter + '\'' +
-			", qualityOfService=" + qualityOfService +
-			'}';
+		return new StringBuilder("MqttTopicSubscription[")
+			.append("topicFilter=").append(topicFilter)
+			.append(", option=").append(this.option)
+			.append(']')
+			.toString();
 	}
-
 }

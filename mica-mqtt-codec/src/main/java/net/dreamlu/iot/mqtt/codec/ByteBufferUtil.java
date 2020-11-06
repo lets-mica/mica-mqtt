@@ -29,7 +29,7 @@ public class ByteBufferUtil {
 	/**
 	 * 空 byte 数组
 	 */
-	public static final byte[] EMPTY = new byte[0];
+	public static final byte[] EMPTY_BYTES = new byte[0];
 
 	/**
 	 * read byte

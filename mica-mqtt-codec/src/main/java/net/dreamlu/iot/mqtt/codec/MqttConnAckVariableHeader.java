@@ -5,7 +5,7 @@
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -20,14 +20,21 @@ package net.dreamlu.iot.mqtt.codec;
  * Variable header of {@link MqttConnectMessage}
  */
 public final class MqttConnAckVariableHeader {
-
 	private final MqttConnectReturnCode connectReturnCode;
+
 	private final boolean sessionPresent;
 
-	public MqttConnAckVariableHeader(MqttConnectReturnCode connectReturnCode,
-									 boolean sessionPresent) {
+	private final MqttProperties properties;
+
+	public MqttConnAckVariableHeader(MqttConnectReturnCode connectReturnCode, boolean sessionPresent) {
+		this(connectReturnCode, sessionPresent, MqttProperties.NO_PROPERTIES);
+	}
+
+	public MqttConnAckVariableHeader(MqttConnectReturnCode connectReturnCode, boolean sessionPresent,
+									 MqttProperties properties) {
 		this.connectReturnCode = connectReturnCode;
 		this.sessionPresent = sessionPresent;
+		this.properties = MqttProperties.withEmptyDefaults(properties);
 	}
 
 	public MqttConnectReturnCode connectReturnCode() {
@@ -38,12 +45,15 @@ public final class MqttConnAckVariableHeader {
 		return sessionPresent;
 	}
 
-	@Override
-	public String toString() {
-		return "MqttConnAckVariableHeader{" +
-			"connectReturnCode=" + connectReturnCode +
-			", sessionPresent=" + sessionPresent +
-			'}';
+	public MqttProperties properties() {
+		return properties;
 	}
 
+	@Override
+	public String toString() {
+		return "MqttConnAckVariableHeader[" +
+			"connectReturnCode=" + connectReturnCode +
+			", sessionPresent=" + sessionPresent +
+			']';
+	}
 }

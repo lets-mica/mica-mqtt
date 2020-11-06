@@ -53,26 +53,26 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	 * @param limit          ByteBuffer的limit
 	 * @param position       ByteBuffer的position，不一定是0哦
 	 * @param readableLength ByteBuffer参与本次解码的有效数据（= limit - position）
-	 * @param channelContext ChannelContext
+	 * @param context        ChannelContext
 	 * @return Packet
 	 * @throws AioDecodeException AioDecodeException
 	 */
 	@Override
-	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws AioDecodeException {
-		return mqttDecoder.decode(buffer);
+	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws AioDecodeException {
+		return mqttDecoder.decode(context, buffer);
 	}
 
 	/**
 	 * 编码
 	 *
-	 * @param packet         Packet
-	 * @param tioConfig      TioConfig
-	 * @param channelContext ChannelContext
+	 * @param packet    Packet
+	 * @param tioConfig TioConfig
+	 * @param context   ChannelContext
 	 * @return ByteBuffer
 	 */
 	@Override
-	public ByteBuffer encode(Packet packet, TioConfig tioConfig, ChannelContext channelContext) {
-		return mqttEncoder.doEncode((MqttMessage) packet);
+	public ByteBuffer encode(Packet packet, TioConfig tioConfig, ChannelContext context) {
+		return mqttEncoder.doEncode(context, (MqttMessage) packet);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The Netty Project
+ * Copyright 2012 The Netty Project
  *
  * The Netty Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -17,36 +17,36 @@
 package net.dreamlu.iot.mqtt.codec;
 
 /**
- * A {@link MqttUnacceptableProtocolVersionException} which is thrown when
- * a CONNECT request contains unacceptable protocol version.
+ * An {@link RuntimeException} which is thrown by an encoder.
  */
-public final class MqttUnacceptableProtocolVersionException extends DecoderException {
-    private static final long serialVersionUID = 4914652213232455749L;
+public class EncoderException extends RuntimeException {
+
+    private static final long serialVersionUID = -5086121160476476774L;
 
     /**
-     * Creates a new instance
+     * Creates a new instance.
      */
-    public MqttUnacceptableProtocolVersionException() { }
+    public EncoderException() {
+    }
 
     /**
-     * Creates a new instance
+     * Creates a new instance.
      */
-    public MqttUnacceptableProtocolVersionException(String message, Throwable cause) {
+    public EncoderException(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Creates a new instance
+     * Creates a new instance.
      */
-    public MqttUnacceptableProtocolVersionException(String message) {
+    public EncoderException(String message) {
         super(message);
     }
 
     /**
-     * Creates a new instance
+     * Creates a new instance.
      */
-    public MqttUnacceptableProtocolVersionException(Throwable cause) {
+    public EncoderException(Throwable cause) {
         super(cause);
     }
-
 }

@@ -5,7 +5,7 @@
  * version 2.0 (the "License"); you may not use this file except in compliance
  * with the License. You may obtain a copy of the License at:
  *
- *   http://www.apache.org/licenses/LICENSE-2.0
+ *   https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -24,17 +24,35 @@ import java.util.Arrays;
  */
 public final class MqttConnectPayload {
 	private final String clientIdentifier;
+	private final MqttProperties willProperties;
 	private final String willTopic;
 	private final byte[] willMessage;
 	private final String userName;
 	private final byte[] password;
 
-	public MqttConnectPayload(String clientIdentifier,
-							  String willTopic,
-							  byte[] willMessage,
-							  String userName,
-							  byte[] password) {
+	public MqttConnectPayload(
+		String clientIdentifier,
+		String willTopic,
+		byte[] willMessage,
+		String userName,
+		byte[] password) {
+		this(clientIdentifier,
+			MqttProperties.NO_PROPERTIES,
+			willTopic,
+			willMessage,
+			userName,
+			password);
+	}
+
+	public MqttConnectPayload(
+		String clientIdentifier,
+		MqttProperties willProperties,
+		String willTopic,
+		byte[] willMessage,
+		String userName,
+		byte[] password) {
 		this.clientIdentifier = clientIdentifier;
+		this.willProperties = MqttProperties.withEmptyDefaults(willProperties);
 		this.willTopic = willTopic;
 		this.willMessage = willMessage;
 		this.userName = userName;
@@ -43,6 +61,10 @@ public final class MqttConnectPayload {
 
 	public String clientIdentifier() {
 		return clientIdentifier;
+	}
+
+	public MqttProperties willProperties() {
+		return willProperties;
 	}
 
 	public String willTopic() {
@@ -67,13 +89,12 @@ public final class MqttConnectPayload {
 
 	@Override
 	public String toString() {
-		return "MqttConnectPayload{" +
-			"clientIdentifier='" + clientIdentifier + '\'' +
-			", willTopic='" + willTopic + '\'' +
+		return "MqttConnectPayload[" +
+			"clientIdentifier=" + clientIdentifier +
+			", willTopic=" + willTopic +
 			", willMessage=" + Arrays.toString(willMessage) +
-			", userName='" + userName + '\'' +
-			", password=" + password() +
-			'}';
+			", userName=" + userName +
+			", password=" + Arrays.toString(password) +
+			']';
 	}
-
 }

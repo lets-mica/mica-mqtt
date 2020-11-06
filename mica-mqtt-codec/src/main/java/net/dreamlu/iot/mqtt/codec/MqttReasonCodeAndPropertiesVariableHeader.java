@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 The Netty Project
+ * Copyright 2020 The Netty Project
  *
  * The Netty Project licenses this file to you under the Apache License,
  * version 2.0 (the "License"); you may not use this file except in compliance
@@ -17,37 +17,22 @@
 package net.dreamlu.iot.mqtt.codec;
 
 /**
- * Variable Header of the {@link MqttPublishMessage}
+ * Variable Header for AUTH and DISCONNECT messages represented by {@link MqttMessage}
  */
-public final class MqttPublishVariableHeader {
-	private final String topicName;
-	private final int packetId;
+public final class MqttReasonCodeAndPropertiesVariableHeader {
+	private final byte reasonCode;
 	private final MqttProperties properties;
 
-	public MqttPublishVariableHeader(String topicName, int packetId) {
-		this(topicName, packetId, MqttProperties.NO_PROPERTIES);
-	}
+	public static final byte REASON_CODE_OK = 0;
 
-	public MqttPublishVariableHeader(String topicName, int packetId, MqttProperties properties) {
-		this.topicName = topicName;
-		this.packetId = packetId;
+	public MqttReasonCodeAndPropertiesVariableHeader(byte reasonCode,
+													 MqttProperties properties) {
+		this.reasonCode = reasonCode;
 		this.properties = MqttProperties.withEmptyDefaults(properties);
 	}
 
-	public String topicName() {
-		return topicName;
-	}
-
-	/**
-	 * @deprecated Use {@link #packetId()} instead.
-	 */
-	@Deprecated
-	public int messageId() {
-		return packetId;
-	}
-
-	public int packetId() {
-		return packetId;
+	public byte reasonCode() {
+		return reasonCode;
 	}
 
 	public MqttProperties properties() {
@@ -56,9 +41,9 @@ public final class MqttPublishVariableHeader {
 
 	@Override
 	public String toString() {
-		return "MqttPublishVariableHeader[" +
-			"topicName=" + topicName +
-			", packetId=" + packetId +
+		return "MqttReasonCodeAndPropertiesVariableHeader[" +
+			"reasonCode=" + reasonCode +
+			", properties=" + properties +
 			']';
 	}
 }
