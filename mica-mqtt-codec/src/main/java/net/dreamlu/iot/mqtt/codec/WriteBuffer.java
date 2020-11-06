@@ -115,20 +115,6 @@ public class WriteBuffer {
 	}
 
 	/**
-	 * 写字符串，返回字符串长度
-	 *
-	 * @param text text
-	 */
-	public int writeUtf8(String text) {
-		if (text == null) {
-			return 0;
-		}
-		byte[] bytes = text.getBytes(StandardCharsets.UTF_8);
-		writeBytes(bytes);
-		return bytes.length;
-	}
-
-	/**
 	 * 转换成数组
 	 *
 	 * @return byte array
