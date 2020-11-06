@@ -40,8 +40,7 @@ public final class MqttUnsubAckPayload {
 
 	public MqttUnsubAckPayload(short... unsubscribeReasonCodes) {
 		Objects.requireNonNull(unsubscribeReasonCodes, "unsubscribeReasonCodes is null.");
-
-		List<Short> list = new ArrayList<Short>(unsubscribeReasonCodes.length);
+		List<Short> list = new ArrayList<>(unsubscribeReasonCodes.length);
 		for (Short v : unsubscribeReasonCodes) {
 			list.add(v);
 		}

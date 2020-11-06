@@ -20,57 +20,57 @@ import java.util.Objects;
 
 /**
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#fixed-header">
- *     MQTTV3.1/fixed-header</a>
+ * MQTTV3.1/fixed-header</a>
  */
 public final class MqttFixedHeader {
 
-    private final MqttMessageType messageType;
-    private final boolean isDup;
-    private final MqttQoS qosLevel;
-    private final boolean isRetain;
-    private final int remainingLength;
+	private final MqttMessageType messageType;
+	private final boolean isDup;
+	private final MqttQoS qosLevel;
+	private final boolean isRetain;
+	private final int remainingLength;
 
-    public MqttFixedHeader(
-            MqttMessageType messageType,
-            boolean isDup,
-            MqttQoS qosLevel,
-            boolean isRetain,
-            int remainingLength) {
-        this.messageType = Objects.requireNonNull(messageType, "messageType is null.");
-        this.isDup = isDup;
-        this.qosLevel = Objects.requireNonNull(qosLevel, "qosLevel is null.");
-        this.isRetain = isRetain;
-        this.remainingLength = remainingLength;
-    }
+	public MqttFixedHeader(
+		MqttMessageType messageType,
+		boolean isDup,
+		MqttQoS qosLevel,
+		boolean isRetain,
+		int remainingLength) {
+		this.messageType = Objects.requireNonNull(messageType, "messageType is null.");
+		this.isDup = isDup;
+		this.qosLevel = Objects.requireNonNull(qosLevel, "qosLevel is null.");
+		this.isRetain = isRetain;
+		this.remainingLength = remainingLength;
+	}
 
-    public MqttMessageType messageType() {
-        return messageType;
-    }
+	public MqttMessageType messageType() {
+		return messageType;
+	}
 
-    public boolean isDup() {
-        return isDup;
-    }
+	public boolean isDup() {
+		return isDup;
+	}
 
-    public MqttQoS qosLevel() {
-        return qosLevel;
-    }
+	public MqttQoS qosLevel() {
+		return qosLevel;
+	}
 
-    public boolean isRetain() {
-        return isRetain;
-    }
+	public boolean isRetain() {
+		return isRetain;
+	}
 
-    public int remainingLength() {
-        return remainingLength;
-    }
+	public int remainingLength() {
+		return remainingLength;
+	}
 
-    @Override
-    public String toString() {
-        return "MqttFixedHeader[" +
+	@Override
+	public String toString() {
+		return "MqttFixedHeader[" +
 			"messageType=" + messageType +
 			", isDup=" + isDup +
 			", qosLevel=" + qosLevel +
 			", isRetain=" + isRetain +
 			", remainingLength=" + remainingLength +
 			']';
-    }
+	}
 }

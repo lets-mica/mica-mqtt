@@ -34,28 +34,28 @@ public enum MqttQoS {
 	 */
 	FAILURE(0x80);
 
-    private final int value;
+	private final int value;
 
-    MqttQoS(int value) {
-        this.value = value;
-    }
+	MqttQoS(int value) {
+		this.value = value;
+	}
 
-    public int value() {
-        return value;
-    }
+	public int value() {
+		return value;
+	}
 
-    public static MqttQoS valueOf(int value) {
-        switch (value) {
-        case 0:
-            return AT_MOST_ONCE;
-        case 1:
-            return AT_LEAST_ONCE;
-        case 2:
-            return EXACTLY_ONCE;
-        case 0x80:
-            return FAILURE;
-        default:
-            throw new IllegalArgumentException("invalid QoS: " + value);
-        }
-    }
+	public static MqttQoS valueOf(int value) {
+		switch (value) {
+			case 0:
+				return AT_MOST_ONCE;
+			case 1:
+				return AT_LEAST_ONCE;
+			case 2:
+				return EXACTLY_ONCE;
+			case 0x80:
+				return FAILURE;
+			default:
+				throw new IllegalArgumentException("invalid QoS: " + value);
+		}
+	}
 }

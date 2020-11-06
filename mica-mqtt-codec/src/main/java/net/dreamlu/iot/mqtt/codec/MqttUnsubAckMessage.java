@@ -18,45 +18,46 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#unsuback">
- *     MQTTV3.1/unsuback</a>
+ * MQTTV3.1/unsuback</a>
  */
 public final class MqttUnsubAckMessage extends MqttMessage {
 
-    public MqttUnsubAckMessage(MqttFixedHeader mqttFixedHeader,
-                               MqttMessageIdAndPropertiesVariableHeader variableHeader,
-                               MqttUnsubAckPayload payload) {
-        super(mqttFixedHeader, variableHeader, MqttUnsubAckPayload.withEmptyDefaults(payload));
-    }
+	public MqttUnsubAckMessage(MqttFixedHeader mqttFixedHeader,
+							   MqttMessageIdAndPropertiesVariableHeader variableHeader,
+							   MqttUnsubAckPayload payload) {
+		super(mqttFixedHeader, variableHeader, MqttUnsubAckPayload.withEmptyDefaults(payload));
+	}
 
-    public MqttUnsubAckMessage(MqttFixedHeader mqttFixedHeader,
-                               MqttMessageIdVariableHeader variableHeader,
-                               MqttUnsubAckPayload payload) {
-        this(mqttFixedHeader, fallbackVariableHeader(variableHeader), payload);
-    }
-    public MqttUnsubAckMessage(MqttFixedHeader mqttFixedHeader,
-                               MqttMessageIdVariableHeader variableHeader) {
-        this(mqttFixedHeader, variableHeader, null);
-    }
+	public MqttUnsubAckMessage(MqttFixedHeader mqttFixedHeader,
+							   MqttMessageIdVariableHeader variableHeader,
+							   MqttUnsubAckPayload payload) {
+		this(mqttFixedHeader, fallbackVariableHeader(variableHeader), payload);
+	}
 
-    private static MqttMessageIdAndPropertiesVariableHeader fallbackVariableHeader(
-            MqttMessageIdVariableHeader variableHeader) {
-        if (variableHeader instanceof MqttMessageIdAndPropertiesVariableHeader) {
-            return (MqttMessageIdAndPropertiesVariableHeader) variableHeader;
-        }
-        return new MqttMessageIdAndPropertiesVariableHeader(variableHeader.messageId(), MqttProperties.NO_PROPERTIES);
-    }
+	public MqttUnsubAckMessage(MqttFixedHeader mqttFixedHeader,
+							   MqttMessageIdVariableHeader variableHeader) {
+		this(mqttFixedHeader, variableHeader, null);
+	}
 
-    @Override
-    public MqttMessageIdVariableHeader variableHeader() {
-        return (MqttMessageIdVariableHeader) super.variableHeader();
-    }
+	private static MqttMessageIdAndPropertiesVariableHeader fallbackVariableHeader(
+		MqttMessageIdVariableHeader variableHeader) {
+		if (variableHeader instanceof MqttMessageIdAndPropertiesVariableHeader) {
+			return (MqttMessageIdAndPropertiesVariableHeader) variableHeader;
+		}
+		return new MqttMessageIdAndPropertiesVariableHeader(variableHeader.messageId(), MqttProperties.NO_PROPERTIES);
+	}
 
-    public MqttMessageIdAndPropertiesVariableHeader idAndPropertiesVariableHeader() {
-        return (MqttMessageIdAndPropertiesVariableHeader) super.variableHeader();
-    }
+	@Override
+	public MqttMessageIdVariableHeader variableHeader() {
+		return (MqttMessageIdVariableHeader) super.variableHeader();
+	}
 
-    @Override
-    public MqttUnsubAckPayload payload() {
-        return (MqttUnsubAckPayload) super.payload();
-    }
+	public MqttMessageIdAndPropertiesVariableHeader idAndPropertiesVariableHeader() {
+		return (MqttMessageIdAndPropertiesVariableHeader) super.variableHeader();
+	}
+
+	@Override
+	public MqttUnsubAckPayload payload() {
+		return (MqttUnsubAckPayload) super.payload();
+	}
 }

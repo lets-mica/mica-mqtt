@@ -49,10 +49,9 @@ public final class MqttTopicSubscription {
 
 	@Override
 	public String toString() {
-		return new StringBuilder("MqttTopicSubscription[")
-			.append("topicFilter=").append(topicFilter)
-			.append(", option=").append(this.option)
-			.append(']')
-			.toString();
+		return "MqttTopicSubscription[" +
+			"topicFilter=" + topicFilter +
+			", option=" + this.option +
+			']';
 	}
 }

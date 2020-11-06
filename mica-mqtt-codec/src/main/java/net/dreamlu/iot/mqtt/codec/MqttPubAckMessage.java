@@ -21,12 +21,12 @@ package net.dreamlu.iot.mqtt.codec;
  */
 public final class MqttPubAckMessage extends MqttMessage {
 
-    public MqttPubAckMessage(MqttFixedHeader mqttFixedHeader, MqttMessageIdVariableHeader variableHeader) {
-        super(mqttFixedHeader, variableHeader);
-    }
+	public MqttPubAckMessage(MqttFixedHeader mqttFixedHeader, MqttMessageIdVariableHeader variableHeader) {
+		super(mqttFixedHeader, variableHeader);
+	}
 
-    @Override
-    public MqttMessageIdVariableHeader variableHeader() {
-        return (MqttMessageIdVariableHeader) super.variableHeader();
-    }
+	@Override
+	public MqttMessageIdVariableHeader variableHeader() {
+		return (MqttMessageIdVariableHeader) super.variableHeader();
+	}
 }

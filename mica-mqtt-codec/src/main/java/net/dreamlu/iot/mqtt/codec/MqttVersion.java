@@ -23,6 +23,9 @@ import java.util.Objects;
  * Mqtt version specific constant values used by multiple classes in mqtt-codec.
  */
 public enum MqttVersion {
+	/**
+	 * mqtt 协议
+	 */
     MQTT_3_1("MQIsdp", (byte) 3),
     MQTT_3_1_1("MQTT", (byte) 4),
     MQTT_5("MQTT", (byte) 5);

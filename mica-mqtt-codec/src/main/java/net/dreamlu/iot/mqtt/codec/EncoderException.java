@@ -21,32 +21,32 @@ package net.dreamlu.iot.mqtt.codec;
  */
 public class EncoderException extends RuntimeException {
 
-    private static final long serialVersionUID = -5086121160476476774L;
+	private static final long serialVersionUID = -5086121160476476774L;
 
-    /**
-     * Creates a new instance.
-     */
-    public EncoderException() {
-    }
+	/**
+	 * Creates a new instance.
+	 */
+	public EncoderException() {
+	}
 
-    /**
-     * Creates a new instance.
-     */
-    public EncoderException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	/**
+	 * Creates a new instance.
+	 */
+	public EncoderException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    /**
-     * Creates a new instance.
-     */
-    public EncoderException(String message) {
-        super(message);
-    }
+	/**
+	 * Creates a new instance.
+	 */
+	public EncoderException(String message) {
+		super(message);
+	}
 
-    /**
-     * Creates a new instance.
-     */
-    public EncoderException(Throwable cause) {
-        super(cause);
-    }
+	/**
+	 * Creates a new instance.
+	 */
+	public EncoderException(Throwable cause) {
+		super(cause);
+	}
 }

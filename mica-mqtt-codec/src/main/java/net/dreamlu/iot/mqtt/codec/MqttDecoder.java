@@ -75,7 +75,7 @@ public final class MqttDecoder {
 		// 4. 解析消息体
 		final Result<?> decodedPayload;
 		try {
-			decodedPayload = decodePayload(ctx, buffer, mqttFixedHeader.messageType(),
+			decodedPayload = decodePayload(buffer, mqttFixedHeader.messageType(),
 				bytesRemainingInVariablePart, variableHeader);
 			bytesRemainingInVariablePart -= decodedPayload.numberOfBytesConsumed;
 			if (bytesRemainingInVariablePart != 0) {
@@ -359,11 +359,8 @@ public final class MqttDecoder {
 	 * @return the payload
 	 */
 	private static Result<?> decodePayload(
-		ChannelContext ctx,
-		ByteBuffer buffer,
-		MqttMessageType messageType,
-		int bytesRemainingInVariablePart,
-		Object variableHeader) {
+		ByteBuffer buffer, MqttMessageType messageType,
+		int bytesRemainingInVariablePart, Object variableHeader) {
 		switch (messageType) {
 			case CONNECT:
 				return decodeConnectionPayload(buffer, (MqttConnectVariableHeader) variableHeader);
@@ -438,7 +435,7 @@ public final class MqttDecoder {
 	private static Result<MqttSubscribePayload> decodeSubscribePayload(
 		ByteBuffer buffer,
 		int bytesRemainingInVariablePart) {
-		final List<MqttTopicSubscription> subscribeTopics = new ArrayList<MqttTopicSubscription>();
+		final List<MqttTopicSubscription> subscribeTopics = new ArrayList<>();
 		int numberOfBytesConsumed = 0;
 		while (numberOfBytesConsumed < bytesRemainingInVariablePart) {
 			final Result<String> decodedTopicName = decodeString(buffer);
