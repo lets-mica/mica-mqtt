@@ -34,9 +34,11 @@ public class MqttServerTest {
 		ServerAioListener listener = new MqttServerAioListener();
 		// 配置
 		ServerTioConfig config = new ServerTioConfig("mqtt-server", handler, listener);
-		TioServer tioServer = new TioServer(config);
 		// 设置timeout
 		config.setHeartbeatTimeout(500);
+		TioServer tioServer = new TioServer(config);
+		// 不校验版本号，社区版设置无效
+		tioServer.setCheckLastVersion(false);
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
