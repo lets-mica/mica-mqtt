@@ -48,11 +48,5 @@ public class MqttClientTest {
 				client.publish("/sys/g27jB42P9hm/" + deviceName + "/thing/event/property/post", ByteBuffer.wrap(content.getBytes()));
 //			}
 //		}, 1000, 2000);
-
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			System.out.println("disconnect..................");
-			client.disconnect();
-		}));
-
 	}
 }
