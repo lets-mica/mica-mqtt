@@ -50,18 +50,19 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 				.cleanSession(clientConfig.isCleanSession())
 				.protocolVersion(clientConfig.getProtocolVersion())
 				.willFlag(willMessage != null);
-			// 密码
+			// 2. 密码
 			String password = clientConfig.getPassword();
 			if (StrUtil.isNotBlank(password)) {
 				builder.password(password.getBytes(StandardCharsets.UTF_8));
 			}
-			// 遗嘱消息
+			// 3. 遗嘱消息
 			if (willMessage != null) {
 				builder.willTopic(willMessage.getTopic())
 					.willMessage(willMessage.getMessage())
 					.willRetain(willMessage.isRetain())
 					.willQoS(willMessage.getQos());
 			}
+			// 4. 发送链接请求
 			Tio.send(context, builder.build());
 		}
 	}

@@ -13,6 +13,7 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
 package net.dreamlu.iot.mqtt.codec;
 
 /**
@@ -20,9 +21,21 @@ package net.dreamlu.iot.mqtt.codec;
  */
 public final class MqttSubscriptionOption {
 
+	/**
+	 * 保留处理政策
+	 */
 	public enum RetainedHandlingPolicy {
+		/**
+		 * 订阅发送
+		 */
 		SEND_AT_SUBSCRIBE(0),
+		/**
+		 * 如果还没有订阅，请发送
+		 */
 		SEND_AT_SUBSCRIBE_IF_NOT_YET_EXISTS(1),
+		/**
+		 * 请勿发送订阅
+		 */
 		DONT_SEND_AT_SUBSCRIBE(2);
 
 		private final int value;

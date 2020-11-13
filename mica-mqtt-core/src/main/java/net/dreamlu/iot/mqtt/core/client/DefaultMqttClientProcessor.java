@@ -31,6 +31,7 @@ import java.nio.ByteBuffer;
  */
 public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
+	protected static final String MQTT_CONNECTED_KEY = "__MQTT_CONNECTED_KEY__";
 	private final MqttClientSubManage subManage;
 
 	public DefaultMqttClientProcessor(MqttClientSubManage subManage) {
@@ -42,6 +43,8 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 		MqttConnectReturnCode returnCode = message.variableHeader().connectReturnCode();
 		switch (message.variableHeader().connectReturnCode()) {
 			case CONNECTION_ACCEPTED:
+				// 标记为链接成功，只有链接成功之后才能 sub 和 pub
+				context.set(MQTT_CONNECTED_KEY, Boolean.TRUE);
 				logger.info("MQTT 连接成功！");
 				break;
 			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:

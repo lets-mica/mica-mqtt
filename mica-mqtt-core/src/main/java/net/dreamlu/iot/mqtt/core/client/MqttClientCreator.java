@@ -217,6 +217,9 @@ public final class MqttClientCreator {
 		return willMessage(builder.build());
 	}
 
+
+
+
 	public MqttClient connect() throws Exception {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();

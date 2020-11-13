@@ -187,4 +187,14 @@ public final class MqttClient {
 		return context;
 	}
 
+	/**
+	 * 判断 mqtt 是否链接成功，仅仅在链接成功之后才能 sub 和 pub
+	 *
+	 * @return 是否成功
+	 */
+	public boolean isConnected() {
+		Boolean connected = (Boolean) context.get(DefaultMqttClientProcessor.MQTT_CONNECTED_KEY);
+		return Boolean.TRUE.equals(connected);
+	}
+
 }
