@@ -46,9 +46,9 @@ public final class MqttDecoder {
 		this.maxBytesInMessage = maxBytesInMessage;
 	}
 
-	public MqttMessage decode(ChannelContext ctx, ByteBuffer buffer) {
+	public MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) {
 		// 1. 首先判断缓存中协议头是否读完（MQTT协议头为2字节）
-		if (buffer.limit() < MQTT_PROTOCOL_LENGTH) {
+		if (readableLength < MQTT_PROTOCOL_LENGTH) {
 			return null;
 		}
 		// 2. 解析 FixedHeader
