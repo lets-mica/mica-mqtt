@@ -59,7 +59,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	 */
 	@Override
 	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws AioDecodeException {
-		return mqttDecoder.decode(context, buffer);
+		return mqttDecoder.decode(context, buffer, limit, position, readableLength);
 	}
 
 	/**
