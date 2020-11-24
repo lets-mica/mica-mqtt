@@ -17,14 +17,11 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
 import org.tio.core.exception.AioDecodeException;
 import org.tio.core.intf.Packet;
-import org.tio.server.AcceptCompletionHandler;
 
 import java.nio.ByteBuffer;
 
@@ -34,7 +31,6 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 public class MqttClientAioHandler implements ClientAioHandler {
-	private static final Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
 	private final MqttClientProcessor processor;
@@ -66,7 +62,7 @@ public class MqttClientAioHandler implements ClientAioHandler {
 		// 1. 先判断 mqtt 消息解析是否正常
 		DecoderResult decoderResult = message.decoderResult();
 		if (decoderResult.isFailure()) {
-			processFailure(message);
+			processor.processDecodeFailure(context, message, decoderResult.getCause());
 			return;
 		}
 		MqttFixedHeader fixedHeader = message.fixedHeader();
@@ -100,17 +96,6 @@ public class MqttClientAioHandler implements ClientAioHandler {
 			default:
 				break;
 		}
-	}
-
-	/**
-	 * 处理失败
-	 *
-	 * @param mqttMessage MqttMessage
-	 */
-	private void processFailure(MqttMessage mqttMessage) {
-		// 客户端失败，我认为日志记录异常就行了
-		Throwable cause = mqttMessage.decoderResult().getCause();
-		log.error(cause.getMessage(), cause);
 	}
 
 }

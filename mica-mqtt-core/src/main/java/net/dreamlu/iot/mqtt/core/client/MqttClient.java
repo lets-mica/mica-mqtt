@@ -58,6 +58,12 @@ public final class MqttClient {
 	 */
 	public MqttClient subQos0(String topicFilter, MqttMessageListener listener) {
 		// TODO L.cm 对 topicFilter 校验
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+			.addSubscription(MqttQoS.AT_MOST_ONCE, topicFilter)
+			.messageId(MqttClientMessageId.getId())
+			.build();
+		Tio.send(context, message);
+		// 绑定 subManage listener
 		return this;
 	}
 
@@ -140,9 +146,13 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
-		MqttPublishMessage message = (MqttPublishMessage) MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.PUBLISH, false, qos, retain, 0),
-			new MqttPublishVariableHeader(topic, 0), payload);
+		MqttPublishMessage message = MqttMessageBuilders.publish()
+			.topicName(topic)
+			.payload(payload)
+			.qos(qos)
+			.retained(retain)
+			.messageId(MqttClientMessageId.getId())
+			.build();
 		return Tio.send(context, message);
 	}
 
@@ -185,16 +195,6 @@ public final class MqttClient {
 	 */
 	public ClientChannelContext getContext() {
 		return context;
-	}
-
-	/**
-	 * 判断 mqtt 是否链接成功，仅仅在链接成功之后才能 sub 和 pub
-	 *
-	 * @return 是否成功
-	 */
-	public boolean isConnected() {
-		Boolean connected = (Boolean) context.get(DefaultMqttClientProcessor.MQTT_CONNECTED_KEY);
-		return Boolean.TRUE.equals(connected);
 	}
 
 }

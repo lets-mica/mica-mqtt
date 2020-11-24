@@ -23,6 +23,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * 默认的 mqtt 消息处理器
@@ -31,11 +32,19 @@ import java.nio.ByteBuffer;
  */
 public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
-	protected static final String MQTT_CONNECTED_KEY = "__MQTT_CONNECTED_KEY__";
 	private final MqttClientSubManage subManage;
+	private final CountDownLatch connLatch;
 
-	public DefaultMqttClientProcessor(MqttClientSubManage subManage) {
+	public DefaultMqttClientProcessor(MqttClientSubManage subManage,
+									  CountDownLatch connLatch) {
 		this.subManage = subManage;
+		this.connLatch = connLatch;
+	}
+
+	@Override
+	public void processDecodeFailure(ChannelContext context, MqttMessage message, Throwable ex) {
+		// 客户端失败，默认记录异常日志
+		logger.error(ex.getMessage(), ex);
 	}
 
 	@Override
@@ -43,8 +52,7 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 		MqttConnectReturnCode returnCode = message.variableHeader().connectReturnCode();
 		switch (message.variableHeader().connectReturnCode()) {
 			case CONNECTION_ACCEPTED:
-				// 标记为链接成功，只有链接成功之后才能 sub 和 pub
-				context.set(MQTT_CONNECTED_KEY, Boolean.TRUE);
+				connLatch.countDown();
 				logger.info("MQTT 连接成功！");
 				break;
 			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:
@@ -53,8 +61,7 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 			case CONNECTION_REFUSED_SERVER_UNAVAILABLE:
 			case CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION:
 			default:
-				Tio.close(context, "MqttClient connect error.");
-				context.setClosed(true);
+				Tio.close(context, "MqttClient connect error error ReturnCode:" + returnCode);
 				throw new IllegalStateException("MqttClient connect error ReturnCode:" + returnCode);
 		}
 	}

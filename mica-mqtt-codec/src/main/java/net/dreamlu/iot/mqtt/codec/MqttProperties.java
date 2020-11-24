@@ -248,7 +248,7 @@ public final class MqttProperties {
 				if (!first) {
 					builder.append(", ");
 				}
-				builder.append(pair.key + "->" + pair.value);
+				builder.append(pair.key).append("->").append(pair.value);
 				first = false;
 			}
 			builder.append(")");
@@ -315,7 +315,7 @@ public final class MqttProperties {
 		} else if (property.propertyId == MqttPropertyType.SUBSCRIPTION_IDENTIFIER.value) {
 			List<IntegerProperty> subscriptionIds = this.subscriptionIds;
 			if (subscriptionIds == null) {
-				subscriptionIds = new ArrayList<IntegerProperty>(1);
+				subscriptionIds = new ArrayList<>(1);
 				this.subscriptionIds = subscriptionIds;
 			}
 			if (property instanceof IntegerProperty) {
@@ -335,7 +335,7 @@ public final class MqttProperties {
 	public Collection<? extends MqttProperty> listAll() {
 		Map<Integer, MqttProperty> props = this.props;
 		if (props == null && subscriptionIds == null && userProperties == null) {
-			return Collections.<MqttProperty>emptyList();
+			return Collections.emptyList();
 		}
 		if (subscriptionIds == null && userProperties == null) {
 			return props.values();
@@ -343,7 +343,7 @@ public final class MqttProperties {
 		if (props == null && userProperties == null) {
 			return subscriptionIds;
 		}
-		List<MqttProperty> propValues = new ArrayList<MqttProperty>(props != null ? props.size() : 1);
+		List<MqttProperty> propValues = new ArrayList<>(props != null ? props.size() : 1);
 		if (props != null) {
 			propValues.addAll(props.values());
 		}
@@ -398,14 +398,14 @@ public final class MqttProperties {
 	 */
 	public List<? extends MqttProperty> getProperties(int propertyId) {
 		if (propertyId == MqttPropertyType.USER_PROPERTY.value) {
-			return userProperties == null ? Collections.<MqttProperty>emptyList() : userProperties;
+			return userProperties == null ? Collections.emptyList() : userProperties;
 		}
 		if (propertyId == MqttPropertyType.SUBSCRIPTION_IDENTIFIER.value) {
-			return subscriptionIds == null ? Collections.<MqttProperty>emptyList() : subscriptionIds;
+			return subscriptionIds == null ? Collections.emptyList() : subscriptionIds;
 		}
 		Map<Integer, MqttProperty> props = this.props;
 		return (props == null || !props.containsKey(propertyId)) ?
-			Collections.<MqttProperty>emptyList() :
+			Collections.emptyList() :
 			Collections.singletonList(props.get(propertyId));
 	}
 }

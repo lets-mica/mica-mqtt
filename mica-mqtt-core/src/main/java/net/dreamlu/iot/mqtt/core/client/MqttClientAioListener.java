@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
+import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import org.tio.client.DefaultClientAioListener;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
@@ -60,7 +61,13 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 				builder.willTopic(willMessage.getTopic())
 					.willMessage(willMessage.getMessage())
 					.willRetain(willMessage.isRetain())
-					.willQoS(willMessage.getQos());
+					.willQoS(willMessage.getQos())
+					.willProperties(willMessage.getWillProperties());
+			}
+			// 4. mqtt5 properties
+			MqttProperties properties = clientConfig.getProperties();
+			if (properties != null) {
+				builder.properties(properties);
 			}
 			// 4. 发送链接请求
 			Tio.send(context, builder.build());

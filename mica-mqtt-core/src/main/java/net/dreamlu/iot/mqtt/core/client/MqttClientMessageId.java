@@ -37,13 +37,17 @@ public enum MqttClientMessageId {
 		this.value = value;
 	}
 
-	public MqttMessageIdVariableHeader getMessageId() {
+	public int getMessageId() {
 		this.value.compareAndSet(0xffff, 1);
-		return MqttMessageIdVariableHeader.from(this.value.getAndIncrement());
+		return this.value.getAndIncrement();
 	}
 
-	public static MqttMessageIdVariableHeader getId() {
+	public static int getId() {
 		return INSTANCE.getMessageId();
+	}
+
+	public static MqttMessageIdVariableHeader getVariableHeader() {
+		return MqttMessageIdVariableHeader.from(getId());
 	}
 
 }

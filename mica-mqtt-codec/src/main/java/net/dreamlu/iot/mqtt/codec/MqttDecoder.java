@@ -367,7 +367,7 @@ public final class MqttDecoder {
 			case SUBSCRIBE:
 				return decodeSubscribePayload(buffer, bytesRemainingInVariablePart);
 			case SUBACK:
-				return decodeSubackPayload(buffer, bytesRemainingInVariablePart);
+				return decodeSubAckPayload(buffer, bytesRemainingInVariablePart);
 			case UNSUBSCRIBE:
 				return decodeUnsubscribePayload(buffer, bytesRemainingInVariablePart);
 			case UNSUBACK:
@@ -458,7 +458,7 @@ public final class MqttDecoder {
 		return new Result<>(new MqttSubscribePayload(subscribeTopics), numberOfBytesConsumed);
 	}
 
-	private static Result<MqttSubAckPayload> decodeSubackPayload(
+	private static Result<MqttSubAckPayload> decodeSubAckPayload(
 		ByteBuffer buffer,
 		int bytesRemainingInVariablePart) {
 		final List<Integer> grantedQos = new ArrayList<>(bytesRemainingInVariablePart);

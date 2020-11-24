@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
@@ -28,6 +29,7 @@ import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 
 /**
@@ -93,6 +95,10 @@ public final class MqttClientCreator {
 	 * 遗嘱消息
 	 */
 	private MqttWillMessage willMessage;
+	/**
+	 * mqtt5 properties
+	 */
+	private MqttProperties properties;
 
 	protected String getIp() {
 		return ip;
@@ -144,6 +150,10 @@ public final class MqttClientCreator {
 
 	protected MqttWillMessage getWillMessage() {
 		return willMessage;
+	}
+
+	public MqttProperties getProperties() {
+		return properties;
 	}
 
 	public MqttClientCreator ip(String ip) {
@@ -217,8 +227,10 @@ public final class MqttClientCreator {
 		return willMessage(builder.build());
 	}
 
-
-
+	public MqttClientCreator properties(MqttProperties properties) {
+		this.properties = properties;
+		return this;
+	}
 
 	public MqttClient connect() throws Exception {
 		// 1. 生成 默认的 clientId
@@ -229,7 +241,8 @@ public final class MqttClientCreator {
 		}
 		MqttClientSubManage subManage = new MqttClientSubManage();
 		// 客户端处理器
-		MqttClientProcessor processor = new DefaultMqttClientProcessor(subManage);
+		CountDownLatch connLatch = new CountDownLatch(1);
+		MqttClientProcessor processor = new DefaultMqttClientProcessor(subManage, connLatch);
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(Objects.requireNonNull(processor));
 		ClientAioListener clientAioListener = new MqttClientAioListener(this);
@@ -245,6 +258,7 @@ public final class MqttClientCreator {
 		// 4. tioClient
 		TioClient tioClient = new TioClient(new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf));
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
+		connLatch.await();
 		return new MqttClient(tioClient, this, context, subManage);
 	}
 
