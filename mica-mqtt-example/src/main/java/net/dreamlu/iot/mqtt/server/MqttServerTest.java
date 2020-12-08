@@ -28,8 +28,9 @@ public class MqttServerTest {
 	public static void main(String[] args) throws IOException {
 		int socketPort = 1883;
 		MqttServerProcessor brokerHandler = new MqttBrokerProcessorImpl();
+		ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 		// 处理消息
-		ServerAioHandler handler = new MqttServerAioHandler(brokerHandler);
+		ServerAioHandler handler = new MqttServerAioHandler(bufferAllocator, brokerHandler);
 		// 监听
 		ServerAioListener listener = new MqttServerAioListener();
 		// 配置

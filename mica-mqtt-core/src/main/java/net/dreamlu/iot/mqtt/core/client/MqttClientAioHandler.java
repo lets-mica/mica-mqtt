@@ -20,7 +20,7 @@ import net.dreamlu.iot.mqtt.codec.*;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
-import org.tio.core.exception.AioDecodeException;
+import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 
 import java.nio.ByteBuffer;
@@ -33,11 +33,13 @@ import java.nio.ByteBuffer;
 public class MqttClientAioHandler implements ClientAioHandler {
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
+	private final ByteBufferAllocator allocator;
 	private final MqttClientProcessor processor;
 
-	public MqttClientAioHandler(MqttClientProcessor processor) {
+	public MqttClientAioHandler(ByteBufferAllocator bufferAllocator, MqttClientProcessor processor) {
 		this.mqttDecoder = MqttDecoder.INSTANCE;
 		this.mqttEncoder = MqttEncoder.INSTANCE;
+		this.allocator = bufferAllocator;
 		this.processor = processor;
 	}
 
@@ -47,13 +49,13 @@ public class MqttClientAioHandler implements ClientAioHandler {
 	}
 
 	@Override
-	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws AioDecodeException {
+	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws TioDecodeException {
 		return mqttDecoder.decode(channelContext, buffer, limit, position, readableLength);
 	}
 
 	@Override
 	public ByteBuffer encode(Packet packet, TioConfig tioConfig, ChannelContext channelContext) {
-		return mqttEncoder.doEncode(channelContext, (MqttMessage) packet);
+		return mqttEncoder.doEncode(channelContext, (MqttMessage) packet, allocator);
 	}
 
 	@Override

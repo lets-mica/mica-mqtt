@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
-import org.tio.core.exception.AioDecodeException;
+import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.server.AcceptCompletionHandler;
 import org.tio.server.intf.ServerAioHandler;
@@ -37,11 +37,13 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	private static final Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
+	private final ByteBufferAllocator allocator;
 	private final MqttServerProcessor processor;
 
-	public MqttServerAioHandler(MqttServerProcessor processor) {
+	public MqttServerAioHandler(ByteBufferAllocator bufferAllocator, MqttServerProcessor processor) {
 		this.mqttDecoder = MqttDecoder.INSTANCE;
 		this.mqttEncoder = MqttEncoder.INSTANCE;
+		this.allocator = bufferAllocator;
 		this.processor = processor;
 	}
 
@@ -55,10 +57,10 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	 * @param readableLength ByteBuffer参与本次解码的有效数据（= limit - position）
 	 * @param context        ChannelContext
 	 * @return Packet
-	 * @throws AioDecodeException AioDecodeException
+	 * @throws TioDecodeException TioDecodeException
 	 */
 	@Override
-	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws AioDecodeException {
+	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws TioDecodeException {
 		return mqttDecoder.decode(context, buffer, limit, position, readableLength);
 	}
 
@@ -72,7 +74,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	 */
 	@Override
 	public ByteBuffer encode(Packet packet, TioConfig tioConfig, ChannelContext context) {
-		return mqttEncoder.doEncode(context, (MqttMessage) packet);
+		return mqttEncoder.doEncode(context, (MqttMessage) packet, allocator);
 	}
 
 	/**

@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.tio.client.ClientChannelContext;
@@ -99,6 +100,10 @@ public final class MqttClientCreator {
 	 * mqtt5 properties
 	 */
 	private MqttProperties properties;
+	/**
+	 * ByteBuffer Allocator
+	 */
+	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 
 	protected String getIp() {
 		return ip;
@@ -154,6 +159,10 @@ public final class MqttClientCreator {
 
 	public MqttProperties getProperties() {
 		return properties;
+	}
+
+	public ByteBufferAllocator getBufferAllocator() {
+		return bufferAllocator;
 	}
 
 	public MqttClientCreator ip(String ip) {
@@ -232,6 +241,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator bufferAllocator(ByteBufferAllocator allocator) {
+		this.bufferAllocator = allocator;
+		return this;
+	}
+
 	public MqttClient connect() throws Exception {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
@@ -244,13 +258,13 @@ public final class MqttClientCreator {
 		CountDownLatch connLatch = new CountDownLatch(1);
 		MqttClientProcessor processor = new DefaultMqttClientProcessor(subManage, connLatch);
 		// 2. 初始化 mqtt 处理器
-		ClientAioHandler clientAioHandler = new MqttClientAioHandler(Objects.requireNonNull(processor));
+		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, Objects.requireNonNull(processor));
 		ClientAioListener clientAioListener = new MqttClientAioListener(this);
 		// 3. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
-			if (reInterval != null && reInterval > 0) {
-				reconnConf = new ReconnConf(reInterval);
+			if (this.reInterval != null && this.reInterval > 0) {
+				reconnConf = new ReconnConf(this.reInterval);
 			} else {
 				reconnConf = new ReconnConf();
 			}
