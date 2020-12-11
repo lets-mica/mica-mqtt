@@ -32,12 +32,12 @@ import java.util.concurrent.CountDownLatch;
  */
 public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
-	private final MqttClientSubManage subManage;
+	private final MqttClientMessageHandler messageHandler;
 	private final CountDownLatch connLatch;
 
-	public DefaultMqttClientProcessor(MqttClientSubManage subManage,
+	public DefaultMqttClientProcessor(MqttClientMessageHandler messageHandler,
 									  CountDownLatch connLatch) {
-		this.subManage = subManage;
+		this.messageHandler = messageHandler;
 		this.connLatch = connLatch;
 	}
 

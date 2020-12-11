@@ -23,11 +23,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * 客户端订阅管理
+ * 客户端管理处理，包括 sub 和 pub
  *
  * @author L.cm
  */
-public class MqttClientSubManage {
+public class MqttClientMessageHandler {
 	/**
 	 * 订阅的数据承载
 	 */

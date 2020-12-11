@@ -33,7 +33,7 @@ public final class MqttClient {
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
 	private final ClientChannelContext context;
-	private final MqttClientSubManage subManage;
+	private final MqttClientMessageHandler messageHandler;
 
 	public static MqttClientCreator create() {
 		return new MqttClientCreator();
@@ -42,11 +42,11 @@ public final class MqttClient {
 	MqttClient(TioClient tioClient,
 			   MqttClientCreator config,
 			   ClientChannelContext context,
-			   MqttClientSubManage subManage) {
+			   MqttClientMessageHandler messageHandler) {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.context = context;
-		this.subManage = subManage;
+		this.messageHandler = messageHandler;
 	}
 
 	/**
@@ -76,6 +76,12 @@ public final class MqttClient {
 	 */
 	public MqttClient subQos1(String topicFilter, MqttMessageListener listener) {
 		// TODO L.cm 对 topicFilter 校验
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+			.addSubscription(MqttQoS.AT_LEAST_ONCE, topicFilter)
+			.messageId(MqttClientMessageId.getId())
+			.build();
+		Tio.send(context, message);
+		// 绑定 subManage listener
 		return this;
 	}
 
@@ -88,6 +94,12 @@ public final class MqttClient {
 	 */
 	public MqttClient subQos2(String topicFilter, MqttMessageListener listener) {
 		// TODO L.cm 对 topicFilter 校验
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+			.addSubscription(MqttQoS.EXACTLY_ONCE, topicFilter)
+			.messageId(MqttClientMessageId.getId())
+			.build();
+		Tio.send(context, message);
+		// 绑定 subManage listener
 		return this;
 	}
 
@@ -98,6 +110,13 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient unSubscribe(String topicFilter) {
+		// TODO L.cm 对 topicFilter 校验
+		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
+			.addTopicFilter(topicFilter)
+			.messageId(MqttClientMessageId.getId())
+			.build();
+		Tio.send(context, message);
+		// 解绑 subManage listener
 		return this;
 	}
 

@@ -129,7 +129,7 @@ public final class MqttWillMessage {
 		MqttWillMessage that = (MqttWillMessage) o;
 		return retain == that.retain &&
 			Objects.equals(topic, that.topic) &&
-			Objects.equals(message, that.message) &&
+			Arrays.equals(message, that.message) &&
 			qos == that.qos;
 	}
 

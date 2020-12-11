@@ -101,7 +101,7 @@ public final class MqttClientCreator {
 	 */
 	private MqttProperties properties;
 	/**
-	 * ByteBuffer Allocator
+	 * ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存
 	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 
@@ -253,10 +253,10 @@ public final class MqttClientCreator {
 			// 默认为：MICA-MQTT- 前缀和 36进制的毫秒数
 			this.clientId("MICA-MQTT-" + Long.toString(System.currentTimeMillis(), 36));
 		}
-		MqttClientSubManage subManage = new MqttClientSubManage();
+		MqttClientMessageHandler messageHandler = new MqttClientMessageHandler();
 		// 客户端处理器
 		CountDownLatch connLatch = new CountDownLatch(1);
-		MqttClientProcessor processor = new DefaultMqttClientProcessor(subManage, connLatch);
+		MqttClientProcessor processor = new DefaultMqttClientProcessor(messageHandler, connLatch);
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, Objects.requireNonNull(processor));
 		ClientAioListener clientAioListener = new MqttClientAioListener(this);
@@ -272,8 +272,9 @@ public final class MqttClientCreator {
 		// 4. tioClient
 		TioClient tioClient = new TioClient(new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf));
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
+		// 5. 等待连接成功之后继续
 		connLatch.await();
-		return new MqttClient(tioClient, this, context, subManage);
+		return new MqttClient(tioClient, this, context, messageHandler);
 	}
 
 }
