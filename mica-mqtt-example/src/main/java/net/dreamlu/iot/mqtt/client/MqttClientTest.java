@@ -23,6 +23,10 @@ public class MqttClientTest {
 			.protocolVersion(MqttVersion.MQTT_5)
 			.connect();
 
+		client.subQos0("test",  (topic, payload) -> {
+			System.out.println(payload);
+		});
+
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override

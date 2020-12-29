@@ -248,17 +248,21 @@ public final class MqttEncoder {
 			byte[] topicNameBytes = encodeStringUtf8(topicName);
 			buf.putShort((short) topicNameBytes.length);
 			buf.put(topicNameBytes, 0, topicNameBytes.length);
-			// option
-			final MqttSubscriptionOption option = topic.option();
-			int optionEncoded = option.retainHandling().value() << 4;
-			if (option.isRetainAsPublished()) {
-				optionEncoded |= 0x08;
+			if (mqttVersion == MqttVersion.MQTT_3_1_1 || mqttVersion == MqttVersion.MQTT_3_1) {
+				buf.put((byte) topic.qualityOfService().value());
+			} else {
+				// option
+				final MqttSubscriptionOption option = topic.option();
+				int optionEncoded = option.retainHandling().value() << 4;
+				if (option.isRetainAsPublished()) {
+					optionEncoded |= 0x08;
+				}
+				if (option.isNoLocal()) {
+					optionEncoded |= 0x04;
+				}
+				optionEncoded |= option.qos().value();
+				buf.put((byte) optionEncoded);
 			}
-			if (option.isNoLocal()) {
-				optionEncoded |= 0x04;
-			}
-			optionEncoded |= option.qos().value();
-			buf.put((byte) optionEncoded);
 		}
 		return buf;
 	}
