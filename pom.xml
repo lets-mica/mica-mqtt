@@ -9,12 +9,33 @@
 
     <name>${project.artifactId}</name>
     <description>Mica mqtt tools.</description>
+    <url>https://www.dreamlu.net/</url>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>ChunmengLu</name>
+            <email>qq596392912@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@git.oschina.net/596392912/mica-mqtt</connection>
+        <developerConnection>scm:git:git@git.oschina.net/596392912/mica-mqtt.git</developerConnection>
+        <url>git@git.oschina.net/596392912/mica-mqtt.git</url>
+    </scm>
 
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mica-iot.version>0.0.1-SNAPSHOT</mica-iot.version>
-        <tio.version>3.7.0.v20201010-RELEASE</tio.version>
+        <tio.version>3.7.1.v20210106-RELEASE</tio.version>
         <slf4j.version>1.7.25</slf4j.version>
     </properties>
 
@@ -60,11 +81,74 @@
     </build>
 
     <repositories>
-        <!--阿里云主仓库，代理了maven central和jcenter仓库-->
+        <!--阿里云主仓库，代理了 maven central 和 jcenter 仓库-->
         <repository>
             <id>aliyun</id>
             <name>aliyun</name>
             <url>https://maven.aliyun.com/repository/public</url>
         </repository>
     </repositories>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <!-- Source -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Javadoc -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <executions>
+                            <execution>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- GPG -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>1.6</version>
+                        <executions>
+                            <execution>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+                <repository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
+        </profile>
+    </profiles>
+
 </project>
