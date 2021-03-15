@@ -4,37 +4,17 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.dreamlu</groupId>
     <artifactId>mica-mqtt</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>2021.00</version>
     <packaging>pom</packaging>
 
     <name>${project.artifactId}</name>
     <description>Mica mqtt tools.</description>
     <url>https://www.dreamlu.net/</url>
 
-    <licenses>
-        <license>
-            <name>Apache License 2.0</name>
-            <url>http://www.apache.org/licenses</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>ChunmengLu</name>
-            <email>qq596392912@gmail.com</email>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git:git@git.oschina.net/596392912/mica-mqtt</connection>
-        <developerConnection>scm:git:git@git.oschina.net/596392912/mica-mqtt.git</developerConnection>
-        <url>git@git.oschina.net/596392912/mica-mqtt.git</url>
-    </scm>
-
     <properties>
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mica-iot.version>0.0.1-SNAPSHOT</mica-iot.version>
+        <mica-iot.version>2021.00</mica-iot.version>
         <tio.version>3.7.1.v20210106-RELEASE</tio.version>
         <slf4j.version>1.7.25</slf4j.version>
     </properties>
@@ -65,6 +45,28 @@
         </dependencies>
     </dependencyManagement>
 
+    <developers>
+        <developer>
+            <name>ChunmengLu</name>
+            <email>qq596392912@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git@git.oschina.net/596392912/mica-mqtt</connection>
+        <developerConnection>scm:git:git@git.oschina.net/596392912/mica-mqtt.git</developerConnection>
+        <url>git@git.oschina.net/596392912/mica-mqtt.git</url>
+    </scm>
+
+    <repositories>
+        <!--阿里云主仓库，代理了 maven central 和 jcenter 仓库-->
+        <repository>
+            <id>aliyun</id>
+            <name>aliyun</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+    </repositories>
+
     <build>
         <plugins>
             <plugin>
@@ -80,14 +82,12 @@
         </plugins>
     </build>
 
-    <repositories>
-        <!--阿里云主仓库，代理了 maven central 和 jcenter 仓库-->
-        <repository>
-            <id>aliyun</id>
-            <name>aliyun</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-        </repository>
-    </repositories>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses</url>
+        </license>
+    </licenses>
 
     <profiles>
         <profile>

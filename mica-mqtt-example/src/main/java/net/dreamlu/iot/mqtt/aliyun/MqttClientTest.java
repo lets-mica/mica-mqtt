@@ -34,11 +34,12 @@ public class MqttClientTest {
 			.clientId(clientId)
 			.connect();
 
-		client.subQos0("/sys/g27jB42P9hm/3dbc1cb4/thing/event/property/post_reply", (topic, payload) -> {
+		client.subQos0("/sys/" + productKey + "/" + deviceName + "/thing/event/property/post_reply", (topic, payload) -> {
 
 		});
 
 		String content = "{\"id\":\"1\",\"version\":\"1.0\",\"params\":{\"LightSwitch\":1}}";
-		client.publish("/sys/g27jB42P9hm/" + deviceName + "/thing/event/property/post", ByteBuffer.wrap(content.getBytes()));
+		client.publish("/sys/" + productKey + "/" + deviceName + "/thing/event/property/post", ByteBuffer.wrap(content.getBytes()));
 	}
+
 }

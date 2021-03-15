@@ -62,9 +62,7 @@ public final class MqttClient {
 			.addSubscription(MqttQoS.AT_MOST_ONCE, topicFilter)
 			.messageId(MqttClientMessageId.getId())
 			.build();
-		Tio.send(context, message);
-		// 绑定 subManage listener
-		return this;
+		return subscribe(message, listener);
 	}
 
 	/**
@@ -80,9 +78,7 @@ public final class MqttClient {
 			.addSubscription(MqttQoS.AT_LEAST_ONCE, topicFilter)
 			.messageId(MqttClientMessageId.getId())
 			.build();
-		Tio.send(context, message);
-		// 绑定 subManage listener
-		return this;
+		return subscribe(message, listener);
 	}
 
 	/**
@@ -98,6 +94,18 @@ public final class MqttClient {
 			.addSubscription(MqttQoS.EXACTLY_ONCE, topicFilter)
 			.messageId(MqttClientMessageId.getId())
 			.build();
+		Tio.send(context, message);
+		return subscribe(message, listener);
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param message  MqttSubscribeMessage
+	 * @param listener MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(MqttSubscribeMessage message, MqttMessageListener listener) {
 		Tio.send(context, message);
 		// 绑定 subManage listener
 		return this;
