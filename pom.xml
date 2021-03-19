@@ -15,8 +15,7 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mica-iot.version>2021.00</mica-iot.version>
-        <tio.version>3.7.1.v20210106-RELEASE</tio.version>
-        <slf4j.version>1.7.25</slf4j.version>
+        <tio.version>3.7.2.v20210316-RELEASE</tio.version>
     </properties>
 
     <modules>
