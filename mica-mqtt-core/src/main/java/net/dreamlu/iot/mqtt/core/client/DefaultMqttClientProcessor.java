@@ -50,7 +50,7 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	@Override
 	public void processConAck(ChannelContext context, MqttConnAckMessage message) {
 		MqttConnectReturnCode returnCode = message.variableHeader().connectReturnCode();
-		switch (message.variableHeader().connectReturnCode()) {
+		switch (returnCode) {
 			case CONNECTION_ACCEPTED:
 				connLatch.countDown();
 				logger.info("MQTT 连接成功！");
@@ -81,7 +81,11 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	@Override
 	public void processPublish(ChannelContext context, MqttPublishMessage message) {
 		MqttFixedHeader mqttFixedHeader = message.fixedHeader();
-		String topicName = message.variableHeader().topicName();
+		MqttPublishVariableHeader variableHeader = message.variableHeader();
+		String topicName = variableHeader.topicName();
+		MqttQoS mqttQoS = mqttFixedHeader.qosLevel();
+		int packetId = variableHeader.packetId();
+		logger.debug("MQTT received publish topic:{} qoS:{} packetId:{}", topicName, mqttQoS, packetId);
 		switch (mqttFixedHeader.qosLevel()) {
 			case AT_MOST_ONCE:
 				List<MqttSubscription> subscriptionList = subscriptionManager.getMatchedSubscription(topicName);
