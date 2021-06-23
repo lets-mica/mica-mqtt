@@ -1,5 +1,6 @@
 package net.dreamlu.iot.mqtt.client;
 
+import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
@@ -23,8 +24,8 @@ public class MqttClientTest {
 			.protocolVersion(MqttVersion.MQTT_5)
 			.connect();
 
-		client.subQos0("test",  (topic, payload) -> {
-			System.out.println(payload);
+		client.subQos0("/test/#", (topic, payload) -> {
+			System.out.println(ByteBufferUtil.toString(payload));
 		});
 
 		Timer timer = new Timer();

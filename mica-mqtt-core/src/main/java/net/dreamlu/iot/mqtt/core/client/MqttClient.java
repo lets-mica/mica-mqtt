@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.core.Tio;
@@ -30,10 +32,11 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 public final class MqttClient {
+	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
 	private final ClientChannelContext context;
-	private final MqttClientMessageHandler messageHandler;
+	private final MqttClientSubscriptionManager subscriptionManager;
 
 	public static MqttClientCreator create() {
 		return new MqttClientCreator();
@@ -42,11 +45,11 @@ public final class MqttClient {
 	MqttClient(TioClient tioClient,
 			   MqttClientCreator config,
 			   ClientChannelContext context,
-			   MqttClientMessageHandler messageHandler) {
+			   MqttClientSubscriptionManager subscriptionManager) {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.context = context;
-		this.messageHandler = messageHandler;
+		this.subscriptionManager = subscriptionManager;
 	}
 
 	/**
@@ -57,12 +60,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos0(String topicFilter, MqttMessageListener listener) {
-		// TODO L.cm 对 topicFilter 校验
-		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-			.addSubscription(MqttQoS.AT_MOST_ONCE, topicFilter)
-			.messageId(MqttClientMessageId.getId())
-			.build();
-		return subscribe(message, listener);
+		return subscribe(MqttQoS.AT_MOST_ONCE, topicFilter, listener);
 	}
 
 	/**
@@ -73,12 +71,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos1(String topicFilter, MqttMessageListener listener) {
-		// TODO L.cm 对 topicFilter 校验
-		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-			.addSubscription(MqttQoS.AT_LEAST_ONCE, topicFilter)
-			.messageId(MqttClientMessageId.getId())
-			.build();
-		return subscribe(message, listener);
+		return subscribe(MqttQoS.AT_LEAST_ONCE, topicFilter, listener);
 	}
 
 	/**
@@ -89,25 +82,29 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos2(String topicFilter, MqttMessageListener listener) {
-		// TODO L.cm 对 topicFilter 校验
-		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-			.addSubscription(MqttQoS.EXACTLY_ONCE, topicFilter)
-			.messageId(MqttClientMessageId.getId())
-			.build();
-		Tio.send(context, message);
-		return subscribe(message, listener);
+		return subscribe(MqttQoS.EXACTLY_ONCE, topicFilter, listener);
 	}
 
 	/**
 	 * 订阅
 	 *
-	 * @param message  MqttSubscribeMessage
-	 * @param listener MqttMessageListener
+	 * @param mqttQoS     MqttQoS
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
 	 * @return MqttClient
 	 */
-	public MqttClient subscribe(MqttSubscribeMessage message, MqttMessageListener listener) {
-		Tio.send(context, message);
-		// 绑定 subManage listener
+	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, MqttMessageListener listener) {
+		int messageId = MqttClientMessageId.getId();
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+			.addSubscription(mqttQoS, topicFilter)
+			.messageId(messageId)
+			.build();
+		Boolean result = Tio.send(context, message);
+		logger.debug("MQTT subscribe topicFilter:{} mqttQoS:{} messageId:{} result:{}", topicFilter, mqttQoS, messageId, result);
+		// 先 tio 发送数据才添加，考虑会不会 ack 早回？？？
+		if (Boolean.TRUE.equals(result)) {
+			subscriptionManager.addPaddingSubscribe(new MqttSubscription(messageId, mqttQoS, topicFilter, listener));
+		}
 		return this;
 	}
 
@@ -118,13 +115,17 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient unSubscribe(String topicFilter) {
-		// TODO L.cm 对 topicFilter 校验
+		int messageId = MqttClientMessageId.getId();
 		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
 			.addTopicFilter(topicFilter)
 			.messageId(MqttClientMessageId.getId())
 			.build();
-		Tio.send(context, message);
+		Boolean result = Tio.send(context, message);
+		logger.debug("MQTT unSubscribe topicFilter:{} messageId:{} result:{}", topicFilter, messageId, result);
 		// 解绑 subManage listener
+		if (Boolean.TRUE.equals(result)) {
+			subscriptionManager.addPaddingUnSubscribe(messageId, topicFilter);
+		}
 		return this;
 	}
 
@@ -180,6 +181,7 @@ public final class MqttClient {
 			.retained(retain)
 			.messageId(MqttClientMessageId.getId())
 			.build();
+		logger.debug("MQTT publish topic:{} qos:{} retain:{}", topic, qos, retain);
 		return Tio.send(context, message);
 	}
 

@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 
-import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -32,12 +32,12 @@ import java.util.concurrent.CountDownLatch;
  */
 public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
-	private final MqttClientMessageHandler messageHandler;
+	private final MqttClientSubscriptionManager subscriptionManager;
 	private final CountDownLatch connLatch;
 
-	public DefaultMqttClientProcessor(MqttClientMessageHandler messageHandler,
+	public DefaultMqttClientProcessor(MqttClientSubscriptionManager subscriptionManager,
 									  CountDownLatch connLatch) {
-		this.messageHandler = messageHandler;
+		this.subscriptionManager = subscriptionManager;
 		this.connLatch = connLatch;
 	}
 
@@ -61,31 +61,55 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 			case CONNECTION_REFUSED_SERVER_UNAVAILABLE:
 			case CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION:
 			default:
-				Tio.close(context, "MqttClient connect error error ReturnCode:" + returnCode);
-				throw new IllegalStateException("MqttClient connect error ReturnCode:" + returnCode);
+				String remark = "MqttClient connect error error ReturnCode:" + returnCode;
+				Tio.close(context, remark);
+				throw new IllegalStateException(remark);
 		}
 	}
 
 	@Override
 	public void processSubAck(MqttSubAckMessage message) {
-		System.out.println(message);
+		int messageId = message.variableHeader().messageId();
+		logger.debug("MQTT SubAck messageId:{}", messageId);
+		MqttSubscription paddingSubscribe = subscriptionManager.getPaddingSubscribe(messageId);
+		if (paddingSubscribe == null) {
+			return;
+		}
+		subscriptionManager.addSubscription(paddingSubscribe);
 	}
 
 	@Override
 	public void processPublish(ChannelContext context, MqttPublishMessage message) {
-		ByteBuffer byteBuffer = message.payload();
-		if (byteBuffer != null) {
-			System.out.println(ByteBufferUtil.toString(byteBuffer));
+		MqttFixedHeader mqttFixedHeader = message.fixedHeader();
+		String topicName = message.variableHeader().topicName();
+		switch (mqttFixedHeader.qosLevel()) {
+			case AT_MOST_ONCE:
+				List<MqttSubscription> subscriptionList = subscriptionManager.getMatchedSubscription(topicName);
+				subscriptionList.forEach(subscription -> subscription.getListener().onMessage(topicName, message.payload()));
+				break;
+			case AT_LEAST_ONCE:
+				break;
+			case EXACTLY_ONCE:
+				break;
+			case FAILURE:
+			default:
 		}
 	}
 
 	@Override
 	public void processUnSubAck(MqttUnsubAckMessage message) {
-		System.out.println(message);
+		int messageId = message.variableHeader().messageId();
+		String topicFilter = subscriptionManager.getPaddingUnSubscribe(messageId);
+		logger.debug("MQTT UnSubAck messageId:{} topicFilter:{}", messageId, topicFilter);
+		if (topicFilter == null) {
+			return;
+		}
+		subscriptionManager.removeSubscriptions(topicFilter);
 	}
 
 	@Override
 	public void processPubAck(MqttPubAckMessage message) {
+		int messageId = message.variableHeader().messageId();
 		System.out.println(message);
 	}
 

@@ -50,7 +50,7 @@ public class MqttServerTest {
 				channelContexts.forEach(context -> {
 					MqttPublishMessage message = (MqttPublishMessage) MqttMessageFactory.newMessage(
 						new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.AT_MOST_ONCE, false, 0),
-						new MqttPublishVariableHeader("testtopic", 0), ByteBuffer.wrap("mica最牛皮".getBytes()));
+						new MqttPublishVariableHeader("/test/123", 0), ByteBuffer.wrap("mica最牛皮".getBytes()));
 					Tio.send(context, message);
 				});
 			}
