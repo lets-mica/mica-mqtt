@@ -24,6 +24,7 @@ import org.tio.core.Tio;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * 默认的 mqtt 消息处理器
@@ -34,11 +35,14 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
 	private final MqttClientSubscriptionManager subscriptionManager;
 	private final CountDownLatch connLatch;
+	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttClientProcessor(MqttClientSubscriptionManager subscriptionManager,
-									  CountDownLatch connLatch) {
+									  CountDownLatch connLatch,
+									  ScheduledThreadPoolExecutor executor) {
 		this.subscriptionManager = subscriptionManager;
 		this.connLatch = connLatch;
+		this.executor = executor;
 	}
 
 	@Override
@@ -53,7 +57,7 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 		switch (returnCode) {
 			case CONNECTION_ACCEPTED:
 				connLatch.countDown();
-				logger.info("MQTT 连接成功！");
+				logger.info("MqttClient connection succeeded!");
 				break;
 			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:
 			case CONNECTION_REFUSED_IDENTIFIER_REJECTED:
@@ -70,12 +74,14 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	@Override
 	public void processSubAck(MqttSubAckMessage message) {
 		int messageId = message.variableHeader().messageId();
-		logger.debug("MQTT SubAck messageId:{}", messageId);
-		MqttSubscription paddingSubscribe = subscriptionManager.getPaddingSubscribe(messageId);
+		logger.debug("MqttClient SubAck messageId:{}", messageId);
+		MqttPendingSubscription paddingSubscribe = subscriptionManager.getPaddingSubscribe(messageId);
 		if (paddingSubscribe == null) {
 			return;
 		}
-		subscriptionManager.addSubscription(paddingSubscribe);
+		paddingSubscribe.onSubAckReceived();
+		subscriptionManager.removePaddingSubscribe(messageId);
+		subscriptionManager.addSubscription(paddingSubscribe.toSubscription());
 	}
 
 	@Override
@@ -85,15 +91,29 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 		String topicName = variableHeader.topicName();
 		MqttQoS mqttQoS = mqttFixedHeader.qosLevel();
 		int packetId = variableHeader.packetId();
-		logger.debug("MQTT received publish topic:{} qoS:{} packetId:{}", topicName, mqttQoS, packetId);
+		logger.debug("MqttClient received publish topic:{} qoS:{} packetId:{}", topicName, mqttQoS, packetId);
 		switch (mqttFixedHeader.qosLevel()) {
 			case AT_MOST_ONCE:
-				List<MqttSubscription> subscriptionList = subscriptionManager.getMatchedSubscription(topicName);
-				subscriptionList.forEach(subscription -> subscription.getListener().onMessage(topicName, message.payload()));
+				invokeListenerForPublish(topicName, message);
 				break;
 			case AT_LEAST_ONCE:
+				invokeListenerForPublish(topicName, message);
+				if (packetId != -1) {
+					MqttMessage messageAck = MqttMessageBuilders.pubAck()
+						.packetId(packetId)
+						.build();
+					Tio.send(context, messageAck);
+				}
 				break;
 			case EXACTLY_ONCE:
+				if (packetId != -1) {
+					MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
+					MqttMessage pubRecMessage = new MqttMessage(fixedHeader, MqttMessageIdVariableHeader.from(packetId));
+					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
+					subscriptionManager.addPendingQos2Publish(packetId, pendingQos2Publish);
+					message.payload().clear();
+					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
+				}
 				break;
 			case FAILURE:
 			default:
@@ -103,33 +123,80 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	@Override
 	public void processUnSubAck(MqttUnsubAckMessage message) {
 		int messageId = message.variableHeader().messageId();
-		String topicFilter = subscriptionManager.getPaddingUnSubscribe(messageId);
-		logger.debug("MQTT UnSubAck messageId:{} topicFilter:{}", messageId, topicFilter);
-		if (topicFilter == null) {
+		logger.debug("MqttClient UnSubAck messageId:{}", messageId);
+		MqttPendingUnSubscription pendingUnSubscription = subscriptionManager.getPaddingUnSubscribe(messageId);
+		if (pendingUnSubscription == null) {
 			return;
 		}
-		subscriptionManager.removeSubscriptions(topicFilter);
+		pendingUnSubscription.onUnSubAckReceived();
+		subscriptionManager.removePaddingUnSubscribe(messageId);
+		subscriptionManager.removeSubscriptions(pendingUnSubscription.getTopic());
 	}
 
 	@Override
 	public void processPubAck(MqttPubAckMessage message) {
 		int messageId = message.variableHeader().messageId();
-		System.out.println(message);
+		logger.debug("MqttClient PubAck messageId:{}", messageId);
+		MqttPendingPublish pendingPublish = subscriptionManager.getPendingPublish(messageId);
+		if (pendingPublish == null) {
+			return;
+		}
+		pendingPublish.onPubAckReceived();
+		subscriptionManager.removePendingPublish(messageId);
+		pendingPublish.getPayload().clear();
 	}
 
 	@Override
 	public void processPubRec(ChannelContext context, MqttMessage message) {
-		System.out.println(message);
+		int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
+		logger.debug("MqttClient PubRec messageId:{}", messageId);
+		MqttPendingPublish pendingPublish = subscriptionManager.getPendingPublish(messageId);
+		pendingPublish.onPubAckReceived();
+
+		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+		MqttMessageIdVariableHeader variableHeader = (MqttMessageIdVariableHeader) message.variableHeader();
+		MqttMessage pubRelMessage = new MqttMessage(fixedHeader, variableHeader);
+		Tio.send(context, pubRelMessage);
+
+		pendingPublish.setPubRelMessage(pubRelMessage);
+		pendingPublish.startPubRelRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 	}
 
 	@Override
 	public void processPubRel(ChannelContext context, MqttMessage message) {
-		System.out.println(message);
+		int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
+		logger.debug("MqttClient PubRel messageId:{}", messageId);
+		MqttPendingQos2Publish pendingQos2Publish = subscriptionManager.getPendingQos2Publish(messageId);
+		if (pendingQos2Publish != null) {
+			MqttPublishMessage incomingPublish = pendingQos2Publish.getIncomingPublish();
+			String topicName = incomingPublish.variableHeader().topicName();
+			this.invokeListenerForPublish(topicName, incomingPublish);
+			pendingQos2Publish.onPubRelReceived();
+			subscriptionManager.removePendingQos2Publish(messageId);
+		}
+		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0);
+		MqttMessageIdVariableHeader variableHeader = MqttMessageIdVariableHeader.from(messageId);
+		Tio.send(context, new MqttMessage(fixedHeader, variableHeader));
 	}
 
 	@Override
 	public void processPubComp(MqttMessage message) {
-		System.out.println(message);
+		int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
+		MqttPendingPublish pendingPublish = subscriptionManager.getPendingPublish(messageId);
+		pendingPublish.getPayload().clear();
+		pendingPublish.onPubCompReceived();
+		subscriptionManager.removePendingPublish(messageId);
+	}
+
+	/**
+	 * 处理订阅的消息
+	 *
+	 * @param topicName topicName
+	 * @param message   MqttPublishMessage
+	 */
+	private void invokeListenerForPublish(String topicName, MqttPublishMessage message) {
+		List<MqttSubscription> subscriptionList = subscriptionManager.getMatchedSubscription(topicName);
+		subscriptionList.forEach(subscription -> subscription.getListener().onMessage(topicName, message.payload()));
 	}
 
 }

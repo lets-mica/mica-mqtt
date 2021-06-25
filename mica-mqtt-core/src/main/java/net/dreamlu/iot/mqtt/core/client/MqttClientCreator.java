@@ -28,9 +28,11 @@ import org.tio.client.intf.ClientAioListener;
 import org.tio.core.Node;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -250,16 +252,17 @@ public final class MqttClientCreator {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
 		if (StrUtil.isBlank(clientId)) {
-			// 默认为：MICA-MQTT- 前缀和 36进制的毫秒数
-			this.clientId("MICA-MQTT-" + Long.toString(System.currentTimeMillis(), 36));
+			// 默认为：MICA-MQTT- 前缀和 36进制的纳秒数
+			this.clientId("MICA-MQTT-" + Long.toString(System.nanoTime(), 36));
 		}
 		MqttClientSubscriptionManager subscriptionManager = new MqttClientSubscriptionManager();
 		// 客户端处理器
 		CountDownLatch connLatch = new CountDownLatch(1);
-		MqttClientProcessor processor = new DefaultMqttClientProcessor(subscriptionManager, connLatch);
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
+		MqttClientProcessor processor = new DefaultMqttClientProcessor(subscriptionManager, connLatch, executor);
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, Objects.requireNonNull(processor));
-		ClientAioListener clientAioListener = new MqttClientAioListener(this);
+		ClientAioListener clientAioListener = new MqttClientAioListener(this, subscriptionManager, executor);
 		// 3. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
@@ -274,7 +277,7 @@ public final class MqttClientCreator {
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
 		// 5. 等待连接成功之后继续
 		connLatch.await();
-		return new MqttClient(tioClient, this, context, subscriptionManager);
+		return new MqttClient(tioClient, this, context, subscriptionManager, executor);
 	}
 
 }

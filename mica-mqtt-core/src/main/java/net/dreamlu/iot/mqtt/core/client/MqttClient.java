@@ -23,8 +23,10 @@ import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.core.Tio;
+import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 客户端
@@ -37,6 +39,7 @@ public final class MqttClient {
 	private final MqttClientCreator config;
 	private final ClientChannelContext context;
 	private final MqttClientSubscriptionManager subscriptionManager;
+	private final ScheduledThreadPoolExecutor executor;
 
 	public static MqttClientCreator create() {
 		return new MqttClientCreator();
@@ -45,11 +48,13 @@ public final class MqttClient {
 	MqttClient(TioClient tioClient,
 			   MqttClientCreator config,
 			   ClientChannelContext context,
-			   MqttClientSubscriptionManager subscriptionManager) {
+			   MqttClientSubscriptionManager subscriptionManager,
+			   ScheduledThreadPoolExecutor executor) {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.context = context;
 		this.subscriptionManager = subscriptionManager;
+		this.executor = executor;
 	}
 
 	/**
@@ -99,12 +104,11 @@ public final class MqttClient {
 			.addSubscription(mqttQoS, topicFilter)
 			.messageId(messageId)
 			.build();
+		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, listener, message);
 		Boolean result = Tio.send(context, message);
 		logger.debug("MQTT subscribe topicFilter:{} mqttQoS:{} messageId:{} result:{}", topicFilter, mqttQoS, messageId, result);
-		// 先 tio 发送数据才添加，考虑会不会 ack 早回？？？
-		if (Boolean.TRUE.equals(result)) {
-			subscriptionManager.addPaddingSubscribe(new MqttSubscription(messageId, mqttQoS, topicFilter, listener));
-		}
+		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
+		subscriptionManager.addPaddingSubscribe(messageId, pendingSubscription);
 		return this;
 	}
 
@@ -120,12 +124,12 @@ public final class MqttClient {
 			.addTopicFilter(topicFilter)
 			.messageId(MqttClientMessageId.getId())
 			.build();
+		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilter, message);
 		Boolean result = Tio.send(context, message);
 		logger.debug("MQTT unSubscribe topicFilter:{} messageId:{} result:{}", topicFilter, messageId, result);
 		// 解绑 subManage listener
-		if (Boolean.TRUE.equals(result)) {
-			subscriptionManager.addPaddingUnSubscribe(messageId, topicFilter);
-		}
+		subscriptionManager.addPaddingUnSubscribe(messageId, pendingUnSubscription);
+		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 		return this;
 	}
 
@@ -174,15 +178,22 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		int messageId = MqttClientMessageId.getId();
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)
 			.qos(qos)
 			.retained(retain)
-			.messageId(MqttClientMessageId.getId())
+			.messageId(messageId)
 			.build();
-		logger.debug("MQTT publish topic:{} qos:{} retain:{}", topic, qos, retain);
-		return Tio.send(context, message);
+		MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
+		Boolean result = Tio.send(context, message);
+		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
+		if (MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos) {
+			subscriptionManager.addPendingPublish(messageId, pendingPublish);
+			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
+		}
+		return result;
 	}
 
 	/**

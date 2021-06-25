@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.core.client;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
@@ -27,25 +28,18 @@ import java.util.regex.Pattern;
  * @author L.cm
  */
 final class MqttSubscription {
-	private final int messageId;
-	private final MqttQoS mqttQoS;
 	private final String topicFilter;
+	private final MqttQoS mqttQoS;
 	private final Pattern topicRegex;
 	private final MqttMessageListener listener;
 
-	public MqttSubscription(int messageId,
-							MqttQoS mqttQoS,
+	public MqttSubscription(MqttQoS mqttQoS,
 							String topicFilter,
 							MqttMessageListener listener) {
-		this.messageId = messageId;
 		this.mqttQoS = mqttQoS;
 		this.topicFilter = topicFilter;
 		this.topicRegex = Pattern.compile(topicFilter.replace("+", "[^/]+").replace("#", ".+").concat("$"));
 		this.listener = listener;
-	}
-
-	public int getMessageId() {
-		return messageId;
 	}
 
 	public MqttQoS getMqttQoS() {
@@ -60,16 +54,36 @@ final class MqttSubscription {
 		return listener;
 	}
 
-	boolean matches(String topic){
+	boolean matches(String topic) {
 		return this.topicRegex.matcher(topic).matches();
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		MqttSubscription that = (MqttSubscription) o;
+		return Objects.equals(topicFilter, that.topicFilter) &&
+			mqttQoS == that.mqttQoS &&
+			Objects.equals(topicRegex, that.topicRegex) &&
+			Objects.equals(listener, that.listener);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(topicFilter, mqttQoS, topicRegex, listener);
+	}
+
+	@Override
 	public String toString() {
-		return "MqttPendingSubscription{" +
-			"messageId=" + messageId +
+		return "MqttSubscription{" +
+			"topicFilter='" + topicFilter + '\'' +
 			", mqttQoS=" + mqttQoS +
-			", topicFilter='" + topicFilter + '\'' +
+			", topicRegex=" + topicRegex +
 			", listener=" + listener +
 			'}';
 	}

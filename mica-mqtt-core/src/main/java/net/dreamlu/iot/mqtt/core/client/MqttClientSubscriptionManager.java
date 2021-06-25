@@ -31,22 +31,38 @@ final class MqttClientSubscriptionManager {
 	 * 订阅的数据承载
 	 */
 	private final MultiValueMap<String, MqttSubscription> subscriptions = new MultiValueMap<>();
-	private final Map<Integer, MqttSubscription> pendingSubscriptions = new LinkedHashMap<>();
-	private final Map<Integer, String> pendingUnSubscriptions = new LinkedHashMap<>();
+	private final Map<Integer, MqttPendingSubscription> pendingSubscriptions = new LinkedHashMap<>();
+	private final Map<Integer, MqttPendingUnSubscription> pendingUnSubscriptions = new LinkedHashMap<>();
+	private final Map<Integer, MqttPendingPublish> pendingPublishData = new LinkedHashMap<>();
+	private final Map<Integer, MqttPendingQos2Publish> pendingQos2PublishData = new LinkedHashMap<>();
 
-	public void addPaddingSubscribe(MqttSubscription pendingSubscription) {
-		pendingSubscriptions.put(pendingSubscription.getMessageId(), pendingSubscription);
+	void addPaddingSubscribe(int messageId, MqttPendingSubscription pendingSubscription) {
+		pendingSubscriptions.put(messageId, pendingSubscription);
 	}
 
-	public MqttSubscription getPaddingSubscribe(int messageId) {
+	MqttPendingSubscription getPaddingSubscribe(int messageId) {
+		return pendingSubscriptions.get(messageId);
+	}
+
+	MqttPendingSubscription removePaddingSubscribe(int messageId) {
 		return pendingSubscriptions.remove(messageId);
 	}
 
-	public void addSubscription(MqttSubscription subscription) {
+	void addSubscription(MqttSubscription subscription) {
 		subscriptions.add(subscription.getTopicFilter(), subscription);
 	}
 
-	public List<MqttSubscription> getMatchedSubscription(String topicName) {
+	List<MqttSubscription> getAndCleanSubscription() {
+		List<MqttSubscription> subscriptionList = new ArrayList<>();
+		for (List<MqttSubscription> mqttSubscriptions : subscriptions.values()) {
+			subscriptionList.addAll(mqttSubscriptions);
+		}
+		List<MqttSubscription> data = Collections.unmodifiableList(subscriptionList);
+		subscriptions.clear();
+		return data;
+	}
+
+	List<MqttSubscription> getMatchedSubscription(String topicName) {
 		List<MqttSubscription> subscriptionList = new ArrayList<>();
 		for (List<MqttSubscription> mqttSubscriptions : subscriptions.values()) {
 			for (MqttSubscription subscription : mqttSubscriptions) {
@@ -58,16 +74,44 @@ final class MqttClientSubscriptionManager {
 		return Collections.unmodifiableList(subscriptionList);
 	}
 
-	public void removeSubscriptions(String topicFilter) {
+	void removeSubscriptions(String topicFilter) {
 		subscriptions.remove(topicFilter);
 	}
 
-	public void addPaddingUnSubscribe(int messageId, String topicFilter) {
-		pendingUnSubscriptions.put(messageId, topicFilter);
+	void addPaddingUnSubscribe(int messageId, MqttPendingUnSubscription pendingUnSubscription) {
+		pendingUnSubscriptions.put(messageId, pendingUnSubscription);
 	}
 
-	public String getPaddingUnSubscribe(int messageId) {
+	MqttPendingUnSubscription getPaddingUnSubscribe(int messageId) {
+		return pendingUnSubscriptions.get(messageId);
+	}
+
+	MqttPendingUnSubscription removePaddingUnSubscribe(int messageId) {
 		return pendingUnSubscriptions.remove(messageId);
+	}
+
+	void addPendingPublish(int messageId, MqttPendingPublish pendingPublish) {
+		pendingPublishData.put(messageId, pendingPublish);
+	}
+
+	MqttPendingPublish getPendingPublish(int messageId) {
+		return pendingPublishData.get(messageId);
+	}
+
+	MqttPendingPublish removePendingPublish(int messageId) {
+		return pendingPublishData.remove(messageId);
+	}
+
+	void addPendingQos2Publish(int messageId, MqttPendingQos2Publish pendingQos2Publish) {
+		pendingQos2PublishData.put(messageId, pendingQos2Publish);
+	}
+
+	MqttPendingQos2Publish getPendingQos2Publish(int messageId) {
+		return pendingQos2PublishData.get(messageId);
+	}
+
+	MqttPendingQos2Publish removePendingQos2Publish(int messageId) {
+		return pendingQos2PublishData.remove(messageId);
 	}
 
 }

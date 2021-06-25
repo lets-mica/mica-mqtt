@@ -16,16 +16,41 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tio.server.ServerTioConfig;
+import org.tio.server.TioServer;
+
 /**
  * mqtt 服务端
  *
  * @author L.cm
  */
-public class MqttServer {
+public final class MqttServer {
+	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
+	private final TioServer tioServer;
 
-	// 1. 服务端的 ip 端口配置，ip 应该可以默认为（127.0.0.1），考虑 ssl
-	// 2. 心跳超时
-	// 3. 自定义业务处理器
-	// 4. sub 的 topic 和 监听的配置，sub 是自定义业务处理器的行为，不应该在这里面配置
+	MqttServer(TioServer tioServer) {
+		this.tioServer = tioServer;
+	}
+
+	public static MqttServerCreator create() {
+		return new MqttServerCreator();
+	}
+
+	/**
+	 * 获取 ServerTioConfig
+	 *
+	 * @return the serverTioConfig
+	 */
+	public ServerTioConfig getServerConfig() {
+		return this.tioServer.getServerTioConfig();
+	}
+
+	public boolean stop() {
+		boolean result = this.tioServer.stop();
+		logger.info("MqttServer stop result:{}", result);
+		return result;
+	}
 
 }
