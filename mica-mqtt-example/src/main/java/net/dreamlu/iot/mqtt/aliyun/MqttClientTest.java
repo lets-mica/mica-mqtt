@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.aliyun;
 
+import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
 import java.nio.ByteBuffer;
@@ -50,8 +51,8 @@ public class MqttClientTest {
 			.clientId(clientId)
 			.connect();
 
-		client.subQos0("/sys/" + productKey + "/" + deviceName + "/thing/event/property/post_reply", (topic, payload) -> {
-
+		client.subQos0("/sys/" + productKey + '/' + deviceName + "/thing/event/property/post_reply", (topic, payload) -> {
+			System.out.println(topic + '\t' +ByteBufferUtil.toString(payload));
 		});
 
 		String content = "{\"id\":\"1\",\"version\":\"1.0\",\"params\":{\"LightSwitch\":1}}";

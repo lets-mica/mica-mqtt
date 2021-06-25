@@ -19,15 +19,11 @@ package net.dreamlu.iot.mqtt.client;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 客户端测试
@@ -46,18 +42,8 @@ public class MqttClientTest {
 			.connect();
 
 		client.subQos0("/test/#", (topic, payload) -> {
-			System.out.println(ByteBufferUtil.toString(payload));
+			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
-
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
-
-		TimerTask task = new TimerTask() {
-			@Override
-			public void run() {
-				System.out.println("TimerTask run");
-			}
-		};
-		executor.schedule(() -> {}, 1, TimeUnit.SECONDS);
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
