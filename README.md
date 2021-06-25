@@ -6,9 +6,9 @@
 
 ## 功能
 - [x] 支持 MQTT v3.1、v3.1.1 以及 v5.0 协议。
-- [x] MQTT client 客户端（演示）。
+- [x] MQTT client 客户端。
+- [x] MQTT 客户端 topic sub，添加阿里云 mqtt demo。
 - [x] MQTT server 服务端（演示）。
-- [ ] MQTT 客户端 topic sub，添加阿里云 mqtt demo。
 - [ ] MQTT 服务端接续完善，精力有限，周期可能会长一些。
 
 ## 文档
