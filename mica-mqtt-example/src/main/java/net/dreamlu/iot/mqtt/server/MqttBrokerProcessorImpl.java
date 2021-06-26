@@ -25,8 +25,8 @@ import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * mqtt broker 处理器
@@ -130,14 +130,17 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 	@Override
 	public void processSubscribe(ChannelContext context, MqttSubscribeMessage message) {
 		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
-		List<Integer> mqttQoSList = topicSubscriptions.stream()
-			.map(MqttTopicSubscription::qualityOfService)
-			.map(MqttQoS::value)
-			.collect(Collectors.toList());
-		MqttMessage subAckMessage = MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.SUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-			MqttMessageIdVariableHeader.from(message.variableHeader().messageId()),
-			new MqttSubAckPayload(mqttQoSList));
+		List<MqttQoS> mqttQoSList = new ArrayList<>();
+		for (MqttTopicSubscription topicSubscription : topicSubscriptions) {
+			String topicName = topicSubscription.topicName();
+			MqttQoS mqttQoS = topicSubscription.qualityOfService();
+			log.debug("Subscribe topicName:{} mqttQoS:{}", topicName, mqttQoS);
+			mqttQoSList.add(mqttQoS);
+		}
+		MqttMessage subAckMessage = MqttMessageBuilders.subAck()
+			.packetId(message.variableHeader().messageId())
+			.addGrantedQoses(mqttQoSList.toArray(new MqttQoS[0]))
+			.build();
 		Tio.send(context, subAckMessage);
 	}
 
@@ -145,10 +148,10 @@ public class MqttBrokerProcessorImpl implements MqttServerProcessor {
 	public void processUnSubscribe(ChannelContext context, MqttUnsubscribeMessage mqttMessage) {
 		String clientId = context.getBsId();
 		log.debug("UnSubscribe - clientId: {}", clientId);
-		MqttMessage message = MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.UNSUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0),
-			MqttMessageIdVariableHeader.from(mqttMessage.variableHeader().messageId()), null);
-		Tio.send(context, message);
+		MqttUnsubAckMessage unsubAckMessage = MqttMessageBuilders.unsubAck()
+			.packetId(mqttMessage.variableHeader().messageId())
+			.build();
+		Tio.send(context, unsubAckMessage);
 	}
 
 	@Override

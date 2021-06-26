@@ -16,12 +16,12 @@
 
 package net.dreamlu.iot.mqtt.codec;
 
+import net.dreamlu.iot.mqtt.codec.MqttProperties.MqttPropertyType;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import net.dreamlu.iot.mqtt.codec.MqttProperties.MqttPropertyType;
 
 /**
  * mqtt 消息构造器

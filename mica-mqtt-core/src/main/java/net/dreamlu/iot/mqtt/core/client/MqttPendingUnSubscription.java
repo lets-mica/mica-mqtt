@@ -12,11 +12,11 @@ import java.util.function.Consumer;
 final class MqttPendingUnSubscription {
 
 	private final String topic;
-	private final RetryProcessor<MqttUnsubscribeMessage> retransmissionHandler = new RetryProcessor<>();
+	private final RetryProcessor<MqttUnsubscribeMessage> retryProcessor = new RetryProcessor<>();
 
 	MqttPendingUnSubscription(String topic, MqttUnsubscribeMessage unSubscribeMessage) {
 		this.topic = topic;
-		this.retransmissionHandler.setOriginalMessage(unSubscribeMessage);
+		this.retryProcessor.setOriginalMessage(unSubscribeMessage);
 	}
 
 	String getTopic() {
@@ -24,13 +24,13 @@ final class MqttPendingUnSubscription {
 	}
 
 	void startRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
-		this.retransmissionHandler.setHandle((fixedHeader, originalMessage) ->
+		this.retryProcessor.setHandle((fixedHeader, originalMessage) ->
 			sendPacket.accept(new MqttUnsubscribeMessage(fixedHeader, originalMessage.variableHeader(), originalMessage.payload())));
-		this.retransmissionHandler.start(executor);
+		this.retryProcessor.start(executor);
 	}
 
 	void onUnSubAckReceived() {
-		this.retransmissionHandler.stop();
+		this.retryProcessor.stop();
 	}
 
 }

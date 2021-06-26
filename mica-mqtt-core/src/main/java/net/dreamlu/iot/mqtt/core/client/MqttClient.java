@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.core.Tio;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
