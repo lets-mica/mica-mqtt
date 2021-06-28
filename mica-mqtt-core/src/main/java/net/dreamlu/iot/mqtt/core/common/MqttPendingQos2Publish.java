@@ -11,11 +11,11 @@ import java.util.function.Consumer;
  */
 public final class MqttPendingQos2Publish {
 	private final MqttPublishMessage incomingPublish;
-	private final RetryProcessor<MqttMessage> retransmissionHandler = new RetryProcessor<>();
+	private final RetryProcessor<MqttMessage> retryProcessor = new RetryProcessor<>();
 
 	public MqttPendingQos2Publish(MqttPublishMessage incomingPublish, MqttMessage originalMessage) {
 		this.incomingPublish = incomingPublish;
-		this.retransmissionHandler.setOriginalMessage(originalMessage);
+		this.retryProcessor.setOriginalMessage(originalMessage);
 	}
 
 	public MqttPublishMessage getIncomingPublish() {
@@ -23,13 +23,13 @@ public final class MqttPendingQos2Publish {
 	}
 
 	public void startPubRecRetransmitTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
-		this.retransmissionHandler.setHandle((fixedHeader, originalMessage) ->
+		this.retryProcessor.setHandle((fixedHeader, originalMessage) ->
 			sendPacket.accept(new MqttMessage(fixedHeader, originalMessage.variableHeader())));
-		this.retransmissionHandler.start(executor);
+		this.retryProcessor.start(executor);
 	}
 
 	public void onPubRelReceived() {
-		this.retransmissionHandler.stop();
+		this.retryProcessor.stop();
 	}
 
 }
