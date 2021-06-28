@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.client;
+package net.dreamlu.iot.mqtt.core.common;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
-import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  *
  * @author L.cm
  */
-final class MqttSubscription {
+public final class MqttSubscription implements Serializable {
 	private final String topicFilter;
 	private final MqttQoS mqttQoS;
 	private final Pattern topicRegex;
@@ -54,7 +54,7 @@ final class MqttSubscription {
 		return listener;
 	}
 
-	boolean matches(String topic) {
+	public boolean matches(String topic) {
 		return this.topicRegex.matcher(topic).matches();
 	}
 

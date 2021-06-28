@@ -23,10 +23,12 @@ import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
 import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
+import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 服务端参数构造
@@ -67,6 +69,10 @@ public class MqttServerCreator {
 	 * tio 的 IpStatListener
 	 */
 	private IpStatListener ipStatListener;
+	/**
+	 * messageId 生成
+	 */
+	private IMqttMessageIdGenerator messageIdGenerator;
 	/**
 	 * mqtt 服务端处理逻辑
 	 */
@@ -157,6 +163,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public IMqttMessageIdGenerator getMessageIdGenerator() {
+		return messageIdGenerator;
+	}
+
+	public MqttServerCreator messageIdGenerator(IMqttMessageIdGenerator messageIdGenerator) {
+		this.messageIdGenerator = messageIdGenerator;
+		return this;
+	}
+
 	public MqttServerProcessor getMqttServerCreatorProcessor() {
 		return mqttServerProcessor;
 	}
@@ -168,6 +183,7 @@ public class MqttServerCreator {
 
 	public MqttServer start() throws IOException {
 		Objects.requireNonNull(this.mqttServerProcessor, "Argument mqttServerProcessor is null.");
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttServer"));
 		// 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, this.mqttServerProcessor);
 		// 监听
@@ -192,7 +208,7 @@ public class MqttServerCreator {
 		tioServer.setCheckLastVersion(false);
 		// 启动
 		tioServer.start(this.ip, this.port);
-		return new MqttServer(tioServer);
+		return new MqttServer(tioServer, this.messageIdGenerator, executor);
 	}
 
 }

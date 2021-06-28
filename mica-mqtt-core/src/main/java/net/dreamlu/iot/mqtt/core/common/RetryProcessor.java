@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.core.client;
+package net.dreamlu.iot.mqtt.core.common;
 
 
 import net.dreamlu.iot.mqtt.codec.MqttFixedHeader;
@@ -15,14 +15,14 @@ import java.util.function.BiConsumer;
  *
  * @param <T> MqttMessage
  */
-final class RetryProcessor<T extends MqttMessage> {
+public final class RetryProcessor<T extends MqttMessage> {
 
 	private ScheduledFuture<?> timer;
 	private int timeout = 10;
 	private BiConsumer<MqttFixedHeader, T> handler;
 	private T originalMessage;
 
-	void start(ScheduledThreadPoolExecutor executor) {
+	public void start(ScheduledThreadPoolExecutor executor) {
 		Objects.requireNonNull(executor, "RetryProcessor executor is null.");
 		Objects.requireNonNull(this.handler, "RetryProcessor handler is null.");
 		this.timeout = 10;
@@ -38,17 +38,17 @@ final class RetryProcessor<T extends MqttMessage> {
 		}, timeout, TimeUnit.SECONDS);
 	}
 
-	void stop() {
+	public void stop() {
 		if (this.timer != null) {
 			this.timer.cancel(true);
 		}
 	}
 
-	void setHandle(BiConsumer<MqttFixedHeader, T> runnable) {
+	public void setHandle(BiConsumer<MqttFixedHeader, T> runnable) {
 		this.handler = runnable;
 	}
 
-	void setOriginalMessage(T originalMessage) {
+	public void setOriginalMessage(T originalMessage) {
 		this.originalMessage = originalMessage;
 	}
 

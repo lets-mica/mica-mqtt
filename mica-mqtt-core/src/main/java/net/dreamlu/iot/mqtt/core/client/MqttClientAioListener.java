@@ -20,6 +20,7 @@ import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttSubscribeMessage;
+import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.DefaultClientAioListener;
@@ -85,22 +86,22 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 			// 5. 发送 mqtt 连接消息
 			Boolean result = Tio.send(context, builder.build());
 			logger.info("MqttClient reconnect send connect result:{}", result);
-			// 6. 发送重新订阅
+			// 6. 重连时发送重新订阅
 			reSendSubscription(context);
 		}
 	}
 
 	private void reSendSubscription(ChannelContext context) {
 		List<MqttSubscription> subscriptionList = subscriptionManager.getAndCleanSubscription();
-		for (MqttSubscription mqttSubscription : subscriptionList) {
+		for (MqttSubscription subscription : subscriptionList) {
 			int messageId = MqttClientMessageId.getId();
-			MqttQoS mqttQoS = mqttSubscription.getMqttQoS();
-			String topicFilter = mqttSubscription.getTopicFilter();
+			MqttQoS mqttQoS = subscription.getMqttQoS();
+			String topicFilter = subscription.getTopicFilter();
 			MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
 				.addSubscription(mqttQoS, topicFilter)
 				.messageId(messageId)
 				.build();
-			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, mqttSubscription.getListener(), message);
+			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, subscription.getListener(), message);
 			Boolean result = Tio.send(context, message);
 			logger.info("MQTT reconnect subscribe topicFilter:{} mqttQoS:{} messageId:{} result:{}", topicFilter, mqttQoS, messageId, result);
 			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));

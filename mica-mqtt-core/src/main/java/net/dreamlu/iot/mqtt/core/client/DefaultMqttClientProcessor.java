@@ -17,6 +17,8 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
+import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
+import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -111,7 +113,6 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 					MqttMessage pubRecMessage = new MqttMessage(fixedHeader, MqttMessageIdVariableHeader.from(packetId));
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					subscriptionManager.addPendingQos2Publish(packetId, pendingQos2Publish);
-					message.payload().clear();
 					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
 				}
 				break;

@@ -565,6 +565,11 @@ public final class MqttMessageBuilders {
 			return this;
 		}
 
+		public SubAckBuilder addGrantedQosList(List<MqttQoS> qosList) {
+			this.grantedQosList.addAll(qosList);
+			return this;
+		}
+
 		public MqttSubAckMessage build() {
 			MqttFixedHeader mqttFixedHeader =
 				new MqttFixedHeader(MqttMessageType.SUBACK, false, MqttQoS.AT_MOST_ONCE, false, 0);

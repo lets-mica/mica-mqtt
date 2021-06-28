@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.core.Tio;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -122,7 +121,7 @@ public final class MqttClient {
 		int messageId = MqttClientMessageId.getId();
 		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
 			.addTopicFilter(topicFilter)
-			.messageId(MqttClientMessageId.getId())
+			.messageId(messageId)
 			.build();
 		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilter, message);
 		Boolean result = Tio.send(context, message);
@@ -178,7 +177,8 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
-		int messageId = MqttClientMessageId.getId();
+		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
+		int messageId = isHighLevelQoS ? MqttClientMessageId.getId() : -1;
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)
@@ -189,7 +189,7 @@ public final class MqttClient {
 		MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 		Boolean result = Tio.send(context, message);
 		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
-		if (MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos) {
+		if (isHighLevelQoS) {
 			subscriptionManager.addPendingPublish(messageId, pendingPublish);
 			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 		}
@@ -225,7 +225,10 @@ public final class MqttClient {
 	public boolean stop() {
 		// 先断开连接
 		this.disconnect();
-		return tioClient.stop();
+		boolean result = tioClient.stop();
+		logger.info("MqttClient stop result:{}", result);
+		this.executor.shutdown();
+		return result;
 	}
 
 	/**

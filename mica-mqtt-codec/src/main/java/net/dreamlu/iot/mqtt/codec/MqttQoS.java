@@ -22,11 +22,11 @@ public enum MqttQoS {
 	 */
 	AT_MOST_ONCE(0),
 	/**
-	 * QoS level 1 都要在可变头部中附加一个16位的消息ID，SUBSCRIBE 和 UNSUBSCRIBE 消息使用 QoS level 1。
+	 * QoS level 1 至少一次，都要在可变头部中附加一个16位的消息ID，SUBSCRIBE 和 UNSUBSCRIBE 消息使用 QoS level 1。
 	 */
 	AT_LEAST_ONCE(1),
 	/**
-	 * QoS level 2 仅仅在 PUBLISH 类型消息中出现，要求在可变头部中要附加消息ID。
+	 * QoS level 2 确保只有一次，仅仅在 PUBLISH 类型消息中出现，要求在可变头部中要附加消息ID。
 	 */
 	EXACTLY_ONCE(2),
 	/**

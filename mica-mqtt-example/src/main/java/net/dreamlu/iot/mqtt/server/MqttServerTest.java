@@ -16,18 +16,19 @@
 
 package net.dreamlu.iot.mqtt.server;
 
-import net.dreamlu.iot.mqtt.codec.*;
+import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
+import net.dreamlu.iot.mqtt.core.server.IMqttAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.IMqttMessageIdGenerator;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import org.tio.core.ChannelContext;
-import org.tio.core.Tio;
-import org.tio.server.ServerTioConfig;
-import org.tio.utils.lock.SetWithLock;
+import net.dreamlu.iot.mqtt.core.server.MqttServerDefaultSubManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 服务端测试
@@ -37,6 +38,17 @@ import java.util.TimerTask;
 public class MqttServerTest {
 
 	public static void main(String[] args) throws IOException {
+		IMqttAuthHandler authHandler = (clientId, userName, password) -> true;
+
+		MqttServerDefaultSubManager subManager = new MqttServerDefaultSubManager();
+		subManager.register(new MqttSubscription(MqttQoS.AT_MOST_ONCE, "/test/#", ((topic, payload) -> {
+			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
+		})));
+
+		IMqttMessageIdGenerator messageIdGenerator = new MqttMessageIdGenerator();
+		ScheduledThreadPoolExecutor executor = null;
+
+		MqttServerProcessorImpl processor = new MqttServerProcessorImpl(authHandler, subManager, messageIdGenerator, executor);
 		MqttServer mqttServer = MqttServer.create()
 			// 默认 MICA-MQTT-SERVER
 			.name("mqtt-server")
@@ -44,24 +56,15 @@ public class MqttServerTest {
 			.ip("127.0.0.1")
 			// 默认：1883
 			.port(1883)
-			.processor(new MqttBrokerProcessorImpl())
+			.messageIdGenerator(messageIdGenerator)
+			.processor(processor)
 			.start();
-
-		ServerTioConfig serverConfig = mqttServer.getServerConfig();
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				SetWithLock<ChannelContext> contextSet = Tio.getAll(serverConfig);
-				Set<ChannelContext> channelContexts = contextSet.getObj();
-				channelContexts.forEach(context -> {
-					System.out.println(String.format("MqttServer send to clientId:%s", context.getBsId()));
-					MqttPublishMessage message = (MqttPublishMessage) MqttMessageFactory.newMessage(
-						new MqttFixedHeader(MqttMessageType.PUBLISH, false, MqttQoS.AT_MOST_ONCE, false, 0),
-						new MqttPublishVariableHeader("/test/123", 0), ByteBuffer.wrap("mica最牛皮".getBytes()));
-					Tio.send(context, message);
-				});
+				mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));
 			}
 		}, 1000, 2000);
 	}
