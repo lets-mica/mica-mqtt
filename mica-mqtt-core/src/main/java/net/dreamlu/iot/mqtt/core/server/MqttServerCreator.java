@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttSubscribeStore;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -70,13 +71,25 @@ public class MqttServerCreator {
 	 */
 	private IpStatListener ipStatListener;
 	/**
+	 * 认证处理器
+	 */
+	private IMqttAuthHandler authHandler;
+	/**
 	 * messageId 生成
 	 */
 	private IMqttMessageIdGenerator messageIdGenerator;
 	/**
-	 * mqtt 服务端处理逻辑
+	 * 发布管理
 	 */
-	private MqttServerProcessor mqttServerProcessor;
+	private IMqttPublishManager publishManager;
+	/**
+	 * 订阅管路
+	 */
+	private IMqttSubManager subManager;
+	/**
+	 * 订阅存储
+	 */
+	private IMqttSubscribeStore subscribeStore;
 
 	public String getName() {
 		return name;
@@ -163,6 +176,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public IMqttAuthHandler getAuthHandler() {
+		return authHandler;
+	}
+
+	public MqttServerCreator authHandler(IMqttAuthHandler authHandler) {
+		this.authHandler = authHandler;
+		return this;
+	}
+
 	public IMqttMessageIdGenerator getMessageIdGenerator() {
 		return messageIdGenerator;
 	}
@@ -172,20 +194,45 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public MqttServerProcessor getMqttServerCreatorProcessor() {
-		return mqttServerProcessor;
+	public IMqttPublishManager getPublishManager() {
+		return publishManager;
 	}
 
-	public MqttServerCreator processor(MqttServerProcessor mqttServerProcessor) {
-		this.mqttServerProcessor = mqttServerProcessor;
+	public MqttServerCreator publishManager(IMqttPublishManager publishManager) {
+		this.publishManager = publishManager;
+		return this;
+	}
+
+	public IMqttSubManager getSubManager() {
+		return subManager;
+	}
+
+	public MqttServerCreator subManager(IMqttSubManager subManager) {
+		this.subManager = subManager;
+		return this;
+	}
+
+	public IMqttSubscribeStore getSubscribeStore() {
+		return subscribeStore;
+	}
+
+	public MqttServerCreator subscribeStore(IMqttSubscribeStore subscribeStore) {
+		this.subscribeStore = subscribeStore;
 		return this;
 	}
 
 	public MqttServer start() throws IOException {
-		Objects.requireNonNull(this.mqttServerProcessor, "Argument mqttServerProcessor is null.");
+		Objects.requireNonNull(this.messageIdGenerator, "Argument messageIdGenerator is null.");
+		Objects.requireNonNull(this.publishManager, "Argument publishManager is null.");
+		Objects.requireNonNull(this.subManager, "Argument subManager is null.");
+		Objects.requireNonNull(this.subscribeStore, "Argument subscribeStore is null.");
+		if (this.authHandler == null) {
+			this.authHandler = new DefaultMqttAuthHandler();
+		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttServer"));
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(authHandler, subManager, publishManager, messageIdGenerator, subscribeStore, executor);
 		// 处理消息
-		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, this.mqttServerProcessor);
+		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, serverProcessor);
 		// 监听
 		ServerAioListener listener = new MqttServerAioListener();
 		// 配置
@@ -208,7 +255,7 @@ public class MqttServerCreator {
 		tioServer.setCheckLastVersion(false);
 		// 启动
 		tioServer.start(this.ip, this.port);
-		return new MqttServer(tioServer, this.messageIdGenerator, executor);
+		return new MqttServer(tioServer, this.messageIdGenerator, this.publishManager, this.subscribeStore, executor);
 	}
 
 }

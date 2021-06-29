@@ -14,45 +14,49 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.server;
+package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
+import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
+import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
-import net.dreamlu.iot.mqtt.core.server.IMqttAuthHandler;
-import net.dreamlu.iot.mqtt.core.server.IMqttMessageIdGenerator;
-import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
-import net.dreamlu.iot.mqtt.core.server.IMqttSubManager;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttSubscribeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.stream.Collectors;
 
 /**
  * mqtt broker 处理器
  *
  * @author L.cm
  */
-public class MqttServerProcessorImpl implements MqttServerProcessor {
-	private static final Logger logger = LoggerFactory.getLogger(MqttServerProcessorImpl.class);
+public class DefaultMqttServerProcessor implements MqttServerProcessor {
+	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttServerProcessor.class);
 	private final IMqttAuthHandler authHandler;
 	private final IMqttMessageIdGenerator messageIdGenerator;
+	private final IMqttPublishManager publishManager;
 	private final IMqttSubManager subManager;
+	private final IMqttSubscribeStore subscribeStore;
 	private final ScheduledThreadPoolExecutor executor;
 
-	public MqttServerProcessorImpl(IMqttAuthHandler authHandler,
+	public DefaultMqttServerProcessor(IMqttAuthHandler authHandler,
 								   IMqttSubManager subManager,
+								   IMqttPublishManager publishManager,
 								   IMqttMessageIdGenerator messageIdGenerator,
+								   IMqttSubscribeStore subscribeStore,
 								   ScheduledThreadPoolExecutor executor) {
 		this.authHandler = authHandler;
 		this.subManager = subManager;
 		this.messageIdGenerator = messageIdGenerator;
+		this.publishManager = publishManager;
+		this.subscribeStore = subscribeStore;
 		this.executor = executor;
 	}
 
@@ -115,7 +119,7 @@ public class MqttServerProcessorImpl implements MqttServerProcessor {
 					MqttFixedHeader pubRecFixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(pubRecFixedHeader, MqttMessageIdVariableHeader.from(packetId));
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
-//					subscriptionManager.addPendingQos2Publish(packetId, pendingQos2Publish);
+					publishManager.addPendingQos2Publish(packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
 				}
 				break;
@@ -129,6 +133,13 @@ public class MqttServerProcessorImpl implements MqttServerProcessor {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
 		logger.debug("PubAck - clientId: {}, messageId: {}", clientId, messageId);
+		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
+		if (pendingPublish == null) {
+			return;
+		}
+		pendingPublish.onPubAckReceived();
+		publishManager.removePendingPublish(messageId);
+		pendingPublish.getPayload().clear();
 	}
 
 	@Override
@@ -136,20 +147,34 @@ public class MqttServerProcessorImpl implements MqttServerProcessor {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
 		logger.debug("PubRec - clientId: {}, messageId: {}", clientId, messageId);
-		MqttMessage message = MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_MOST_ONCE, false, 0),
-			MqttMessageIdVariableHeader.from(messageId), null);
-		Tio.send(context, message);
+		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
+		pendingPublish.onPubAckReceived();
+
+		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+		MqttMessage pubRelMessage = new MqttMessage(fixedHeader, variableHeader);
+		Tio.send(context, pubRelMessage);
+
+		pendingPublish.setPubRelMessage(pubRelMessage);
+		pendingPublish.startPubRelRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 	}
 
 	@Override
 	public void processPubRel(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		String clientId = context.getBsId();
-		logger.debug("PubRel - clientId: {}, messageId: {}", clientId, variableHeader.messageId());
-		// TODO L.cm invokeListenerForPublish
+		int messageId = variableHeader.messageId();
+		logger.debug("PubRel - clientId: {}, messageId: {}", clientId, messageId);
+		MqttPendingQos2Publish pendingQos2Publish = publishManager.getPendingQos2Publish(messageId);
+		if (pendingQos2Publish != null) {
+			MqttPublishMessage incomingPublish = pendingQos2Publish.getIncomingPublish();
+			String topicName = incomingPublish.variableHeader().topicName();
+			MqttQoS mqttQoS = incomingPublish.fixedHeader().qosLevel();
+			invokeListenerForPublish(mqttQoS, topicName, incomingPublish);
+			pendingQos2Publish.onPubRelReceived();
+			publishManager.removePendingQos2Publish(messageId);
+		}
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0),
-			MqttMessageIdVariableHeader.from(variableHeader.messageId()), null);
+			MqttMessageIdVariableHeader.from(messageId), null);
 		Tio.send(context, message);
 	}
 
@@ -158,32 +183,45 @@ public class MqttServerProcessorImpl implements MqttServerProcessor {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
 		logger.debug("PubComp - clientId: {}, messageId: {}", clientId, messageId);
+		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
+		pendingPublish.getPayload().clear();
+		pendingPublish.onPubCompReceived();
+		publishManager.removePendingPublish(messageId);
 	}
 
 	@Override
 	public void processSubscribe(ChannelContext context, MqttSubscribeMessage message) {
 		String clientId = context.getBsId();
 		int messageId = message.variableHeader().messageId();
-		logger.debug("Subscribe - clientId: {} messageId:{}", clientId, messageId);
 		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
 		// 1. 校验 topicFilter
 		// 2. 存储 clientId 订阅的 topic
+		List<MqttQoS> mqttQosList = new ArrayList<>();
+		for (MqttTopicSubscription subscription : topicSubscriptions) {
+			String topicName = subscription.topicName();
+			MqttQoS mqttQoS = subscription.qualityOfService();
+			mqttQosList.add(mqttQoS);
+			subscribeStore.add(clientId, topicName, mqttQoS);
+			logger.debug("Subscribe - clientId: {} messageId:{} topicFilter:{} mqttQoS:{}", clientId, messageId, topicName, mqttQoS);
+		}
 		// 3. 返回 ack
-		List<MqttQoS> mqttQoSList = topicSubscriptions.stream()
-			.map(MqttTopicSubscription::qualityOfService)
-			.collect(Collectors.toList());
 		MqttMessage subAckMessage = MqttMessageBuilders.subAck()
-			.addGrantedQosList(mqttQoSList)
+			.addGrantedQosList(mqttQosList)
 			.packetId(messageId)
 			.build();
 		Tio.send(context, subAckMessage);
+		// 4. 发送保留消息
 	}
 
 	@Override
 	public void processUnSubscribe(ChannelContext context, MqttUnsubscribeMessage message) {
 		String clientId = context.getBsId();
 		int messageId = message.variableHeader().messageId();
-		logger.debug("UnSubscribe - clientId: {} messageId:{}", clientId, messageId);
+		List<String> topicFilterList = message.payload().topics();
+		for (String topicFilter : topicFilterList) {
+			subscribeStore.remove(clientId, topicFilter);
+			logger.debug("UnSubscribe - clientId: {} messageId:{} topicFilter:{}", clientId, messageId, topicFilter);
+		}
 		MqttMessage unSubMessage = MqttMessageBuilders.unsubAck()
 			.packetId(messageId)
 			.build();

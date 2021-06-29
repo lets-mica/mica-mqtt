@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
 import net.dreamlu.iot.mqtt.core.util.MultiValueMap;

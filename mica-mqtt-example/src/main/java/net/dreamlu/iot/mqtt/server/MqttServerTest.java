@@ -19,16 +19,14 @@ package net.dreamlu.iot.mqtt.server;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
-import net.dreamlu.iot.mqtt.core.server.IMqttAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.DefaultMqttServerSubManager;
 import net.dreamlu.iot.mqtt.core.server.IMqttMessageIdGenerator;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import net.dreamlu.iot.mqtt.core.server.MqttServerDefaultSubManager;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 服务端测试
@@ -38,26 +36,23 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class MqttServerTest {
 
 	public static void main(String[] args) throws IOException {
-		IMqttAuthHandler authHandler = (clientId, userName, password) -> true;
-
-		MqttServerDefaultSubManager subManager = new MqttServerDefaultSubManager();
+		DefaultMqttServerSubManager subManager = new DefaultMqttServerSubManager();
 		subManager.register(new MqttSubscription(MqttQoS.AT_MOST_ONCE, "/test/#", ((topic, payload) -> {
 			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
 		})));
 
 		IMqttMessageIdGenerator messageIdGenerator = new MqttMessageIdGenerator();
-		ScheduledThreadPoolExecutor executor = null;
-
-		MqttServerProcessorImpl processor = new MqttServerProcessorImpl(authHandler, subManager, messageIdGenerator, executor);
+		MqttSubscribeStore subscribeStore = new MqttSubscribeStore();
+		MqttPublishManager publishManager = new MqttPublishManager();
 		MqttServer mqttServer = MqttServer.create()
-			// 默认 MICA-MQTT-SERVER
-			.name("mqtt-server")
 			// 默认：127.0.0.1
 			.ip("127.0.0.1")
 			// 默认：1883
 			.port(1883)
 			.messageIdGenerator(messageIdGenerator)
-			.processor(processor)
+			.publishManager(publishManager)
+			.subManager(subManager)
+			.subscribeStore(subscribeStore)
 			.start();
 
 		Timer timer = new Timer();

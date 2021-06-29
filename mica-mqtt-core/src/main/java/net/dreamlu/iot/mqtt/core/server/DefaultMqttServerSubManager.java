@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author L.cm
  */
-public class MqttServerDefaultSubManager implements IMqttSubManager {
+public class DefaultMqttServerSubManager implements IMqttSubManager {
 	private final List<MqttSubscription> subscriptionList = new LinkedList<>();
 
 	@Override

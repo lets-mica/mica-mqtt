@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
+import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
@@ -186,10 +187,10 @@ public final class MqttClient {
 			.retained(retain)
 			.messageId(messageId)
 			.build();
-		MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 		Boolean result = Tio.send(context, message);
 		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
+			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			subscriptionManager.addPendingPublish(messageId, pendingPublish);
 			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 		}
