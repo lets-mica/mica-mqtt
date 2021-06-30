@@ -45,6 +45,13 @@ public interface IMqttSubscribeStore {
 	void remove(String clientId, String topicFilter);
 
 	/**
+	 * 删除订阅
+	 *
+	 * @param clientId 客户端 Id
+	 */
+	void remove(String clientId);
+
+	/**
 	 * 查找订阅信息
 	 *
 	 * @param clientId  客户端 Id

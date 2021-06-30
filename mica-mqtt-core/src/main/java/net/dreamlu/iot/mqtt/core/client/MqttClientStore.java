@@ -28,7 +28,7 @@ import java.util.*;
  *
  * @author L.cm
  */
-final class MqttClientSubscriptionManager {
+final class MqttClientStore {
 
 	/**
 	 * 订阅的数据承载
@@ -117,4 +117,11 @@ final class MqttClientSubscriptionManager {
 		return pendingQos2PublishData.remove(messageId);
 	}
 
+	public void clean() {
+		subscriptions.clear();
+		pendingSubscriptions.clear();
+		pendingUnSubscriptions.clear();
+		pendingPublishData.clear();
+		pendingQos2PublishData.clear();
+	}
 }

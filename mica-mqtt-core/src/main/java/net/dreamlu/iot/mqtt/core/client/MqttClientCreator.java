@@ -255,14 +255,14 @@ public final class MqttClientCreator {
 			// 默认为：MICA-MQTT- 前缀和 36进制的纳秒数
 			this.clientId("MICA-MQTT-" + Long.toString(System.nanoTime(), 36));
 		}
-		MqttClientSubscriptionManager subscriptionManager = new MqttClientSubscriptionManager();
+		MqttClientStore clientStore = new MqttClientStore();
 		// 客户端处理器
 		CountDownLatch connLatch = new CountDownLatch(1);
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
-		MqttClientProcessor processor = new DefaultMqttClientProcessor(subscriptionManager, connLatch, executor);
+		MqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, connLatch, executor);
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, Objects.requireNonNull(processor));
-		ClientAioListener clientAioListener = new MqttClientAioListener(this, subscriptionManager, executor);
+		ClientAioListener clientAioListener = new MqttClientAioListener(this, clientStore, executor);
 		// 3. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
@@ -277,7 +277,7 @@ public final class MqttClientCreator {
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
 		// 5. 等待连接成功之后继续
 		connLatch.await();
-		return new MqttClient(tioClient, this, context, subscriptionManager, executor);
+		return new MqttClient(tioClient, this, context, clientStore, executor);
 	}
 
 }

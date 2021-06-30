@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
+import net.dreamlu.iot.mqtt.core.server.store.IMqttSubscribeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -29,6 +30,11 @@ import org.tio.core.Tio;
  */
 public class MqttServerAioListener extends DefaultAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServerAioListener.class);
+	private final IMqttSubscribeStore subscribeStore;
+
+	public MqttServerAioListener(IMqttSubscribeStore subscribeStore) {
+		this.subscribeStore = subscribeStore;
+	}
 
 	@Override
 	public boolean onHeartbeatTimeout(ChannelContext context, Long interval, int heartbeatTimeoutCount) {
@@ -41,6 +47,11 @@ public class MqttServerAioListener extends DefaultAioListener {
 	public void onBeforeClose(ChannelContext context, Throwable throwable, String remark, boolean isRemove) {
 		String clientId = context.getBsId();
 		logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
+		// 对于异常，处理遗嘱消息
+		if (throwable != null) {
+			// TODO 遗嘱消息处理
+		}
+		subscribeStore.remove(clientId);
 		Tio.unbindBsId(context);
 	}
 

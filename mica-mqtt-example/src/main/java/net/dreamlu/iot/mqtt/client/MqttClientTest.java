@@ -45,6 +45,10 @@ public class MqttClientTest {
 			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 
+		client.subQos0("/#", (topic, payload) -> {
+			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
+		});
+
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override

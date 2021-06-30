@@ -34,6 +34,11 @@ public class MqttSubscribeStore implements IMqttSubscribeStore {
 	}
 
 	@Override
+	public void remove(String clientId) {
+		data.remove(clientId);
+	}
+
+	@Override
 	public List<SubscribeStore> search(String clientId, String topicName) {
 		List<SubscribeStore> list = new ArrayList<>();
 		ConcurrentMap<String, SubscribeStore> map = data.get(clientId);

@@ -229,12 +229,12 @@ public class MqttServerCreator {
 		if (this.authHandler == null) {
 			this.authHandler = new DefaultMqttAuthHandler();
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttServer"));
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(authHandler, subManager, publishManager, messageIdGenerator, subscribeStore, executor);
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttServer"));
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this.authHandler, this.subManager, this.publishManager, this.subscribeStore, executor);
 		// 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, serverProcessor);
 		// 监听
-		ServerAioListener listener = new MqttServerAioListener();
+		ServerAioListener listener = new MqttServerAioListener(this.subscribeStore);
 		// 配置
 		ServerTioConfig config = new ServerTioConfig(this.name, handler, listener);
 		// 设置心跳 timeout

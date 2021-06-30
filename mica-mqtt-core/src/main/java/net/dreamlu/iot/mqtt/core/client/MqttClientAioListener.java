@@ -42,15 +42,15 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
 	private final MqttClientCreator clientConfig;
 	private final MqttWillMessage willMessage;
-	private final MqttClientSubscriptionManager subscriptionManager;
+	private final MqttClientStore clientStore;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public MqttClientAioListener(MqttClientCreator clientConfig,
-								 MqttClientSubscriptionManager subscriptionManager,
+								 MqttClientStore clientStore,
 								 ScheduledThreadPoolExecutor executor) {
 		this.clientConfig = Objects.requireNonNull(clientConfig);
 		this.willMessage = clientConfig.getWillMessage();
-		this.subscriptionManager = subscriptionManager;
+		this.clientStore = clientStore;
 		this.executor = executor;
 	}
 
@@ -92,7 +92,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	}
 
 	private void reSendSubscription(ChannelContext context) {
-		List<MqttSubscription> subscriptionList = subscriptionManager.getAndCleanSubscription();
+		List<MqttSubscription> subscriptionList = clientStore.getAndCleanSubscription();
 		for (MqttSubscription subscription : subscriptionList) {
 			int messageId = MqttClientMessageId.getId();
 			MqttQoS mqttQoS = subscription.getMqttQoS();
@@ -105,7 +105,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 			Boolean result = Tio.send(context, message);
 			logger.info("MQTT reconnect subscribe topicFilter:{} mqttQoS:{} messageId:{} result:{}", topicFilter, mqttQoS, messageId, result);
 			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
-			subscriptionManager.addPaddingSubscribe(messageId, pendingSubscription);
+			clientStore.addPaddingSubscribe(messageId, pendingSubscription);
 		}
 	}
 }

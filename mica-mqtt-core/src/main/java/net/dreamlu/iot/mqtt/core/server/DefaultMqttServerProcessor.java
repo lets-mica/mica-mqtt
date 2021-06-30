@@ -28,6 +28,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -40,21 +41,18 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttServerProcessor.class);
 	private final IMqttAuthHandler authHandler;
-	private final IMqttMessageIdGenerator messageIdGenerator;
 	private final IMqttPublishManager publishManager;
 	private final IMqttSubManager subManager;
 	private final IMqttSubscribeStore subscribeStore;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttServerProcessor(IMqttAuthHandler authHandler,
-								   IMqttSubManager subManager,
-								   IMqttPublishManager publishManager,
-								   IMqttMessageIdGenerator messageIdGenerator,
-								   IMqttSubscribeStore subscribeStore,
-								   ScheduledThreadPoolExecutor executor) {
+									  IMqttSubManager subManager,
+									  IMqttPublishManager publishManager,
+									  IMqttSubscribeStore subscribeStore,
+									  ScheduledThreadPoolExecutor executor) {
 		this.authHandler = authHandler;
 		this.subManager = subManager;
-		this.messageIdGenerator = messageIdGenerator;
 		this.publishManager = publishManager;
 		this.subscribeStore = subscribeStore;
 		this.executor = executor;
@@ -79,7 +77,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 3. 设置 clientId
 		context.setBsId(clientId);
 		Tio.bindBsId(context, clientId);
-		// 4. 返回 ack
+		// 4. TODO 存储遗嘱消息
+		// 5. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
 	}
 
@@ -210,7 +209,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			.packetId(messageId)
 			.build();
 		Tio.send(context, subAckMessage);
-		// 4. 发送保留消息
+		// 4. TODO 发送保留消息
 	}
 
 	@Override
@@ -239,7 +238,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processDisConnect(ChannelContext context) {
 		String clientId = context.getBsId();
 		logger.info("DisConnect - clientId: {}", clientId);
-		Tio.unbindBsId(context);
 		Tio.close(context, "Mqtt DisConnect");
 	}
 
@@ -251,9 +249,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	 */
 	private void invokeListenerForPublish(MqttQoS mqttQoS, String topicName, MqttPublishMessage message) {
 		List<MqttSubscription> subscriptionList = subManager.getMatchedSubscription(topicName, mqttQoS);
+		final ByteBuffer payload = message.payload();
 		subscriptionList.forEach(subscription -> {
 			MqttMessageListener listener = subscription.getListener();
-			listener.onMessage(topicName, message.payload());
+			payload.rewind();
+			listener.onMessage(topicName, payload);
 		});
 	}
 
