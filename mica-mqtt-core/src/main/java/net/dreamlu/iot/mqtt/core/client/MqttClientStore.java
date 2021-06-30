@@ -29,7 +29,6 @@ import java.util.*;
  * @author L.cm
  */
 final class MqttClientStore {
-
 	/**
 	 * 订阅的数据承载
 	 */
@@ -39,23 +38,23 @@ final class MqttClientStore {
 	private final Map<Integer, MqttPendingPublish> pendingPublishData = new LinkedHashMap<>();
 	private final Map<Integer, MqttPendingQos2Publish> pendingQos2PublishData = new LinkedHashMap<>();
 
-	void addPaddingSubscribe(int messageId, MqttPendingSubscription pendingSubscription) {
+	protected void addPaddingSubscribe(int messageId, MqttPendingSubscription pendingSubscription) {
 		pendingSubscriptions.put(messageId, pendingSubscription);
 	}
 
-	MqttPendingSubscription getPaddingSubscribe(int messageId) {
+	protected MqttPendingSubscription getPaddingSubscribe(int messageId) {
 		return pendingSubscriptions.get(messageId);
 	}
 
-	MqttPendingSubscription removePaddingSubscribe(int messageId) {
+	protected MqttPendingSubscription removePaddingSubscribe(int messageId) {
 		return pendingSubscriptions.remove(messageId);
 	}
 
-	void addSubscription(MqttSubscription subscription) {
+	protected void addSubscription(MqttSubscription subscription) {
 		subscriptions.add(subscription.getTopicFilter(), subscription);
 	}
 
-	List<MqttSubscription> getAndCleanSubscription() {
+	protected List<MqttSubscription> getAndCleanSubscription() {
 		List<MqttSubscription> subscriptionList = new ArrayList<>();
 		for (List<MqttSubscription> mqttSubscriptions : subscriptions.values()) {
 			subscriptionList.addAll(mqttSubscriptions);
@@ -65,7 +64,7 @@ final class MqttClientStore {
 		return data;
 	}
 
-	List<MqttSubscription> getMatchedSubscription(String topicName) {
+	protected List<MqttSubscription> getMatchedSubscription(String topicName) {
 		List<MqttSubscription> subscriptionList = new ArrayList<>();
 		for (List<MqttSubscription> mqttSubscriptions : subscriptions.values()) {
 			for (MqttSubscription subscription : mqttSubscriptions) {
@@ -77,43 +76,43 @@ final class MqttClientStore {
 		return Collections.unmodifiableList(subscriptionList);
 	}
 
-	void removeSubscriptions(String topicFilter) {
+	protected void removeSubscriptions(String topicFilter) {
 		subscriptions.remove(topicFilter);
 	}
 
-	void addPaddingUnSubscribe(int messageId, MqttPendingUnSubscription pendingUnSubscription) {
+	protected void addPaddingUnSubscribe(int messageId, MqttPendingUnSubscription pendingUnSubscription) {
 		pendingUnSubscriptions.put(messageId, pendingUnSubscription);
 	}
 
-	MqttPendingUnSubscription getPaddingUnSubscribe(int messageId) {
+	protected MqttPendingUnSubscription getPaddingUnSubscribe(int messageId) {
 		return pendingUnSubscriptions.get(messageId);
 	}
 
-	MqttPendingUnSubscription removePaddingUnSubscribe(int messageId) {
+	protected MqttPendingUnSubscription removePaddingUnSubscribe(int messageId) {
 		return pendingUnSubscriptions.remove(messageId);
 	}
 
-	void addPendingPublish(int messageId, MqttPendingPublish pendingPublish) {
+	protected void addPendingPublish(int messageId, MqttPendingPublish pendingPublish) {
 		pendingPublishData.put(messageId, pendingPublish);
 	}
 
-	MqttPendingPublish getPendingPublish(int messageId) {
+	protected MqttPendingPublish getPendingPublish(int messageId) {
 		return pendingPublishData.get(messageId);
 	}
 
-	MqttPendingPublish removePendingPublish(int messageId) {
+	protected MqttPendingPublish removePendingPublish(int messageId) {
 		return pendingPublishData.remove(messageId);
 	}
 
-	void addPendingQos2Publish(int messageId, MqttPendingQos2Publish pendingQos2Publish) {
+	protected void addPendingQos2Publish(int messageId, MqttPendingQos2Publish pendingQos2Publish) {
 		pendingQos2PublishData.put(messageId, pendingQos2Publish);
 	}
 
-	MqttPendingQos2Publish getPendingQos2Publish(int messageId) {
+	protected MqttPendingQos2Publish getPendingQos2Publish(int messageId) {
 		return pendingQos2PublishData.get(messageId);
 	}
 
-	MqttPendingQos2Publish removePendingQos2Publish(int messageId) {
+	protected MqttPendingQos2Publish removePendingQos2Publish(int messageId) {
 		return pendingQos2PublishData.remove(messageId);
 	}
 

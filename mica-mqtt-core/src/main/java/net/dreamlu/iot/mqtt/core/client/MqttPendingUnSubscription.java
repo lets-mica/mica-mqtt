@@ -11,7 +11,6 @@ import java.util.function.Consumer;
  * MqttPendingSubscription，参考于 netty-mqtt-client
  */
 final class MqttPendingUnSubscription {
-
 	private final String topic;
 	private final RetryProcessor<MqttUnsubscribeMessage> retryProcessor = new RetryProcessor<>();
 
@@ -20,17 +19,17 @@ final class MqttPendingUnSubscription {
 		this.retryProcessor.setOriginalMessage(unSubscribeMessage);
 	}
 
-	String getTopic() {
+	protected String getTopic() {
 		return topic;
 	}
 
-	void startRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
+	protected void startRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
 		this.retryProcessor.setHandle((fixedHeader, originalMessage) ->
 			sendPacket.accept(new MqttUnsubscribeMessage(fixedHeader, originalMessage.variableHeader(), originalMessage.payload())));
 		this.retryProcessor.start(executor);
 	}
 
-	void onUnSubAckReceived() {
+	protected void onUnSubAckReceived() {
 		this.retryProcessor.stop();
 	}
 

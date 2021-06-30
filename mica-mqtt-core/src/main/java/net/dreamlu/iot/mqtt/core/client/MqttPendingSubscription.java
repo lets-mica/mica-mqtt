@@ -30,15 +30,15 @@ final class MqttPendingSubscription {
 		this.retryProcessor.setOriginalMessage(message);
 	}
 
-	MqttQoS getMqttQoS() {
+	protected MqttQoS getMqttQoS() {
 		return mqttQoS;
 	}
 
-	String getTopicFilter() {
+	protected String getTopicFilter() {
 		return topicFilter;
 	}
 
-	MqttMessageListener getListener() {
+	protected MqttMessageListener getListener() {
 		return listener;
 	}
 
@@ -46,13 +46,13 @@ final class MqttPendingSubscription {
 		return new MqttSubscription(getMqttQoS(), getTopicFilter(), getListener());
 	}
 
-	void startRetransmitTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
+	protected void startRetransmitTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
 		this.retryProcessor.setHandle((fixedHeader, originalMessage) ->
 			sendPacket.accept(new MqttSubscribeMessage(fixedHeader, originalMessage.variableHeader(), originalMessage.payload())));
 		this.retryProcessor.start(executor);
 	}
 
-	void onSubAckReceived() {
+	protected void onSubAckReceived() {
 		this.retryProcessor.stop();
 	}
 
