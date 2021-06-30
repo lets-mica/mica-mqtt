@@ -124,6 +124,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				break;
 			case FAILURE:
 			default:
+				break;
 		}
 	}
 

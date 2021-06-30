@@ -72,6 +72,7 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 			default:
 				String remark = "MqttClient connect error error ReturnCode:" + returnCode;
 				Tio.close(context, remark);
+				break;
 		}
 	}
 
