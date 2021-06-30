@@ -22,9 +22,9 @@ final class MqttCodecUtil {
 	private static final char[] TOPIC_WILDCARDS = {'#', '+'};
 	private static final int MIN_CLIENT_ID_LENGTH = 1;
 	private static final int MAX_CLIENT_ID_LENGTH = 23;
-	static final String MQTT_VERSION_KEY = "NETTY_CODEC_MQTT_VERSION";
+	private static final String MQTT_VERSION_KEY = "NETTY_CODEC_MQTT_VERSION";
 
-	static MqttVersion getMqttVersion(ChannelContext ctx) {
+	protected static MqttVersion getMqttVersion(ChannelContext ctx) {
 		MqttVersion version = (MqttVersion) ctx.get(MQTT_VERSION_KEY);
 		if (version == null) {
 			return MqttVersion.MQTT_3_1_1;
@@ -32,11 +32,11 @@ final class MqttCodecUtil {
 		return version;
 	}
 
-	static void setMqttVersion(ChannelContext ctx, MqttVersion version) {
+	protected static void setMqttVersion(ChannelContext ctx, MqttVersion version) {
 		ctx.set(MQTT_VERSION_KEY, version);
 	}
 
-	static boolean isValidPublishTopicName(String topicName) {
+	protected static boolean isValidPublishTopicName(String topicName) {
 		// publish topic name must not contain any wildcard
 		for (char c : TOPIC_WILDCARDS) {
 			if (topicName.indexOf(c) >= 0) {
@@ -46,11 +46,11 @@ final class MqttCodecUtil {
 		return true;
 	}
 
-	static boolean isValidMessageId(int messageId) {
+	protected static boolean isValidMessageId(int messageId) {
 		return messageId != 0;
 	}
 
-	static boolean isValidClientId(MqttVersion mqttVersion, String clientId) {
+	protected static boolean isValidClientId(MqttVersion mqttVersion, String clientId) {
 		if (mqttVersion == MqttVersion.MQTT_3_1) {
 			return clientId != null && clientId.length() >= MIN_CLIENT_ID_LENGTH &&
 				clientId.length() <= MAX_CLIENT_ID_LENGTH;
@@ -63,7 +63,7 @@ final class MqttCodecUtil {
 		throw new IllegalArgumentException(mqttVersion + " is unknown mqtt version");
 	}
 
-	static MqttFixedHeader validateFixedHeader(ChannelContext ctx, MqttFixedHeader mqttFixedHeader) {
+	protected static MqttFixedHeader validateFixedHeader(ChannelContext ctx, MqttFixedHeader mqttFixedHeader) {
 		switch (mqttFixedHeader.messageType()) {
 			case PUBREL:
 			case SUBSCRIBE:
@@ -82,7 +82,7 @@ final class MqttCodecUtil {
 		}
 	}
 
-	static MqttFixedHeader resetUnusedFields(MqttFixedHeader mqttFixedHeader) {
+	protected static MqttFixedHeader resetUnusedFields(MqttFixedHeader mqttFixedHeader) {
 		switch (mqttFixedHeader.messageType()) {
 			case CONNECT:
 			case CONNACK:
