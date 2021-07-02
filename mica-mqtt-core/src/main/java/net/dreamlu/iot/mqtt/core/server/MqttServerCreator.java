@@ -41,7 +41,7 @@ public class MqttServerCreator {
 	/**
 	 * 名称
 	 */
-	private String name = "MICA-MQTT-SERVER";
+	private String name = "Mica-Mqtt-Server";
 	/**
 	 * 服务端 ip
 	 */

@@ -43,6 +43,10 @@ import java.util.function.Consumer;
 public final class MqttClientCreator {
 
 	/**
+	 * 名称
+	 */
+	private String name = "Mica-Mqtt-Client";
+	/**
 	 * ip，可为空，为空 t-io 默认为 127.0.0.1
 	 */
 	private String ip;
@@ -107,31 +111,35 @@ public final class MqttClientCreator {
 	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 
-	protected String getIp() {
+	public String getName() {
+		return name;
+	}
+
+	public String getIp() {
 		return ip;
 	}
 
-	protected int getPort() {
+	public int getPort() {
 		return port;
 	}
 
-	protected Integer getTimeout() {
+	public Integer getTimeout() {
 		return timeout;
 	}
 
-	protected int getKeepAliveSecs() {
+	public int getKeepAliveSecs() {
 		return keepAliveSecs;
 	}
 
-	protected SslConfig getSslConfig() {
+	public SslConfig getSslConfig() {
 		return sslConfig;
 	}
 
-	protected boolean isReconnect() {
+	public boolean isReconnect() {
 		return reconnect;
 	}
 
-	protected Long getReInterval() {
+	public Long getReInterval() {
 		return reInterval;
 	}
 
@@ -139,23 +147,23 @@ public final class MqttClientCreator {
 		return clientId;
 	}
 
-	protected MqttVersion getProtocolVersion() {
+	public MqttVersion getProtocolVersion() {
 		return protocolVersion;
 	}
 
-	protected String getUsername() {
+	public String getUsername() {
 		return username;
 	}
 
-	protected String getPassword() {
+	public String getPassword() {
 		return password;
 	}
 
-	protected boolean isCleanSession() {
+	public boolean isCleanSession() {
 		return cleanSession;
 	}
 
-	protected MqttWillMessage getWillMessage() {
+	public MqttWillMessage getWillMessage() {
 		return willMessage;
 	}
 
@@ -165,6 +173,11 @@ public final class MqttClientCreator {
 
 	public ByteBufferAllocator getBufferAllocator() {
 		return bufferAllocator;
+	}
+
+	public MqttClientCreator name(String name) {
+		this.name = name;
+		return this;
 	}
 
 	public MqttClientCreator ip(String ip) {
@@ -272,10 +285,13 @@ public final class MqttClientCreator {
 				reconnConf = new ReconnConf();
 			}
 		}
-		// 4. tioClient
-		TioClient tioClient = new TioClient(new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf));
+		// 4. tioConfig
+		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
+		tioConfig.setName(this.name);
+		// 5. tioClient
+		TioClient tioClient = new TioClient(tioConfig);
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
-		// 5. 等待连接成功之后继续
+		// 6. 等待连接成功之后继续
 		connLatch.await();
 		return new MqttClient(tioClient, this, context, clientStore, executor);
 	}
