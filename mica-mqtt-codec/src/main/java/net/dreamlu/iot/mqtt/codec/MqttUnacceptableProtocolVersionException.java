@@ -31,6 +31,9 @@ public final class MqttUnacceptableProtocolVersionException extends DecoderExcep
 
 	/**
 	 * Creates a new instance
+	 *
+	 * @param message message
+	 * @param cause   Throwable
 	 */
 	public MqttUnacceptableProtocolVersionException(String message, Throwable cause) {
 		super(message, cause);
@@ -38,6 +41,8 @@ public final class MqttUnacceptableProtocolVersionException extends DecoderExcep
 
 	/**
 	 * Creates a new instance
+	 *
+	 * @param message message
 	 */
 	public MqttUnacceptableProtocolVersionException(String message) {
 		super(message);
@@ -45,6 +50,8 @@ public final class MqttUnacceptableProtocolVersionException extends DecoderExcep
 
 	/**
 	 * Creates a new instance
+	 *
+	 * @param cause Throwable
 	 */
 	public MqttUnacceptableProtocolVersionException(Throwable cause) {
 		super(cause);

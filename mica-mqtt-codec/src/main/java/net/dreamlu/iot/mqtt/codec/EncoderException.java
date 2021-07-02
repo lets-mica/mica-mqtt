@@ -31,6 +31,9 @@ public class EncoderException extends RuntimeException {
 
 	/**
 	 * Creates a new instance.
+	 *
+	 * @param message message
+	 * @param cause   Throwable
 	 */
 	public EncoderException(String message, Throwable cause) {
 		super(message, cause);
@@ -38,6 +41,8 @@ public class EncoderException extends RuntimeException {
 
 	/**
 	 * Creates a new instance.
+	 *
+	 * @param message message
 	 */
 	public EncoderException(String message) {
 		super(message);
@@ -45,6 +50,8 @@ public class EncoderException extends RuntimeException {
 
 	/**
 	 * Creates a new instance.
+	 *
+	 * @param cause Throwable
 	 */
 	public EncoderException(Throwable cause) {
 		super(cause);

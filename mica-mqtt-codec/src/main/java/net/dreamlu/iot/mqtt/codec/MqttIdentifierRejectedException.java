@@ -28,6 +28,9 @@ public final class MqttIdentifierRejectedException extends DecoderException {
 
 	/**
 	 * Creates a new instance
+	 *
+	 * @param message message
+	 * @param cause Throwable
 	 */
 	public MqttIdentifierRejectedException(String message, Throwable cause) {
 		super(message, cause);
@@ -35,6 +38,8 @@ public final class MqttIdentifierRejectedException extends DecoderException {
 
 	/**
 	 * Creates a new instance
+	 *
+	 * @param message message
 	 */
 	public MqttIdentifierRejectedException(String message) {
 		super(message);
@@ -42,6 +47,8 @@ public final class MqttIdentifierRejectedException extends DecoderException {
 
 	/**
 	 * Creates a new instance
+	 *
+	 * @param cause Throwable
 	 */
 	public MqttIdentifierRejectedException(Throwable cause) {
 		super(cause);

@@ -200,6 +200,7 @@ public final class MqttClient {
 	/**
 	 * 重连
 	 *
+	 * @return MqttClient
 	 * @throws Exception 异常
 	 */
 	public MqttClient reconnect() throws Exception {
@@ -209,6 +210,8 @@ public final class MqttClient {
 
 	/**
 	 * 断开 mqtt 连接
+	 *
+	 * @return 是否成功
 	 */
 	public boolean disconnect() {
 		boolean result = Tio.send(context, MqttMessage.DISCONNECT);
