@@ -55,3 +55,7 @@ Servers
 .metadata
 upload
 gen_code
+
+# Flattened pom
+.flattened-pom.xml
+/**/.flattened-pom.xml

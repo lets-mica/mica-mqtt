@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.dreamlu</groupId>
         <artifactId>mica-mqtt</artifactId>
-        <version>2021.00</version>
+        <version>${revision}</version>
     </parent>
     <artifactId>mica-mqtt-core</artifactId>
 
