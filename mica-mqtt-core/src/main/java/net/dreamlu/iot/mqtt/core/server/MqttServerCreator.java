@@ -90,6 +90,10 @@ public class MqttServerCreator {
 	 * 订阅存储
 	 */
 	private IMqttSubscribeStore subscribeStore;
+	/**
+	 * debug
+	 */
+	private boolean debug = false;
 
 	public String getName() {
 		return name;
@@ -149,7 +153,7 @@ public class MqttServerCreator {
 		return sslConfig;
 	}
 
-	public MqttServerCreator sslConfig(InputStream keyStoreInputStream, InputStream trustStoreInputStream, String pwd) {
+	public MqttServerCreator useSsl(InputStream keyStoreInputStream, InputStream trustStoreInputStream, String pwd) {
 		try {
 			this.sslConfig = SslConfig.forServer(keyStoreInputStream, trustStoreInputStream, pwd);
 		} catch (Exception e) {
@@ -158,7 +162,7 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public MqttServerCreator sslConfig(String keyStoreFile, String trustStoreFile, String pwd) {
+	public MqttServerCreator useSsl(String keyStoreFile, String trustStoreFile, String pwd) {
 		try {
 			this.sslConfig = SslConfig.forServer(keyStoreFile, trustStoreFile, pwd);
 		} catch (Exception e) {
@@ -221,6 +225,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public MqttServerCreator debug() {
+		this.debug = true;
+		return this;
+	}
+
 	public MqttServer start() throws IOException {
 		Objects.requireNonNull(this.messageIdGenerator, "Argument messageIdGenerator is null.");
 		Objects.requireNonNull(this.publishManager, "Argument publishManager is null.");
@@ -249,6 +262,9 @@ public class MqttServerCreator {
 		}
 		if (this.sslConfig != null) {
 			config.setSslConfig(this.sslConfig);
+		}
+		if (this.debug) {
+			config.debug = true;
 		}
 		TioServer tioServer = new TioServer(config);
 		// 不校验版本号，社区版设置无效

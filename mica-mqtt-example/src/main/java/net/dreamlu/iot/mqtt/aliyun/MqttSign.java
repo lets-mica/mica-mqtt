@@ -65,13 +65,13 @@ public class MqttSign {
 	}
 
 	private static String getPassword(String productKey, String deviceName, String deviceSecret, String timestamp) {
-		String plainPasswd = "clientId" + productKey + '.' + deviceName + "deviceName" +
+		String plainPwd = "clientId" + productKey + '.' + deviceName + "deviceName" +
 			deviceName + "productKey" + productKey + "timestamp" + timestamp;
-		return hmacSha256(plainPasswd, deviceSecret);
+		return hmacSha256(plainPwd, deviceSecret);
 	}
 
 	private static String getClientId(String productKey, String deviceName, String timestamp) {
-		return productKey + '.' + deviceName + '|' + "timestamp=" + timestamp + ",_v=paho-java-1.0.0,securemode=2,signmethod=hmacsha256|";
+		return productKey + '.' + deviceName + "|timestamp=" + timestamp + ",_v=paho-java-1.0.0,securemode=2,signmethod=hmacsha256|";
 	}
 
 	private static String hmacSha256(String plainText, String key) {
@@ -85,7 +85,7 @@ public class MqttSign {
 			byte[] hmacResult = mac.doFinal(plainText.getBytes());
 			return String.format("%064x", new BigInteger(1, hmacResult));
 		} catch (NoSuchAlgorithmException | InvalidKeyException e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException(e);
 		}
 	}
 

@@ -17,7 +17,7 @@ public class DefaultMqttServerSubManager implements IMqttSubManager {
 	private final List<MqttSubscription> subscriptionList = new LinkedList<>();
 
 	@Override
-	public void register(MqttSubscription subscription) {
+	public void subscribe(MqttSubscription subscription) {
 		subscriptionList.add(subscription);
 	}
 

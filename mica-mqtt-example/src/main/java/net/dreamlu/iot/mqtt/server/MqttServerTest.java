@@ -37,7 +37,8 @@ public class MqttServerTest {
 
 	public static void main(String[] args) throws IOException {
 		DefaultMqttServerSubManager subManager = new DefaultMqttServerSubManager();
-		subManager.register(new MqttSubscription(MqttQoS.AT_MOST_ONCE, "/test/#", ((topic, payload) -> {
+		// 服务端注册订阅
+		subManager.subscribe(new MqttSubscription(MqttQoS.AT_MOST_ONCE, "/test/#", ((topic, payload) -> {
 			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
 		})));
 
@@ -53,6 +54,7 @@ public class MqttServerTest {
 			.publishManager(publishManager)
 			.subManager(subManager)
 			.subscribeStore(subscribeStore)
+			.debug() // 开启 debug 信息日志
 			.start();
 
 		Timer timer = new Timer();

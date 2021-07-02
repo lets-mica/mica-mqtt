@@ -29,11 +29,11 @@ import java.util.List;
 public interface IMqttSubManager {
 
 	/**
-	 * 注册订阅
+	 * 订阅
 	 *
 	 * @param subscription 订阅信息
 	 */
-	void register(MqttSubscription subscription);
+	void subscribe(MqttSubscription subscription);
 
 	/**
 	 * 获取匹配的订阅
