@@ -99,7 +99,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		MqttPublishVariableHeader variableHeader = message.variableHeader();
 		String topicName = variableHeader.topicName();
 		int packetId = variableHeader.packetId();
-		logger.debug("Publish - clientId: {} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
+		logger.debug("Publish - clientId:{} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
 		switch (mqttQoS) {
 			case AT_MOST_ONCE:
 				invokeListenerForPublish(mqttQoS, topicName, message);
@@ -110,7 +110,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck()
 						.packetId(packetId)
 						.build();
-					Tio.send(context, messageAck);
+					Boolean resultPubAck = Tio.send(context, messageAck);
+					logger.debug("Publish - PubAck send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubAck);
 				}
 				break;
 			case EXACTLY_ONCE:
@@ -118,6 +119,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					MqttFixedHeader pubRecFixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(pubRecFixedHeader, MqttMessageIdVariableHeader.from(packetId));
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
+					Boolean resultPubRec = Tio.send(context, pubRecMessage);
+					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
 					publishManager.addPendingQos2Publish(packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
 				}
@@ -132,7 +135,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubAck(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
-		logger.debug("PubAck - clientId: {}, messageId: {}", clientId, messageId);
+		logger.debug("PubAck - clientId:{}, messageId: {}", clientId, messageId);
 		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
 		if (pendingPublish == null) {
 			return;
@@ -146,7 +149,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubRec(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
-		logger.debug("PubRec - clientId: {}, messageId: {}", clientId, messageId);
+		logger.debug("PubRec - clientId:{}, messageId: {}", clientId, messageId);
 		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
 		pendingPublish.onPubAckReceived();
 
@@ -162,7 +165,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubRel(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
-		logger.debug("PubRel - clientId: {}, messageId: {}", clientId, messageId);
+		logger.debug("PubRel - clientId:{}, messageId: {}", clientId, messageId);
 		MqttPendingQos2Publish pendingQos2Publish = publishManager.getPendingQos2Publish(messageId);
 		if (pendingQos2Publish != null) {
 			MqttPublishMessage incomingPublish = pendingQos2Publish.getIncomingPublish();
@@ -182,7 +185,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubComp(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
-		logger.debug("PubComp - clientId: {}, messageId: {}", clientId, messageId);
+		logger.debug("PubComp - clientId:{}, messageId: {}", clientId, messageId);
 		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
 		pendingPublish.getPayload().clear();
 		pendingPublish.onPubCompReceived();
@@ -202,7 +205,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			MqttQoS mqttQoS = subscription.qualityOfService();
 			mqttQosList.add(mqttQoS);
 			subscribeStore.add(clientId, topicName, mqttQoS);
-			logger.debug("Subscribe - clientId: {} messageId:{} topicFilter:{} mqttQoS:{}", clientId, messageId, topicName, mqttQoS);
+			logger.debug("Subscribe - clientId:{} messageId:{} topicFilter:{} mqttQoS:{}", clientId, messageId, topicName, mqttQoS);
 		}
 		// 3. 返回 ack
 		MqttMessage subAckMessage = MqttMessageBuilders.subAck()
@@ -220,7 +223,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		List<String> topicFilterList = message.payload().topics();
 		for (String topicFilter : topicFilterList) {
 			subscribeStore.remove(clientId, topicFilter);
-			logger.debug("UnSubscribe - clientId: {} messageId:{} topicFilter:{}", clientId, messageId, topicFilter);
+			logger.debug("UnSubscribe - clientId:{} messageId:{} topicFilter:{}", clientId, messageId, topicFilter);
 		}
 		MqttMessage unSubMessage = MqttMessageBuilders.unsubAck()
 			.packetId(messageId)
@@ -231,14 +234,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	@Override
 	public void processPingReq(ChannelContext context) {
 		String clientId = context.getBsId();
-		logger.debug("PingReq - clientId: {}", clientId);
+		logger.debug("PingReq - clientId:{}", clientId);
 		Tio.send(context, MqttMessage.PINGRESP);
 	}
 
 	@Override
 	public void processDisConnect(ChannelContext context) {
 		String clientId = context.getBsId();
-		logger.info("DisConnect - clientId: {}", clientId);
+		logger.info("DisConnect - clientId:{}", clientId);
 		Tio.close(context, "Mqtt DisConnect");
 	}
 
