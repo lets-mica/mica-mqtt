@@ -22,6 +22,8 @@ import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
 import net.dreamlu.iot.mqtt.core.server.DefaultMqttServerSubManager;
 import net.dreamlu.iot.mqtt.core.server.IMqttMessageIdGenerator;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -34,12 +36,13 @@ import java.util.TimerTask;
  * @author L.cm
  */
 public class MqttServerTest {
+	private static final Logger logger = LoggerFactory.getLogger(MqttServerTest.class);
 
 	public static void main(String[] args) throws IOException {
 		DefaultMqttServerSubManager subManager = new DefaultMqttServerSubManager();
 		// 服务端注册订阅
 		subManager.subscribe(new MqttSubscription(MqttQoS.AT_MOST_ONCE, "/test/#", ((topic, payload) -> {
-			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
+			logger.info("subscribe:\t" + topic + '\t' + ByteBufferUtil.toString(payload));
 		})));
 
 		IMqttMessageIdGenerator messageIdGenerator = new MqttMessageIdGenerator();

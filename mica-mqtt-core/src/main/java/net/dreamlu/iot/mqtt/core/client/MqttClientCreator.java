@@ -47,9 +47,9 @@ public final class MqttClientCreator {
 	 */
 	private String name = "Mica-Mqtt-Client";
 	/**
-	 * ip，可为空，为空 t-io 默认为 127.0.0.1
+	 * ip，可为空，默认为 127.0.0.1
 	 */
-	private String ip;
+	private String ip = "127.0.0.1";
 	/**
 	 * 端口，默认：1883
 	 */

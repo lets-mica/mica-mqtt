@@ -28,6 +28,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
+import org.tio.utils.lock.ReadLockHandler;
 import org.tio.utils.lock.SetWithLock;
 
 import java.nio.ByteBuffer;
@@ -217,15 +218,16 @@ public final class MqttServer {
 	 */
 	public Boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		SetWithLock<ChannelContext> contextSet = Tio.getAll(getServerConfig());
-		Set<ChannelContext> channelContexts = contextSet.getObj();
-		if (channelContexts.isEmpty()) {
-			logger.warn("Mqtt publish to all ChannelContext is empty.");
-			return false;
-		}
-		for (ChannelContext context : channelContexts) {
-			String clientId = context.getBsId();
-			publish(clientId, topic, payload, qos, retain);
-		}
+		contextSet.handle((ReadLockHandler<Set<ChannelContext>>) channelContexts -> {
+			if (channelContexts.isEmpty()) {
+				logger.warn("Mqtt publish to all ChannelContext is empty.");
+				return;
+			}
+			for (ChannelContext context : channelContexts) {
+				String clientId = context.getBsId();
+				publish(clientId, topic, payload, qos, retain);
+			}
+		});
 		return true;
 	}
 

@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.client;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -31,6 +33,7 @@ import java.util.TimerTask;
  * @author L.cm
  */
 public class MqttClientTest {
+	private static final Logger logger = LoggerFactory.getLogger(MqttClientTest.class);
 
 	public static void main(String[] args) throws Exception {
 		// 初始化 mqtt 客户端
@@ -42,11 +45,11 @@ public class MqttClientTest {
 			.connect();
 
 		client.subQos0("/test/#", (topic, payload) -> {
-			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
+			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 
 		client.subQos0("/#", (topic, payload) -> {
-			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
+			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 
 		Timer timer = new Timer();

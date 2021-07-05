@@ -19,7 +19,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- tio version -->
-        <tio.version>3.7.2.v20210316-RELEASE</tio.version>
+        <tio.version>3.7.3.v20210706-RELEASE</tio.version>
     </properties>
 
     <modules>

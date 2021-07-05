@@ -4,12 +4,12 @@ import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.server.IMqttPublishManager;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class MqttPublishManager implements IMqttPublishManager {
-	private final Map<Integer, MqttPendingPublish> pendingPublishData = new LinkedHashMap<>();
-	private final Map<Integer, MqttPendingQos2Publish> pendingQos2PublishData = new LinkedHashMap<>();
+	private final Map<Integer, MqttPendingPublish> pendingPublishData = new ConcurrentHashMap<>();
+	private final Map<Integer, MqttPendingQos2Publish> pendingQos2PublishData = new ConcurrentHashMap<>();
 
 	@Override
 	public void addPendingPublish(int messageId, MqttPendingPublish pendingPublish) {
