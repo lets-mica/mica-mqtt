@@ -124,7 +124,9 @@ Mica-Mqtt-Server
 2021-07-05 20:46:46,926 WARN  server.ServerTioConfig - Mica-Mqtt-Server, 检查心跳, 共1个连接, 取锁耗时0ms, 循环耗时0ms, 心跳超时时间:120000ms
 ```
 
-### 3. 测试 Aliyun MQTT 服务（可选）
+### 3. Client 接入 Aliyun MQTT 服务（示例）
+
+详见 `mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/aliyun/MqttClientTest.java`
 
 ## 参考vs借鉴
 - [netty codec-mqtt](https://github.com/netty/netty/tree/4.1/codec-mqtt)
