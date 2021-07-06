@@ -31,6 +31,7 @@ public class MqttBenchmark {
 
 	public static void main(String[] args) throws Exception {
 		// 1. 模拟 1w 连接，在开发机（i5-7500 4核4线程 win10 MqttServer 6G）1万连连接很轻松。
+		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
 		int clientCount = 1_0000;
 		for (int i = 0; i < clientCount; i++) {
 			// 2. 初始化 mqtt 客户端
