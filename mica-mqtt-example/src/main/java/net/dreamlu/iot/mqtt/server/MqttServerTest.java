@@ -39,6 +39,7 @@ public class MqttServerTest {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServerTest.class);
 
 	public static void main(String[] args) throws IOException {
+		// 注意：为了能接受更多链接（降低内存），请添加 jvm 参数 -Xss129k
 		DefaultMqttServerSubManager subManager = new DefaultMqttServerSubManager();
 		// 服务端注册订阅
 		subManager.subscribe(new MqttSubscription(MqttQoS.AT_MOST_ONCE, "/test/#", ((topic, payload) -> {
@@ -53,6 +54,8 @@ public class MqttServerTest {
 			.ip("127.0.0.1")
 			// 默认：1883
 			.port(1883)
+			// 默认为： 20480，为了降低内存可以小此参数
+			.readBufferSize(512)
 			.messageIdGenerator(messageIdGenerator)
 			.publishManager(publishManager)
 			.subManager(subManager)
