@@ -22,11 +22,11 @@
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-mqtt-core</artifactId>
         </dependency>
-        <!--用于与slf4j保持桥接-->
+        <!-- caffeine 3.x 减少反射，对 graalvm 支持更好 -->
         <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-slf4j-impl</artifactId>
-            <version>${log4j2.version}</version>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>3.0.3</version>
         </dependency>
     </dependencies>
 
@@ -36,6 +36,14 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
+            <dependencies>
+                <!-- 非 GraalVM 环境用 log4j2 -->
+                <dependency>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-slf4j-impl</artifactId>
+                    <version>${log4j2.version}</version>
+                </dependency>
+            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -74,6 +82,12 @@
         <profile>
             <id>mqtt-server-graal</id>
             <dependencies>
+                <!-- GraalVM 环境使用 jdk log -->
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                    <version>1.7.31</version>
+                </dependency>
                 <!-- GraalVM -->
                 <dependency>
                     <groupId>org.graalvm.sdk</groupId>
@@ -99,10 +113,10 @@
                         </executions>
                         <configuration>
                             <skip>false</skip>
-                            <imageName>mqtt-graalvm</imageName>
+                            <imageName>mqtt-server-graalvm</imageName>
                             <mainClass>${mainClass.server}</mainClass>
                             <buildArgs>
-                                --no-fallback
+                                --enable-all-security-services --report-unsupported-elements-at-runtime -H:+RemoveSaturatedTypeFlows --allow-incomplete-classpath -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
                             </buildArgs>
                         </configuration>
                     </plugin>
@@ -112,6 +126,12 @@
         <profile>
             <id>mqtt-client-graal</id>
             <dependencies>
+                <!-- GraalVM 环境使用 jdk log -->
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-jdk14</artifactId>
+                    <version>1.7.31</version>
+                </dependency>
                 <!-- GraalVM -->
                 <dependency>
                     <groupId>org.graalvm.sdk</groupId>
@@ -137,10 +157,10 @@
                         </executions>
                         <configuration>
                             <skip>false</skip>
-                            <imageName>mqtt-graalvm</imageName>
+                            <imageName>mqtt-client-graalvm</imageName>
                             <mainClass>${mainClass.client}</mainClass>
                             <buildArgs>
-                                --no-fallback
+                                --enable-all-security-services --report-unsupported-elements-at-runtime -H:+RemoveSaturatedTypeFlows --allow-incomplete-classpath -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
                             </buildArgs>
                         </configuration>
                     </plugin>
