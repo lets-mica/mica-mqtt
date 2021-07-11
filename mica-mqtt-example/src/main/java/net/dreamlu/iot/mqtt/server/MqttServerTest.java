@@ -60,7 +60,7 @@ public class MqttServerTest {
 			.publishManager(publishManager)
 			.subManager(subManager)
 			.subscribeStore(subscribeStore)
-//			.debug() // 开启 debug 信息日志
+			.debug() // 开启 debug 信息日志
 			.start();
 
 		Timer timer = new Timer();

@@ -36,10 +36,6 @@
                 <version>${tio.version}</version>
                 <exclusions>
                     <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>fastjson</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>com.github.ben-manes.caffeine</groupId>
                         <artifactId>caffeine</artifactId>
                     </exclusion>
