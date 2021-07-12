@@ -121,7 +121,6 @@
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
                                 -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
-                                -H:IncludeResources=../graalvm/resource-config.json
                             </buildArgs>
                         </configuration>
                     </plugin>
@@ -170,7 +169,6 @@
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
                                 -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
-                                -H:IncludeResources=../graalvm/resource-config.json
                             </buildArgs>
                         </configuration>
                     </plugin>
