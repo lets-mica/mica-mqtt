@@ -26,9 +26,5 @@
   {
     "name": "com.github.benmanes.caffeine.cache.PSAMS",
     "allDeclaredConstructors": true
-  },
-  {
-    "name": "org.tio.utils.caffeine.CaffeineUtils",
-    "allDeclaredConstructors": true
   }
 ]

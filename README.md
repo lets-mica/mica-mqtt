@@ -3,10 +3,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/30dad82f79f34e41bafbc3cef6b68fc3)](https://www.codacy.com/gh/lets-mica/mica-mqtt/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lets-mica/mica-mqtt&amp;utm_campaign=Badge_Grade)
 [![GitHub](https://img.shields.io/github/license/lets-mica/mica-mqtt.svg?style=flat-square)](https://github.com/lets-mica/mica-mqtt/blob/master/LICENSE)
 
-基于 `t-io` 实现的 `mqtt` 物联网组件。  
-
-## 使用
-目前仅仅是试验性质，不过 `t-io` 确实很稳，`mica-mqtt-example` 中有 `mqtt` 服务端和客户端测试代码， `main` 方法运行即可。
+基于 `t-io` 实现的**低延迟**、**高性能**的 `mqtt` 物联网组件。  
 
 ## 功能
 - [x] 支持 MQTT v3.1、v3.1.1 以及 v5.0 协议。
@@ -16,9 +13,11 @@
 - [ ] MQTT 服务端接续完善，精力有限，周期可能会长一些。
 
 ## 文档
+- [t-io 官方问](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
 
 ##  快速开始
+查看 `mica-mqtt-example` 中有 `mqtt` 服务端和客户端演示代码， `main` 方法运行即可。
 
 ### 1. 启动 Server 端
 
