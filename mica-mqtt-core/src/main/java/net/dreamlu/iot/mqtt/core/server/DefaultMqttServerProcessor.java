@@ -74,8 +74,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}
-		// 3. 设置 clientId
-		context.setBsId(clientId);
+		// 3. 绑定 clientId
 		Tio.bindBsId(context, clientId);
 		// 4. TODO 存储遗嘱消息
 		// 5. 返回 ack
