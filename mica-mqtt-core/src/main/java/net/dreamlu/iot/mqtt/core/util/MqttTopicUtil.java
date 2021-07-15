@@ -1,5 +1,7 @@
 package net.dreamlu.iot.mqtt.core.util;
 
+import java.util.regex.Pattern;
+
 /**
  * Mqtt Topic 工具
  *
@@ -7,15 +9,15 @@ package net.dreamlu.iot.mqtt.core.util;
  */
 public final class MqttTopicUtil {
 
-    public static String regexTopic(String topic) {
-        if (topic.startsWith("$")) {
-            topic = "\\" + topic;
-        }
-        return topic
-                .replaceAll("/", "\\\\/")
-                .replaceAll("\\+", "[^/]+")
-                .replaceAll("#", "(.+)") + "$";
-    }
-
+	public static Pattern getTopicPattern(String topic) {
+		if (topic.startsWith("$")) {
+			topic = "\\" + topic;
+		}
+		return Pattern.compile(topic
+			.replace("+", "[^/]+")
+			.replace("#", ".+")
+			.concat("$")
+		);
+	}
 
 }
