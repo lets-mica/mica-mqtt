@@ -9,6 +9,7 @@
         <version>${revision}</version>
     </parent>
     <artifactId>mica-mqtt-example</artifactId>
+    <name>${project.artifactId}</name>
 
     <properties>
         <log4j2.version>2.14.1</log4j2.version>
