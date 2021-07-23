@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server;
+package net.dreamlu.iot.mqtt.core.server.support;
+
+import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
 
 /**
  * 默认的认证处理
  *
  * @author L.cm
  */
-public class DefaultMqttAuthHandler implements IMqttAuthHandler {
+public class DefaultMqttServerAuthHandler implements IMqttServerAuthHandler {
 
 	@Override
 	public boolean authenticate(String clientId, String userName, String password) {

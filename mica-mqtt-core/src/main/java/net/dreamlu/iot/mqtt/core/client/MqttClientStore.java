@@ -18,7 +18,6 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
 import net.dreamlu.iot.mqtt.core.util.MultiValueMap;
 
 import java.util.*;
@@ -32,7 +31,7 @@ final class MqttClientStore {
 	/**
 	 * 订阅的数据承载
 	 */
-	private final MultiValueMap<String, MqttSubscription> subscriptions = new MultiValueMap<>();
+	private final MultiValueMap<String, MqttClientSubscription> subscriptions = new MultiValueMap<>();
 	private final Map<Integer, MqttPendingSubscription> pendingSubscriptions = new LinkedHashMap<>();
 	private final Map<Integer, MqttPendingUnSubscription> pendingUnSubscriptions = new LinkedHashMap<>();
 	private final Map<Integer, MqttPendingPublish> pendingPublishData = new LinkedHashMap<>();
@@ -50,24 +49,24 @@ final class MqttClientStore {
 		return pendingSubscriptions.remove(messageId);
 	}
 
-	protected void addSubscription(MqttSubscription subscription) {
+	protected void addSubscription(MqttClientSubscription subscription) {
 		subscriptions.add(subscription.getTopicFilter(), subscription);
 	}
 
-	protected List<MqttSubscription> getAndCleanSubscription() {
-		List<MqttSubscription> subscriptionList = new ArrayList<>();
-		for (List<MqttSubscription> mqttSubscriptions : subscriptions.values()) {
+	protected List<MqttClientSubscription> getAndCleanSubscription() {
+		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
+		for (List<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
 			subscriptionList.addAll(mqttSubscriptions);
 		}
-		List<MqttSubscription> data = Collections.unmodifiableList(subscriptionList);
+		List<MqttClientSubscription> data = Collections.unmodifiableList(subscriptionList);
 		subscriptions.clear();
 		return data;
 	}
 
-	protected List<MqttSubscription> getMatchedSubscription(String topicName) {
-		List<MqttSubscription> subscriptionList = new ArrayList<>();
-		for (List<MqttSubscription> mqttSubscriptions : subscriptions.values()) {
-			for (MqttSubscription subscription : mqttSubscriptions) {
+	protected List<MqttClientSubscription> getMatchedSubscription(String topicName) {
+		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
+		for (List<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
+			for (MqttClientSubscription subscription : mqttSubscriptions) {
 				if (subscription.matches(topicName)) {
 					subscriptionList.add(subscription);
 				}

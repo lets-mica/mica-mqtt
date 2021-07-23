@@ -16,7 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
-import net.dreamlu.iot.mqtt.core.server.store.IMqttSubscribeStore;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -30,10 +30,10 @@ import org.tio.core.Tio;
  */
 public class MqttServerAioListener extends DefaultAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServerAioListener.class);
-	private final IMqttSubscribeStore subscribeStore;
+	private final IMqttSessionManager sessionManager;
 
-	public MqttServerAioListener(IMqttSubscribeStore subscribeStore) {
-		this.subscribeStore = subscribeStore;
+	public MqttServerAioListener(IMqttSessionManager sessionManager) {
+		this.sessionManager = sessionManager;
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 		if (throwable != null) {
 			// TODO 遗嘱消息处理
 		}
-		subscribeStore.remove(clientId);
+		sessionManager.clean(clientId);
 		Tio.unbindBsId(context);
 	}
 

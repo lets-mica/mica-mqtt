@@ -34,9 +34,9 @@ public class MqttClientAioHandler implements ClientAioHandler {
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
 	private final ByteBufferAllocator allocator;
-	private final MqttClientProcessor processor;
+	private final IMqttClientProcessor processor;
 
-	public MqttClientAioHandler(ByteBufferAllocator bufferAllocator, MqttClientProcessor processor) {
+	public MqttClientAioHandler(ByteBufferAllocator bufferAllocator, IMqttClientProcessor processor) {
 		this.mqttDecoder = MqttDecoder.INSTANCE;
 		this.mqttEncoder = MqttEncoder.INSTANCE;
 		this.allocator = bufferAllocator;

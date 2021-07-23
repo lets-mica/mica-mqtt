@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server;
+package net.dreamlu.iot.mqtt.core.server.support;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
-import net.dreamlu.iot.mqtt.core.server.store.IMqttSubscribeStore;
+import net.dreamlu.iot.mqtt.core.server.*;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -40,21 +39,21 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttServerProcessor.class);
-	private final IMqttAuthHandler authHandler;
-	private final IMqttPublishManager publishManager;
-	private final IMqttSubManager subManager;
-	private final IMqttSubscribeStore subscribeStore;
+	private final IMqttSessionManager sessionManager;
+	private final IMqttServerAuthHandler authHandler;
+	private final IMqttServerPublishManager publishManager;
+	private final IMqttServerSubscribeManager subManager;
 	private final ScheduledThreadPoolExecutor executor;
 
-	public DefaultMqttServerProcessor(IMqttAuthHandler authHandler,
-									  IMqttSubManager subManager,
-									  IMqttPublishManager publishManager,
-									  IMqttSubscribeStore subscribeStore,
+	public DefaultMqttServerProcessor(IMqttSessionManager sessionManager,
+									  IMqttServerAuthHandler authHandler,
+									  IMqttServerSubscribeManager subManager,
+									  IMqttServerPublishManager publishManager,
 									  ScheduledThreadPoolExecutor executor) {
+		this.sessionManager = sessionManager;
 		this.authHandler = authHandler;
 		this.subManager = subManager;
 		this.publishManager = publishManager;
-		this.subscribeStore = subscribeStore;
 		this.executor = executor;
 	}
 
@@ -74,9 +73,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}
+		// TODO session 处理
+		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
+		boolean cleanSession = variableHeader.isCleanSession();
 		// 3. 绑定 clientId
 		Tio.bindBsId(context, clientId);
 		// 4. TODO 存储遗嘱消息
+//		variableHeader.isWillFlag()
+
 		// 5. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
 	}
@@ -101,10 +105,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		logger.debug("Publish - clientId:{} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
 		switch (mqttQoS) {
 			case AT_MOST_ONCE:
-				invokeListenerForPublish(mqttQoS, topicName, message);
+				invokeListenerForPublish(clientId, mqttQoS, topicName, message);
 				break;
 			case AT_LEAST_ONCE:
-				invokeListenerForPublish(mqttQoS, topicName, message);
+				invokeListenerForPublish(clientId, mqttQoS, topicName, message);
 				if (packetId != -1) {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck()
 						.packetId(packetId)
@@ -120,7 +124,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					Boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
-					publishManager.addPendingQos2Publish(packetId, pendingQos2Publish);
+					publishManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
 				}
 				break;
@@ -135,12 +139,12 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
 		logger.debug("PubAck - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
+		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish == null) {
 			return;
 		}
 		pendingPublish.onPubAckReceived();
-		publishManager.removePendingPublish(messageId);
+		publishManager.removePendingPublish(clientId, messageId);
 		pendingPublish.getPayload().clear();
 	}
 
@@ -149,7 +153,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
 		logger.debug("PubRec - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
+		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(clientId, messageId);
+		if (pendingPublish == null) {
+			return;
+		}
 		pendingPublish.onPubAckReceived();
 
 		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_LEAST_ONCE, false, 0);
@@ -165,14 +172,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
 		logger.debug("PubRel - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingQos2Publish pendingQos2Publish = publishManager.getPendingQos2Publish(messageId);
+		MqttPendingQos2Publish pendingQos2Publish = publishManager.getPendingQos2Publish(clientId, messageId);
 		if (pendingQos2Publish != null) {
 			MqttPublishMessage incomingPublish = pendingQos2Publish.getIncomingPublish();
 			String topicName = incomingPublish.variableHeader().topicName();
 			MqttQoS mqttQoS = incomingPublish.fixedHeader().qosLevel();
-			invokeListenerForPublish(mqttQoS, topicName, incomingPublish);
+			invokeListenerForPublish(clientId, mqttQoS, topicName, incomingPublish);
 			pendingQos2Publish.onPubRelReceived();
-			publishManager.removePendingQos2Publish(messageId);
+			publishManager.removePendingQos2Publish(clientId, messageId);
 		}
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0),
@@ -185,10 +192,12 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
 		logger.debug("PubComp - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(messageId);
-		pendingPublish.getPayload().clear();
-		pendingPublish.onPubCompReceived();
-		publishManager.removePendingPublish(messageId);
+		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(clientId, messageId);
+		if (pendingPublish != null) {
+			pendingPublish.getPayload().clear();
+			pendingPublish.onPubCompReceived();
+			publishManager.removePendingPublish(clientId, messageId);
+		}
 	}
 
 	@Override
@@ -203,7 +212,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			String topicName = subscription.topicName();
 			MqttQoS mqttQoS = subscription.qualityOfService();
 			mqttQosList.add(mqttQoS);
-			subscribeStore.add(clientId, topicName, mqttQoS);
+			sessionManager.addSubscribe(clientId, topicName, mqttQoS);
 			logger.debug("Subscribe - clientId:{} messageId:{} topicFilter:{} mqttQoS:{}", clientId, messageId, topicName, mqttQoS);
 		}
 		// 3. 返回 ack
@@ -221,7 +230,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int messageId = message.variableHeader().messageId();
 		List<String> topicFilterList = message.payload().topics();
 		for (String topicFilter : topicFilterList) {
-			subscribeStore.remove(clientId, topicFilter);
+			sessionManager.removeSubscribe(clientId, topicFilter);
 			logger.debug("UnSubscribe - clientId:{} messageId:{} topicFilter:{}", clientId, messageId, topicFilter);
 		}
 		MqttMessage unSubMessage = MqttMessageBuilders.unsubAck()
@@ -247,16 +256,17 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	/**
 	 * 处理订阅的消息
 	 *
+	 * @param clientId  clientId
 	 * @param topicName topicName
 	 * @param message   MqttPublishMessage
 	 */
-	private void invokeListenerForPublish(MqttQoS mqttQoS, String topicName, MqttPublishMessage message) {
-		List<MqttSubscription> subscriptionList = subManager.getMatchedSubscription(topicName, mqttQoS);
+	private void invokeListenerForPublish(String clientId, MqttQoS mqttQoS, String topicName, MqttPublishMessage message) {
+		List<MqttServerSubscription> subscriptionList = subManager.getMatchedSubscription(topicName, mqttQoS);
 		final ByteBuffer payload = message.payload();
 		subscriptionList.forEach(subscription -> {
-			MqttMessageListener listener = subscription.getListener();
+			IMqttServerMessageListener listener = subscription.getListener();
 			payload.rewind();
-			listener.onMessage(topicName, payload);
+			listener.onMessage(clientId, topicName, payload);
 		});
 	}
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.common;
+package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
@@ -28,15 +28,15 @@ import java.util.regex.Pattern;
  *
  * @author L.cm
  */
-public final class MqttSubscription implements Serializable {
+final class MqttClientSubscription implements Serializable {
 	private final String topicFilter;
 	private final MqttQoS mqttQoS;
 	private final Pattern topicRegex;
-	private final MqttMessageListener listener;
+	private final IMqttClientMessageListener listener;
 
-	public MqttSubscription(MqttQoS mqttQoS,
-							String topicFilter,
-							MqttMessageListener listener) {
+	public MqttClientSubscription(MqttQoS mqttQoS,
+								  String topicFilter,
+								  IMqttClientMessageListener listener) {
 		this.mqttQoS = mqttQoS;
 		this.topicFilter = topicFilter;
 		this.topicRegex = MqttTopicUtil.getTopicPattern(topicFilter);
@@ -51,7 +51,7 @@ public final class MqttSubscription implements Serializable {
 		return topicFilter;
 	}
 
-	public MqttMessageListener getListener() {
+	public IMqttClientMessageListener getListener() {
 		return listener;
 	}
 
@@ -67,7 +67,7 @@ public final class MqttSubscription implements Serializable {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		MqttSubscription that = (MqttSubscription) o;
+		MqttClientSubscription that = (MqttClientSubscription) o;
 		return Objects.equals(topicFilter, that.topicFilter) &&
 			mqttQoS == that.mqttQoS &&
 			Objects.equals(topicRegex, that.topicRegex) &&

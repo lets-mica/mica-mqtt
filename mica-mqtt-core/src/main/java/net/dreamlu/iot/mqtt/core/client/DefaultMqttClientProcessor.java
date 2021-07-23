@@ -17,10 +17,8 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -36,7 +34,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  *
  * @author L.cm
  */
-public class DefaultMqttClientProcessor implements MqttClientProcessor {
+public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
 	private final MqttClientStore clientStore;
 	private final CountDownLatch connLatch;
@@ -199,10 +197,10 @@ public class DefaultMqttClientProcessor implements MqttClientProcessor {
 	 * @param message   MqttPublishMessage
 	 */
 	private void invokeListenerForPublish(String topicName, MqttPublishMessage message) {
-		List<MqttSubscription> subscriptionList = clientStore.getMatchedSubscription(topicName);
+		List<MqttClientSubscription> subscriptionList = clientStore.getMatchedSubscription(topicName);
 		final ByteBuffer payload = message.payload();
 		subscriptionList.forEach(subscription -> {
-			MqttMessageListener listener = subscription.getListener();
+			IMqttClientMessageListener listener = subscription.getListener();
 			payload.rewind();
 			listener.onMessage(topicName, payload);
 		});

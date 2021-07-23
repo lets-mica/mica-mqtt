@@ -24,7 +24,7 @@ import org.tio.core.ChannelContext;
  *
  * @author L.cm
  */
-public interface MqttClientProcessor {
+public interface IMqttClientProcessor {
 
 	/**
 	 * 处理编解码失败

@@ -272,7 +272,7 @@ public final class MqttClientCreator {
 		// 客户端处理器
 		CountDownLatch connLatch = new CountDownLatch(1);
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
-		MqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, connLatch, executor);
+		IMqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, connLatch, executor);
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, Objects.requireNonNull(processor));
 		ClientAioListener clientAioListener = new MqttClientAioListener(this, clientStore, executor);

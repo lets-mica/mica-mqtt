@@ -20,7 +20,7 @@ import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
-import net.dreamlu.iot.mqtt.core.server.store.IMqttSubscribeStore;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.SubscribeStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,20 +44,17 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public final class MqttServer {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
 	private final TioServer tioServer;
-	private final IMqttMessageIdGenerator messageIdGenerator;
-	private final IMqttPublishManager publishManager;
-	private final IMqttSubscribeStore subscribeStore;
+	private final IMqttSessionManager sessionManager;
+	private final IMqttServerPublishManager publishManager;
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
-			   IMqttMessageIdGenerator messageIdGenerator,
-			   IMqttPublishManager publishManager,
-			   IMqttSubscribeStore subscribeStore,
+			   IMqttSessionManager sessionManager,
+			   IMqttServerPublishManager publishManager,
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
-		this.messageIdGenerator = messageIdGenerator;
+		this.sessionManager = sessionManager;
 		this.publishManager = publishManager;
-		this.subscribeStore = subscribeStore;
 		this.executor = executor;
 	}
 
@@ -128,7 +125,7 @@ public final class MqttServer {
 			logger.warn("Mqtt publish to clientId:{} ChannelContext is null May be disconnected.", clientId);
 			return false;
 		}
-		List<SubscribeStore> subscribeList = subscribeStore.search(clientId, topic);
+		List<SubscribeStore> subscribeList = sessionManager.searchSubscribe(clientId, topic);
 		if (subscribeList.isEmpty()) {
 			logger.warn("Mqtt publish but clientId:{} subscribeList is empty.", clientId);
 			return false;
@@ -136,7 +133,7 @@ public final class MqttServer {
 		for (SubscribeStore subscribe : subscribeList) {
 			int subMqttQoS = subscribe.getMqttQoS();
 			MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
-			publish(context, topic, payload, mqttQoS, retain);
+			publish(context, clientId, topic, payload, mqttQoS, retain);
 		}
 		return true;
 	}
@@ -151,9 +148,9 @@ public final class MqttServer {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	private boolean publish(ChannelContext context, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	private boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
-		int messageId = isHighLevelQoS ? messageIdGenerator.getId() : -1;
+		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
 		payload.rewind();
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
@@ -166,7 +163,7 @@ public final class MqttServer {
 		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
-			publishManager.addPendingPublish(messageId, pendingPublish);
+			publishManager.addPendingPublish(clientId, messageId, pendingPublish);
 			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 		}
 		return result;

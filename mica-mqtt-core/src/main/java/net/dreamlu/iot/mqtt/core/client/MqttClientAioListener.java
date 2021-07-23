@@ -20,7 +20,6 @@ import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttSubscribeMessage;
-import net.dreamlu.iot.mqtt.core.common.MqttSubscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.DefaultClientAioListener;
@@ -92,8 +91,8 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	}
 
 	private void reSendSubscription(ChannelContext context) {
-		List<MqttSubscription> subscriptionList = clientStore.getAndCleanSubscription();
-		for (MqttSubscription subscription : subscriptionList) {
+		List<MqttClientSubscription> subscriptionList = clientStore.getAndCleanSubscription();
+		for (MqttClientSubscription subscription : subscriptionList) {
 			int messageId = MqttClientMessageId.getId();
 			MqttQoS mqttQoS = subscription.getMqttQoS();
 			String topicFilter = subscription.getTopicFilter();

@@ -22,7 +22,7 @@ package net.dreamlu.iot.mqtt.core.server;
  * @author L.cm
  */
 @FunctionalInterface
-public interface IMqttAuthHandler {
+public interface IMqttServerAuthHandler {
 
 	/**
 	 * 认证

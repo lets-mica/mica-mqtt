@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.core.common.MqttMessageListener;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +63,7 @@ public final class MqttClient {
 	 * @param listener    MqttMessageListener
 	 * @return MqttClient
 	 */
-	public MqttClient subQos0(String topicFilter, MqttMessageListener listener) {
+	public MqttClient subQos0(String topicFilter, IMqttClientMessageListener listener) {
 		return subscribe(MqttQoS.AT_MOST_ONCE, topicFilter, listener);
 	}
 
@@ -75,7 +74,7 @@ public final class MqttClient {
 	 * @param listener    MqttMessageListener
 	 * @return MqttClient
 	 */
-	public MqttClient subQos1(String topicFilter, MqttMessageListener listener) {
+	public MqttClient subQos1(String topicFilter, IMqttClientMessageListener listener) {
 		return subscribe(MqttQoS.AT_LEAST_ONCE, topicFilter, listener);
 	}
 
@@ -86,7 +85,7 @@ public final class MqttClient {
 	 * @param listener    MqttMessageListener
 	 * @return MqttClient
 	 */
-	public MqttClient subQos2(String topicFilter, MqttMessageListener listener) {
+	public MqttClient subQos2(String topicFilter, IMqttClientMessageListener listener) {
 		return subscribe(MqttQoS.EXACTLY_ONCE, topicFilter, listener);
 	}
 
@@ -98,7 +97,7 @@ public final class MqttClient {
 	 * @param listener    MqttMessageListener
 	 * @return MqttClient
 	 */
-	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, MqttMessageListener listener) {
+	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, IMqttClientMessageListener listener) {
 		int messageId = MqttClientMessageId.getId();
 		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
 			.addSubscription(mqttQoS, topicFilter)

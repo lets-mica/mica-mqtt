@@ -12,7 +12,7 @@
 
     <properties>
         <log4j2.version>2.14.1</log4j2.version>
-        <graalvm.version>21.1.0</graalvm.version>
+        <graalvm.version>21.2.0</graalvm.version>
         <mainClass.server>net.dreamlu.iot.mqtt.server.MqttServerTest</mainClass.server>
         <mainClass.client>net.dreamlu.iot.mqtt.client.MqttClientTest</mainClass.client>
     </properties>
