@@ -35,7 +35,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * clientId: messageId
 	 */
-	private final Map<String, AtomicInteger> messageIdStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, AtomicInteger> messageIdStore = new ConcurrentHashMap<>();
 	/**
 	 * clientId: {topicFilter: SubscribeStore}
 	 */
@@ -43,11 +43,11 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * clientId: {msgId: Object}
 	 */
-	private final Map<String, Map<Integer, MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Map<Integer, MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
 	/**
 	 * clientId: {msgId: Object}
 	 */
-	private final Map<String , Map<Integer, MqttPendingQos2Publish>> pendingQos2PublishStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String , Map<Integer, MqttPendingQos2Publish>> pendingQos2PublishStore = new ConcurrentHashMap<>();
 
 	@Override
 	public void addSubscribe(String clientId, String topicFilter, MqttQoS mqttQoS) {
