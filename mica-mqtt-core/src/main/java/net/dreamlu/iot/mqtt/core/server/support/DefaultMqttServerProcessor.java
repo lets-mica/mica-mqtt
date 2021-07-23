@@ -70,14 +70,13 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}
-		// TODO session 处理
-		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
-		boolean cleanSession = variableHeader.isCleanSession();
+		// TODO session 处理，先默认全部连接关闭时清除
+//		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
+//		boolean cleanSession = variableHeader.isCleanSession();
 		// 3. 绑定 clientId
 		Tio.bindBsId(context, clientId);
 		// 4. TODO 存储遗嘱消息
 //		variableHeader.isWillFlag()
-
 		// 5. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
 	}
