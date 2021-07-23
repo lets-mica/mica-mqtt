@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.store;
+package net.dreamlu.iot.mqtt.core.server.model;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * 订阅存储
+ * 订阅模型，用于存储
  *
  * @author L.cm
  */
-public class SubscribeStore implements Serializable {
+public class Subscribe implements Serializable {
 	private Pattern topicRegex;
 	private int mqttQoS;
 
-	public SubscribeStore() {
+	public Subscribe() {
 	}
 
-	public SubscribeStore(String topicFilter, int mqttQoS) {
+	public Subscribe(String topicFilter, int mqttQoS) {
 		this.topicRegex = Pattern.compile(topicFilter.replace("+", "[^/]+").replace("#", ".+").concat("$"));
 		this.mqttQoS = mqttQoS;
 	}
@@ -41,7 +41,7 @@ public class SubscribeStore implements Serializable {
 		return topicRegex;
 	}
 
-	public SubscribeStore setTopicRegex(Pattern topicRegex) {
+	public Subscribe setTopicRegex(Pattern topicRegex) {
 		this.topicRegex = topicRegex;
 		return this;
 	}
@@ -50,7 +50,7 @@ public class SubscribeStore implements Serializable {
 		return mqttQoS;
 	}
 
-	public SubscribeStore setMqttQoS(int mqttQoS) {
+	public Subscribe setMqttQoS(int mqttQoS) {
 		this.mqttQoS = mqttQoS;
 		return this;
 	}
@@ -63,7 +63,7 @@ public class SubscribeStore implements Serializable {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		SubscribeStore that = (SubscribeStore) o;
+		Subscribe that = (Subscribe) o;
 		return mqttQoS == that.mqttQoS &&
 			Objects.equals(topicRegex, that.topicRegex);
 	}

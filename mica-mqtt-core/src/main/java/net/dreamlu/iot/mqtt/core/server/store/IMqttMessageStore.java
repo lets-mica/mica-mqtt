@@ -1,0 +1,79 @@
+/*
+ * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & www.net.dreamlu.net).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package net.dreamlu.iot.mqtt.core.server.store;
+
+import net.dreamlu.iot.mqtt.core.server.model.Message;
+
+import java.util.Collection;
+
+/**
+ * message store
+ *
+ * @author L.cm
+ */
+public interface IMqttMessageStore {
+
+	/**
+	 * 存储clientId的遗嘱消息
+	 *
+	 * @param clientId clientId
+	 * @param message  message
+	 * @return boolean
+	 */
+	boolean addWillMessage(String clientId, Message message);
+
+	/**
+	 * 清理该clientId的遗嘱消息
+	 *
+	 * @param clientId clientId
+	 * @return boolean
+	 */
+	boolean clearWillMessage(String clientId);
+
+	/**
+	 * 获取will消息
+	 *
+	 * @param clientId clientId
+	 * @return Message
+	 */
+	Message getWillMessage(String clientId);
+
+	/**
+	 * 存储retain消息
+	 *
+	 * @param topic   topic
+	 * @param message message
+	 * @return boolean
+	 */
+	boolean addRetainMessage(String topic, Message message);
+
+	/**
+	 * 清理该topic的 retain消息
+	 *
+	 * @param topic topic
+	 * @return boolean
+	 */
+	boolean clearRetainMessage(String topic);
+
+	/**
+	 * 获取所有retain消息
+	 *
+	 * @return Message Collection
+	 */
+	Collection<Message> getAllRetainMsg();
+
+}

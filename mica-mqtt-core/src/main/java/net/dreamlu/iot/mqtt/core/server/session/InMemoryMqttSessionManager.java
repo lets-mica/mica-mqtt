@@ -19,7 +19,7 @@ package net.dreamlu.iot.mqtt.core.server.session;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.server.store.SubscribeStore;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,7 +39,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * clientId: {topicFilter: SubscribeStore}
 	 */
-	private final ConcurrentMap<String, ConcurrentMap<String, SubscribeStore>> subscribeStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ConcurrentMap<String, Subscribe>> subscribeStore = new ConcurrentHashMap<>();
 	/**
 	 * clientId: {msgId: Object}
 	 */
@@ -51,13 +51,13 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void addSubscribe(String clientId, String topicFilter, MqttQoS mqttQoS) {
-		Map<String, SubscribeStore> data = subscribeStore.computeIfAbsent(clientId, (key) -> new ConcurrentHashMap<>(16));
-		data.put(topicFilter, new SubscribeStore(topicFilter, mqttQoS.value()));
+		Map<String, Subscribe> data = subscribeStore.computeIfAbsent(clientId, (key) -> new ConcurrentHashMap<>(16));
+		data.put(topicFilter, new Subscribe(topicFilter, mqttQoS.value()));
 	}
 
 	@Override
 	public void removeSubscribe(String clientId, String topicFilter) {
-		ConcurrentMap<String, SubscribeStore> map = subscribeStore.get(clientId);
+		ConcurrentMap<String, Subscribe> map = subscribeStore.get(clientId);
 		if (map == null) {
 			return;
 		}
@@ -65,14 +65,14 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	}
 
 	@Override
-	public List<SubscribeStore> searchSubscribe(String clientId, String topicName) {
-		List<SubscribeStore> list = new ArrayList<>();
-		ConcurrentMap<String, SubscribeStore> map = subscribeStore.get(clientId);
+	public List<Subscribe> searchSubscribe(String clientId, String topicName) {
+		List<Subscribe> list = new ArrayList<>();
+		ConcurrentMap<String, Subscribe> map = subscribeStore.get(clientId);
 		if (map == null) {
 			return Collections.emptyList();
 		}
-		Collection<SubscribeStore> values = map.values();
-		for (SubscribeStore value : values) {
+		Collection<Subscribe> values = map.values();
+		for (Subscribe value : values) {
 			if (value.getTopicRegex().matcher(topicName).matches()) {
 				list.add(value);
 			}

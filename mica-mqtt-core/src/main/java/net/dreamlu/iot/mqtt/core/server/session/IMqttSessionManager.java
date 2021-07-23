@@ -19,7 +19,7 @@ package net.dreamlu.iot.mqtt.core.server.session;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.server.store.SubscribeStore;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 
 import java.util.List;
 
@@ -54,7 +54,7 @@ public interface IMqttSessionManager {
 	 * @param topicName topicName
 	 * @return 订阅存储列表
 	 */
-	List<SubscribeStore> searchSubscribe(String clientId, String topicName);
+	List<Subscribe> searchSubscribe(String clientId, String topicName);
 
 	/**
 	 * 添加发布过程存储

@@ -21,7 +21,7 @@ import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
-import net.dreamlu.iot.mqtt.core.server.store.SubscribeStore;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -122,12 +122,12 @@ public final class MqttServer {
 			logger.warn("Mqtt publish to clientId:{} ChannelContext is null May be disconnected.", clientId);
 			return false;
 		}
-		List<SubscribeStore> subscribeList = sessionManager.searchSubscribe(clientId, topic);
+		List<Subscribe> subscribeList = sessionManager.searchSubscribe(clientId, topic);
 		if (subscribeList.isEmpty()) {
 			logger.warn("Mqtt publish but clientId:{} subscribeList is empty.", clientId);
 			return false;
 		}
-		for (SubscribeStore subscribe : subscribeList) {
+		for (Subscribe subscribe : subscribeList) {
 			int subMqttQoS = subscribe.getMqttQoS();
 			MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
 			publish(context, clientId, topic, payload, mqttQoS, retain);
