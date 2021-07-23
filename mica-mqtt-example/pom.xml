@@ -122,8 +122,6 @@
                             <imageName>mqtt-server-graalvm</imageName>
                             <mainClass>${mainClass.server}</mainClass>
                             <buildArgs>
-                                --enable-all-security-services
-                                --report-unsupported-elements-at-runtime
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
                                 -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
@@ -176,8 +174,6 @@
                             <imageName>mqtt-client-graalvm</imageName>
                             <mainClass>${mainClass.client}</mainClass>
                             <buildArgs>
-                                --enable-all-security-services
-                                --report-unsupported-elements-at-runtime
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
                                 -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
