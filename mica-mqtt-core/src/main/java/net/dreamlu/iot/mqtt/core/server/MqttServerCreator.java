@@ -20,7 +20,6 @@ import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerPublishManager;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
@@ -221,9 +220,7 @@ public class MqttServerCreator {
 			this.authHandler = new DefaultMqttServerAuthHandler();
 		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttServer"));
-		// 过程消息存储
-		IMqttServerPublishManager publishManager = new DefaultMqttServerPublishManager();
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this.sessionManager, this.authHandler, this.subManager, publishManager, executor);
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this.sessionManager, this.authHandler, this.subManager, executor);
 		// 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, serverProcessor);
 		// 监听
@@ -251,7 +248,7 @@ public class MqttServerCreator {
 		tioServer.setCheckLastVersion(false);
 		// 启动
 		tioServer.start(this.ip, this.port);
-		return new MqttServer(tioServer, this.sessionManager, publishManager, executor);
+		return new MqttServer(tioServer, this.sessionManager, executor);
 	}
 
 }

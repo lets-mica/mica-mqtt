@@ -51,7 +51,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 		if (throwable != null) {
 			// TODO 遗嘱消息处理
 		}
-		sessionManager.clean(clientId);
+		sessionManager.remove(clientId);
 		Tio.unbindBsId(context);
 	}
 

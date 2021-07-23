@@ -45,16 +45,13 @@ public final class MqttServer {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
 	private final TioServer tioServer;
 	private final IMqttSessionManager sessionManager;
-	private final IMqttServerPublishManager publishManager;
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
 			   IMqttSessionManager sessionManager,
-			   IMqttServerPublishManager publishManager,
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
 		this.sessionManager = sessionManager;
-		this.publishManager = publishManager;
 		this.executor = executor;
 	}
 
@@ -163,7 +160,7 @@ public final class MqttServer {
 		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
-			publishManager.addPendingPublish(clientId, messageId, pendingPublish);
+			sessionManager.addPendingPublish(clientId, messageId, pendingPublish);
 			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 		}
 		return result;

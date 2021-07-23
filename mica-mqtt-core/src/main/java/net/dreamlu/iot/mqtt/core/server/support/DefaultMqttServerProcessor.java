@@ -41,19 +41,16 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttServerProcessor.class);
 	private final IMqttSessionManager sessionManager;
 	private final IMqttServerAuthHandler authHandler;
-	private final IMqttServerPublishManager publishManager;
 	private final IMqttServerSubscribeManager subManager;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttServerProcessor(IMqttSessionManager sessionManager,
 									  IMqttServerAuthHandler authHandler,
 									  IMqttServerSubscribeManager subManager,
-									  IMqttServerPublishManager publishManager,
 									  ScheduledThreadPoolExecutor executor) {
 		this.sessionManager = sessionManager;
 		this.authHandler = authHandler;
 		this.subManager = subManager;
-		this.publishManager = publishManager;
 		this.executor = executor;
 	}
 
@@ -124,7 +121,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					Boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
-					publishManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);
+					sessionManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
 				}
 				break;
@@ -139,12 +136,12 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
 		logger.debug("PubAck - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(clientId, messageId);
+		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish == null) {
 			return;
 		}
 		pendingPublish.onPubAckReceived();
-		publishManager.removePendingPublish(clientId, messageId);
+		sessionManager.removePendingPublish(clientId, messageId);
 		pendingPublish.getPayload().clear();
 	}
 
@@ -153,7 +150,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
 		logger.debug("PubRec - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(clientId, messageId);
+		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish == null) {
 			return;
 		}
@@ -172,14 +169,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
 		logger.debug("PubRel - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingQos2Publish pendingQos2Publish = publishManager.getPendingQos2Publish(clientId, messageId);
+		MqttPendingQos2Publish pendingQos2Publish = sessionManager.getPendingQos2Publish(clientId, messageId);
 		if (pendingQos2Publish != null) {
 			MqttPublishMessage incomingPublish = pendingQos2Publish.getIncomingPublish();
 			String topicName = incomingPublish.variableHeader().topicName();
 			MqttQoS mqttQoS = incomingPublish.fixedHeader().qosLevel();
 			invokeListenerForPublish(clientId, mqttQoS, topicName, incomingPublish);
 			pendingQos2Publish.onPubRelReceived();
-			publishManager.removePendingQos2Publish(clientId, messageId);
+			sessionManager.removePendingQos2Publish(clientId, messageId);
 		}
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0),
@@ -192,11 +189,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
 		logger.debug("PubComp - clientId:{}, messageId: {}", clientId, messageId);
-		MqttPendingPublish pendingPublish = publishManager.getPendingPublish(clientId, messageId);
+		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish != null) {
 			pendingPublish.getPayload().clear();
 			pendingPublish.onPubCompReceived();
-			publishManager.removePendingPublish(clientId, messageId);
+			sessionManager.removePendingPublish(clientId, messageId);
 		}
 	}
 
