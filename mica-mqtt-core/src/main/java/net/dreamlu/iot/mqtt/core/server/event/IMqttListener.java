@@ -24,7 +24,7 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 @FunctionalInterface
-public interface IMqttEvent {
+public interface IMqttListener {
 
 	/**
 	 * 设备上线（连接成功）
