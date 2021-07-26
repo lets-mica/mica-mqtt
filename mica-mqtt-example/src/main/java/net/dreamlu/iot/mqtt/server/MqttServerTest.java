@@ -19,8 +19,6 @@ package net.dreamlu.iot.mqtt.server;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import net.dreamlu.iot.mqtt.core.server.MqttServerSubscription;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerSubscribeManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,12 +37,6 @@ public class MqttServerTest {
 
 	public static void main(String[] args) throws IOException {
 		// 注意：为了能接受更多链接（降低内存），请添加 jvm 参数 -Xss129k
-		DefaultMqttServerSubscribeManager subManager = new DefaultMqttServerSubscribeManager();
-		// 服务端注册订阅
-		subManager.subscribe(new MqttServerSubscription(MqttQoS.AT_MOST_ONCE, "/test/#", ((clientId, topic, payload) -> {
-			logger.info("clientId:{} subscribe:{} message:{}", clientId, topic, ByteBufferUtil.toString(payload));
-		})));
-
 		MqttServer mqttServer = MqttServer.create()
 			// 默认：127.0.0.1
 			.ip("127.0.0.1")
@@ -52,16 +44,18 @@ public class MqttServerTest {
 			.port(1883)
 			// 默认为： 20480，为了降低内存可以小此参数
 			.readBufferSize(512)
-			.subManager(subManager)
+			.messageListener((clientId, topic, mqttQoS, payload) -> {
+				logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));
+			})
 			.debug() // 开启 debug 信息日志
 			.start();
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
-			}
-		}, 1000, 2000);
+//		Timer timer = new Timer();
+//		timer.schedule(new TimerTask() {
+//			@Override
+//			public void run() {
+//				mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
+//			}
+//		}, 1000, 2000);
 	}
 }

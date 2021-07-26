@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * Variable Header for AUTH and DISCONNECT messages represented by {@link MqttMessage}
+ *
+ * @author netty
  */
 public final class MqttReasonCodeAndPropertiesVariableHeader {
 	private final byte reasonCode;

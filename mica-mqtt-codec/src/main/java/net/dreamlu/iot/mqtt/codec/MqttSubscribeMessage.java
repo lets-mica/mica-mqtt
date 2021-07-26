@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.codec;
 /**
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#subscribe">
  * MQTTV3.1/subscribe</a>
+ *
+ * @author netty
  */
 public final class MqttSubscribeMessage extends MqttMessage {
 

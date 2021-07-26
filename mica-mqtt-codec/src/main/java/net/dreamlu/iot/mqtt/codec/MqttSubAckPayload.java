@@ -23,6 +23,8 @@ import java.util.Objects;
 
 /**
  * Payload of the {@link MqttSubAckMessage}
+ *
+ * @author netty
  */
 public class MqttSubAckPayload {
 	private final List<Integer> reasonCodes;

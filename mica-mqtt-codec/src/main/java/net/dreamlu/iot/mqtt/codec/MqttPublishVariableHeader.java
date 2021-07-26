@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * Variable Header of the {@link MqttPublishMessage}
+ *
+ * @author netty
  */
 public final class MqttPublishVariableHeader {
 	private final String topicName;

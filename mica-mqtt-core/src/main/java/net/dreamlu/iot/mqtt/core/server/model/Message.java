@@ -16,11 +16,9 @@
 
 package net.dreamlu.iot.mqtt.core.server.model;
 
-import net.dreamlu.iot.mqtt.codec.MqttMessageType;
-
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.Map;
+import java.util.Objects;
 
 /**
  * 消息模型，用于存储
@@ -28,11 +26,38 @@ import java.util.Map;
  * @author L.cm
  */
 public class Message implements Serializable {
+
+	/**
+	 * 客户端 id
+	 */
 	private String clientId;
-	private int messageId;
-	private Map<String, Object> headers;
-	private MqttMessageType messageType;
+	/**
+	 * 消息类型
+	 */
+	private int messageType;
+	/**
+	 * topic
+	 */
+	private String topic;
+	/**
+	 * qos
+	 */
+	private int qos;
+	/**
+	 * retain
+	 */
+	private boolean retain;
+	/**
+	 * 是否重发
+	 */
+	private boolean dup;
+	/**
+	 * 消息内容
+	 */
 	private byte[] payload;
+	/**
+	 * 存储时间
+	 */
 	private long storeTime;
 
 	public String getClientId() {
@@ -43,28 +68,44 @@ public class Message implements Serializable {
 		this.clientId = clientId;
 	}
 
-	public int getMessageId() {
-		return messageId;
-	}
-
-	public void setMessageId(int messageId) {
-		this.messageId = messageId;
-	}
-
-	public Map<String, Object> getHeaders() {
-		return headers;
-	}
-
-	public void setHeaders(Map<String, Object> headers) {
-		this.headers = headers;
-	}
-
-	public MqttMessageType getMessageType() {
+	public int getMessageType() {
 		return messageType;
 	}
 
-	public void setMessageType(MqttMessageType messageType) {
+	public void setMessageType(int messageType) {
 		this.messageType = messageType;
+	}
+
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
+	public int getQos() {
+		return qos;
+	}
+
+	public void setQos(int qos) {
+		this.qos = qos;
+	}
+
+	public boolean isRetain() {
+		return retain;
+	}
+
+	public void setRetain(boolean retain) {
+		this.retain = retain;
+	}
+
+	public boolean isDup() {
+		return dup;
+	}
+
+	public void setDup(boolean dup) {
+		this.dup = dup;
 	}
 
 	public byte[] getPayload() {
@@ -84,12 +125,40 @@ public class Message implements Serializable {
 	}
 
 	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		Message message = (Message) o;
+		return messageType == message.messageType &&
+			qos == message.qos &&
+			retain == message.retain &&
+			dup == message.dup &&
+			storeTime == message.storeTime &&
+			Objects.equals(clientId, message.clientId) &&
+			Objects.equals(topic, message.topic) &&
+			Arrays.equals(payload, message.payload);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hash(clientId, messageType, topic, qos, retain, dup, storeTime);
+		result = 31 * result + Arrays.hashCode(payload);
+		return result;
+	}
+
+	@Override
 	public String toString() {
-		return "MessageInfo{" +
+		return "Message{" +
 			"clientId='" + clientId + '\'' +
-			", messageId=" + messageId +
-			", headers=" + headers +
 			", messageType=" + messageType +
+			", topic='" + topic + '\'' +
+			", qos=" + qos +
+			", retain=" + retain +
+			", dup=" + dup +
 			", payload=" + Arrays.toString(payload) +
 			", storeTime=" + storeTime +
 			'}';

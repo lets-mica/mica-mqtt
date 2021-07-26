@@ -20,8 +20,8 @@ import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
-import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -45,13 +45,16 @@ public final class MqttServer {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
 	private final TioServer tioServer;
 	private final IMqttSessionManager sessionManager;
+	private final IMqttServerSubscribeManager subscribeManager;
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
 			   IMqttSessionManager sessionManager,
+			   IMqttServerSubscribeManager subscribeManager,
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
 		this.sessionManager = sessionManager;
+		this.subscribeManager = subscribeManager;
 		this.executor = executor;
 	}
 
@@ -122,7 +125,7 @@ public final class MqttServer {
 			logger.warn("Mqtt publish to clientId:{} ChannelContext is null May be disconnected.", clientId);
 			return false;
 		}
-		List<Subscribe> subscribeList = sessionManager.searchSubscribe(clientId, topic);
+		List<Subscribe> subscribeList = subscribeManager.search(topic, clientId);
 		if (subscribeList.isEmpty()) {
 			logger.warn("Mqtt publish but clientId:{} subscribeList is empty.", clientId);
 			return false;
@@ -228,6 +231,8 @@ public final class MqttServer {
 	public boolean stop() {
 		boolean result = this.tioServer.stop();
 		logger.info("MqttServer stop result:{}", result);
+		sessionManager.clean();
+		subscribeManager.clean();
 		this.executor.shutdown();
 		return result;
 	}

@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.codec;
 /**
  * Variable Header containing only Message Id
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#msg-id">MQTTV3.1/msg-id</a>
+ *
+ * @author netty
  */
 public class MqttMessageIdVariableHeader {
 	private final int messageId;

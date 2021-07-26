@@ -21,6 +21,8 @@ import java.util.Objects;
 /**
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#fixed-header">
  * MQTTV3.1/fixed-header</a>
+ *
+ * @author netty
  */
 public final class MqttFixedHeader {
 

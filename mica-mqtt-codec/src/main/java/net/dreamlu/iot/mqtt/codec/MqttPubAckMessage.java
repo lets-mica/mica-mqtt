@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#puback">MQTTV3.1/puback</a>
+ *
+ * @author netty
  */
 public final class MqttPubAckMessage extends MqttMessage {
 

@@ -23,6 +23,8 @@ import java.util.Objects;
 
 /**
  * Payload for MQTT unsuback message as in V5.
+ *
+ * @author netty
  */
 public final class MqttUnsubAckPayload {
 

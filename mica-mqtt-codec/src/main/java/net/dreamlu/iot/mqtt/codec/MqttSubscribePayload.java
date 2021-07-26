@@ -21,6 +21,8 @@ import java.util.List;
 
 /**
  * Payload of the {@link MqttSubscribeMessage}
+ *
+ * @author netty
  */
 public final class MqttSubscribePayload {
 

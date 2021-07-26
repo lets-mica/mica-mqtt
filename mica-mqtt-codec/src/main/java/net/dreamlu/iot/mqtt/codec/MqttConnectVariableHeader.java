@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * Variable Header for the {@link MqttConnectMessage}
+ *
+ * @author netty
  */
 public final class MqttConnectVariableHeader {
 

@@ -18,6 +18,11 @@ package net.dreamlu.iot.mqtt.codec;
 
 import org.tio.core.ChannelContext;
 
+/**
+ * 编解码工具
+ *
+ * @author netty
+ */
 final class MqttCodecUtil {
 	private static final char[] TOPIC_WILDCARDS = {'#', '+'};
 	private static final int MIN_CLIENT_ID_LENGTH = 1;

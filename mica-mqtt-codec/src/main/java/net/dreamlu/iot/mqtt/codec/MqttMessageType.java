@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * MQTT Message Types.
+ *
+ * @author netty
  */
 public enum MqttMessageType {
 	/**

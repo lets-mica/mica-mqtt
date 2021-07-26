@@ -18,8 +18,6 @@ package net.dreamlu.iot.mqtt.core.server.store;
 
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 
-import java.util.Collection;
-
 /**
  * message store
  *
@@ -28,7 +26,7 @@ import java.util.Collection;
 public interface IMqttMessageStore {
 
 	/**
-	 * 存储clientId的遗嘱消息
+	 * 存储 clientId 的遗嘱消息
 	 *
 	 * @param clientId clientId
 	 * @param message  message
@@ -37,7 +35,7 @@ public interface IMqttMessageStore {
 	boolean addWillMessage(String clientId, Message message);
 
 	/**
-	 * 清理该clientId的遗嘱消息
+	 * 清理该 clientId 的遗嘱消息
 	 *
 	 * @param clientId clientId
 	 * @return boolean
@@ -45,7 +43,7 @@ public interface IMqttMessageStore {
 	boolean clearWillMessage(String clientId);
 
 	/**
-	 * 获取will消息
+	 * 获取 will 消息
 	 *
 	 * @param clientId clientId
 	 * @return Message
@@ -53,7 +51,7 @@ public interface IMqttMessageStore {
 	Message getWillMessage(String clientId);
 
 	/**
-	 * 存储retain消息
+	 * 存储 retain 消息
 	 *
 	 * @param topic   topic
 	 * @param message message
@@ -62,7 +60,7 @@ public interface IMqttMessageStore {
 	boolean addRetainMessage(String topic, Message message);
 
 	/**
-	 * 清理该topic的 retain消息
+	 * 清理该 topic 的 retain 消息
 	 *
 	 * @param topic topic
 	 * @return boolean
@@ -70,10 +68,11 @@ public interface IMqttMessageStore {
 	boolean clearRetainMessage(String topic);
 
 	/**
-	 * 获取所有retain消息
+	 * 获取所有 retain 消息
 	 *
-	 * @return Message Collection
+	 * @param topic topic
+	 * @return Message
 	 */
-	Collection<Message> getAllRetainMsg();
+	Message getRetainMessage(String topic);
 
 }

@@ -167,10 +167,10 @@ public class MqttServerAioHandler implements ServerAioHandler {
 			Tio.close(context, cause, "MqttIdentifierRejected");
 		} else if (cause instanceof DecoderException) {
 			log.error(cause.getMessage(), cause);
-			// 消息解码异常，怎么处理？只打印异常？
+			Tio.close(context, cause, "MqttDecoderException");
 		} else {
 			log.error(cause.getMessage(), cause);
-			// 发送断开连接，是否强制关闭客户端连接？？？
+			Tio.close(context, cause, "MqttUnknownException");
 		}
 	}
 

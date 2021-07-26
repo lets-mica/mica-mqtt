@@ -20,6 +20,8 @@ import java.util.*;
 
 /**
  * MQTT Properties container
+ *
+ * @author netty
  */
 public final class MqttProperties {
 

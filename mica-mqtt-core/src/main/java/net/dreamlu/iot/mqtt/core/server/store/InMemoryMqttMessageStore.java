@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.core.server.store;
 
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 
-import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -68,8 +67,8 @@ public class InMemoryMqttMessageStore implements IMqttMessageStore {
 	}
 
 	@Override
-	public Collection<Message> getAllRetainMsg() {
-		return retainStore.values();
+	public Message getRetainMessage(String topic) {
+		return retainStore.get(topic);
 	}
 
 }

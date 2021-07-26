@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * Return Code of {@link MqttConnAckMessage}
+ *
+ * @author netty
  */
 public enum MqttConnectReturnCode {
 	/**

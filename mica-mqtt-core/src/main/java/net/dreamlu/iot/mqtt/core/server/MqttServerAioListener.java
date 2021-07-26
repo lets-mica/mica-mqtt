@@ -16,12 +16,17 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
+import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.DefaultAioListener;
 import org.tio.core.Tio;
+import org.tio.utils.hutool.StrUtil;
 
 /**
  * mqtt 服务监听
@@ -30,10 +35,19 @@ import org.tio.core.Tio;
  */
 public class MqttServerAioListener extends DefaultAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServerAioListener.class);
+	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;
+	private final IMqttMessageDispatcher messageDispatcher;
+	private final IMqttConnectStatusListener clientStatusListener;
 
-	public MqttServerAioListener(IMqttSessionManager sessionManager) {
+	public MqttServerAioListener(IMqttMessageStore messageStore,
+								 IMqttSessionManager sessionManager,
+								 IMqttMessageDispatcher messageDispatcher,
+								 IMqttConnectStatusListener clientStatusListener) {
+		this.messageStore = messageStore;
 		this.sessionManager = sessionManager;
+		this.messageDispatcher = messageDispatcher;
+		this.clientStatusListener = clientStatusListener;
 	}
 
 	@Override
@@ -46,13 +60,23 @@ public class MqttServerAioListener extends DefaultAioListener {
 	@Override
 	public void onBeforeClose(ChannelContext context, Throwable throwable, String remark, boolean isRemove) {
 		String clientId = context.getBsId();
-		logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
-		// 对于异常，处理遗嘱消息
-		if (throwable != null) {
-			// TODO 遗嘱消息处理
+		if (StrUtil.isBlank(clientId)) {
+			logger.warn("Mqtt server close clientId isBlank, remark:{} isRemove:{}", remark, isRemove);
+			return;
 		}
+		logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
+		// 1. 对于异常断开连接，处理遗嘱消息
+		Object normalDisconnectMark = context.get(MqttConst.DIS_CONNECTED);
+		if (normalDisconnectMark == null) {
+			// 遗嘱消息发送
+			Message willMessage = messageStore.getWillMessage(clientId);
+			messageDispatcher.send(willMessage);
+		}
+		// 2. 释放资源
 		sessionManager.remove(clientId);
 		Tio.unbindBsId(context);
+		// 3. 下线事件
+		clientStatusListener.offline(clientId);
 	}
 
 }

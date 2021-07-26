@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * Variable Header containing, Packet Id and Properties as in MQTT v5 spec.
+ *
+ * @author netty
  */
 public final class MqttMessageIdAndPropertiesVariableHeader extends MqttMessageIdVariableHeader {
 	private final MqttProperties properties;

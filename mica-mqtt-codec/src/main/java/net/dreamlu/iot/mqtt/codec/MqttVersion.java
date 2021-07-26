@@ -21,6 +21,8 @@ import java.util.Objects;
 
 /**
  * Mqtt version specific constant values used by multiple classes in mqtt-codec.
+ *
+ * @author netty
  */
 public enum MqttVersion {
 	/**

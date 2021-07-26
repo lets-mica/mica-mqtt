@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * Model the SubscriptionOption used in Subscribe MQTT v5 packet
+ *
+ * @author netty
  */
 public final class MqttSubscriptionOption {
 

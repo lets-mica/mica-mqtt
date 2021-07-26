@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.codec;
 /**
  * Contains a topic name and Qos Level.
  * This is part of the {@link MqttSubscribePayload}
+ *
+ * @author netty
  */
 public final class MqttTopicSubscription {
 

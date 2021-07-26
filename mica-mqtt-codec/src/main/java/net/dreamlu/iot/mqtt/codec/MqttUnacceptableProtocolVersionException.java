@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.codec;
 /**
  * A {@link MqttUnacceptableProtocolVersionException} which is thrown when
  * a CONNECT request contains unacceptable protocol version.
+ *
+ * @author netty
  */
 public final class MqttUnacceptableProtocolVersionException extends DecoderException {
 	private static final long serialVersionUID = 4914652213232455749L;

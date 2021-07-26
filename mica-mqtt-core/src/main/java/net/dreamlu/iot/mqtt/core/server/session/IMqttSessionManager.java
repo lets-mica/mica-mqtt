@@ -16,12 +16,8 @@
 
 package net.dreamlu.iot.mqtt.core.server.session;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
-
-import java.util.List;
 
 /**
  * session 管理，不封装 MqttSession 实体，方便 redis 等集群处理
@@ -29,32 +25,6 @@ import java.util.List;
  * @author L.cm
  */
 public interface IMqttSessionManager {
-
-	/**
-	 * 添加订阅存储
-	 *
-	 * @param clientId    客户端 Id
-	 * @param topicFilter topicFilter
-	 * @param mqttQoS     MqttQoS
-	 */
-	void addSubscribe(String clientId, String topicFilter, MqttQoS mqttQoS);
-
-	/**
-	 * 删除订阅
-	 *
-	 * @param clientId    客户端 Id
-	 * @param topicFilter topicFilter
-	 */
-	void removeSubscribe(String clientId, String topicFilter);
-
-	/**
-	 * 查找订阅信息
-	 *
-	 * @param clientId  客户端 Id
-	 * @param topicName topicName
-	 * @return 订阅存储列表
-	 */
-	List<Subscribe> searchSubscribe(String clientId, String topicName);
 
 	/**
 	 * 添加发布过程存储
@@ -115,5 +85,10 @@ public interface IMqttSessionManager {
 	 * @param clientId clientId
 	 */
 	void remove(String clientId);
+
+	/**
+	 * 清理
+	 */
+	void clean();
 
 }

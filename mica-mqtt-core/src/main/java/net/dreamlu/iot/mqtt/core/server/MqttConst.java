@@ -14,42 +14,18 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.event;
-
-import java.nio.ByteBuffer;
+package net.dreamlu.iot.mqtt.core.server;
 
 /**
- * mqtt 设备事件
+ * 常量
  *
  * @author L.cm
  */
-@FunctionalInterface
-public interface IMqttListener {
+public interface MqttConst {
 
 	/**
-	 * 设备上线（连接成功）
-	 *
-	 * @param clientId clientId
+	 * 正常断开连接
 	 */
-	default void online(String clientId) {
-
-	}
-
-	/**
-	 * 监听到消息
-	 *
-	 * @param clientId clientId
-	 * @param topic    topic
-	 * @param payload  payload
-	 */
-	void onMessage(String clientId, String topic, ByteBuffer payload);
-
-	/**
-	 * 设备离线
-	 * @param clientId clientId
-	 */
-	default void offline(String clientId) {
-
-	}
+	String DIS_CONNECTED = "disconnected";
 
 }

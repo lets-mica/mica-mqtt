@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 
 import java.util.List;
 
@@ -28,20 +29,37 @@ import java.util.List;
 public interface IMqttServerSubscribeManager {
 
 	/**
-	 * 订阅
+	 * 添加订阅存储
 	 *
-	 * @param subscription 订阅信息
+	 * @param topicFilter topicFilter
+	 * @param clientId    客户端 Id
+	 * @param mqttQoS     MqttQoS
 	 */
-	void subscribe(MqttServerSubscription subscription);
+	void add(String topicFilter, String clientId, MqttQoS mqttQoS);
 
 	/**
-	 * 获取匹配的订阅
+	 * 删除订阅
+	 *
+	 * @param topicFilter topicFilter
+	 * @param clientId    客户端 Id
+	 */
+	void remove(String topicFilter, String clientId);
+
+	/**
+	 * 删除订阅
+	 *
+	 * @param clientId 客户端 Id
+	 */
+	void remove(String clientId);
+
+	/**
+	 * 查找订阅信息
 	 *
 	 * @param topicName topicName
-	 * @param mqttQoS   MqttQoS
-	 * @return 订阅信息
+	 * @param clientId  客户端 Id
+	 * @return 订阅存储列表
 	 */
-	List<MqttServerSubscription> getMatchedSubscription(String topicName, MqttQoS mqttQoS);
+	List<Subscribe> search(String topicName, String clientId);
 
 	/**
 	 * 清理

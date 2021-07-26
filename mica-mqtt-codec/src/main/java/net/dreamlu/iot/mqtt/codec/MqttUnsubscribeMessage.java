@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.codec;
 /**
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#unsubscribe">
  * MQTTV3.1/unsubscribe</a>
+ *
+ * @author netty
  */
 public final class MqttUnsubscribeMessage extends MqttMessage {
 

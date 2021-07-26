@@ -18,12 +18,12 @@ package net.dreamlu.iot.mqtt.core.server.support;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.IMqttServerSubscribeManager;
-import net.dreamlu.iot.mqtt.core.server.MqttServerSubscription;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
+import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * 默认的 mqtt 订阅管理
@@ -31,28 +31,52 @@ import java.util.List;
  * @author L.cm
  */
 public class DefaultMqttServerSubscribeManager implements IMqttServerSubscribeManager {
-	private final List<MqttServerSubscription> subscriptionList = new LinkedList<>();
+	/**
+	 * topicFilter: {clientId: SubscribeStore}
+	 */
+	private final ConcurrentMap<String, ConcurrentMap<String, Subscribe>> subscribeStore = new ConcurrentHashMap<>();
 
 	@Override
-	public void subscribe(MqttServerSubscription subscription) {
-		subscriptionList.add(subscription);
+	public void add(String topicFilter, String clientId, MqttQoS mqttQoS) {
+		Map<String, Subscribe> data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
+		data.put(clientId, new Subscribe(topicFilter, mqttQoS.value()));
 	}
 
 	@Override
-	public List<MqttServerSubscription> getMatchedSubscription(String topicName, MqttQoS mqttQoS) {
-		List<MqttServerSubscription> list = new ArrayList<>();
-		for (MqttServerSubscription subscription : subscriptionList) {
-			MqttQoS qos = subscription.getMqttQoS();
-			if (subscription.matches(topicName) && (qos == null || qos == mqttQoS)) {
-				list.add(subscription);
+	public void remove(String topicFilter, String clientId) {
+		ConcurrentMap<String, Subscribe> map = subscribeStore.get(topicFilter);
+		if (map == null) {
+			return;
+		}
+		map.remove(clientId);
+	}
+
+	@Override
+	public void remove(String clientId) {
+		subscribeStore.forEach((key, value) -> value.remove(clientId));
+	}
+
+	@Override
+	public List<Subscribe> search(String topicName, String clientId) {
+		List<Subscribe> list = new ArrayList<>();
+		Set<String> topicFilterSet = subscribeStore.keySet();
+		for (String topicFilter : topicFilterSet) {
+			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
+				ConcurrentMap<String, Subscribe> data = subscribeStore.get(topicFilter);
+				if (data != null && !data.isEmpty()) {
+					Subscribe subscribe = data.get(clientId);
+					if (subscribe != null) {
+						list.add(subscribe);
+					}
+				}
 			}
 		}
-		return Collections.unmodifiableList(list);
+		return list;
 	}
 
 	@Override
 	public void clean() {
-		subscriptionList.clear();
+		subscribeStore.clear();
 	}
 
 }

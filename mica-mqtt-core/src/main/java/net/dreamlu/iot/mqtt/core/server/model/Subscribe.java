@@ -18,7 +18,6 @@ package net.dreamlu.iot.mqtt.core.server.model;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 /**
  * 订阅模型，用于存储
@@ -26,33 +25,31 @@ import java.util.regex.Pattern;
  * @author L.cm
  */
 public class Subscribe implements Serializable {
-	private Pattern topicRegex;
+	private String topicFilter;
 	private int mqttQoS;
 
 	public Subscribe() {
 	}
 
 	public Subscribe(String topicFilter, int mqttQoS) {
-		this.topicRegex = Pattern.compile(topicFilter.replace("+", "[^/]+").replace("#", ".+").concat("$"));
+		this.topicFilter = topicFilter;
 		this.mqttQoS = mqttQoS;
 	}
 
-	public Pattern getTopicRegex() {
-		return topicRegex;
+	public String getTopicFilter() {
+		return topicFilter;
 	}
 
-	public Subscribe setTopicRegex(Pattern topicRegex) {
-		this.topicRegex = topicRegex;
-		return this;
+	public void setTopicFilter(String topicFilter) {
+		this.topicFilter = topicFilter;
 	}
 
 	public int getMqttQoS() {
 		return mqttQoS;
 	}
 
-	public Subscribe setMqttQoS(int mqttQoS) {
+	public void setMqttQoS(int mqttQoS) {
 		this.mqttQoS = mqttQoS;
-		return this;
 	}
 
 	@Override
@@ -63,20 +60,20 @@ public class Subscribe implements Serializable {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		Subscribe that = (Subscribe) o;
-		return mqttQoS == that.mqttQoS &&
-			Objects.equals(topicRegex, that.topicRegex);
+		Subscribe subscribe = (Subscribe) o;
+		return mqttQoS == subscribe.mqttQoS &&
+			Objects.equals(topicFilter, subscribe.topicFilter);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(topicRegex, mqttQoS);
+		return Objects.hash(topicFilter, mqttQoS);
 	}
 
 	@Override
 	public String toString() {
-		return "SubscribeStore{" +
-			"topicRegex=" + topicRegex +
+		return "Subscribe{" +
+			"topicFilter='" + topicFilter + '\'' +
 			", mqttQoS=" + mqttQoS +
 			'}';
 	}

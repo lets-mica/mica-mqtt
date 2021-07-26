@@ -10,6 +10,7 @@ import java.util.function.Consumer;
 
 /**
  * MqttPendingPublish，参考于 netty-mqtt-client
+ * @author netty
  */
 public final class MqttPendingPublish {
 	private final ByteBuffer payload;

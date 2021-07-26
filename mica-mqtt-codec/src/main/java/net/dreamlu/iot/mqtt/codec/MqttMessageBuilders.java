@@ -25,6 +25,8 @@ import java.util.List;
 
 /**
  * mqtt 消息构造器
+ *
+ * @author netty
  */
 public final class MqttMessageBuilders {
 

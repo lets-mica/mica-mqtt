@@ -30,6 +30,9 @@ import java.util.List;
  * or
  * <a href="https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html">v5.0</a>, depending on the
  * version specified in the CONNECT message that first goes through the channel.
+ *
+ * @author netty
+ * @author L.cm
  */
 public final class MqttDecoder {
 	private static final int DEFAULT_MAX_BYTES_IN_MESSAGE = 8092;

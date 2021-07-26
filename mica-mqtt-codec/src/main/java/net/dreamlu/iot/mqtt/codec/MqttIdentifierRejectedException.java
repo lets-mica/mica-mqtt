@@ -17,6 +17,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * A {@link MqttIdentifierRejectedException} which is thrown when a CONNECT request contains invalid client identifier.
+ *
+ * @author netty
  */
 public final class MqttIdentifierRejectedException extends DecoderException {
 	private static final long serialVersionUID = -1323503322689614981L;

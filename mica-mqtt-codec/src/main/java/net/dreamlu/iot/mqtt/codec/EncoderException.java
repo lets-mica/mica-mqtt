@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.codec;
 
 /**
  * An {@link RuntimeException} which is thrown by an encoder.
+ *
+ * @author netty
  */
 public class EncoderException extends RuntimeException {
 

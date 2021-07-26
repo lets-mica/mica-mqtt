@@ -17,10 +17,14 @@
 package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
+import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.server.support.*;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -78,13 +82,29 @@ public class MqttServerCreator {
 	 */
 	private IMqttServerAuthHandler authHandler;
 	/**
+	 * 消息处理器
+	 */
+	private IMqttMessageDispatcher messageDispatcher;
+	/**
+	 * 消息存储
+	 */
+	private IMqttMessageStore messageStore;
+	/**
 	 * session 管理
 	 */
 	private IMqttSessionManager sessionManager;
 	/**
-	 * 订阅管路
+	 * 订阅管理
 	 */
-	private IMqttServerSubscribeManager subManager;
+	private IMqttServerSubscribeManager subscribeManager;
+	/**
+	 * 消息监听
+	 */
+	private IMqttMessageListener messageListener;
+	/**
+	 * 链接状态监听
+	 */
+	private IMqttConnectStatusListener connectStatusListener;
 	/**
 	 * debug
 	 */
@@ -184,6 +204,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public IMqttMessageStore getMessageStore() {
+		return messageStore;
+	}
+
+	public MqttServerCreator messageStore(IMqttMessageStore messageStore) {
+		this.messageStore = messageStore;
+		return this;
+	}
+
 	public IMqttSessionManager getSessionManager() {
 		return sessionManager;
 	}
@@ -193,12 +222,30 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public IMqttServerSubscribeManager getSubManager() {
-		return subManager;
+	public IMqttServerSubscribeManager getSubscribeManager() {
+		return subscribeManager;
 	}
 
-	public MqttServerCreator subManager(IMqttServerSubscribeManager subManager) {
-		this.subManager = subManager;
+	public MqttServerCreator subscribeManager(IMqttServerSubscribeManager subscribeManager) {
+		this.subscribeManager = subscribeManager;
+		return this;
+	}
+
+	public IMqttMessageListener getMessageListener() {
+		return messageListener;
+	}
+
+	public MqttServerCreator messageListener(IMqttMessageListener messageListener) {
+		this.messageListener = messageListener;
+		return this;
+	}
+
+	public IMqttConnectStatusListener getConnectStatusListener() {
+		return connectStatusListener;
+	}
+
+	public MqttServerCreator connectStatusListener(IMqttConnectStatusListener connectStatusListener) {
+		this.connectStatusListener = connectStatusListener;
 		return this;
 	}
 
@@ -212,19 +259,34 @@ public class MqttServerCreator {
 	}
 
 	public MqttServer start() throws IOException {
-		Objects.requireNonNull(this.subManager, "Argument subManager is null.");
-		if (this.sessionManager == null) {
-			this.sessionManager = new InMemoryMqttSessionManager();
-		}
+		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		if (this.authHandler == null) {
 			this.authHandler = new DefaultMqttServerAuthHandler();
 		}
+		if (this.messageDispatcher == null) {
+			this.messageDispatcher = new DefaultMqttMessageDispatcher();
+		}
+		if (this.sessionManager == null) {
+			this.sessionManager = new InMemoryMqttSessionManager();
+		}
+		if (this.subscribeManager == null) {
+			this.subscribeManager = new DefaultMqttServerSubscribeManager();
+		}
+		if (this.messageStore == null) {
+			this.messageStore = new InMemoryMqttMessageStore();
+		}
+		if (this.connectStatusListener == null) {
+			this.connectStatusListener = new DefaultMqttConnectStatusListener();
+		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttServer"));
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this.sessionManager, this.authHandler, this.subManager, executor);
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(
+			this.messageStore, this.sessionManager, this.authHandler, this.subscribeManager,
+			this.messageDispatcher, this.connectStatusListener, this.messageListener, executor);
 		// 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, serverProcessor);
 		// 监听
-		ServerAioListener listener = new MqttServerAioListener(this.sessionManager);
+		ServerAioListener listener = new MqttServerAioListener(
+			this.messageStore, this.sessionManager, this.messageDispatcher, this.connectStatusListener);
 		// 配置
 		ServerTioConfig config = new ServerTioConfig(this.name, handler, listener);
 		// 设置心跳 timeout
@@ -248,7 +310,9 @@ public class MqttServerCreator {
 		tioServer.setCheckLastVersion(false);
 		// 启动
 		tioServer.start(this.ip, this.port);
-		return new MqttServer(tioServer, this.sessionManager, executor);
+		MqttServer mqttServer = new MqttServer(tioServer, this.sessionManager, this.subscribeManager, executor);
+		messageDispatcher.config(mqttServer);
+		return mqttServer;
 	}
 
 }

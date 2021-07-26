@@ -15,6 +15,11 @@
 
 package net.dreamlu.iot.mqtt.codec;
 
+/**
+ * Mqtt QoS
+ *
+ * @author netty
+ */
 public enum MqttQoS {
 
 	/**

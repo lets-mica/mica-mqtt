@@ -20,6 +20,8 @@ import org.tio.core.intf.Packet;
 
 /**
  * Base class for all MQTT message types.
+ *
+ * @author netty
  */
 public class MqttMessage extends Packet {
 	private final MqttFixedHeader mqttFixedHeader;

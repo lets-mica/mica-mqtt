@@ -20,6 +20,8 @@ import java.nio.ByteBuffer;
 
 /**
  * Utility class with factory methods to create different types of MQTT messages.
+ *
+ * @author netty
  */
 public final class MqttMessageFactory {
 

@@ -27,6 +27,9 @@ import java.util.List;
  * as described here <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html">MQTTV3.1</a>
  * or v5.0 as described here <a href="https://docs.oasis-open.org/mqtt/mqtt/v5.0/mqtt-v5.0.html">MQTTv5.0</a> -
  * depending on the version specified in the first CONNECT message that goes through the channel.
+ *
+ * @author netty
+ * @author L.cm
  */
 public final class MqttEncoder {
 	public static final MqttEncoder INSTANCE = new MqttEncoder();
