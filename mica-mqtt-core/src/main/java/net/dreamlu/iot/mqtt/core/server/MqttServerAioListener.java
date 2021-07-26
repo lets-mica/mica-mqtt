@@ -66,17 +66,31 @@ public class MqttServerAioListener extends DefaultAioListener {
 		}
 		logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
 		// 1. 对于异常断开连接，处理遗嘱消息
-		Object normalDisconnectMark = context.get(MqttConst.DIS_CONNECTED);
-		if (normalDisconnectMark == null) {
-			// 遗嘱消息发送
-			Message willMessage = messageStore.getWillMessage(clientId);
-			messageDispatcher.send(willMessage);
-		}
+		sendWillMessage(context, clientId);
 		// 2. 释放资源
 		sessionManager.remove(clientId);
 		Tio.unbindBsId(context);
 		// 3. 下线事件
 		clientStatusListener.offline(clientId);
+	}
+
+	private void sendWillMessage(ChannelContext context, String clientId) {
+		// 1. 判断是否正常断开
+		Object normalDisconnectMark = context.get(MqttConst.DIS_CONNECTED);
+		if (normalDisconnectMark != null) {
+			return;
+		}
+		// 2. 获取遗嘱消息
+		Message willMessage = messageStore.getWillMessage(clientId);
+		if (willMessage == null) {
+			return;
+		}
+		// 3. 遗嘱消息发送
+		try {
+			messageDispatcher.send(willMessage);
+		} catch (Throwable throwable) {
+			logger.error("Mqtt server send willMessage error.", throwable);
+		}
 	}
 
 }
