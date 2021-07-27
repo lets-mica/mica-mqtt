@@ -234,8 +234,16 @@ public final class MqttServer {
 	public boolean stop() {
 		boolean result = this.tioServer.stop();
 		logger.info("MqttServer stop result:{}", result);
-		sessionManager.clean();
-		subscribeManager.clean();
+		try {
+			sessionManager.clean();
+		} catch (Throwable e) {
+			logger.error("Mqtt server stop session clean error.", e);
+		}
+		try {
+			subscribeManager.clean();
+		} catch (Throwable e) {
+			logger.error("Mqtt server stop subscribe clean error.", e);
+		}
 		this.executor.shutdown();
 		return result;
 	}

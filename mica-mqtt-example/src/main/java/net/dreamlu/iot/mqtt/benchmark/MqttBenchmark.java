@@ -38,6 +38,7 @@ public class MqttBenchmark {
 			MqttClient client = MqttClient.create()
 				.username("admin")
 				.password("123456")
+				.readBufferSize(512)
 				.connect();
 			// 3. 订阅服务端消息
 			client.subQos0("/#", (topic, payload) -> {

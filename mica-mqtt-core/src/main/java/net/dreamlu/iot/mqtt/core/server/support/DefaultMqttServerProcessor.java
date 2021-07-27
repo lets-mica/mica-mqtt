@@ -39,6 +39,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * mqtt broker 处理器
@@ -93,9 +94,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 3. 绑定 clientId
 		Tio.bindBsId(context, clientId);
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
+		// 4. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
+		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
+		if (keepAliveSeconds > 0) {
+			context.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(keepAliveSeconds));
+		}
 		// TODO session 处理，先默认全部连接关闭时清除
 //		boolean cleanSession = variableHeader.isCleanSession();
-		// 4. 存储遗嘱消息
+		// 5. 存储遗嘱消息
 		boolean willFlag = variableHeader.isWillFlag();
 		if (willFlag) {
 			Message willMessage = new Message();
@@ -105,9 +111,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setRetain(variableHeader.isWillRetain());
 			messageStore.addWillMessage(clientId, willMessage);
 		}
-		// 5. 返回 ack
+		// 6. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
-		// 6. 在线状态
+		// 7. 在线状态
 		clientStatusListener.online(clientId);
 	}
 
