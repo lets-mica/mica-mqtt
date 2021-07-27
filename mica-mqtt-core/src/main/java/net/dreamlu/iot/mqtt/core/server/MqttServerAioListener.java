@@ -87,7 +87,8 @@ public class MqttServerAioListener extends DefaultAioListener {
 		}
 		// 3. 遗嘱消息发送
 		try {
-			messageDispatcher.send(willMessage);
+			boolean result = messageDispatcher.send(willMessage);
+			logger.info("Mqtt server send willMessage result:{}.", result);
 		} catch (Throwable throwable) {
 			logger.error("Mqtt server send willMessage error.", throwable);
 		}

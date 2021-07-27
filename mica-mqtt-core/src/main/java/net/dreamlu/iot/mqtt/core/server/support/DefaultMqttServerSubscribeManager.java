@@ -37,17 +37,17 @@ public class DefaultMqttServerSubscribeManager implements IMqttServerSubscribeMa
 	/**
 	 * topicFilter: {clientId: SubscribeStore}
 	 */
-	private final ConcurrentMap<String, ConcurrentMap<String, Subscribe>> subscribeStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, ConcurrentMap<String, Integer>> subscribeStore = new ConcurrentHashMap<>();
 
 	@Override
 	public void add(String topicFilter, String clientId, MqttQoS mqttQoS) {
-		Map<String, Subscribe> data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
-		data.put(clientId, new Subscribe(topicFilter, mqttQoS.value()));
+		Map<String, Integer> data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
+		data.put(clientId, mqttQoS.value());
 	}
 
 	@Override
 	public void remove(String topicFilter, String clientId) {
-		ConcurrentMap<String, Subscribe> map = subscribeStore.get(topicFilter);
+		ConcurrentMap<String, Integer> map = subscribeStore.get(topicFilter);
 		if (map == null) {
 			return;
 		}
@@ -65,11 +65,11 @@ public class DefaultMqttServerSubscribeManager implements IMqttServerSubscribeMa
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
 			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
-				ConcurrentMap<String, Subscribe> data = subscribeStore.get(topicFilter);
+				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
-					Subscribe subscribe = data.get(clientId);
-					if (subscribe != null) {
-						list.add(subscribe);
+					Integer mqttQoS = data.get(clientId);
+					if (mqttQoS != null) {
+						list.add(new Subscribe(topicFilter, mqttQoS));
 					}
 				}
 			}

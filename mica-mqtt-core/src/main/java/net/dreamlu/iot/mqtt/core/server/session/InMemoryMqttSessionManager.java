@@ -51,12 +51,19 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public MqttPendingPublish getPendingPublish(String clientId, int messageId) {
-		return pendingPublishStore.get(clientId).get(messageId);
+		Map<Integer, MqttPendingPublish> data = pendingPublishStore.get(clientId);
+		if (data == null) {
+			return null;
+		}
+		return data.get(messageId);
 	}
 
 	@Override
 	public void removePendingPublish(String clientId, int messageId) {
-		pendingPublishStore.get(clientId).remove(messageId);
+		Map<Integer, MqttPendingPublish> data = pendingPublishStore.get(clientId);
+		if (data != null) {
+			data.remove(messageId);
+		}
 	}
 
 	@Override
@@ -67,12 +74,19 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public MqttPendingQos2Publish getPendingQos2Publish(String clientId, int messageId) {
-		return pendingQos2PublishStore.get(clientId).get(messageId);
+		Map<Integer, MqttPendingQos2Publish> data = pendingQos2PublishStore.get(clientId);
+		if (data == null) {
+			return null;
+		}
+		return data.get(messageId);
 	}
 
 	@Override
 	public void removePendingQos2Publish(String clientId, int messageId) {
-		pendingQos2PublishStore.get(clientId).remove(messageId);
+		Map<Integer, MqttPendingQos2Publish> data = pendingQos2PublishStore.get(clientId);
+		if (data != null) {
+			data.remove(messageId);
+		}
 	}
 
 	@Override
