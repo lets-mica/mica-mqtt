@@ -19,6 +19,15 @@
 - [ ] 添加 Spring boot stater。
 - [ ] 添加 websocket 支持。
 
+## 依赖
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-core</artifactId>
+  <version>1.0.0</version>
+</dependency>
+```
+
 ## 文档
 - [mica-mqtt 使用文档](docs/docs.md)
 - [mica-mqtt 发行版本](CHANGELOG.md)
