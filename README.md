@@ -4,25 +4,29 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/30dad82f79f34e41bafbc3cef6b68fc3)](https://www.codacy.com/gh/lets-mica/mica-mqtt/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lets-mica/mica-mqtt&amp;utm_campaign=Badge_Grade)
 [![GitHub](https://img.shields.io/github/license/lets-mica/mica-mqtt.svg?style=flat-square)](https://github.com/lets-mica/mica-mqtt/blob/master/LICENSE)
 
-基于 `t-io` 实现的**低延迟**、**高性能**的 `mqtt` 物联网组件。  
+基于 `t-io` 实现的**低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
 
 ## 功能
 - [x] 支持 MQTT v3.1、v3.1.1 以及 v5.0 协议。
-- [x] MQTT client 客户端。
-- [x] MQTT server 服务端。
+- [x] 支持 MQTT client 客户端。
+- [x] 支持 MQTT server 服务端。
+- [x] 支持 MQTT 遗嘱消息。
+- [x] 支持 MQTT 保留消息。
+- [x] 支持自定义消息（mq）处理转发实现集群。
 - [x] MQTT 客户端 阿里云 mqtt 连接 demo。
 
 ## 待办
-- [ ] 完善使用文档。
 - [ ] 添加 Spring boot stater。
 - [ ] 添加 websocket 支持。
 
 ## 文档
+- [mica-mqtt 使用文档](docs/docs.md)
+- [mica-mqtt 发行版本](CHANGELOG.md)
 - [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
 
 ##  快速开始
-查看 `mica-mqtt-example` 中有 `mqtt` 服务端和客户端演示代码， `main` 方法运行即可。
+查看 **mica-mqtt-example** 中有 `mqtt` 服务端和客户端演示代码， `main` 方法运行即可。
 
 ### 1. 启动 Server 端
 
@@ -133,15 +137,22 @@ Mica-Mqtt-Server
 详见 `mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/aliyun/MqttClientTest.java`
 
 ## 参考vs借鉴
-- [netty codec-mqtt](https://github.com/netty/netty/tree/4.1/codec-mqtt)
+- [netty codec mqtt](https://github.com/netty/netty/tree/4.1/codec-mqtt)
 - [jmqtt](https://github.com/Cicizz/jmqtt)
 - [iot-mqtt-server](https://gitee.com/recallcode/iot-mqtt-server)
-- [moquette](https://github.com/moquette-io/moquette)
 - [netty-mqtt-client](https://github.com/jetlinks/netty-mqtt-client)
 
-## 工具
+## mqtt 客户端工具
 - [mqttx 优雅的跨平台 MQTT 5.0 客户端工具](https://mqttx.app/cn/)
 - [mqttx.fx mqtt 客户端](http://mqttfx.org/)
+
+## 开源推荐
+- `Avue` 一款基于 vue 可配置化的神奇框架：[https://gitee.com/smallweigit/avue](https://gitee.com/smallweigit/avue)
+- `pig` 宇宙最强微服务（架构师必备）：[https://gitee.com/log4j/pig](https://gitee.com/log4j/pig)
+- `SpringBlade` 完整的线上解决方案（企业开发必备）：[https://gitee.com/smallc/SpringBlade](https://gitee.com/smallc/SpringBlade)
+- `IJPay` 支付 SDK 让支付触手可及：[https://gitee.com/javen205/IJPay](https://gitee.com/javen205/IJPay)
+- `JustAuth` 史上最全的整合第三方登录的开源库: [https://github.com/zhangyd-c/JustAuth](https://github.com/zhangyd-c/JustAuth)
+- `spring-boot-demo` 深度学习并实战 spring boot 的项目: [https://github.com/xkcoding/spring-boot-demo](https://github.com/xkcoding/spring-boot-demo)
 
 ## 微信公众号
 

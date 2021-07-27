@@ -41,7 +41,7 @@ public class MqttClientTest {
 			.ip("127.0.0.1")
 			.username("admin")
 			.password("123456")
-			.protocolVersion(MqttVersion.MQTT_5)
+			.version(MqttVersion.MQTT_5)
 			.connect();
 
 		client.subQos0("/test/#", (topic, payload) -> {

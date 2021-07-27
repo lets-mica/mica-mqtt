@@ -86,7 +86,7 @@ public final class MqttClientCreator {
 	/**
 	 * mqtt 协议，默认：3_1_1
 	 */
-	private MqttVersion protocolVersion = MqttVersion.MQTT_3_1_1;
+	private MqttVersion version = MqttVersion.MQTT_3_1_1;
 	/**
 	 * 用户名
 	 */
@@ -156,8 +156,8 @@ public final class MqttClientCreator {
 		return clientId;
 	}
 
-	public MqttVersion getProtocolVersion() {
-		return protocolVersion;
+	public MqttVersion getVersion() {
+		return version;
 	}
 
 	public String getUsername() {
@@ -234,8 +234,8 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClientCreator protocolVersion(MqttVersion protocolVersion) {
-		this.protocolVersion = protocolVersion;
+	public MqttClientCreator version(MqttVersion version) {
+		this.version = version;
 		return this;
 	}
 

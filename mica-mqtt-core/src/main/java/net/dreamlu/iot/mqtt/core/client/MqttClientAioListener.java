@@ -62,7 +62,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 				.username(clientConfig.getUsername())
 				.keepAlive(clientConfig.getKeepAliveSecs())
 				.cleanSession(clientConfig.isCleanSession())
-				.protocolVersion(clientConfig.getProtocolVersion())
+				.protocolVersion(clientConfig.getVersion())
 				.willFlag(willMessage != null);
 			// 2. 密码
 			String password = clientConfig.getPassword();

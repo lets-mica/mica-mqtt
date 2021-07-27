@@ -205,6 +205,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public IMqttMessageDispatcher getMessageDispatcher() {
+		return messageDispatcher;
+	}
+
+	public MqttServerCreator messageDispatcher(IMqttMessageDispatcher messageDispatcher) {
+		this.messageDispatcher = messageDispatcher;
+		return this;
+	}
+
 	public IMqttMessageStore getMessageStore() {
 		return messageStore;
 	}
