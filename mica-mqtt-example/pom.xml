@@ -22,6 +22,13 @@
         <dependency>
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-mqtt-core</artifactId>
+            <!-- 为了测试 graalvm 排除自行添加，实际使用时不需要排除 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>com.github.ben-manes.caffeine</groupId>
+                    <artifactId>caffeine</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
