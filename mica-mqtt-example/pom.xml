@@ -94,6 +94,12 @@
         <profile>
             <id>mqtt-server-graal</id>
             <dependencies>
+                <!-- caffeine 3.x 减少反射，对 graalvm 支持更好，最低 JDK11 -->
+                <dependency>
+                    <groupId>com.github.ben-manes.caffeine</groupId>
+                    <artifactId>caffeine</artifactId>
+                    <version>3.0.3</version>
+                </dependency>
                 <!-- GraalVM 环境使用 jdk log -->
                 <dependency>
                     <groupId>org.slf4j</groupId>
