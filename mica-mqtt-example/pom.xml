@@ -22,7 +22,10 @@
         <dependency>
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-mqtt-core</artifactId>
-            <!-- 为了测试 graalvm 排除自行添加，实际使用时不需要排除 -->
+            <!--
+            为了支持 GraalVM 排除 caffeine 2.x， 3.x 最低支持 java11，请按实际情况选择
+            可使用 idea 右侧面板 maven 视图切换 profile，使用不同的依赖
+             -->
             <exclusions>
                 <exclusion>
                     <groupId>com.github.ben-manes.caffeine</groupId>
@@ -34,7 +37,7 @@
 
     <profiles>
         <profile>
-            <id>default</id>
+            <id>jar</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -91,12 +94,6 @@
         <profile>
             <id>mqtt-server-graal</id>
             <dependencies>
-                <!-- caffeine 3.x 减少反射，对 graalvm 支持更好，最低 JDK11 -->
-                <dependency>
-                    <groupId>com.github.ben-manes.caffeine</groupId>
-                    <artifactId>caffeine</artifactId>
-                    <version>3.0.3</version>
-                </dependency>
                 <!-- GraalVM 环境使用 jdk log -->
                 <dependency>
                     <groupId>org.slf4j</groupId>
