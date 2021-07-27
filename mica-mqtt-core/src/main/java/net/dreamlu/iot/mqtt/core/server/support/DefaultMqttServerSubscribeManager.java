@@ -78,6 +78,23 @@ public class DefaultMqttServerSubscribeManager implements IMqttServerSubscribeMa
 	}
 
 	@Override
+	public List<Subscribe> search(String topicName) {
+		List<Subscribe> list = new ArrayList<>();
+		Set<String> topicFilterSet = subscribeStore.keySet();
+		for (String topicFilter : topicFilterSet) {
+			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
+				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
+				if (data != null && !data.isEmpty()) {
+					data.forEach((clientId, qos) -> {
+						list.add(new Subscribe(topicFilter, clientId, qos));
+					});
+				}
+			}
+		}
+		return list;
+	}
+
+	@Override
 	public void clean() {
 		subscribeStore.clear();
 	}

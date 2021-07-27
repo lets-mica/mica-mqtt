@@ -28,12 +28,9 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
-import org.tio.utils.lock.ReadLockHandler;
-import org.tio.utils.lock.SetWithLock;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -121,8 +118,8 @@ public final class MqttServer {
 	 */
 	public Boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
-		if (context == null) {
-			logger.warn("Mqtt publish to clientId:{} ChannelContext is null May be disconnected.", clientId);
+		if (context == null || context.isClosed) {
+			logger.warn("Mqtt publish to clientId:{} ChannelContext is null may be disconnected.", clientId);
 			return false;
 		}
 		List<Subscribe> subscribeList = subscribeManager.search(topic, clientId);
@@ -214,17 +211,23 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public Boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
-		SetWithLock<ChannelContext> contextSet = Tio.getAll(getServerConfig());
-		contextSet.handle((ReadLockHandler<Set<ChannelContext>>) channelContexts -> {
-			if (channelContexts.isEmpty()) {
-				logger.warn("Mqtt publish to all ChannelContext is empty.");
-				return;
+		// 查找订阅该 topic 的客户端
+		List<Subscribe> subscribeList = subscribeManager.search(topic);
+		if (subscribeList.isEmpty()) {
+			logger.warn("Mqtt publish but topic:{} subscribe client list is empty.", topic);
+			return false;
+		}
+		for (Subscribe subscribe : subscribeList) {
+			String clientId = subscribe.getClientId();
+			ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
+			if (context == null || context.isClosed) {
+				logger.warn("Mqtt publish to clientId:{} ChannelContext may be disconnected.", clientId);
+				continue;
 			}
-			for (ChannelContext context : channelContexts) {
-				String clientId = context.getBsId();
-				publish(clientId, topic, payload, qos, retain);
-			}
-		});
+			int subMqttQoS = subscribe.getMqttQoS();
+			MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
+			publish(context, clientId, topic, payload, mqttQoS, retain);
+		}
 		return true;
 	}
 

@@ -42,7 +42,7 @@ public class MqttServerTest {
 			.ip("127.0.0.1")
 			// 默认：1883
 			.port(1883)
-			// 默认为： 8092（mqtt 最大消息大小），为了降低内存可以减小小此参数，如果消息过大会尝试解析多次
+			// 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
 			.readBufferSize(512)
 			.messageListener((clientId, topic, mqttQoS, payload) -> {
 				logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));

@@ -26,6 +26,7 @@ import java.util.Objects;
  */
 public class Subscribe implements Serializable {
 	private String topicFilter;
+	private String clientId;
 	private int mqttQoS;
 
 	public Subscribe() {
@@ -36,12 +37,26 @@ public class Subscribe implements Serializable {
 		this.mqttQoS = mqttQoS;
 	}
 
+	public Subscribe(String topicFilter, String clientId, int mqttQoS) {
+		this.topicFilter = topicFilter;
+		this.clientId = clientId;
+		this.mqttQoS = mqttQoS;
+	}
+
 	public String getTopicFilter() {
 		return topicFilter;
 	}
 
 	public void setTopicFilter(String topicFilter) {
 		this.topicFilter = topicFilter;
+	}
+
+	public String getClientId() {
+		return clientId;
+	}
+
+	public void setClientId(String clientId) {
+		this.clientId = clientId;
 	}
 
 	public int getMqttQoS() {
@@ -62,18 +77,20 @@ public class Subscribe implements Serializable {
 		}
 		Subscribe subscribe = (Subscribe) o;
 		return mqttQoS == subscribe.mqttQoS &&
-			Objects.equals(topicFilter, subscribe.topicFilter);
+			Objects.equals(topicFilter, subscribe.topicFilter) &&
+			Objects.equals(clientId, subscribe.clientId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(topicFilter, mqttQoS);
+		return Objects.hash(topicFilter, clientId, mqttQoS);
 	}
 
 	@Override
 	public String toString() {
 		return "Subscribe{" +
 			"topicFilter='" + topicFilter + '\'' +
+			", clientId='" + clientId + '\'' +
 			", mqttQoS=" + mqttQoS +
 			'}';
 	}

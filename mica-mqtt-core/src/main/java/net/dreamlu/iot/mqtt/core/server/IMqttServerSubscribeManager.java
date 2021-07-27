@@ -62,6 +62,14 @@ public interface IMqttServerSubscribeManager {
 	List<Subscribe> search(String topicName, String clientId);
 
 	/**
+	 * 查找订阅信息
+	 *
+	 * @param topicName topicName
+	 * @return 订阅存储列表
+	 */
+	List<Subscribe> search(String topicName);
+
+	/**
 	 * 清理
 	 */
 	void clean();
