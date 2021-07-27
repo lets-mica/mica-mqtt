@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
+import net.dreamlu.iot.mqtt.codec.MqttDecoder;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.tio.client.ClientChannelContext;
@@ -58,6 +59,10 @@ public final class MqttClientCreator {
 	 * 超时时间，t-io 配置，可为 null
 	 */
 	private Integer timeout;
+	/**
+	 * t-io 每次消息读取长度
+	 */
+	private int readBufferSize = MqttDecoder.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
 	 * Keep Alive (s)
 	 */
@@ -127,6 +132,10 @@ public final class MqttClientCreator {
 		return timeout;
 	}
 
+	public int getReadBufferSize() {
+		return readBufferSize;
+	}
+
 	public int getKeepAliveSecs() {
 		return keepAliveSecs;
 	}
@@ -192,6 +201,11 @@ public final class MqttClientCreator {
 
 	public MqttClientCreator timeout(int timeout) {
 		this.timeout = timeout;
+		return this;
+	}
+
+	public MqttClientCreator readBufferSize(int readBufferSize) {
+		this.readBufferSize = readBufferSize;
 		return this;
 	}
 
@@ -288,10 +302,12 @@ public final class MqttClientCreator {
 		// 4. tioConfig
 		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
 		tioConfig.setName(this.name);
-		// 5. tioClient
+		// 5. mqtt 消息最大长度
+		tioConfig.setReadBufferSize(this.readBufferSize);
+		// 6. tioClient
 		TioClient tioClient = new TioClient(tioConfig);
 		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
-		// 6. 等待连接成功之后继续
+		// 7. 等待连接成功之后继续
 		connLatch.await();
 		return new MqttClient(tioClient, this, context, clientStore, executor);
 	}

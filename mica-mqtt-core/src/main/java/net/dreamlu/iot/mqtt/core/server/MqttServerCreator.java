@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
+import net.dreamlu.iot.mqtt.codec.MqttDecoder;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -62,13 +63,13 @@ public class MqttServerCreator {
 	 */
 	private Long heartbeatTimeout;
 	/**
+	 * 接收数据的 buffer size
+	 */
+	private int readBufferSize = MqttDecoder.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	/**
 	 * 堆内存和堆外内存
 	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
-	/**
-	 * 接收数据的buffer size
-	 */
-	private Integer readBufferSize;
 	/**
 	 * ssl 证书配置
 	 */
@@ -146,21 +147,21 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public int getReadBufferSize() {
+		return readBufferSize;
+	}
+
+	public MqttServerCreator readBufferSize(int readBufferSize) {
+		this.readBufferSize = readBufferSize;
+		return this;
+	}
+
 	public ByteBufferAllocator getBufferAllocator() {
 		return bufferAllocator;
 	}
 
 	public MqttServerCreator bufferAllocator(ByteBufferAllocator bufferAllocator) {
 		this.bufferAllocator = bufferAllocator;
-		return this;
-	}
-
-	public Integer getReadBufferSize() {
-		return readBufferSize;
-	}
-
-	public MqttServerCreator readBufferSize(Integer readBufferSize) {
-		this.readBufferSize = readBufferSize;
 		return this;
 	}
 
@@ -282,33 +283,32 @@ public class MqttServerCreator {
 		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(
 			this.messageStore, this.sessionManager, this.authHandler, this.subscribeManager,
 			this.messageDispatcher, this.connectStatusListener, this.messageListener, executor);
-		// 处理消息
+		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, serverProcessor);
-		// 监听
+		// 2. t-io 监听
 		ServerAioListener listener = new MqttServerAioListener(
 			this.messageStore, this.sessionManager, this.messageDispatcher, this.connectStatusListener);
-		// 配置
-		ServerTioConfig config = new ServerTioConfig(this.name, handler, listener);
-		// 设置心跳 timeout
+		// 2. t-io 配置
+		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
+		// 4. 设置 t-io 心跳 timeout
 		if (this.heartbeatTimeout != null) {
-			config.setHeartbeatTimeout(this.heartbeatTimeout);
+			tioConfig.setHeartbeatTimeout(this.heartbeatTimeout);
 		}
 		if (this.ipStatListener != null) {
-			config.setIpStatListener(this.ipStatListener);
-		}
-		if (this.readBufferSize != null) {
-			config.setReadBufferSize(readBufferSize);
+			tioConfig.setIpStatListener(this.ipStatListener);
 		}
 		if (this.sslConfig != null) {
-			config.setSslConfig(this.sslConfig);
+			tioConfig.setSslConfig(this.sslConfig);
 		}
 		if (this.debug) {
-			config.debug = true;
+			tioConfig.debug = true;
 		}
-		TioServer tioServer = new TioServer(config);
-		// 不校验版本号，社区版设置无效
+		// 5. mqtt 消息最大长度
+		tioConfig.setReadBufferSize(this.readBufferSize);
+		TioServer tioServer = new TioServer(tioConfig);
+		// 6. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
-		// 启动
+		// 7. 启动
 		tioServer.start(this.ip, this.port);
 		MqttServer mqttServer = new MqttServer(tioServer, this.sessionManager, this.subscribeManager, executor);
 		messageDispatcher.config(mqttServer);

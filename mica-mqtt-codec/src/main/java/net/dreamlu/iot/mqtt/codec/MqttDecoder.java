@@ -35,8 +35,8 @@ import java.util.List;
  * @author L.cm
  */
 public final class MqttDecoder {
-	private static final int DEFAULT_MAX_BYTES_IN_MESSAGE = 8092;
-	private static final int MQTT_PROTOCOL_LENGTH = 2;
+	public static final int DEFAULT_MAX_BYTES_IN_MESSAGE = 8092;
+	public static final int MQTT_PROTOCOL_LENGTH = 2;
 
 	public static final MqttDecoder INSTANCE = new MqttDecoder();
 	private final int maxBytesInMessage;
@@ -54,7 +54,7 @@ public final class MqttDecoder {
 		if (readableLength < MQTT_PROTOCOL_LENGTH) {
 			return null;
 		}
-		// 2. 解析 FixedHeader
+		// 2. 解析 FixedHeader 2 个字节
 		MqttFixedHeader mqttFixedHeader;
 		int bytesRemainingInVariablePart;
 		try {
@@ -63,7 +63,13 @@ public final class MqttDecoder {
 		} catch (Exception cause) {
 			return MqttMessageFactory.newInvalidMessage(cause);
 		}
-		// 3. 解析头信息
+		// 3. 判断消息长度
+		int packetNeededLength = bytesRemainingInVariablePart + MQTT_PROTOCOL_LENGTH - readableLength;
+		if (packetNeededLength > 0) {
+			ctx.setPacketNeededLength(packetNeededLength);
+			return null;
+		}
+		// 4. 解析头信息
 		Object variableHeader = null;
 		try {
 			Result<?> decodedVariableHeader = decodeVariableHeader(ctx, buffer, mqttFixedHeader, bytesRemainingInVariablePart);
@@ -75,7 +81,7 @@ public final class MqttDecoder {
 		} catch (Exception cause) {
 			return MqttMessageFactory.newInvalidMessage(mqttFixedHeader, variableHeader, cause);
 		}
-		// 4. 解析消息体
+		// 5. 解析消息体
 		final Result<?> decodedPayload;
 		try {
 			decodedPayload = decodePayload(buffer, mqttFixedHeader.messageType(),
