@@ -21,6 +21,8 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * mqtt 压力测试
  *
@@ -33,6 +35,7 @@ public class MqttBenchmark {
 		// 1. 模拟 1w 连接，在开发机（i5-7500 4核4线程 win10 MqttServer 6G）1万连连接很轻松。
 		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
 		int clientCount = 1_0000;
+		long beginTime = System.nanoTime();
 		for (int i = 0; i < clientCount; i++) {
 			// 2. 初始化 mqtt 客户端
 			MqttClient client = MqttClient.create()
@@ -45,6 +48,7 @@ public class MqttBenchmark {
 				logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
 			});
 		}
+		System.err.println("批量连接完成，耗时：" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - beginTime));
 	}
 
 }
