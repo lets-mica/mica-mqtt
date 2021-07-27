@@ -12,8 +12,13 @@
 - [x] MQTT server 服务端。
 - [x] MQTT 客户端 阿里云 mqtt 连接 demo。
 
+## 待办
+- [ ] 完善使用文档。
+- [ ] 添加 Spring boot stater。
+- [ ] 添加 websocket 支持。
+
 ## 文档
-- [t-io 官方问](https://www.tiocloud.com/doc/tio/85)
+- [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
 
 ##  快速开始
