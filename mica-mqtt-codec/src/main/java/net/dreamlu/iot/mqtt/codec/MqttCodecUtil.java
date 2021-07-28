@@ -27,7 +27,7 @@ final class MqttCodecUtil {
 	private static final char[] TOPIC_WILDCARDS = {'#', '+'};
 	private static final int MIN_CLIENT_ID_LENGTH = 1;
 	private static final int MAX_CLIENT_ID_LENGTH = 23;
-	private static final String MQTT_VERSION_KEY = "NETTY_CODEC_MQTT_VERSION";
+	private static final String MQTT_VERSION_KEY = "TIO_CODEC_MQTT_VERSION";
 
 	protected static MqttVersion getMqttVersion(ChannelContext ctx) {
 		MqttVersion version = (MqttVersion) ctx.get(MQTT_VERSION_KEY);
