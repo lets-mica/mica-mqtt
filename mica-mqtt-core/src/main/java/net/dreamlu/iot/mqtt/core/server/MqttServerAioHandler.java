@@ -104,7 +104,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 		// 3. 客户端 id 是创建连接之后才有的，如果客户端 id 为空，直接关闭
 		String clientId = context.getBsId();
 		if (StrUtil.isBlank(clientId)) {
-			context.setClosed(true);
+			Tio.close(context, "Mqtt connected but clientId is isBlank.");
 			return;
 		}
 		// 4. 按类型的消息处理
