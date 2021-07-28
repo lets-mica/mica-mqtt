@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.codec;
 
 import org.tio.core.ChannelContext;
+import static net.dreamlu.iot.mqtt.codec.MqttConstant.MIN_CLIENT_ID_LENGTH;
 
 /**
  * 编解码工具
@@ -25,8 +26,6 @@ import org.tio.core.ChannelContext;
  */
 final class MqttCodecUtil {
 	private static final char[] TOPIC_WILDCARDS = {'#', '+'};
-	private static final int MIN_CLIENT_ID_LENGTH = 1;
-	private static final int MAX_CLIENT_ID_LENGTH = 23;
 	private static final String MQTT_VERSION_KEY = "TIO_CODEC_MQTT_VERSION";
 
 	protected static MqttVersion getMqttVersion(ChannelContext ctx) {
@@ -55,13 +54,13 @@ final class MqttCodecUtil {
 		return messageId != 0;
 	}
 
-	protected static boolean isValidClientId(MqttVersion mqttVersion, String clientId) {
+	protected static boolean isValidClientId(MqttVersion mqttVersion, int maxClientIdLength, String clientId) {
 		if (clientId == null) {
 			return false;
 		}
 		switch (mqttVersion) {
 			case MQTT_3_1:
-				return clientId.length() >= MIN_CLIENT_ID_LENGTH && clientId.length() <= MAX_CLIENT_ID_LENGTH;
+				return clientId.length() >= MIN_CLIENT_ID_LENGTH && clientId.length() <= maxClientIdLength;
 			case MQTT_3_1_1:
 			case MQTT_5:
 				// In 3.1.3.1 Client Identifier of MQTT 3.1.1 and 5.0 specifications, The Server MAY allow ClientId’s

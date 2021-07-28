@@ -16,10 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
-import net.dreamlu.iot.mqtt.codec.MqttDecoder;
-import net.dreamlu.iot.mqtt.codec.MqttProperties;
-import net.dreamlu.iot.mqtt.codec.MqttVersion;
+import net.dreamlu.iot.mqtt.codec.*;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
@@ -60,9 +57,9 @@ public final class MqttClientCreator {
 	 */
 	private Integer timeout;
 	/**
-	 * t-io 每次消息读取长度
+	 * t-io 每次消息读取长度，跟 maxBytesInMessage 相关
 	 */
-	private int readBufferSize = MqttDecoder.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
 	 * Keep Alive (s)
 	 */
@@ -70,7 +67,7 @@ public final class MqttClientCreator {
 	/**
 	 * SSL配置
 	 */
-	protected SslConfig sslConfig;
+	private SslConfig sslConfig;
 	/**
 	 * 自动重连
 	 */
@@ -288,7 +285,7 @@ public final class MqttClientCreator {
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, connLatch, executor);
 		// 2. 初始化 mqtt 处理器
-		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, Objects.requireNonNull(processor));
+		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, processor);
 		ClientAioListener clientAioListener = new MqttClientAioListener(this, clientStore, executor);
 		// 3. 重连配置
 		ReconnConf reconnConf = null;

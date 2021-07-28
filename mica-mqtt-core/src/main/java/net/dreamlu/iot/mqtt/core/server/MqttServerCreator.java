@@ -17,7 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
-import net.dreamlu.iot.mqtt.codec.MqttDecoder;
+import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -63,9 +63,17 @@ public class MqttServerCreator {
 	 */
 	private Long heartbeatTimeout;
 	/**
-	 * 接收数据的 buffer size
+	 * 接收数据的 buffer size，默认：8092
 	 */
-	private int readBufferSize = MqttDecoder.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	/**
+	 * 消息解析最大 bytes 长度，默认：8092
+	 */
+	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	/**
+	 * 最大 clientId 长度，默认：23
+	 */
+	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
 	 * 堆内存和堆外内存
 	 */
@@ -153,6 +161,30 @@ public class MqttServerCreator {
 
 	public MqttServerCreator readBufferSize(int readBufferSize) {
 		this.readBufferSize = readBufferSize;
+		return this;
+	}
+
+	public int getMaxBytesInMessage() {
+		return maxBytesInMessage;
+	}
+
+	public MqttServerCreator maxBytesInMessage(int maxBytesInMessage) {
+		if (maxBytesInMessage < 1) {
+			throw new IllegalArgumentException("maxBytesInMessage must be greater than 0.");
+		}
+		this.maxBytesInMessage = maxBytesInMessage;
+		return this;
+	}
+
+	public int getMaxClientIdLength() {
+		return maxClientIdLength;
+	}
+
+	public MqttServerCreator maxClientIdLength(int maxClientIdLength) {
+		if (maxClientIdLength < 1) {
+			throw new IllegalArgumentException("maxClientIdLength must be greater than 0.");
+		}
+		this.maxClientIdLength = maxClientIdLength;
 		return this;
 	}
 
@@ -289,14 +321,13 @@ public class MqttServerCreator {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttServer"));
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(
-			this.messageStore, this.sessionManager, this.authHandler, this.subscribeManager,
-			this.messageDispatcher, this.connectStatusListener, this.messageListener, executor);
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this.messageStore, this.sessionManager,
+			this.authHandler, this.subscribeManager, this.messageDispatcher, this.connectStatusListener, this.messageListener, executor);
 		// 1. 处理消息
-		ServerAioHandler handler = new MqttServerAioHandler(this.bufferAllocator, serverProcessor);
+		ServerAioHandler handler = new MqttServerAioHandler(this.maxBytesInMessage, this.maxClientIdLength, this.bufferAllocator, serverProcessor);
 		// 2. t-io 监听
-		ServerAioListener listener = new MqttServerAioListener(
-			this.messageStore, this.sessionManager, this.subscribeManager, this.messageDispatcher, this.connectStatusListener);
+		ServerAioListener listener = new MqttServerAioListener(this.messageStore, this.sessionManager, this.subscribeManager,
+			this.messageDispatcher, this.connectStatusListener);
 		// 2. t-io 配置
 		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
 		// 4. 设置 t-io 心跳 timeout

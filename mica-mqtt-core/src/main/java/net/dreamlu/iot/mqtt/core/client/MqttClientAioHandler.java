@@ -37,7 +37,7 @@ public class MqttClientAioHandler implements ClientAioHandler {
 	private final IMqttClientProcessor processor;
 
 	public MqttClientAioHandler(ByteBufferAllocator bufferAllocator, IMqttClientProcessor processor) {
-		this.mqttDecoder = MqttDecoder.INSTANCE;
+		this.mqttDecoder = new MqttDecoder();
 		this.mqttEncoder = MqttEncoder.INSTANCE;
 		this.allocator = bufferAllocator;
 		this.processor = processor;
@@ -49,7 +49,7 @@ public class MqttClientAioHandler implements ClientAioHandler {
 	}
 
 	@Override
-	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws TioDecodeException {
+	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) {
 		return mqttDecoder.decode(channelContext, buffer, limit, position, readableLength);
 	}
 

@@ -40,8 +40,11 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	private final ByteBufferAllocator allocator;
 	private final MqttServerProcessor processor;
 
-	public MqttServerAioHandler(ByteBufferAllocator bufferAllocator, MqttServerProcessor processor) {
-		this.mqttDecoder = MqttDecoder.INSTANCE;
+	public MqttServerAioHandler(int maxBytesInMessage,
+								int maxClientIdLength,
+								ByteBufferAllocator bufferAllocator,
+								MqttServerProcessor processor) {
+		this.mqttDecoder = new MqttDecoder(maxBytesInMessage, maxClientIdLength);
 		this.mqttEncoder = MqttEncoder.INSTANCE;
 		this.allocator = bufferAllocator;
 		this.processor = processor;
@@ -57,10 +60,9 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	 * @param readableLength ByteBuffer参与本次解码的有效数据（= limit - position）
 	 * @param context        ChannelContext
 	 * @return Packet
-	 * @throws TioDecodeException TioDecodeException
 	 */
 	@Override
-	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws TioDecodeException {
+	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) {
 		return mqttDecoder.decode(context, buffer, limit, position, readableLength);
 	}
 
@@ -82,10 +84,9 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	 *
 	 * @param packet  Packet
 	 * @param context ChannelContext
-	 * @throws Exception Exception
 	 */
 	@Override
-	public void handler(Packet packet, ChannelContext context) throws Exception {
+	public void handler(Packet packet, ChannelContext context) {
 		MqttMessage mqttMessage = (MqttMessage) packet;
 		// 1. 先判断 mqtt 消息解析是否正常
 		DecoderResult decoderResult = mqttMessage.decoderResult();

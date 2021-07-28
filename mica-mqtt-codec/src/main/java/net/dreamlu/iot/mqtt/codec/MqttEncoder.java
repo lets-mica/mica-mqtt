@@ -21,6 +21,7 @@ import org.tio.core.ChannelContext;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import static net.dreamlu.iot.mqtt.codec.MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 
 /**
  * Encodes Mqtt messages into bytes following the protocol specification v3.1
@@ -99,7 +100,7 @@ public final class MqttEncoder {
 
 		// Client id
 		String clientIdentifier = payload.clientIdentifier();
-		if (!MqttCodecUtil.isValidClientId(mqttVersion, clientIdentifier)) {
+		if (!MqttCodecUtil.isValidClientId(mqttVersion, DEFAULT_MAX_CLIENT_ID_LENGTH, clientIdentifier)) {
 			throw new MqttIdentifierRejectedException("invalid clientIdentifier: " + clientIdentifier);
 		}
 		byte[] clientIdentifierBytes = encodeStringUtf8(clientIdentifier);

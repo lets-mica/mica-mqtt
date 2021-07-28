@@ -23,6 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
+import static net.dreamlu.iot.mqtt.codec.MqttConstant.*;
+
+
 /**
  * Decodes Mqtt messages from bytes, following
  * the MQTT protocol specification
@@ -35,18 +38,20 @@ import java.util.List;
  * @author L.cm
  */
 public final class MqttDecoder {
-	public static final int DEFAULT_MAX_BYTES_IN_MESSAGE = 8092;
-	public static final int MQTT_PROTOCOL_LENGTH = 2;
-
-	public static final MqttDecoder INSTANCE = new MqttDecoder();
 	private final int maxBytesInMessage;
+	private final int maxClientIdLength;
 
 	public MqttDecoder() {
 		this(DEFAULT_MAX_BYTES_IN_MESSAGE);
 	}
 
 	public MqttDecoder(int maxBytesInMessage) {
+		this(maxBytesInMessage, DEFAULT_MAX_CLIENT_ID_LENGTH);
+	}
+
+	public MqttDecoder(int maxBytesInMessage, int maxClientIdLength) {
 		this.maxBytesInMessage = maxBytesInMessage;
+		this.maxClientIdLength = maxClientIdLength;
 	}
 
 	public MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) {
@@ -84,7 +89,7 @@ public final class MqttDecoder {
 		// 5. 解析消息体
 		final Result<?> decodedPayload;
 		try {
-			decodedPayload = decodePayload(buffer, mqttFixedHeader.messageType(),
+			decodedPayload = decodePayload(buffer, maxClientIdLength, mqttFixedHeader.messageType(),
 				bytesRemainingInVariablePart, variableHeader);
 			bytesRemainingInVariablePart -= decodedPayload.numberOfBytesConsumed;
 			if (bytesRemainingInVariablePart != 0) {
@@ -367,12 +372,12 @@ public final class MqttDecoder {
 	 * @param variableHeader               variable header of the same message
 	 * @return the payload
 	 */
-	private static Result<?> decodePayload(
-		ByteBuffer buffer, MqttMessageType messageType,
-		int bytesRemainingInVariablePart, Object variableHeader) {
+	private static Result<?> decodePayload(ByteBuffer buffer, int maxClientIdLength,
+										   MqttMessageType messageType, int bytesRemainingInVariablePart,
+										   Object variableHeader) {
 		switch (messageType) {
 			case CONNECT:
-				return decodeConnectionPayload(buffer, (MqttConnectVariableHeader) variableHeader);
+				return decodeConnectionPayload(buffer, maxClientIdLength, (MqttConnectVariableHeader) variableHeader);
 			case SUBSCRIBE:
 				return decodeSubscribePayload(buffer, bytesRemainingInVariablePart);
 			case SUBACK:
@@ -389,13 +394,13 @@ public final class MqttDecoder {
 		}
 	}
 
-	private static Result<MqttConnectPayload> decodeConnectionPayload(
-		ByteBuffer buffer, MqttConnectVariableHeader mqttConnectVariableHeader) {
+	private static Result<MqttConnectPayload> decodeConnectionPayload(ByteBuffer buffer, int maxClientIdLength,
+																	  MqttConnectVariableHeader mqttConnectVariableHeader) {
 		final Result<String> decodedClientId = decodeString(buffer);
 		final String decodedClientIdValue = decodedClientId.value;
 		final MqttVersion mqttVersion = MqttVersion.fromProtocolNameAndLevel(mqttConnectVariableHeader.name(),
 			(byte) mqttConnectVariableHeader.version());
-		if (!MqttCodecUtil.isValidClientId(mqttVersion, decodedClientIdValue)) {
+		if (!MqttCodecUtil.isValidClientId(mqttVersion, maxClientIdLength, decodedClientIdValue)) {
 			throw new MqttIdentifierRejectedException("invalid clientIdentifier: " + decodedClientIdValue);
 		}
 		int numberOfBytesConsumed = decodedClientId.numberOfBytesConsumed;
@@ -441,9 +446,7 @@ public final class MqttDecoder {
 		return new Result<>(mqttConnectPayload, numberOfBytesConsumed);
 	}
 
-	private static Result<MqttSubscribePayload> decodeSubscribePayload(
-		ByteBuffer buffer,
-		int bytesRemainingInVariablePart) {
+	private static Result<MqttSubscribePayload> decodeSubscribePayload(ByteBuffer buffer, int bytesRemainingInVariablePart) {
 		final List<MqttTopicSubscription> subscribeTopics = new ArrayList<>();
 		int numberOfBytesConsumed = 0;
 		while (numberOfBytesConsumed < bytesRemainingInVariablePart) {
@@ -467,9 +470,7 @@ public final class MqttDecoder {
 		return new Result<>(new MqttSubscribePayload(subscribeTopics), numberOfBytesConsumed);
 	}
 
-	private static Result<MqttSubAckPayload> decodeSubAckPayload(
-		ByteBuffer buffer,
-		int bytesRemainingInVariablePart) {
+	private static Result<MqttSubAckPayload> decodeSubAckPayload(ByteBuffer buffer, int bytesRemainingInVariablePart) {
 		final List<Integer> grantedQos = new ArrayList<>(bytesRemainingInVariablePart);
 		int numberOfBytesConsumed = 0;
 		while (numberOfBytesConsumed < bytesRemainingInVariablePart) {
@@ -492,9 +493,7 @@ public final class MqttDecoder {
 		return new Result<>(new MqttUnsubAckPayload(reasonCodes), numberOfBytesConsumed);
 	}
 
-	private static Result<MqttUnsubscribePayload> decodeUnsubscribePayload(
-		ByteBuffer buffer,
-		int bytesRemainingInVariablePart) {
+	private static Result<MqttUnsubscribePayload> decodeUnsubscribePayload(ByteBuffer buffer, int bytesRemainingInVariablePart) {
 		final List<String> unsubscribeTopics = new ArrayList<>();
 		int numberOfBytesConsumed = 0;
 		while (numberOfBytesConsumed < bytesRemainingInVariablePart) {
