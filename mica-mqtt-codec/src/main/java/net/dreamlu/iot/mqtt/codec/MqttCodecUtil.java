@@ -56,16 +56,20 @@ final class MqttCodecUtil {
 	}
 
 	protected static boolean isValidClientId(MqttVersion mqttVersion, String clientId) {
-		if (mqttVersion == MqttVersion.MQTT_3_1) {
-			return clientId != null && clientId.length() >= MIN_CLIENT_ID_LENGTH &&
-				clientId.length() <= MAX_CLIENT_ID_LENGTH;
+		if (clientId == null) {
+			return false;
 		}
-		if (mqttVersion == MqttVersion.MQTT_3_1_1 || mqttVersion == MqttVersion.MQTT_5) {
-			// In 3.1.3.1 Client Identifier of MQTT 3.1.1 and 5.0 specifications, The Server MAY allow ClientId’s
-			// that contain more than 23 encoded bytes. And, The Server MAY allow zero-length ClientId.
-			return clientId != null;
+		switch (mqttVersion) {
+			case MQTT_3_1:
+				return clientId.length() >= MIN_CLIENT_ID_LENGTH && clientId.length() <= MAX_CLIENT_ID_LENGTH;
+			case MQTT_3_1_1:
+			case MQTT_5:
+				// In 3.1.3.1 Client Identifier of MQTT 3.1.1 and 5.0 specifications, The Server MAY allow ClientId’s
+				// that contain more than 23 encoded bytes. And, The Server MAY allow zero-length ClientId.
+				return true;
+			default:
+				throw new IllegalArgumentException(mqttVersion + " is unknown mqtt version");
 		}
-		throw new IllegalArgumentException(mqttVersion + " is unknown mqtt version");
 	}
 
 	protected static MqttFixedHeader validateFixedHeader(ChannelContext ctx, MqttFixedHeader mqttFixedHeader) {
