@@ -71,10 +71,6 @@ public class MqttServerCreator {
 	 */
 	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
-	 * 最大 clientId 长度，默认：23
-	 */
-	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
-	/**
 	 * 堆内存和堆外内存
 	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
@@ -173,18 +169,6 @@ public class MqttServerCreator {
 			throw new IllegalArgumentException("maxBytesInMessage must be greater than 0.");
 		}
 		this.maxBytesInMessage = maxBytesInMessage;
-		return this;
-	}
-
-	public int getMaxClientIdLength() {
-		return maxClientIdLength;
-	}
-
-	public MqttServerCreator maxClientIdLength(int maxClientIdLength) {
-		if (maxClientIdLength < 1) {
-			throw new IllegalArgumentException("maxClientIdLength must be greater than 0.");
-		}
-		this.maxClientIdLength = maxClientIdLength;
 		return this;
 	}
 
@@ -324,7 +308,7 @@ public class MqttServerCreator {
 		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this.messageStore, this.sessionManager,
 			this.authHandler, this.subscribeManager, this.messageDispatcher, this.connectStatusListener, this.messageListener, executor);
 		// 1. 处理消息
-		ServerAioHandler handler = new MqttServerAioHandler(this.maxBytesInMessage, this.maxClientIdLength, this.bufferAllocator, serverProcessor);
+		ServerAioHandler handler = new MqttServerAioHandler(this.maxBytesInMessage, this.bufferAllocator, serverProcessor);
 		// 2. t-io 监听
 		ServerAioListener listener = new MqttServerAioListener(this.messageStore, this.sessionManager, this.subscribeManager,
 			this.messageDispatcher, this.connectStatusListener);

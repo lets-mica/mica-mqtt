@@ -16,7 +16,10 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.*;
+import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
+import net.dreamlu.iot.mqtt.codec.MqttConstant;
+import net.dreamlu.iot.mqtt.codec.MqttProperties;
+import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
@@ -28,7 +31,6 @@ import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;

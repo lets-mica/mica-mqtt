@@ -21,6 +21,7 @@ import org.tio.core.ChannelContext;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+
 import static net.dreamlu.iot.mqtt.codec.MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 
 /**

@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
-import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.server.AcceptCompletionHandler;
 import org.tio.server.intf.ServerAioHandler;
@@ -41,10 +40,9 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	private final MqttServerProcessor processor;
 
 	public MqttServerAioHandler(int maxBytesInMessage,
-								int maxClientIdLength,
 								ByteBufferAllocator bufferAllocator,
 								MqttServerProcessor processor) {
-		this.mqttDecoder = new MqttDecoder(maxBytesInMessage, maxClientIdLength);
+		this.mqttDecoder = new MqttDecoder(maxBytesInMessage);
 		this.mqttEncoder = MqttEncoder.INSTANCE;
 		this.allocator = bufferAllocator;
 		this.processor = processor;
