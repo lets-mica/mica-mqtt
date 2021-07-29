@@ -25,6 +25,7 @@
     <modules>
         <module>mica-mqtt-codec</module>
         <module>mica-mqtt-core</module>
+        <module>mica-mqtt-websocket</module>
         <module>mica-mqtt-example</module>
     </modules>
 
@@ -33,6 +34,11 @@
             <dependency>
                 <groupId>org.t-io</groupId>
                 <artifactId>tio-core</artifactId>
+                <version>${tio.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.t-io</groupId>
+                <artifactId>tio-websocket-server</artifactId>
                 <version>${tio.version}</version>
             </dependency>
             <dependency>

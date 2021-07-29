@@ -154,4 +154,13 @@ public class WriteBuffer {
 		buffer.reset();
 	}
 
+	/**
+	 * buffer 大小
+	 *
+	 * @return size
+	 */
+	public int size() {
+		return buffer.size();
+	}
+
 }
