@@ -89,10 +89,13 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 */
 	@Override
 	public Object onBytes(WsRequest wsRequest, byte[] bytes, ChannelContext context) {
-		ByteBuffer buffer = getMqttBody(bytes, context);
+		WriteBuffer wsBody = (WriteBuffer) context.get(MQTT_WS_MSG_BODY_KEY);
+		ByteBuffer buffer = getMqttBody(wsBody, bytes, context);
 		if (buffer == null) {
 			return null;
 		}
+		// 重置 buffer
+		buffer.rewind();
 		// 解析 mqtt 消息
 		MqttMessage mqttMessage = new MqttDecoder().decode(context, buffer, 0, 0, buffer.remaining());
 		if (mqttMessage == null) {
@@ -185,8 +188,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 * @param context ChannelContext
 	 * @return ByteBuffer
 	 */
-	private static synchronized ByteBuffer getMqttBody(byte[] bytes, ChannelContext context) {
-		WriteBuffer wsBody = (WriteBuffer) context.get(MQTT_WS_MSG_BODY_KEY);
+	private static synchronized ByteBuffer getMqttBody(WriteBuffer wsBody, byte[] bytes, ChannelContext context) {
 		wsBody.writeBytes(bytes);
 		int length = wsBody.size();
 		if (length < 2) {
@@ -199,7 +201,6 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 		}
 		// 数据已经读取完毕
 		wsBody.reset();
-		buffer.rewind();
 		return buffer;
 	}
 
