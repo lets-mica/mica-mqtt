@@ -305,13 +305,11 @@ public class MqttServerCreator {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttServer"));
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this.messageStore, this.sessionManager,
-			this.authHandler, this.subscribeManager, this.messageDispatcher, this.connectStatusListener, this.messageListener, executor);
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, executor);
 		// 1. 处理消息
-		ServerAioHandler handler = new MqttServerAioHandler(this.maxBytesInMessage, this.bufferAllocator, serverProcessor);
+		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		ServerAioListener listener = new MqttServerAioListener(this.messageStore, this.sessionManager, this.subscribeManager,
-			this.messageDispatcher, this.connectStatusListener);
+		ServerAioListener listener = new MqttServerAioListener(this);
 		// 2. t-io 配置
 		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
 		// 4. 设置 t-io 心跳 timeout
@@ -338,7 +336,7 @@ public class MqttServerCreator {
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt server start fail.", e);
 		}
-		MqttServer mqttServer = new MqttServer(tioServer, this.sessionManager, this.subscribeManager, executor);
+		MqttServer mqttServer = new MqttServer(tioServer, this, executor);
 		messageDispatcher.config(mqttServer);
 		return mqttServer;
 	}

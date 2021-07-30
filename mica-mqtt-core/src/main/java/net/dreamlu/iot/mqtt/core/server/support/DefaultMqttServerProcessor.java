@@ -19,10 +19,7 @@ package net.dreamlu.iot.mqtt.core.server.support;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
-import net.dreamlu.iot.mqtt.core.server.IMqttServerSubscribeManager;
-import net.dreamlu.iot.mqtt.core.server.MqttConst;
-import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.*;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -53,25 +50,18 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttServerAuthHandler authHandler;
 	private final IMqttServerSubscribeManager subscribeManager;
 	private final IMqttMessageDispatcher messageDispatcher;
-	private final IMqttConnectStatusListener clientStatusListener;
+	private final IMqttConnectStatusListener connectStatusListener;
 	private final IMqttMessageListener messageListener;
 	private final ScheduledThreadPoolExecutor executor;
 
-	public DefaultMqttServerProcessor(IMqttMessageStore mqttMessageStore,
-									  IMqttSessionManager sessionManager,
-									  IMqttServerAuthHandler authHandler,
-									  IMqttServerSubscribeManager subscribeManager,
-									  IMqttMessageDispatcher messageDispatcher,
-									  IMqttConnectStatusListener clientStatusListener,
-									  IMqttMessageListener messageListener,
-									  ScheduledThreadPoolExecutor executor) {
-		this.messageStore = mqttMessageStore;
-		this.sessionManager = sessionManager;
-		this.authHandler = authHandler;
-		this.subscribeManager = subscribeManager;
-		this.messageDispatcher = messageDispatcher;
-		this.clientStatusListener = clientStatusListener;
-		this.messageListener = messageListener;
+	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
+		this.messageStore = serverCreator.getMessageStore();
+		this.sessionManager = serverCreator.getSessionManager();
+		this.authHandler = serverCreator.getAuthHandler();
+		this.subscribeManager = serverCreator.getSubscribeManager();
+		this.messageDispatcher = serverCreator.getMessageDispatcher();
+		this.connectStatusListener = serverCreator.getConnectStatusListener();
+		this.messageListener = serverCreator.getMessageListener();
 		this.executor = executor;
 	}
 
@@ -114,7 +104,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 6. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
 		// 7. 在线状态
-		clientStatusListener.online(clientId);
+		connectStatusListener.online(clientId);
 	}
 
 	private void connAckByReturnCode(String clientId, ChannelContext context, MqttConnectReturnCode returnCode) {

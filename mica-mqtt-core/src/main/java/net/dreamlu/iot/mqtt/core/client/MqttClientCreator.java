@@ -31,7 +31,6 @@ import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
-import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;

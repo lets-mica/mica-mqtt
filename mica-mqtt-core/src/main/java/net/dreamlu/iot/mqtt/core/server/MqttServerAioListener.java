@@ -39,18 +39,14 @@ public class MqttServerAioListener extends DefaultAioListener {
 	private final IMqttSessionManager sessionManager;
 	private final IMqttServerSubscribeManager subscribeManager;
 	private final IMqttMessageDispatcher messageDispatcher;
-	private final IMqttConnectStatusListener clientStatusListener;
+	private final IMqttConnectStatusListener connectStatusListener;
 
-	public MqttServerAioListener(IMqttMessageStore messageStore,
-								 IMqttSessionManager sessionManager,
-								 IMqttServerSubscribeManager subscribeManager,
-								 IMqttMessageDispatcher messageDispatcher,
-								 IMqttConnectStatusListener clientStatusListener) {
-		this.messageStore = messageStore;
-		this.sessionManager = sessionManager;
-		this.subscribeManager = subscribeManager;
-		this.messageDispatcher = messageDispatcher;
-		this.clientStatusListener = clientStatusListener;
+	public MqttServerAioListener(MqttServerCreator serverCreator) {
+		this.messageStore = serverCreator.getMessageStore();
+		this.sessionManager = serverCreator.getSessionManager();
+		this.subscribeManager = serverCreator.getSubscribeManager();
+		this.messageDispatcher = serverCreator.getMessageDispatcher();
+		this.connectStatusListener = serverCreator.getConnectStatusListener();
 	}
 
 	@Override
@@ -113,7 +109,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 
 	private void notify(String clientId) {
 		try {
-			clientStatusListener.offline(clientId);
+			connectStatusListener.offline(clientId);
 		} catch (Throwable throwable) {
 			logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
 		}

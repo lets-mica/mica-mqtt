@@ -39,12 +39,10 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	private final ByteBufferAllocator allocator;
 	private final MqttServerProcessor processor;
 
-	public MqttServerAioHandler(int maxBytesInMessage,
-								ByteBufferAllocator bufferAllocator,
-								MqttServerProcessor processor) {
-		this.mqttDecoder = new MqttDecoder(maxBytesInMessage);
+	public MqttServerAioHandler(MqttServerCreator serverCreator, MqttServerProcessor processor) {
+		this.mqttDecoder = new MqttDecoder(serverCreator.getMaxBytesInMessage());
 		this.mqttEncoder = MqttEncoder.INSTANCE;
-		this.allocator = bufferAllocator;
+		this.allocator = serverCreator.getBufferAllocator();
 		this.processor = processor;
 	}
 

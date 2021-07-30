@@ -46,12 +46,11 @@ public final class MqttServer {
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
-			   IMqttSessionManager sessionManager,
-			   IMqttServerSubscribeManager subscribeManager,
+			   MqttServerCreator serverCreator,
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
-		this.sessionManager = sessionManager;
-		this.subscribeManager = subscribeManager;
+		this.sessionManager = serverCreator.getSessionManager();
+		this.subscribeManager = serverCreator.getSubscribeManager();
 		this.executor = executor;
 	}
 
