@@ -37,10 +37,12 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 
 	@Override
 	public void start() {
-		new Thread(() -> {
+		Thread mqttServerThread = new Thread(() -> {
 			mqttServer = serverCreator.start();
 			running = true;
-		}).start();
+		});
+		mqttServerThread.setDaemon(true);
+		mqttServerThread.start();
 	}
 
 	@Override
