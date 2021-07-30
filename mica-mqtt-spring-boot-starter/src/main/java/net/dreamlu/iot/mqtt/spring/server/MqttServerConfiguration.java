@@ -32,6 +32,8 @@ import org.springframework.context.annotation.Configuration;
 import org.tio.core.stat.IpStatListener;
 import org.tio.utils.hutool.StrUtil;
 
+import java.util.Objects;
+
 /**
  * mqtt server 配置
  *
@@ -82,6 +84,8 @@ public class MqttServerConfiguration {
 		ipStatListenerObjectProvider.ifAvailable(serverCreator::ipStatListener);
 		// 自定义处理
 		customizers.ifAvailable((customizer) -> customizer.customize(serverCreator));
+		// 消息监听器不能为 null
+		Objects.requireNonNull(serverCreator.getMessageListener(), "Mqtt server IMqttMessageListener Bean not found.");
 		return serverCreator;
 	}
 
