@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & www.net.dreamlu.net).
+ * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & dreamlu.net).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,7 +142,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 			ByteBuffer encode = encoder.doEncode(context, subAckMessage, ByteBufferAllocator.HEAP);
 			Tio.send(context, WsResponse.fromBytes(encode.array()));
 		} else if (MqttMessageType.DISCONNECT == messageType) {
-			Tio.close(context, "Mqtt DisConnect");
+			Tio.close(context, "Mqtt websocket DisConnect");
 		}
 		return null;
 	}
@@ -189,12 +189,13 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	}
 
 	/**
-	 * 读取 mqtt 消息长度
+	 * Decodes the fixed header. It's one byte for the flags and then variable bytes for the remaining length.
 	 *
 	 * @param buffer the buffer to decode from
-	 * @return mqtt 消息长度
+	 * @return the fixed header
 	 */
 	private static int getMqttLength(ByteBuffer buffer) {
+		ByteBufferUtil.skipBytes(buffer, 1);
 		int remainingLength = 0;
 		int multiplier = 1;
 		short digit;
