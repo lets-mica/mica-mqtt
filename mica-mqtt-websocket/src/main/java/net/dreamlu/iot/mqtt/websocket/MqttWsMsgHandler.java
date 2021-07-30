@@ -189,10 +189,10 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	}
 
 	/**
-	 * Decodes the fixed header. It's one byte for the flags and then variable bytes for the remaining length.
+	 * 解析 mqtt 消息长度
 	 *
 	 * @param buffer the buffer to decode from
-	 * @return the fixed header
+	 * @return mqtt 消息长度
 	 */
 	private static int getMqttLength(ByteBuffer buffer) {
 		ByteBufferUtil.skipBytes(buffer, 1);
