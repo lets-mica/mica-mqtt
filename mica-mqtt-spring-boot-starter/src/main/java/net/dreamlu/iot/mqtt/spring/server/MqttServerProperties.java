@@ -69,6 +69,8 @@ public class MqttServerProperties {
 	 */
 	private Ssl ssl = new Ssl();
 
+	@Getter
+	@Setter
 	public static class Ssl {
 		/**
 		 * 证书路径

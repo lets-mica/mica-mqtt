@@ -29,6 +29,7 @@
 ```
 
 ## 文档
+- [mica-mqtt-spring-boot-starter 使用文档](docs/starter.md)
 - [mica-mqtt 使用文档](docs/docs.md)
 - [mica-mqtt 发行版本](CHANGELOG.md)
 - [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
@@ -156,12 +157,12 @@ Mica-Mqtt-Server
 - [mqttx.fx mqtt 客户端](http://mqttfx.org/)
 
 ## 开源推荐
-- `Avue` 一款基于 vue 可配置化的神奇框架：[https://gitee.com/smallweigit/avue](https://gitee.com/smallweigit/avue)
-- `pig` 宇宙最强微服务（架构师必备）：[https://gitee.com/log4j/pig](https://gitee.com/log4j/pig)
-- `SpringBlade` 完整的线上解决方案（企业开发必备）：[https://gitee.com/smallc/SpringBlade](https://gitee.com/smallc/SpringBlade)
-- `IJPay` 支付 SDK 让支付触手可及：[https://gitee.com/javen205/IJPay](https://gitee.com/javen205/IJPay)
-- `JustAuth` 史上最全的整合第三方登录的开源库: [https://github.com/zhangyd-c/JustAuth](https://github.com/zhangyd-c/JustAuth)
-- `spring-boot-demo` 深度学习并实战 spring boot 的项目: [https://github.com/xkcoding/spring-boot-demo](https://github.com/xkcoding/spring-boot-demo)
+- `Avue` 基于 vue 可配置化的前端框架：[https://gitee.com/smallweigit/avue](https://gitee.com/smallweigit/avue)
+- `pig` 上央视的微服务框架（架构必备）：[https://gitee.com/log4j/pig](https://gitee.com/log4j/pig)
+- `SpringBlade` 完整的企业级解决方案（企业开发必备）：[https://gitee.com/smallc/SpringBlade](https://gitee.com/smallc/SpringBlade)
+- `IJPay` 支付 SDK，让支付触手可及：[https://gitee.com/javen205/IJPay](https://gitee.com/javen205/IJPay)
+- `JustAuth` 史上最全的第三方登录开源库: [https://github.com/zhangyd-c/JustAuth](https://github.com/zhangyd-c/JustAuth)
+- `spring-boot-demo` Spring boot 深度学习实战: [https://github.com/xkcoding/spring-boot-demo](https://github.com/xkcoding/spring-boot-demo)
 
 ## 微信公众号
 

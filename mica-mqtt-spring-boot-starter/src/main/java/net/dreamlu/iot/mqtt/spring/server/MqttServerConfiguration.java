@@ -16,12 +16,21 @@
 
 package net.dreamlu.iot.mqtt.spring.server;
 
+import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.IMqttServerSubscribeManager;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
+import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.tio.core.stat.IpStatListener;
+import org.tio.utils.hutool.StrUtil;
 
 /**
  * mqtt server 配置
@@ -34,6 +43,14 @@ public class MqttServerConfiguration {
 
 	@Bean
 	public MqttServerCreator mqttServerCreator(MqttServerProperties properties,
+											   ObjectProvider<IMqttServerAuthHandler> authHandlerObjectProvider,
+											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
+											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
+											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
+											   ObjectProvider<IMqttServerSubscribeManager> subscribeManagerObjectProvider,
+											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
+											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
+											   ObjectProvider<IpStatListener> ipStatListenerObjectProvider,
 											   ObjectProvider<MqttServerCustomizer> customizers) {
 		MqttServerCreator serverCreator = MqttServer.create()
 			.name(properties.getName())
@@ -46,10 +63,25 @@ public class MqttServerConfiguration {
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}
+		MqttServerProperties.Ssl ssl = properties.getSsl();
+		String keyStorePath = ssl.getKeyStorePath();
+		String trustStorePath = ssl.getTrustStorePath();
+		String password = ssl.getPassword();
+		// ssl 配置
+		if (StrUtil.isNotBlank(keyStorePath) && StrUtil.isNotBlank(trustStorePath) && StrUtil.isNotBlank(password)) {
+			serverCreator.useSsl(keyStorePath, trustStorePath, password);
+		}
+		// bean 初始化
+		authHandlerObjectProvider.ifAvailable(serverCreator::authHandler);
+		messageDispatcherObjectProvider.ifAvailable(serverCreator::messageDispatcher);
+		messageStoreObjectProvider.ifAvailable(serverCreator::messageStore);
+		sessionManagerObjectProvider.ifAvailable(serverCreator::sessionManager);
+		subscribeManagerObjectProvider.ifAvailable(serverCreator::subscribeManager);
+		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
+		connectStatusListenerObjectProvider.ifAvailable(serverCreator::connectStatusListener);
+		ipStatListenerObjectProvider.ifAvailable(serverCreator::ipStatListener);
 		// 自定义处理
-		customizers.ifAvailable((customizer) -> {
-			customizer.customize(serverCreator);
-		});
+		customizers.ifAvailable((customizer) -> customizer.customize(serverCreator));
 		return serverCreator;
 	}
 
