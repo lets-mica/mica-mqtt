@@ -21,7 +21,7 @@
 | mqtt.server.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
 | mqtt.server.debug | false | debug |
 
-## 可实现接口
+## 可实现接口（注册成 Spring Bean 即可）
 
 | 接口                        | 是否必须       | 说明               |
 | --------------------------- | -------------- | ------------------ |
