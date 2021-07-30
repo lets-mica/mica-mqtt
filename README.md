@@ -159,7 +159,7 @@ Mica-Mqtt-Server
 ## 开源推荐
 - `Avue` 基于 vue 可配置化的前端框架：[https://gitee.com/smallweigit/avue](https://gitee.com/smallweigit/avue)
 - `pig` 上央视的微服务框架（架构必备）：[https://gitee.com/log4j/pig](https://gitee.com/log4j/pig)
-- `SpringBlade` 完整的企业级解决方案（企业开发必备）：[https://gitee.com/smallc/SpringBlade](https://gitee.com/smallc/SpringBlade)
+- `SpringBlade` 企业级解决方案（企业开发必备）：[https://gitee.com/smallc/SpringBlade](https://gitee.com/smallc/SpringBlade)
 - `IJPay` 支付 SDK，让支付触手可及：[https://gitee.com/javen205/IJPay](https://gitee.com/javen205/IJPay)
 - `JustAuth` 史上最全的第三方登录开源库: [https://github.com/zhangyd-c/JustAuth](https://github.com/zhangyd-c/JustAuth)
 - `spring-boot-demo` Spring boot 深度学习实战: [https://github.com/xkcoding/spring-boot-demo](https://github.com/xkcoding/spring-boot-demo)
