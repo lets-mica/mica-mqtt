@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & www.net.dreamlu.net).
+ * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & dreamlu.net).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import java.util.TimerTask;
 public class MqttClientTest {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientTest.class);
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		// 初始化 mqtt 客户端
 		MqttClient client = MqttClient.create()
 			.ip("127.0.0.1")

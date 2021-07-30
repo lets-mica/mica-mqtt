@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & www.net.dreamlu.net).
+ * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & dreamlu.net).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
+import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
@@ -274,7 +275,7 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClient connect() throws Exception {
+	public MqttClient connect() {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
 		if (StrUtil.isBlank(clientId)) {
@@ -304,11 +305,15 @@ public final class MqttClientCreator {
 		// 5. mqtt 消息最大长度
 		tioConfig.setReadBufferSize(this.readBufferSize);
 		// 6. tioClient
-		TioClient tioClient = new TioClient(tioConfig);
-		ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
-		// 7. 等待连接成功之后继续
-		connLatch.await();
-		return new MqttClient(tioClient, this, context, clientStore, executor);
+		try {
+			TioClient tioClient = new TioClient(tioConfig);
+			ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
+			// 7. 等待连接成功之后继续
+			connLatch.await();
+			return new MqttClient(tioClient, this, context, clientStore, executor);
+		} catch (Exception e) {
+			throw new IllegalStateException("Mica mqtt client start fail.", e);
+		}
 	}
 
 }

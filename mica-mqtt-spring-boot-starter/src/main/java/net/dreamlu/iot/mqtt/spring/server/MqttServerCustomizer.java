@@ -14,28 +14,23 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.event;
+package net.dreamlu.iot.mqtt.spring.server;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
-
-import java.nio.ByteBuffer;
+import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 
 /**
- * mqtt 消息处理
+ * MqttServer 配置自定义
  *
  * @author L.cm
  */
 @FunctionalInterface
-public interface IMqttMessageListener {
+public interface MqttServerCustomizer {
 
 	/**
-	 * 监听到消息
+	 * MqttServerCreator 自定义扩展
 	 *
-	 * @param clientId clientId
-	 * @param topic    topic
-	 * @param mqttQoS  MqttQoS
-	 * @param payload  payload
+	 * @param creator MqttServerCreator
 	 */
-	void onMessage(String clientId, String topic, MqttQoS mqttQoS, ByteBuffer payload);
+	void customize(MqttServerCreator creator);
 
 }

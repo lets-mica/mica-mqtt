@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & www.net.dreamlu.net).
+ * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & dreamlu.net).
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -284,7 +284,7 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public MqttServer start() throws IOException {
+	public MqttServer start() {
 		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		if (this.authHandler == null) {
 			this.authHandler = new DefaultMqttServerAuthHandler();
@@ -333,7 +333,11 @@ public class MqttServerCreator {
 		// 6. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
 		// 7. 启动
-		tioServer.start(this.ip, this.port);
+		try {
+			tioServer.start(this.ip, this.port);
+		} catch (IOException e) {
+			throw new IllegalStateException("Mica mqtt server start fail.", e);
+		}
 		MqttServer mqttServer = new MqttServer(tioServer, this.sessionManager, this.subscribeManager, executor);
 		messageDispatcher.config(mqttServer);
 		return mqttServer;

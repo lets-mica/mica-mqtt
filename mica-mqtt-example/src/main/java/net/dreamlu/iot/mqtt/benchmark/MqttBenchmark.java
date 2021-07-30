@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 public class MqttBenchmark {
 	private static final Logger logger = LoggerFactory.getLogger(MqttBenchmark.class);
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		// 1. 模拟 1w 连接，在开发机（i5-7500 4核4线程 win10 MqttServer 6G）1万连连接很轻松。
 		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
 		int clientCount = 1_0000;

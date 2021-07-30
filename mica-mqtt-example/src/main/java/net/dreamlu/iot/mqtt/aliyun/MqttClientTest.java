@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
  */
 public class MqttClientTest {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		String productKey = "g27jB42P9hm";
 		String deviceName = "3dbc1cb4";
 		String deviceSecret = "";

@@ -26,6 +26,7 @@
         <module>mica-mqtt-codec</module>
         <module>mica-mqtt-core</module>
         <module>mica-mqtt-websocket</module>
+        <module>mica-mqtt-spring-boot-starter</module>
         <module>mica-mqtt-example</module>
     </modules>
 

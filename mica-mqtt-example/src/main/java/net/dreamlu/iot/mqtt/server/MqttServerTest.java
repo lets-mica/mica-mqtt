@@ -22,7 +22,6 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -35,7 +34,7 @@ import java.util.TimerTask;
 public class MqttServerTest {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServerTest.class);
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) {
 		// 注意：为了能接受更多链接（降低内存），请添加 jvm 参数 -Xss129k
 		MqttServer mqttServer = MqttServer.create()
 			// 默认：127.0.0.1
