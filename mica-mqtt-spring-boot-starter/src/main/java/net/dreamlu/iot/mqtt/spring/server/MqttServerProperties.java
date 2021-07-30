@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * MqttServer 配置
@@ -28,6 +29,7 @@ import net.dreamlu.iot.mqtt.codec.MqttConstant;
  */
 @Getter
 @Setter
+@ConfigurationProperties("mqtt.server")
 public class MqttServerProperties {
 
 	/**
