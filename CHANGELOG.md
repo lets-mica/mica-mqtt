@@ -2,6 +2,10 @@
 
 ## 发行版本
 ### v1.0.0 - 2021-07-31
+- :sparkles: 添加 Spring boot starter 方便接入。
+- :sparkles: 调研 t-io websocket 子协议。
+
+### v1.0.0 - 2021-07-29
 - :sparkles: 基于低延迟高性能的 t-io AIO 框架。
 - :sparkles: 支持 MQTT v3.1、v3.1.1 以及 v5.0 协议。
 - :sparkles: 支持 MQTT client 客户端。
