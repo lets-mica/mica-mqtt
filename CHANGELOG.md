@@ -1,7 +1,7 @@
 # 变更记录
 
 ## 发行版本
-### v1.0.0 - 2021-07-31
+### v1.0.1-RC - 2021-07-31
 - :sparkles: 添加 Spring boot starter 方便接入。
 - :sparkles: 调研 t-io websocket 子协议。
 
