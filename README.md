@@ -21,11 +21,21 @@
 - [ ] 添加 websocket 支持。
 
 ## 依赖
+### Spring boot 项目
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-spring-boot-starter</artifactId>
+  <version>1.0.0-RC</version>
+</dependency>
+```
+
+### 非 Spring boot 项目
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-core</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.0-RC</version>
 </dependency>
 ```
 
