@@ -29,7 +29,6 @@ import org.springframework.core.Ordered;
 public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	private final MqttServerCreator serverCreator;
 	private MqttServer mqttServer;
-	private Thread mqttServerThread;
 	private boolean running = false;
 
 	public MqttServerLauncher(MqttServerCreator serverCreator) {
@@ -38,21 +37,14 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 
 	@Override
 	public void start() {
-		mqttServerThread = new Thread(() -> {
-			mqttServer = serverCreator.start();
-			running = true;
-		});
-		mqttServerThread.setDaemon(true);
-		mqttServerThread.start();
+		mqttServer = serverCreator.start();
+		running = true;
 	}
 
 	@Override
 	public void stop() {
 		if (mqttServer != null) {
 			mqttServer.stop();
-		}
-		if (mqttServerThread != null) {
-			mqttServerThread.interrupt();
 		}
 	}
 
