@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.spring.server;
 
 import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
-import net.dreamlu.iot.mqtt.core.server.IMqttServerSubscribeManager;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
@@ -49,7 +48,6 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
 											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
-											   ObjectProvider<IMqttServerSubscribeManager> subscribeManagerObjectProvider,
 											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
 											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
 											   ObjectProvider<IpStatListener> ipStatListenerObjectProvider,
@@ -78,7 +76,6 @@ public class MqttServerConfiguration {
 		messageDispatcherObjectProvider.ifAvailable(serverCreator::messageDispatcher);
 		messageStoreObjectProvider.ifAvailable(serverCreator::messageStore);
 		sessionManagerObjectProvider.ifAvailable(serverCreator::sessionManager);
-		subscribeManagerObjectProvider.ifAvailable(serverCreator::subscribeManager);
 		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
 		connectStatusListenerObjectProvider.ifAvailable(serverCreator::connectStatusListener);
 		ipStatListenerObjectProvider.ifAvailable(serverCreator::ipStatListener);

@@ -25,7 +25,10 @@ import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
-import net.dreamlu.iot.mqtt.core.server.support.*;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -98,10 +101,6 @@ public class MqttServerCreator {
 	 * session 管理
 	 */
 	private IMqttSessionManager sessionManager;
-	/**
-	 * 订阅管理
-	 */
-	private IMqttServerSubscribeManager subscribeManager;
 	/**
 	 * 消息监听
 	 */
@@ -248,15 +247,6 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public IMqttServerSubscribeManager getSubscribeManager() {
-		return subscribeManager;
-	}
-
-	public MqttServerCreator subscribeManager(IMqttServerSubscribeManager subscribeManager) {
-		this.subscribeManager = subscribeManager;
-		return this;
-	}
-
 	public IMqttMessageListener getMessageListener() {
 		return messageListener;
 	}
@@ -294,9 +284,6 @@ public class MqttServerCreator {
 		}
 		if (this.sessionManager == null) {
 			this.sessionManager = new InMemoryMqttSessionManager();
-		}
-		if (this.subscribeManager == null) {
-			this.subscribeManager = new DefaultMqttServerSubscribeManager();
 		}
 		if (this.messageStore == null) {
 			this.messageStore = new InMemoryMqttMessageStore();

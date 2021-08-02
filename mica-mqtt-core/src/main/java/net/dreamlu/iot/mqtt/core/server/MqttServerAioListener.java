@@ -37,14 +37,12 @@ public class MqttServerAioListener extends DefaultAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServerAioListener.class);
 	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;
-	private final IMqttServerSubscribeManager subscribeManager;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 
 	public MqttServerAioListener(MqttServerCreator serverCreator) {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
-		this.subscribeManager = serverCreator.getSubscribeManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 	}
@@ -66,9 +64,11 @@ public class MqttServerAioListener extends DefaultAioListener {
 		logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
 		// 1. 对于异常断开连接，处理遗嘱消息
 		sendWillMessage(context, clientId);
-		// 2. 释放资源
-		cleanUp(context, clientId);
-		// 3. 下线事件
+		// 2. 会话清理
+		cleanSession(clientId);
+		// 3. 解绑 clientId
+		Tio.unbindBsId(context);
+		// 4. 下线事件
 		notify(clientId);
 	}
 
@@ -93,18 +93,12 @@ public class MqttServerAioListener extends DefaultAioListener {
 		}
 	}
 
-	private void cleanUp(ChannelContext context, String clientId) {
+	private void cleanSession(String clientId) {
 		try {
 			sessionManager.remove(clientId);
 		} catch (Throwable throwable) {
 			logger.error("Mqtt server clientId:{} session clean error.", clientId, throwable);
 		}
-		try {
-			subscribeManager.remove(clientId);
-		} catch (Throwable throwable) {
-			logger.error("Mqtt server clientId:{} subscribe clean error.", clientId, throwable);
-		}
-		Tio.unbindBsId(context);
 	}
 
 	private void notify(String clientId) {

@@ -28,7 +28,6 @@
 | IMqttServerAuthHandler      | 是             | 用于客户端认证       |
 | IMqttMessageListener        | 是             | 消息监听            |
 | IMqttConnectStatusListener  | 是             | 连接状态监听         |
-| IMqttServerSubscribeManager | 否             | 订阅管理            |
 | IMqttSessionManager         | 否             | session 管理        |
 | IMqttMessageStore           | 集群是，单机否   | 遗嘱和保留消息存储    |
 | IMqttMessageDispatcher      | 集群是，单机否   | 消息转发             |

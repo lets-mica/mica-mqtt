@@ -43,7 +43,6 @@ public final class MqttServer {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
 	private final TioServer tioServer;
 	private final IMqttSessionManager sessionManager;
-	private final IMqttServerSubscribeManager subscribeManager;
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
@@ -51,7 +50,6 @@ public final class MqttServer {
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
 		this.sessionManager = serverCreator.getSessionManager();
-		this.subscribeManager = serverCreator.getSubscribeManager();
 		this.executor = executor;
 	}
 
@@ -122,7 +120,7 @@ public final class MqttServer {
 			logger.warn("Mqtt publish to clientId:{} ChannelContext is null may be disconnected.", clientId);
 			return false;
 		}
-		List<Subscribe> subscribeList = subscribeManager.search(topic, clientId);
+		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic, clientId);
 		if (subscribeList.isEmpty()) {
 			logger.warn("Mqtt publish but clientId:{} subscribeList is empty.", clientId);
 			return false;
@@ -212,7 +210,7 @@ public final class MqttServer {
 	 */
 	public Boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		// 查找订阅该 topic 的客户端
-		List<Subscribe> subscribeList = subscribeManager.search(topic);
+		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {
 			logger.warn("Mqtt publish but topic:{} subscribe client list is empty.", topic);
 			return false;
@@ -238,11 +236,6 @@ public final class MqttServer {
 			sessionManager.clean();
 		} catch (Throwable e) {
 			logger.error("Mqtt server stop session clean error.", e);
-		}
-		try {
-			subscribeManager.clean();
-		} catch (Throwable e) {
-			logger.error("Mqtt server stop subscribe clean error.", e);
 		}
 		this.executor.shutdown();
 		return result;

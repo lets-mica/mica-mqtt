@@ -16,10 +16,16 @@
 
 package net.dreamlu.iot.mqtt.core.server.session;
 
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
+import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,17 +37,75 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
-	 * clientId: messageId
+	 * messageId 存储 clientId: messageId
 	 */
 	private final ConcurrentMap<String, AtomicInteger> messageIdStore = new ConcurrentHashMap<>();
 	/**
-	 * clientId: {msgId: Object}
+	 * 订阅存储 topicFilter: {clientId: SubscribeStore}
+	 */
+	private final ConcurrentMap<String, ConcurrentMap<String, Integer>> subscribeStore = new ConcurrentHashMap<>();
+	/**
+	 * qos1 消息过程存储 clientId: {msgId: Object}
 	 */
 	private final ConcurrentMap<String, Map<Integer, MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
 	/**
-	 * clientId: {msgId: Object}
+	 * qos2 消息过程存储 clientId: {msgId: Object}
 	 */
 	private final ConcurrentMap<String, Map<Integer, MqttPendingQos2Publish>> pendingQos2PublishStore = new ConcurrentHashMap<>();
+
+	@Override
+	public void addSubscribe(String topicFilter, String clientId, MqttQoS mqttQoS) {
+		Map<String, Integer> data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
+		data.put(clientId, mqttQoS.value());
+	}
+
+	@Override
+	public void removeSubscribe(String topicFilter, String clientId) {
+		ConcurrentMap<String, Integer> map = subscribeStore.get(topicFilter);
+		if (map == null) {
+			return;
+		}
+		map.remove(clientId);
+	}
+
+	public void removeSubscribe(String clientId) {
+		subscribeStore.forEach((key, value) -> value.remove(clientId));
+	}
+
+	@Override
+	public List<Subscribe> searchSubscribe(String topicName, String clientId) {
+		List<Subscribe> list = new ArrayList<>();
+		Set<String> topicFilterSet = subscribeStore.keySet();
+		for (String topicFilter : topicFilterSet) {
+			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
+				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
+				if (data != null && !data.isEmpty()) {
+					Integer mqttQoS = data.get(clientId);
+					if (mqttQoS != null) {
+						list.add(new Subscribe(topicFilter, mqttQoS));
+					}
+				}
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public List<Subscribe> searchSubscribe(String topicName) {
+		List<Subscribe> list = new ArrayList<>();
+		Set<String> topicFilterSet = subscribeStore.keySet();
+		for (String topicFilter : topicFilterSet) {
+			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
+				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
+				if (data != null && !data.isEmpty()) {
+					data.forEach((clientId, qos) -> {
+						list.add(new Subscribe(topicFilter, clientId, qos));
+					});
+				}
+			}
+		}
+		return list;
+	}
 
 	@Override
 	public void addPendingPublish(String clientId, int messageId, MqttPendingPublish pendingPublish) {
@@ -103,6 +167,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void remove(String clientId) {
+		removeSubscribe(clientId);
 		pendingPublishStore.remove(clientId);
 		pendingQos2PublishStore.remove(clientId);
 		messageIdStore.remove(clientId);
@@ -110,6 +175,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void clean() {
+		subscribeStore.clear();
 		pendingPublishStore.clear();
 		pendingQos2PublishStore.clear();
 		messageIdStore.clear();

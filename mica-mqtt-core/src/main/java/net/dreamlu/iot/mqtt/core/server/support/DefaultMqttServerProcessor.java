@@ -19,7 +19,10 @@ package net.dreamlu.iot.mqtt.core.server.support;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.server.*;
+import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.MqttConst;
+import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
+import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -48,7 +51,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttServerAuthHandler authHandler;
-	private final IMqttServerSubscribeManager subscribeManager;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final IMqttMessageListener messageListener;
@@ -58,7 +60,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.authHandler = serverCreator.getAuthHandler();
-		this.subscribeManager = serverCreator.getSubscribeManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 		this.messageListener = serverCreator.getMessageListener();
@@ -245,7 +246,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			MqttQoS mqttQoS = subscription.qualityOfService();
 			mqttQosList.add(mqttQoS);
 			topicList.add(topicName);
-			subscribeManager.add(topicName, clientId, mqttQoS);
+			sessionManager.addSubscribe(topicName, clientId, mqttQoS);
 			logger.debug("Subscribe - clientId:{} messageId:{} topicFilter:{} mqttQoS:{}", clientId, messageId, topicName, mqttQoS);
 		}
 		// 3. 返回 ack
@@ -269,7 +270,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int messageId = message.variableHeader().messageId();
 		List<String> topicFilterList = message.payload().topics();
 		for (String topicFilter : topicFilterList) {
-			subscribeManager.remove(topicFilter, clientId);
+			sessionManager.removeSubscribe(topicFilter, clientId);
 			logger.debug("UnSubscribe - clientId:{} messageId:{} topicFilter:{}", clientId, messageId, topicFilter);
 		}
 		MqttMessage unSubMessage = MqttMessageBuilders.unsubAck()
