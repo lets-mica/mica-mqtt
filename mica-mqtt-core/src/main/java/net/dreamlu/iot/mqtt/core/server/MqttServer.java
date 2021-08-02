@@ -146,7 +146,7 @@ public final class MqttServer {
 	private boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
-		ByteBufferUtil.rewind(payload);
+		payload.rewind();
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)

@@ -42,7 +42,7 @@ public final class MqttPendingPublish {
 
 	public void startPublishRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
 		this.pubRetryProcessor.setHandle(((fixedHeader, originalMessage) -> {
-			ByteBufferUtil.rewind(this.payload);
+			this.payload.rewind();
 			sendPacket.accept(new MqttPublishMessage(fixedHeader, originalMessage.variableHeader(), this.payload));
 		}));
 		this.pubRetryProcessor.start(executor);

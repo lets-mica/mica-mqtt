@@ -175,7 +175,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		}
 		pendingPublish.onPubAckReceived();
 		sessionManager.removePendingPublish(clientId, messageId);
-		ByteBufferUtil.clear(pendingPublish.getPayload());
+		pendingPublish.getPayload().clear();
 	}
 
 	@Override
@@ -226,7 +226,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		logger.debug("PubComp - clientId:{}, messageId: {}", clientId, messageId);
 		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish != null) {
-			ByteBufferUtil.clear(pendingPublish.getPayload());
+			pendingPublish.getPayload().clear();
 			pendingPublish.onPubCompReceived();
 			sessionManager.removePendingPublish(clientId, messageId);
 		}

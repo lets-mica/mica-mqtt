@@ -145,7 +145,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 		pendingPublish.onPubAckReceived();
 		clientStore.removePendingPublish(messageId);
-		ByteBufferUtil.clear(pendingPublish.getPayload());
+		pendingPublish.getPayload().clear();
 	}
 
 	@Override
@@ -188,7 +188,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (pendingPublish == null) {
 			return;
 		}
-		ByteBufferUtil.clear(pendingPublish.getPayload());
+		pendingPublish.getPayload().clear();
 		pendingPublish.onPubCompReceived();
 		clientStore.removePendingPublish(messageId);
 	}
@@ -204,7 +204,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		final ByteBuffer payload = message.payload();
 		subscriptionList.forEach(subscription -> {
 			IMqttClientMessageListener listener = subscription.getListener();
-			ByteBufferUtil.rewind(payload);
+			payload.rewind();
 			listener.onMessage(topicName, payload);
 		});
 	}
