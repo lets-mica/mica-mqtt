@@ -1,6 +1,13 @@
 # 变更记录
 
 ## 发行版本
+### v1.0.1 - 2021-08-02
+- :sparkles: 订阅管理集成到 session 管理中。
+- :sparkles:  MqttProperties.MqttPropertyType 添加注释，考虑 mqtt V5.0 新特性处理。
+- :sparkles: 添加 Spring boot starter 方便接入，兼容低版本 Spring boot。
+- :sparkles: 调研 t-io websocket 子协议。
+- :bug: 修复 java8 运行期间的部分问题，NoSuchMethodError: java.nio.ByteBuffer.xxx
+
 ### v1.0.1-RC - 2021-07-31
 - :sparkles: 添加 Spring boot starter 方便接入。
 - :sparkles: 调研 t-io websocket 子协议。
