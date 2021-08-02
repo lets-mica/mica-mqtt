@@ -15,9 +15,9 @@
 - [x] 支持 MQTT 保留消息。
 - [x] 支持自定义消息（mq）处理转发实现集群。
 - [x] MQTT 客户端 阿里云 mqtt 连接 demo。
+- [x] 支持 Spring boot 项目快速接入（mica-mqtt-spring-boot-starter）。
 
 ## 待办
-- [ ] 添加 Spring boot stater。
 - [ ] 添加 websocket 支持。
 
 ## 依赖
@@ -30,6 +30,8 @@
 </dependency>
 ```
 
+**配置详见**：[mica-mqtt-spring-boot-starter 使用文档](docs/starter.md)
+
 ### 非 Spring boot 项目
 ```xml
 <dependency>
@@ -38,6 +40,8 @@
   <version>1.0.1-RC</version>
 </dependency>
 ```
+
+**配置详见**：[mica-mqtt 使用文档](docs/docs.md)
 
 ## 文档
 - [mica-mqtt-spring-boot-starter 使用文档](docs/starter.md)

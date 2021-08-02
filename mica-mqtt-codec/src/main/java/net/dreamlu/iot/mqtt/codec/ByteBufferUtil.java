@@ -117,7 +117,7 @@ public class ByteBufferUtil {
 	 *
 	 * @param buffer Buffer
 	 */
-	public static void reset​(Buffer buffer) {
+	public static void reset(Buffer buffer) {
 		((Buffer) buffer).reset();
 	}
 
@@ -130,14 +130,32 @@ public class ByteBufferUtil {
 		((Buffer) buffer).clear();
 	}
 
+	/**
+	 * 转成 string
+	 *
+	 * @param buffer ByteBuffer
+	 * @return 字符串
+	 */
 	public static String toString(ByteBuffer buffer) {
-		return toString(buffer, StandardCharsets.UTF_8);
+		return new String(buffer.array(), StandardCharsets.UTF_8);
 	}
 
+	/**
+	 * 转成 string
+	 *
+	 * @param buffer ByteBuffer
+	 * @return 字符串
+	 */
 	public static String toString(ByteBuffer buffer, Charset charset) {
 		return new String(buffer.array(), buffer.position(), buffer.limit(), charset);
 	}
 
+	/**
+	 * ByteBuffer clone
+	 *
+	 * @param original ByteBuffer
+	 * @return ByteBuffer
+	 */
 	public static ByteBuffer clone(ByteBuffer original) {
 		ByteBuffer clone = ByteBuffer.allocate(original.capacity());
 		// copy from the beginning
