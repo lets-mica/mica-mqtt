@@ -62,6 +62,22 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	}
 
 	@Override
+	public boolean isAutoStartup() {
+		return true;
+	}
+
+	@Override
+	public void stop(Runnable callback) {
+		stop();
+		callback.run();
+	}
+
+	@Override
+	public int getPhase() {
+		return DEFAULT_PHASE;
+	}
+
+	@Override
 	public int getOrder() {
 		return Ordered.LOWEST_PRECEDENCE;
 	}
