@@ -89,9 +89,16 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		if (keepAliveSeconds > 0) {
 			context.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(keepAliveSeconds));
 		}
-		// TODO session 处理，先默认全部连接关闭时清除
+		// 5. session 处理，先默认全部连接关闭时清除
 //		boolean cleanSession = variableHeader.isCleanSession();
-		// 5. 存储遗嘱消息
+//		if (cleanSession) {
+//			// TODO L.cm 考虑 session 处理 可参数： https://www.emqx.com/zh/blog/mqtt-session
+//			// mqtt v5.0 会话超时时间
+//			MqttProperties properties = variableHeader.properties();
+//			Integer sessionExpiryInterval = properties.getPropertyValue(MqttProperties.MqttPropertyType.SESSION_EXPIRY_INTERVAL);
+//			System.out.println(sessionExpiryInterval);
+//		}
+		// 6. 存储遗嘱消息
 		boolean willFlag = variableHeader.isWillFlag();
 		if (willFlag) {
 			Message willMessage = new Message();
@@ -101,9 +108,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setRetain(variableHeader.isWillRetain());
 			messageStore.addWillMessage(clientId, willMessage);
 		}
-		// 6. 返回 ack
+		// 7. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
-		// 7. 在线状态
+		// 8. 在线状态
 		connectStatusListener.online(clientId);
 	}
 

@@ -19,6 +19,7 @@
 
 ## 待办
 - [ ] 添加 websocket 支持。
+- [ ] 优化处理 mqtt session，以及支持 v5.0 
 
 ## 依赖
 ### Spring boot 项目

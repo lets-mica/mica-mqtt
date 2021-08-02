@@ -97,6 +97,11 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	}
 
 	@Override
+	public boolean hasSession(String clientId) {
+		return false;
+	}
+
+	@Override
 	public void remove(String clientId) {
 		pendingPublishStore.remove(clientId);
 		pendingQos2PublishStore.remove(clientId);

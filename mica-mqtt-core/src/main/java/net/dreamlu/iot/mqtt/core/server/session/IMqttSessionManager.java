@@ -80,6 +80,14 @@ public interface IMqttSessionManager {
 	int getMessageId(String clientId);
 
 	/**
+	 * 判断是否存在 session
+	 *
+	 * @param clientId clientId
+	 * @return 是否存在 session
+	 */
+	boolean hasSession(String clientId);
+
+	/**
 	 * 清除 session
 	 *
 	 * @param clientId clientId
