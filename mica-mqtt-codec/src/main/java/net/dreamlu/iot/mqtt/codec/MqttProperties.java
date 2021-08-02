@@ -486,7 +486,8 @@ public final class MqttProperties {
 	 * then return the first one.
 	 *
 	 * @param mqttPropertyType Type of the property
-	 * @return a property if it is set, null otherwise
+	 * @param <T> 泛型标记
+	 * @return a property value if it is set, null otherwise
 	 */
 	public <T> T getPropertyValue(MqttPropertyType mqttPropertyType) {
 		MqttProperty property = getProperty(mqttPropertyType.value);

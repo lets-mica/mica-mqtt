@@ -77,6 +77,7 @@ public class ByteBufferUtil {
 	 * 转成 string
 	 *
 	 * @param buffer ByteBuffer
+	 * @param charset Charset
 	 * @return 字符串
 	 */
 	public static String toString(ByteBuffer buffer, Charset charset) {
