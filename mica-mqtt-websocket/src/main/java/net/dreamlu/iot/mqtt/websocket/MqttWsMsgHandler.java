@@ -95,7 +95,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 			return null;
 		}
 		// 重置 buffer
-		buffer.rewind();
+		ByteBufferUtil.rewind(buffer);
 		// 解析 mqtt 消息
 		MqttMessage mqttMessage = new MqttDecoder().decode(context, buffer, 0, 0, buffer.remaining());
 		if (mqttMessage == null) {

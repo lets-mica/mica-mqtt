@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.codec;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +34,7 @@ public class ByteBufferUtil {
 
 	/**
 	 * read byte
+	 *
 	 * @param buffer ByteBuffer
 	 * @return byte
 	 */
@@ -42,6 +44,7 @@ public class ByteBufferUtil {
 
 	/**
 	 * read unsigned byte
+	 *
 	 * @param buffer ByteBuffer
 	 * @return short
 	 */
@@ -51,13 +54,80 @@ public class ByteBufferUtil {
 
 	/**
 	 * skip bytes
+	 *
 	 * @param buffer ByteBuffer
-	 * @param skip skip bytes
+	 * @param skip   skip bytes
 	 * @return ByteBuffer
 	 */
 	public static ByteBuffer skipBytes(ByteBuffer buffer, int skip) {
-		buffer.position(buffer.position() + skip);
+		position(buffer, buffer.position() + skip);
 		return buffer;
+	}
+
+	/**
+	 * position 为了兼容 java8，详见： https://gitee.com/596392912/mica-mqtt/issues/I43EZT
+	 *
+	 * @param buffer      Buffer
+	 * @param newPosition newPosition
+	 */
+	public static void position(Buffer buffer, int newPosition) {
+		((Buffer) buffer).position(newPosition);
+	}
+
+	/**
+	 * limit 为了兼容 java8，详见： https://gitee.com/596392912/mica-mqtt/issues/I43EZT
+	 *
+	 * @param buffer   Buffer
+	 * @param newLimit newLimit
+	 */
+	public static void limit(Buffer buffer, int newLimit) {
+		((Buffer) buffer).limit(newLimit);
+	}
+
+	/**
+	 * flip 为了兼容 java8，详见： https://gitee.com/596392912/mica-mqtt/issues/I43EZT
+	 *
+	 * @param buffer Buffer
+	 */
+	public static void flip(Buffer buffer) {
+		((Buffer) buffer).flip();
+	}
+
+	/**
+	 * rewind 为了兼容 java8，详见： https://gitee.com/596392912/mica-mqtt/issues/I43EZT
+	 *
+	 * @param buffer Buffer
+	 */
+	public static void rewind(Buffer buffer) {
+		((Buffer) buffer).rewind();
+	}
+
+	/**
+	 * mark 为了兼容 java8，详见： https://gitee.com/596392912/mica-mqtt/issues/I43EZT
+	 *
+	 * @param buffer Buffer
+	 */
+	public static void mark(Buffer buffer) {
+		((Buffer) buffer).mark();
+	}
+
+
+	/**
+	 * reset 为了兼容 java8，详见： https://gitee.com/596392912/mica-mqtt/issues/I43EZT
+	 *
+	 * @param buffer Buffer
+	 */
+	public static void reset​(Buffer buffer) {
+		((Buffer) buffer).reset();
+	}
+
+	/**
+	 * clear 为了兼容 java8，详见： https://gitee.com/596392912/mica-mqtt/issues/I43EZT
+	 *
+	 * @param buffer Buffer
+	 */
+	public static void clear(Buffer buffer) {
+		((Buffer) buffer).clear();
 	}
 
 	public static String toString(ByteBuffer buffer) {
@@ -71,10 +141,10 @@ public class ByteBufferUtil {
 	public static ByteBuffer clone(ByteBuffer original) {
 		ByteBuffer clone = ByteBuffer.allocate(original.capacity());
 		// copy from the beginning
-		original.rewind();
+		rewind(original);
 		clone.put(original);
-		original.rewind();
-		clone.flip();
+		rewind(original);
+		flip(clone);
 		return clone;
 	}
 

@@ -145,7 +145,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 		pendingPublish.onPubAckReceived();
 		clientStore.removePendingPublish(messageId);
-		pendingPublish.getPayload().clear();
+		ByteBufferUtil.clear(pendingPublish.getPayload());
 	}
 
 	@Override
@@ -185,7 +185,10 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	public void processPubComp(MqttMessage message) {
 		int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
 		MqttPendingPublish pendingPublish = clientStore.getPendingPublish(messageId);
-		pendingPublish.getPayload().clear();
+		if (pendingPublish == null) {
+			return;
+		}
+		ByteBufferUtil.clear(pendingPublish.getPayload());
 		pendingPublish.onPubCompReceived();
 		clientStore.removePendingPublish(messageId);
 	}
@@ -201,7 +204,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		final ByteBuffer payload = message.payload();
 		subscriptionList.forEach(subscription -> {
 			IMqttClientMessageListener listener = subscription.getListener();
-			payload.rewind();
+			ByteBufferUtil.rewind(payload);
 			listener.onMessage(topicName, payload);
 		});
 	}

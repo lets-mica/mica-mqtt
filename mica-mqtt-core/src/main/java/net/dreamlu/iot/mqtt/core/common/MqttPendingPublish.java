@@ -1,5 +1,6 @@
 package net.dreamlu.iot.mqtt.core.common;
 
+import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
@@ -10,6 +11,7 @@ import java.util.function.Consumer;
 
 /**
  * MqttPendingPublish，参考于 netty-mqtt-client
+ *
  * @author netty
  */
 public final class MqttPendingPublish {
@@ -40,7 +42,7 @@ public final class MqttPendingPublish {
 
 	public void startPublishRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
 		this.pubRetryProcessor.setHandle(((fixedHeader, originalMessage) -> {
-			this.payload.rewind();
+			ByteBufferUtil.rewind(this.payload);
 			sendPacket.accept(new MqttPublishMessage(fixedHeader, originalMessage.variableHeader(), this.payload));
 		}));
 		this.pubRetryProcessor.start(executor);
