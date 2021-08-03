@@ -82,15 +82,21 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}
-		// 3. 绑定 clientId
+		// 3. 判断 clientId 是否在多个地方使用，如果在其他地方有使用，先解绑
+		ChannelContext otherContext = Tio.getByBsId(context.getTioConfig(), clientId);
+		if (otherContext != null) {
+			Tio.unbindBsId(otherContext);
+			Tio.close(otherContext, "clientId:" + clientId + " now bind on new context id:" + context.getId());
+		}
+		// 4. 绑定 clientId
 		Tio.bindBsId(context, clientId);
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
-		// 4. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
+		// 5. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
 		if (keepAliveSeconds > 0) {
 			context.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(keepAliveSeconds));
 		}
-		// 5. session 处理，先默认全部连接关闭时清除
+		// 6. session 处理，先默认全部连接关闭时清除
 //		boolean cleanSession = variableHeader.isCleanSession();
 //		if (cleanSession) {
 //			// TODO L.cm 考虑 session 处理 可参数： https://www.emqx.com/zh/blog/mqtt-session
@@ -99,7 +105,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 //			Integer sessionExpiryInterval = properties.getPropertyValue(MqttProperties.MqttPropertyType.SESSION_EXPIRY_INTERVAL);
 //			System.out.println(sessionExpiryInterval);
 //		}
-		// 6. 存储遗嘱消息
+		// 7. 存储遗嘱消息
 		boolean willFlag = variableHeader.isWillFlag();
 		if (willFlag) {
 			Message willMessage = new Message();
@@ -109,9 +115,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setRetain(variableHeader.isWillRetain());
 			messageStore.addWillMessage(clientId, willMessage);
 		}
-		// 7. 返回 ack
+		// 8. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
-		// 8. 在线状态
+		// 9. 在线状态
 		connectStatusListener.online(clientId);
 	}
 
