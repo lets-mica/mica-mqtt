@@ -40,7 +40,7 @@ public class MqttServerTest {
 			// 默认：127.0.0.1
 			.ip("127.0.0.1")
 			// 默认：1883
-			.port(1883)
+			.port(3883)
 			// 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
 			.readBufferSize(512)
 			.messageListener((clientId, topic, mqttQoS, payload) -> {
@@ -54,6 +54,9 @@ public class MqttServerTest {
 			@Override
 			public void run() {
 				mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
+				mqttServer.publishAll("/test/123/456", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
+				mqttServer.publishAll("/test/456", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
+				mqttServer.publishAll("/test/456/123", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
 			}
 		}, 1000, 2000);
 	}

@@ -1,0 +1,29 @@
+spring:
+
+mqtt:
+  server:
+    enable: true
+    name: Mica-Mqtt-Server
+    ip: 127.0.0.1
+    port: 5883
+    buffer-allocator: HEAP
+    heartbeat-timeout: 120000
+    read-buffer-size: 8092
+    max-bytes-in-message: 8092
+    debug: true
+  client:
+    enable: true
+    name: Mica-Mqtt-Client
+    ip: 127.0.0.1
+    port: 3883
+    user-name: mica
+    password: 123456
+    timeout: 120000
+    readBufferSize: 8092
+    keepAliveSecs: 60
+    reconnect: true
+    reInterval: 120000
+    clientId: 000001
+    cleanSession: true
+    version: MQTT_5
+    bufferAllocator: HEAP
