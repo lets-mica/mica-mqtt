@@ -31,7 +31,7 @@
 | IMqttSessionManager         | 否             | session 管理        |
 | IMqttMessageStore           | 集群是，单机否   | 遗嘱和保留消息存储    |
 | IMqttMessageDispatcher      | 集群是，单机否   | 消息转发             |
-| IpStatListener              | 否             | t-io ip 转态监听     |
+| IpStatListener              | 否             | t-io ip 状态监听     |
 
 ## 自定义配置（可选）
 ```java
