@@ -2,15 +2,6 @@ server:
   port: 30012
 spring:
   application:
-    name: springboot-mica-mqqt
+    name: mica-mqtt-broker
   profiles:
     active: dev
-
-#配置日志-使用外部配置文件
-logging:
-  config: classpath:logback-spring.xml
-
-#jasypt加密
-jasypt:
-  encryptor:
-    password: PFqEQomIp=

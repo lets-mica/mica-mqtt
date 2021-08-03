@@ -1,5 +1,3 @@
-spring:
-
 mqtt:
   server:
     enable: true
