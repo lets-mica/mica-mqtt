@@ -38,7 +38,22 @@ public class MqttClientConfiguration {
 			.ip(properties.getIp())
 			.port(properties.getPort())
 			.username(properties.getUserName())
-			.password(properties.getPassword());
+			.password(properties.getPassword())
+			.clientId(properties.getClientId())
+			.readBufferSize(properties.getReadBufferSize())
+			.keepAliveSecs(properties.getKeepAliveSecs())
+			.reconnect(properties.isReconnect())
+			.version(properties.getVersion())
+			.cleanSession(properties.isCleanSession())
+			.bufferAllocator(properties.getBufferAllocator());
+		Integer timeout = properties.getTimeout();
+		if (timeout != null && timeout > 0) {
+			mqttClientCreator.timeout(timeout);
+		}
+		Long reInterval1 = properties.getReInterval();
+		if (reInterval1 != null && reInterval1 > 0) {
+			mqttClientCreator.reInterval(reInterval1);
+		}
 		return mqttClientCreator;
 	}
 

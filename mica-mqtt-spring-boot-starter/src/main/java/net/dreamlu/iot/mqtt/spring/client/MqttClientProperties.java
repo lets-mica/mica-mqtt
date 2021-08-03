@@ -61,15 +61,45 @@ public class MqttClientProperties {
 	 * 密码
 	 */
 	private String password;
-
-	private Integer timeout = 120000;
-	private long readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
-	private int keepAliveSecs = 60;
-	private boolean reconnect = true;
-	private long reInterval = 120000;
+	/**
+	 * 客户端ID
+	 */
 	private String clientId;
-	private boolean cleanSession = true;
+	/**
+	 * 超时时间，t-io 配置，可为 null
+	 */
+	private Integer timeout;
+	/**
+	 * t-io 每次消息读取长度，跟 maxBytesInMessage 相关
+	 */
+	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	/**
+	 * Keep Alive (s)
+	 */
+	private int keepAliveSecs = 60;
+	/**
+	 * 自动重连
+	 */
+	private boolean reconnect = true;
+	/**
+	 * 重连重试时间
+	 */
+	private Long reInterval;
+	/**
+	 * mqtt 协议，默认：3_1_1
+	 */
 	private MqttVersion version = MqttVersion.MQTT_3_1_1;
+	/**
+	 * 清除会话
+	 * <p>
+	 * false 表示如果订阅的客户机断线了，那么要保存其要推送的消息，如果其重新连接时，则将这些消息推送。
+	 * true 表示消除，表示客户机是第一次连接，消息所以以前的连接信息。
+	 * </p>
+	 */
+	private boolean cleanSession = true;
+	/**
+	 * ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存
+	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 
 }

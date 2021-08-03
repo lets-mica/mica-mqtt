@@ -21,6 +21,7 @@ import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.tio.client.ClientChannelContext;
 
@@ -32,7 +33,7 @@ import java.nio.ByteBuffer;
  * @author wsq（冷月宫主）
  */
 @RequiredArgsConstructor
-public class MqttClientTemplate implements InitializingBean {
+public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	private final MqttClientCreator mqttClientCreator;
 	private MqttClient client;
 
@@ -159,15 +160,6 @@ public class MqttClientTemplate implements InitializingBean {
 	}
 
 	/**
-	 * 停止客户端
-	 *
-	 * @return 是否停止成功
-	 */
-	public boolean stop() {
-		return client.stop();
-	}
-
-	/**
 	 * 获取 ClientChannelContext
 	 *
 	 * @return ClientChannelContext
@@ -177,8 +169,13 @@ public class MqttClientTemplate implements InitializingBean {
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 		client = mqttClientCreator.connect();
+	}
+
+	@Override
+	public void destroy() {
+		client.stop();
 	}
 
 }

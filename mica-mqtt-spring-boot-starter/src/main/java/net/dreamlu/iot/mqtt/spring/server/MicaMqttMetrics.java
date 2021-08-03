@@ -19,9 +19,9 @@ package net.dreamlu.iot.mqtt.spring.server;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.binder.BaseUnits;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import lombok.RequiredArgsConstructor;
+import org.tio.server.ServerTioConfig;
 
 import java.util.Collections;
 
@@ -42,29 +42,23 @@ public class MicaMqttMetrics implements MeterBinder {
 	private static final String MQTT_GROUP_STAT_HANDLED_PACKETS = MQTT_METRIC_NAME_PREFIX + ".group.handled.packets";
 	private static final String MQTT_GROUP_STAT_HANDLED_BYTES = MQTT_METRIC_NAME_PREFIX + ".group.handled.bytes";
 
-	private final MqttServerLauncher serverLauncher;
+	private final ServerTioConfig serverTioConfig;
 	private final Iterable<Tag> tags;
 
-	public MicaMqttMetrics(MqttServerLauncher serverLauncher) {
-		this.serverLauncher = serverLauncher;
+	public MicaMqttMetrics(ServerTioConfig serverTioConfig) {
+		this.serverTioConfig = serverTioConfig;
 		this.tags = Collections.emptyList();
 	}
 
 	@Override
 	public void bindTo(MeterRegistry meterRegistry) {
-		Gauge.builder(MQTT_GROUP_STAT_HANDLED_PACKETS, serverLauncher, (serverLauncher) -> {
-			return serverLauncher.getServerConfig().getGroupStat().getHandledPackets().get();
-		})
+		Gauge.builder(MQTT_GROUP_STAT_HANDLED_PACKETS, serverTioConfig, (serverLauncher) -> serverTioConfig.getGroupStat().getHandledPackets().get())
 			.description("Mqtt handled packets")
 			.tags(tags)
-			.baseUnit(BaseUnits.MESSAGES)
 			.register(meterRegistry);
-		Gauge.builder(MQTT_GROUP_STAT_HANDLED_BYTES, serverLauncher, (serverLauncher) -> {
-			return serverLauncher.getServerConfig().getGroupStat().getHandledBytes().get();
-		})
+		Gauge.builder(MQTT_GROUP_STAT_HANDLED_BYTES, serverTioConfig, (serverLauncher) -> serverTioConfig.getGroupStat().getHandledBytes().get())
 			.description("Mqtt handled bytes")
 			.tags(tags)
-			.baseUnit(BaseUnits.BYTES)
 			.register(meterRegistry);
 	}
 

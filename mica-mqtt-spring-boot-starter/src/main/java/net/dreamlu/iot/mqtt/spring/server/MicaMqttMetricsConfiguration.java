@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.spring.server;
 
 import io.micrometer.core.instrument.binder.MeterBinder;
+import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,8 +33,8 @@ import org.springframework.context.annotation.Configuration;
 public class MicaMqttMetricsConfiguration {
 
 	@Bean
-	public MicaMqttMetrics micaMqttMetrics(MqttServerLauncher serverLauncher) {
-		return new MicaMqttMetrics(serverLauncher);
+	public MicaMqttMetrics micaMqttMetrics(MqttServer mqttServer) {
+		return new MicaMqttMetrics(mqttServer.getServerConfig());
 	}
 
 }

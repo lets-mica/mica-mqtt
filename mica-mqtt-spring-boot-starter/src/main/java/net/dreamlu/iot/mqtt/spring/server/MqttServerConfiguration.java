@@ -16,22 +16,33 @@
 
 package net.dreamlu.iot.mqtt.spring.server;
 
-import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
-import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
+import net.dreamlu.iot.mqtt.core.server.*;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
+import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
+import org.tio.server.ServerTioConfig;
+import org.tio.server.TioServer;
+import org.tio.server.intf.ServerAioHandler;
+import org.tio.server.intf.ServerAioListener;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.util.Objects;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt server 配置
@@ -72,23 +83,73 @@ public class MqttServerConfiguration {
 			serverCreator.useSsl(keyStorePath, trustStorePath, password);
 		}
 		// bean 初始化
-		authHandlerObjectProvider.ifAvailable(serverCreator::authHandler);
-		messageDispatcherObjectProvider.ifAvailable(serverCreator::messageDispatcher);
-		messageStoreObjectProvider.ifAvailable(serverCreator::messageStore);
-		sessionManagerObjectProvider.ifAvailable(serverCreator::sessionManager);
-		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
-		connectStatusListenerObjectProvider.ifAvailable(serverCreator::connectStatusListener);
-		ipStatListenerObjectProvider.ifAvailable(serverCreator::ipStatListener);
+		IMqttMessageListener messageListener = messageListenerObjectProvider.getIfAvailable();
+		// 消息监听器不能为 null
+		Objects.requireNonNull(messageListener, "Mqtt server IMqttMessageListener Bean not found.");
+		serverCreator.messageListener(messageListener);
+
+		IMqttServerAuthHandler authHandler = authHandlerObjectProvider.getIfAvailable(DefaultMqttServerAuthHandler::new);
+		serverCreator.authHandler(authHandler);
+
+		IMqttMessageDispatcher messageDispatcher = messageDispatcherObjectProvider.getIfAvailable(DefaultMqttMessageDispatcher::new);
+		serverCreator.messageDispatcher(messageDispatcher);
+
+		IMqttMessageStore messageStore = messageStoreObjectProvider.getIfAvailable(InMemoryMqttMessageStore::new);
+		serverCreator.messageStore(messageStore);
+
+		IMqttSessionManager sessionManager = sessionManagerObjectProvider.getIfAvailable(InMemoryMqttSessionManager::new);
+		serverCreator.sessionManager(sessionManager);
+
+		IMqttConnectStatusListener connectStatusListener = connectStatusListenerObjectProvider.getIfAvailable(DefaultMqttConnectStatusListener::new);
+		serverCreator.connectStatusListener(connectStatusListener);
+
+		IpStatListener ipStatListener = ipStatListenerObjectProvider.getIfAvailable();
+		serverCreator.ipStatListener(ipStatListener);
 		// 自定义处理
 		customizers.ifAvailable((customizer) -> customizer.customize(serverCreator));
-		// 消息监听器不能为 null
-		Objects.requireNonNull(serverCreator.getMessageListener(), "Mqtt server IMqttMessageListener Bean not found.");
 		return serverCreator;
 	}
 
 	@Bean
-	public MqttServerLauncher mqttServerLauncher(MqttServerCreator serverCreator) {
-		return new MqttServerLauncher(serverCreator);
+	public MqttServer mqttServer(MqttServerCreator mqttServerCreator) {
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttServer"));
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(mqttServerCreator, executor);
+		// 1. 处理消息
+		ServerAioHandler handler = new MqttServerAioHandler(mqttServerCreator, serverProcessor);
+		// 2. t-io 监听
+		ServerAioListener listener = new MqttServerAioListener(mqttServerCreator);
+		// 2. t-io 配置
+		ServerTioConfig tioConfig = new ServerTioConfig(mqttServerCreator.getName(), handler, listener);
+		// 4. 设置 t-io 心跳 timeout
+		Long heartbeatTimeout = mqttServerCreator.getHeartbeatTimeout();
+		if (heartbeatTimeout != null && heartbeatTimeout > 0) {
+			tioConfig.setHeartbeatTimeout(heartbeatTimeout);
+		}
+		IpStatListener ipStatListener = mqttServerCreator.getIpStatListener();
+		if (ipStatListener != null) {
+			tioConfig.setIpStatListener(ipStatListener);
+		}
+		SslConfig sslConfig = mqttServerCreator.getSslConfig();
+		if (sslConfig != null) {
+			tioConfig.setSslConfig(sslConfig);
+		}
+		if (mqttServerCreator.isDebug()) {
+			tioConfig.debug = true;
+		}
+		// 5. mqtt 消息最大长度
+		tioConfig.setReadBufferSize(mqttServerCreator.getReadBufferSize());
+		TioServer tioServer = new TioServer(tioConfig);
+		// 6. 不校验版本号，社区版设置无效
+		tioServer.setCheckLastVersion(false);
+		MqttServer mqttServer = new MqttServer(tioServer, mqttServerCreator, executor);
+		mqttServerCreator.getMessageDispatcher().config(mqttServer);
+		return mqttServer;
+	}
+
+	@Bean
+	public MqttServerLauncher mqttServerLauncher(MqttServerCreator serverCreator,
+												 MqttServer mqttServer) {
+		return new MqttServerLauncher(serverCreator, mqttServer);
 	}
 
 }

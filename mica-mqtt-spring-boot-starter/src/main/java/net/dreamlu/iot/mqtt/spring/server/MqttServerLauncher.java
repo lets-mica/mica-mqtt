@@ -16,30 +16,35 @@
 
 package net.dreamlu.iot.mqtt.spring.server;
 
+import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.Ordered;
-import org.tio.server.ServerTioConfig;
+import org.tio.server.TioServer;
+
+import java.io.IOException;
 
 /**
  * MqttServer 启动器
  *
  * @author L.cm
  */
+@RequiredArgsConstructor
 public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	private final MqttServerCreator serverCreator;
-	private MqttServer mqttServer;
+	private final MqttServer mqttServer;
 	private boolean running = false;
-
-	public MqttServerLauncher(MqttServerCreator serverCreator) {
-		this.serverCreator = serverCreator;
-	}
 
 	@Override
 	public void start() {
-		mqttServer = serverCreator.start();
-		running = true;
+		TioServer tioServer = mqttServer.getTioServer();
+		try {
+			tioServer.start(serverCreator.getIp(), serverCreator.getPort());
+			running = true;
+		} catch (IOException e) {
+			throw new IllegalStateException("Mica mqtt server start fail.", e);
+		}
 	}
 
 	@Override
@@ -73,18 +78,6 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	@Override
 	public int getOrder() {
 		return Ordered.LOWEST_PRECEDENCE;
-	}
-
-	/**
-	 * 获取服务配置
-	 *
-	 * @return ServerTioConfig
-	 */
-	public ServerTioConfig getServerConfig() {
-		if (mqttServer == null) {
-			return null;
-		}
-		return mqttServer.getServerConfig();
 	}
 
 }

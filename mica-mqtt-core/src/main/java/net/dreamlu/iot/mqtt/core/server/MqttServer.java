@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
@@ -45,9 +44,9 @@ public final class MqttServer {
 	private final IMqttSessionManager sessionManager;
 	private final ScheduledThreadPoolExecutor executor;
 
-	MqttServer(TioServer tioServer,
-			   MqttServerCreator serverCreator,
-			   ScheduledThreadPoolExecutor executor) {
+	public MqttServer(TioServer tioServer,
+					  MqttServerCreator serverCreator,
+					  ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
 		this.sessionManager = serverCreator.getSessionManager();
 		this.executor = executor;
@@ -55,6 +54,15 @@ public final class MqttServer {
 
 	public static MqttServerCreator create() {
 		return new MqttServerCreator();
+	}
+
+	/**
+	 * 获取 TioServer
+	 *
+	 * @return TioServer
+	 */
+	public TioServer getTioServer() {
+		return this.tioServer;
 	}
 
 	/**
