@@ -29,8 +29,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties("mqtt.server")
+@ConfigurationProperties(MqttServerProperties.PREFIX)
 public class MqttServerProperties {
+	/**
+	 * 配置前缀
+	 */
+	public static final String PREFIX = "mqtt.server";
 	/**
 	 * 是否启用
 	 */

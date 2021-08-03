@@ -14,7 +14,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
-import org.springframework.stereotype.Service;
 import org.tio.core.ChannelContext;
 import org.tio.core.stat.IpStatListener;
 import org.tio.utils.hutool.StrUtil;
@@ -22,7 +21,6 @@ import org.tio.utils.hutool.StrUtil;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
-@Service
 @Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(MqttServerProperties.class)
 public class MqttServerTemplate implements SmartLifecycle, Ordered {

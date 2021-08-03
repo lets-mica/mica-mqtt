@@ -1,37 +1,40 @@
+/*
+ * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & dreamlu.net).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.dreamlu.iot.mqtt.spring.client;
 
-import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.core.client.*;
-import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
+import net.dreamlu.iot.mqtt.core.client.MqttClient;
+import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import org.springframework.beans.factory.InitializingBean;
 import org.tio.client.ClientChannelContext;
 
 import java.nio.ByteBuffer;
 
 /**
- * @author wsq
+ * mqtt client 模板
+ *
+ * @author wsq（冷月宫主）
  */
-@Service
-@EnableConfigurationProperties(MqttClientProperties.class)
-public class MqttClientTemplate {
-	/**
-	 * 是否启用
-	 */
-	private boolean enable = false;
-	MqttClient client;
-
-	public MqttClientTemplate(MqttClientProperties properties){
-		client = MqttClient.create()
-			.ip(properties.getIp())
-			.port(properties.getPort())
-			.username(properties.getUserName())
-			.password(properties.getPassword())
-			.version(MqttVersion.MQTT_5)
-			.connect();
-		enable=properties.isEnable();
-	}
+@RequiredArgsConstructor
+public class MqttClientTemplate implements InitializingBean {
+	private final MqttClientCreator mqttClientCreator;
+	private MqttClient client;
 
 	/**
 	 * 订阅
@@ -171,6 +174,11 @@ public class MqttClientTemplate {
 	 */
 	public ClientChannelContext getContext() {
 		return client.getContext();
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		client = mqttClientCreator.connect();
 	}
 
 }

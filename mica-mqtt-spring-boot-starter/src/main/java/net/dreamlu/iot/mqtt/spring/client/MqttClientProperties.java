@@ -24,41 +24,51 @@ import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
- * MqttServer 配置
+ * MqttClient 配置
  *
- * @author L.cm
+ * @author wsq（冷月宫主）
  */
 @Getter
 @Setter
-@ConfigurationProperties("mqtt.client")
+@ConfigurationProperties(MqttClientProperties.PREFIX)
 public class MqttClientProperties {
+
 	/**
-	 * 是否启用
+	 * 配置前缀
+	 */
+	public static final String PREFIX = "mqtt.client";
+	/**
+	 * 是否启用，默认：false
 	 */
 	private boolean enable = false;
 	/**
-	 * 名称
+	 * 名称，默认：Mica-Mqtt-Client
 	 */
 	private String name = "Mica-Mqtt-Client";
 	/**
-	 * 服务端 ip
+	 * 服务端 ip，默认：127.0.0.1
 	 */
 	private String ip = "127.0.0.1";
 	/**
-	 * 端口
+	 * 端口，默认：1883
 	 */
 	private int port = 1883;
+	/**
+	 * 用户名
+	 */
+	private String userName;
+	/**
+	 * 密码
+	 */
+	private String password;
 
-	private String userName = "mica";
-	private String password = "123456";
-
-	private long timeout=120000;
-	private long readBufferSize= MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
-	private int keepAliveSecs=60;
-	private boolean reconnect=true;
-	private long reInterval=120000;
+	private Integer timeout = 120000;
+	private long readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private int keepAliveSecs = 60;
+	private boolean reconnect = true;
+	private long reInterval = 120000;
 	private String clientId;
-	boolean cleanSession=true;
+	private boolean cleanSession = true;
 	private MqttVersion version = MqttVersion.MQTT_3_1_1;
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 
