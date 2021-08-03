@@ -11,13 +11,13 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableCaching
-public class SpringbootApplication {
+public class MicaMqttApplication {
 
 	/**
 	 * 启动同目录下的 MqttClientTest、MqttServerTest 进行测试
 	 */
 	public static void main(String[] args) {
-		SpringApplication.run(SpringbootApplication.class, args);
+		SpringApplication.run(MicaMqttApplication.class, args);
 	}
 
 }

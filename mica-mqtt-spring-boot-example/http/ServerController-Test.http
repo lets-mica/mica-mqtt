@@ -1,9 +1,0 @@
-### 发布
-POST http://127.0.0.1:30012/micamqtt/server/publish
-Content-Type: application/text
-
-mica-mqqt 测试
-
-
-### 订阅
-GET http://127.0.0.1:30012/micamqtt/server/sub

@@ -55,6 +55,10 @@
         </dependency>
         <dependency>
             <groupId>net.dreamlu</groupId>
+            <artifactId>mica-swagger</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
             <artifactId>mica-mqtt-spring-boot-starter</artifactId>
             <version>1.0.1</version>
         </dependency>
@@ -168,7 +172,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>libs/</classpathPrefix>
-                            <mainClass>net.dreamlu.iot.mqtt.mica.SpringbootApplication</mainClass>
+                            <mainClass>net.dreamlu.iot.mqtt.mica.MicaMqttApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
