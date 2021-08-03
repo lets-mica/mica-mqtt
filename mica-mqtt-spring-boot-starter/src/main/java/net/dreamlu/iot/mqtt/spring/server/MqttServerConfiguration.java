@@ -29,6 +29,7 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,6 +51,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * @author L.cm
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnProperty(
+	prefix = MqttServerProperties.PREFIX,
+	name = "enabled",
+	havingValue = "true",
+	matchIfMissing = true
+)
 @EnableConfigurationProperties(MqttServerProperties.class)
 public class MqttServerConfiguration {
 

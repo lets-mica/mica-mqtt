@@ -1,6 +1,6 @@
 mqtt:
   server:
-    enable: true
+    enabled: true
     name: Mica-Mqtt-Server
     ip: 127.0.0.1
     port: 5883
@@ -10,7 +10,7 @@ mqtt:
     max-bytes-in-message: 8092
     debug: true
   client:
-    enable: true
+    enabled: true
     name: Mica-Mqtt-Client
     ip: 127.0.0.1
     port: 3883

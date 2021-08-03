@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.spring.client;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,12 +30,18 @@ import org.springframework.context.annotation.Configuration;
  * @author L.cm
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnProperty(
+	prefix = MqttClientProperties.PREFIX,
+	name = "enabled",
+	havingValue = "true"
+)
 @EnableConfigurationProperties(MqttClientProperties.class)
 public class MqttClientConfiguration {
 
 	@Bean
-	public MqttClientCreator mqttClientCreator(MqttClientProperties properties) {
-		MqttClientCreator mqttClientCreator = MqttClient.create()
+	public MqttClientCreator mqttClientCreator(MqttClientProperties properties,
+											   ObjectProvider<MqttClientCustomizer> customizers) {
+		MqttClientCreator clientCreator = MqttClient.create()
 			.name(properties.getName())
 			.ip(properties.getIp())
 			.port(properties.getPort())
@@ -48,13 +56,15 @@ public class MqttClientConfiguration {
 			.bufferAllocator(properties.getBufferAllocator());
 		Integer timeout = properties.getTimeout();
 		if (timeout != null && timeout > 0) {
-			mqttClientCreator.timeout(timeout);
+			clientCreator.timeout(timeout);
 		}
 		Long reInterval1 = properties.getReInterval();
 		if (reInterval1 != null && reInterval1 > 0) {
-			mqttClientCreator.reInterval(reInterval1);
+			clientCreator.reInterval(reInterval1);
 		}
-		return mqttClientCreator;
+		// 自定义处理
+		customizers.ifAvailable((customizer) -> customizer.customize(clientCreator));
+		return clientCreator;
 	}
 
 	@Bean

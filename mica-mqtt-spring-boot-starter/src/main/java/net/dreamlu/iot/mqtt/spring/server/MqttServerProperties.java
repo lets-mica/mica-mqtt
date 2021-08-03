@@ -31,14 +31,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Setter
 @ConfigurationProperties(MqttServerProperties.PREFIX)
 public class MqttServerProperties {
+
 	/**
 	 * 配置前缀
 	 */
 	public static final String PREFIX = "mqtt.server";
 	/**
-	 * 是否启用
+	 * 是否启用，默认：启用
 	 */
-	private boolean enable = false;
+	private boolean enabled = true;
 	/**
 	 * 名称
 	 */
