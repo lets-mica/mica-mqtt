@@ -143,7 +143,7 @@ public final class MqttServer {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	private boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
 		payload.rewind();

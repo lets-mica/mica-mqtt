@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.spring.server;
+package net.dreamlu.iot.mqtt.spring.client;
 
 import lombok.Getter;
 import lombok.Setter;
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
+import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
@@ -29,8 +30,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  */
 @Getter
 @Setter
-@ConfigurationProperties("mqtt.server")
-public class MqttServerProperties {
+@ConfigurationProperties("mqtt.client")
+public class MqttClientProperties {
 	/**
 	 * 是否启用
 	 */
@@ -38,7 +39,7 @@ public class MqttServerProperties {
 	/**
 	 * 名称
 	 */
-	private String name = "Mica-Mqtt-Server";
+	private String name = "Mica-Mqtt-Client";
 	/**
 	 * 服务端 ip
 	 */
@@ -47,46 +48,18 @@ public class MqttServerProperties {
 	 * 端口
 	 */
 	private int port = 1883;
-	/**
-	 * 心跳超时时间(单位: 毫秒 默认: 1000 * 120)，如果用户不希望框架层面做心跳相关工作，请把此值设为0或负数
-	 */
-	private Long heartbeatTimeout;
-	/**
-	 * 接收数据的 buffer size，默认：8092
-	 */
-	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
-	/**
-	 * 消息解析最大 bytes 长度，默认：8092
-	 */
-	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
-	/**
-	 * 堆内存和堆外内存
-	 */
-	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
-	/**
-	 * debug
-	 */
-	private boolean debug = false;
-	/**
-	 * ssl 配置
-	 */
-	private Ssl ssl = new Ssl();
 
-	@Getter
-	@Setter
-	public static class Ssl {
-		/**
-		 * 证书路径
-		 */
-		private String keyStorePath;
-		/**
-		 *
-		 */
-		private String trustStorePath;
-		/**
-		 * 证书密钥
-		 */
-		private String password;
-	}
+	private String userName = "mica";
+	private String password = "123456";
+
+	private long timeout=120000;
+	private long readBufferSize= MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private int keepAliveSecs=60;
+	private boolean reconnect=true;
+	private long reInterval=120000;
+	private String clientId;
+	boolean cleanSession=true;
+	private MqttVersion version = MqttVersion.MQTT_3_1_1;
+	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 
 }
