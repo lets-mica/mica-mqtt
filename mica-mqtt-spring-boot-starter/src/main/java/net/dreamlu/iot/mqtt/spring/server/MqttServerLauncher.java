@@ -20,6 +20,7 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.Ordered;
+import org.tio.server.ServerTioConfig;
 
 /**
  * MqttServer 启动器
@@ -72,6 +73,18 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	@Override
 	public int getOrder() {
 		return Ordered.LOWEST_PRECEDENCE;
+	}
+
+	/**
+	 * 获取服务配置
+	 *
+	 * @return ServerTioConfig
+	 */
+	public ServerTioConfig getServerConfig() {
+		if (mqttServer == null) {
+			return null;
+		}
+		return mqttServer.getServerConfig();
 	}
 
 }
