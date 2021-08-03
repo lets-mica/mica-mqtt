@@ -159,4 +159,9 @@ public class MqttServerConfiguration {
 		return new MqttServerLauncher(serverCreator, mqttServer);
 	}
 
+	@Bean
+	public MqttServerTemplate mqttServerTemplate(MqttServer mqttServer) {
+		return new MqttServerTemplate(mqttServer);
+	}
+
 }
