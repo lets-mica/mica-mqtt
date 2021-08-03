@@ -13,6 +13,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableCaching
 public class SpringbootApplication {
 
+	/**
+	 * 启动同目录下的 MqttClientTest、MqttServerTest 进行测试
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(SpringbootApplication.class, args);
 	}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.client;
+package net.dreamlu.iot.mqtt.mica;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
@@ -39,7 +39,7 @@ public class MqttClientTest {
 		// 初始化 mqtt 客户端
 		MqttClient client = MqttClient.create()
 			.ip("127.0.0.1")
-			.port(1883)
+			.port(5883)
 			.username("admin")
 			.password("123456")
 			.version(MqttVersion.MQTT_5)
