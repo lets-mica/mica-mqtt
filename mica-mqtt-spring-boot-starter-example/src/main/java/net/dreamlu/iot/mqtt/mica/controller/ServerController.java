@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/micamqtt")
 @RestController
 public class ServerController {
-    @Autowired
-    private ServerService service;
+	@Autowired
+	private ServerService service;
 
-    @PostMapping("/server/publish")
-    public boolean publish(@RequestBody String body) {
-        return service.publish(body);
-    }
+	@PostMapping("/server/publish")
+	public boolean publish(@RequestBody String body) {
+		return service.publish(body);
+	}
 }

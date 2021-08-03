@@ -7,17 +7,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/micamqtt")
 @RestController
 public class ClientController {
-    @Autowired
-    private ClientService service;
+	@Autowired
+	private ClientService service;
 
-    @PostMapping("/client/publish")
-    public boolean publish(@RequestBody String body) {
-        return service.publish(body);
-    }
+	@PostMapping("/client/publish")
+	public boolean publish(@RequestBody String body) {
+		return service.publish(body);
+	}
 
-    @GetMapping("/client/sub")
-    public boolean sub() {
-        return service.sub();
-    }
+	@GetMapping("/client/sub")
+	public boolean sub() {
+		return service.sub();
+	}
 
 }

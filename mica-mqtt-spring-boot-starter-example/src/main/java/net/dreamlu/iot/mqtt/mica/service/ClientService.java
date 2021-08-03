@@ -15,25 +15,20 @@ import java.nio.charset.StandardCharsets;
  */
 @Service
 public class ClientService {
-    private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
-    @Autowired
-    private MqttClientTemplate client;
+	private static final Logger logger = LoggerFactory.getLogger(ClientService.class);
+	@Autowired
+	private MqttClientTemplate client;
 
-    public boolean publish(String body) {
-        client.publish("/test/client", ByteBuffer.wrap(body.getBytes(StandardCharsets.UTF_8)));
-        return true;
-    }
+	public boolean publish(String body) {
+		client.publish("/test/client", ByteBuffer.wrap(body.getBytes(StandardCharsets.UTF_8)));
+		return true;
+	}
 
-    public boolean sub() {
-        client.subQos0("/test/#", (topic, payload) -> {
-            logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
-        });
-
-        /*client.subQos0("/#", (topic, payload) -> {
-            logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
-        });*/
-
-        return true;
-    }
+	public boolean sub() {
+		client.subQos0("/test/#", (topic, payload) -> {
+			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
+		});
+		return true;
+	}
 
 }

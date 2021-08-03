@@ -14,12 +14,12 @@ import java.nio.ByteBuffer;
  */
 @Service
 public class ServerService {
-    private static final Logger logger = LoggerFactory.getLogger(ServerService.class);
-    @Autowired
-    private MqttServerTemplate server;
+	private static final Logger logger = LoggerFactory.getLogger(ServerService.class);
+	@Autowired
+	private MqttServerTemplate server;
 
-    public boolean publish(String body) {
-        server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()), MqttQoS.EXACTLY_ONCE);
-        return true;
-    }
+	public boolean publish(String body) {
+		server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()), MqttQoS.EXACTLY_ONCE);
+		return true;
+	}
 }
