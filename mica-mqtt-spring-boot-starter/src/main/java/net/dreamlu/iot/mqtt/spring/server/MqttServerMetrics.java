@@ -21,6 +21,8 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import lombok.RequiredArgsConstructor;
+import org.tio.core.Tio;
+import org.tio.server.ServerGroupStat;
 import org.tio.server.ServerTioConfig;
 
 import java.util.Collections;
@@ -37,10 +39,20 @@ public class MqttServerMetrics implements MeterBinder {
 	 */
 	public static final String MQTT_METRIC_NAME_PREFIX = "mqtt";
 	/**
-	 * groupStat
+	 * 连接统计
 	 */
-	private static final String MQTT_GROUP_STAT_HANDLED_PACKETS = MQTT_METRIC_NAME_PREFIX + ".group.handled.packets";
-	private static final String MQTT_GROUP_STAT_HANDLED_BYTES = MQTT_METRIC_NAME_PREFIX + ".group.handled.bytes";
+	private static final String MQTT_CONNECTIONS_ACCEPTED 		= MQTT_METRIC_NAME_PREFIX + ".connections.accepted";
+	private static final String MQTT_CONNECTIONS_SIZE 			= MQTT_METRIC_NAME_PREFIX + ".connections.size";
+	private static final String MQTT_CONNECTIONS_CLOSED 		= MQTT_METRIC_NAME_PREFIX + ".connections.closed";
+	/**
+	 * 消息统计
+	 */
+	private static final String MQTT_MESSAGES_HANDLED_PACKETS 	= MQTT_METRIC_NAME_PREFIX + ".messages.handled.packets";
+	private static final String MQTT_MESSAGES_HANDLED_BYTES 	= MQTT_METRIC_NAME_PREFIX + ".messages.handled.bytes";
+	private static final String MQTT_MESSAGES_RECEIVED_PACKETS 	= MQTT_METRIC_NAME_PREFIX + ".messages.received.packets";
+	private static final String MQTT_MESSAGES_RECEIVED_BYTES 	= MQTT_METRIC_NAME_PREFIX + ".messages.received.bytes";
+	private static final String MQTT_MESSAGES_SEND_PACKETS 		= MQTT_METRIC_NAME_PREFIX + ".messages.send.packets";
+	private static final String MQTT_MESSAGES_SEND_BYTES 		= MQTT_METRIC_NAME_PREFIX + ".messages.send.bytes";
 
 	private final ServerTioConfig serverTioConfig;
 	private final Iterable<Tag> tags;
@@ -52,12 +64,44 @@ public class MqttServerMetrics implements MeterBinder {
 
 	@Override
 	public void bindTo(MeterRegistry meterRegistry) {
-		Gauge.builder(MQTT_GROUP_STAT_HANDLED_PACKETS, serverTioConfig, (serverLauncher) -> serverTioConfig.getGroupStat().getHandledPackets().get())
-			.description("Mqtt handled packets")
+		// 连接统计
+		Gauge.builder(MQTT_CONNECTIONS_ACCEPTED, serverTioConfig, (config) -> ((ServerGroupStat) config.getGroupStat()).getAccepted().get())
+			.description("Mqtt server connections accepted")
 			.tags(tags)
 			.register(meterRegistry);
-		Gauge.builder(MQTT_GROUP_STAT_HANDLED_BYTES, serverTioConfig, (serverLauncher) -> serverTioConfig.getGroupStat().getHandledBytes().get())
-			.description("Mqtt handled bytes")
+		Gauge.builder(MQTT_CONNECTIONS_SIZE, serverTioConfig, (config) -> Tio.getAll(config).size())
+			.description("Mqtt server connections size")
+			.tags(tags)
+			.register(meterRegistry);
+		Gauge.builder(MQTT_CONNECTIONS_CLOSED, serverTioConfig, (config) -> config.getGroupStat().getClosed().get())
+			.description("Mqtt server connections closed")
+			.tags(tags)
+			.register(meterRegistry);
+		// 消息统计
+		Gauge.builder(MQTT_MESSAGES_HANDLED_PACKETS, serverTioConfig, (config) -> config.getGroupStat().getHandledPackets().get())
+			.description("Mqtt server handled packets")
+			.tags(tags)
+			.register(meterRegistry);
+		Gauge.builder(MQTT_MESSAGES_HANDLED_BYTES, serverTioConfig, (config) -> config.getGroupStat().getHandledBytes().get())
+			.description("Mqtt server handled bytes")
+			.tags(tags)
+			.register(meterRegistry);
+		// 接收的消息
+		Gauge.builder(MQTT_MESSAGES_RECEIVED_PACKETS, serverTioConfig, (config) -> config.getGroupStat().getReceivedPackets().get())
+			.description("Mqtt server received packets")
+			.tags(tags)
+			.register(meterRegistry);
+		Gauge.builder(MQTT_MESSAGES_RECEIVED_BYTES, serverTioConfig, (config) -> config.getGroupStat().getReceivedBytes().get())
+			.description("Mqtt server received bytes")
+			.tags(tags)
+			.register(meterRegistry);
+		// 发送的消息
+		Gauge.builder(MQTT_MESSAGES_SEND_PACKETS, serverTioConfig, (config) -> config.getGroupStat().getSentPackets().get())
+			.description("Mqtt server send packets")
+			.tags(tags)
+			.register(meterRegistry);
+		Gauge.builder(MQTT_MESSAGES_SEND_BYTES, serverTioConfig, (config) -> config.getGroupStat().getSentPackets().get())
+			.description("Mqtt server send bytes")
 			.tags(tags)
 			.register(meterRegistry);
 	}

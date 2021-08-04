@@ -25,6 +25,8 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.util.Objects;
+
 /**
  * MqttClient 订阅监听器
  *
@@ -33,15 +35,22 @@ import org.springframework.util.ReflectionUtils;
 @Slf4j
 @RequiredArgsConstructor
 public class MqttClientSubscribeDetector implements BeanPostProcessor {
-	private MqttClient client;
+	private final MqttClientTemplate clientTemplate;
 
 	@Override
 	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+		MqttClient mqttClient = clientTemplate.getMqttClient();
+		Objects.requireNonNull(mqttClient, "MqttClient is null.");
 		Class<?> userClass = ClassUtils.getUserClass(bean);
 		ReflectionUtils.doWithMethods(userClass, method -> {
 			MqttClientSubscribe subscribe = AnnotationUtils.findAnnotation(method, MqttClientSubscribe.class);
 			if (subscribe != null) {
-				client.subscribe(subscribe.qos(), subscribe.value(), (topic, payload) ->
+				// 校验 method，method 入参数必须等于2
+				int paramCount = method.getParameterCount();
+				if (paramCount != 2) {
+					throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter count must equal to 2.");
+				}
+				mqttClient.subscribe(subscribe.qos(), subscribe.value(), (topic, payload) ->
 					ReflectionUtils.invokeMethod(method, bean, topic, payload)
 				);
 			}

@@ -44,7 +44,7 @@ public final class MqttClient {
 		return new MqttClientCreator();
 	}
 
-	MqttClient(TioClient tioClient,
+	public MqttClient(TioClient tioClient,
 			   MqttClientCreator config,
 			   ClientChannelContext context,
 			   MqttClientStore clientStore,

@@ -72,4 +72,9 @@ public class MqttClientConfiguration {
 		return new MqttClientTemplate(mqttClientCreator);
 	}
 
+	@Bean
+	public MqttClientSubscribeDetector mqttClientSubscribeDetector(MqttClientTemplate clientTemplate) {
+		return new MqttClientSubscribeDetector(clientTemplate);
+	}
+
 }

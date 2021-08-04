@@ -168,6 +168,15 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean {
 		return client.getContext();
 	}
 
+	/**
+	 * 获取 MqttClient
+	 *
+	 * @return MqttClient
+	 */
+	public MqttClient getMqttClient() {
+		return client;
+	}
+
 	@Override
 	public void afterPropertiesSet() {
 		client = mqttClientCreator.connect();

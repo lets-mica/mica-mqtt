@@ -5,3 +5,20 @@ spring:
     name: mica-mqtt-broker
   profiles:
     active: dev
+# actuator management
+management:
+  info:
+    defaults:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: ALWAYS
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'

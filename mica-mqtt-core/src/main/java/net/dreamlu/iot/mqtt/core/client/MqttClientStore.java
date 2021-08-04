@@ -27,7 +27,7 @@ import java.util.*;
  *
  * @author L.cm
  */
-final class MqttClientStore {
+public final class MqttClientStore {
 	/**
 	 * 订阅的数据承载
 	 */
