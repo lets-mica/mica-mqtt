@@ -31,7 +31,7 @@ import java.util.Collections;
  * @author L.cm
  */
 @RequiredArgsConstructor
-public class MicaMqttMetrics implements MeterBinder {
+public class MqttServerMetrics implements MeterBinder {
 	/**
 	 * Prefix used for all mica-mqtt metric names.
 	 */
@@ -45,7 +45,7 @@ public class MicaMqttMetrics implements MeterBinder {
 	private final ServerTioConfig serverTioConfig;
 	private final Iterable<Tag> tags;
 
-	public MicaMqttMetrics(ServerTioConfig serverTioConfig) {
+	public MqttServerMetrics(ServerTioConfig serverTioConfig) {
 		this.serverTioConfig = serverTioConfig;
 		this.tags = Collections.emptyList();
 	}

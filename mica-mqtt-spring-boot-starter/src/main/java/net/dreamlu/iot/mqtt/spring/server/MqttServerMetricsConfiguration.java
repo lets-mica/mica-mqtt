@@ -37,11 +37,11 @@ import org.springframework.context.annotation.Configuration;
 	matchIfMissing = true
 )
 @ConditionalOnClass(MeterBinder.class)
-public class MicaMqttMetricsConfiguration {
+public class MqttServerMetricsConfiguration {
 
 	@Bean
-	public MicaMqttMetrics micaMqttMetrics(MqttServer mqttServer) {
-		return new MicaMqttMetrics(mqttServer.getServerConfig());
+	public MqttServerMetrics micaMqttMetrics(MqttServer mqttServer) {
+		return new MqttServerMetrics(mqttServer.getServerConfig());
 	}
 
 }
