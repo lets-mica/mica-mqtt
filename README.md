@@ -33,7 +33,7 @@
 </dependency>
 ```
 
-**配置详见**：[mica-mqtt-spring-boot-starter 使用文档](docs/starter.md)
+**配置详见**：[mica-mqtt-spring-boot-starter 使用文档](mica-mqtt-spring-boot-starter/README.md)
 
 ### 非 Spring boot 项目
 ```xml
