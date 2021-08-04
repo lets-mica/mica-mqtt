@@ -13,7 +13,7 @@
 
     <properties>
         <!-- mica-mqtt version -->
-        <revision>1.0.1</revision>
+        <revision>1.0.2-RC</revision>
         <!-- java version -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -51,6 +51,11 @@
             <dependency>
                 <groupId>net.dreamlu</groupId>
                 <artifactId>mica-mqtt-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-mqtt-spring-boot-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
         </dependencies>

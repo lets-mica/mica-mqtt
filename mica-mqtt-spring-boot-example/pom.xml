@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mica-mqtt-spring-boot-example</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.0</version>
     <name>${artifactId}</name>
     <url>https://www.dreamlu.net</url>
 
@@ -18,6 +18,7 @@
     <properties>
         <java.version>1.8</java.version>
         <mica.version>2.5.3</mica.version>
+        <mica.mqtt.version>1.0.2-RC</mica.mqtt.version>
         <spring.boot.version>2.5.3</spring.boot.version>
     </properties>
 
@@ -41,7 +42,7 @@
         <dependency>
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-mqtt-spring-boot-starter</artifactId>
-            <version>1.0.1</version>
+            <version>${mica.mqtt.version}</version>
         </dependency>
         <!-- 开启 prometheus 指标收集，详见： http://localhost:30012/actuator/prometheus -->
         <dependency>

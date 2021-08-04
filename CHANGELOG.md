@@ -1,9 +1,15 @@
 # 变更记录
 
 ## 发行版本
+### v1.0.2-RC - 2021-08-04
+- :sparkles: 添加 mica-mqtt-spring-boot-example 。感谢 wsq（ @冷月宫主 ）pr。
+- :sparkles: mica-mqtt-spring-boot-starter 支持客户端接入和服务端优化。感谢 wsq（ @冷月宫主 ）pr。
+- :sparkles: mica-mqtt-spring-boot-starter 服务端支持指标收集。可对接 `Prometheus + Grafana` 监控。
+- :sparkles: mqtt server 接受连接时，先判断该 clientId 是否存在其它连接，有则解绑并关闭其他连接。
+
 ### v1.0.1 - 2021-08-02
 - :sparkles: 订阅管理集成到 session 管理中。
-- :sparkles:  MqttProperties.MqttPropertyType 添加注释，考虑 mqtt V5.0 新特性处理。
+- :sparkles: MqttProperties.MqttPropertyType 添加注释，考虑 mqtt V5.0 新特性处理。
 - :sparkles: 添加 Spring boot starter 方便接入，兼容低版本 Spring boot。
 - :sparkles: 调研 t-io websocket 子协议。
 - :bug: 修复 java8 运行期间的部分问题，NoSuchMethodError: java.nio.ByteBuffer.xxx
