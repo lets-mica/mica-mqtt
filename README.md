@@ -16,6 +16,7 @@
 - [x] 支持自定义消息（mq）处理转发实现集群。
 - [x] MQTT 客户端 阿里云 mqtt 连接 demo。
 - [x] 支持 Spring boot 项目快速接入（mica-mqtt-spring-boot-starter）。
+- [x] 支持 GraalVM 编译成本机可执行程序。
 
 ## 待办
 - [ ] 添加 websocket 支持。
