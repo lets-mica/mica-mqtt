@@ -115,6 +115,31 @@ public class ServerService {
 }
 ```
 
+### Prometheus + Grafana 监控对接
+```xml
+<!-- 开启 prometheus 指标收集 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.micrometer</groupId>
+    <artifactId>micrometer-registry-prometheus</artifactId>
+</dependency>
+```
+
+| 支持得指标                     | 说明             |
+| ------------------------------ | ---------------- |
+| mqtt_connections_accepted      | 共接受过连接数   |
+| mqtt_connections_closed        | 关闭过的连接数   |
+| mqtt_connections_size          | 当前连接数       |
+| mqtt_messages_handled_packets  | 已处理消息数     |
+| mqtt_messages_handled_bytes    | 已处理消息字节数  |
+| mqtt_messages_received_packets | 已接收消息数      |
+| mqtt_messages_received_bytes   | 已处理消息字节数 |
+| mqtt_messages_send_packets     | 已发送消息数      |
+| mqtt_messages_send_bytes       | 已发送消息字节数  |
+
 ## mqtt 客户端
 
 ### 配置项

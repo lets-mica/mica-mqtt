@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.spring.server;
 
 import io.micrometer.core.instrument.binder.MeterBinder;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,7 @@ import org.springframework.context.annotation.Configuration;
 	matchIfMissing = true
 )
 @ConditionalOnClass(MeterBinder.class)
+@AutoConfigureAfter(MqttServerConfiguration.class)
 public class MqttServerMetricsConfiguration {
 
 	@Bean
