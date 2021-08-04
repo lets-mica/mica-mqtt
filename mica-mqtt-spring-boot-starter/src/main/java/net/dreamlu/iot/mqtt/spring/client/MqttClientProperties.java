@@ -66,7 +66,7 @@ public class MqttClientProperties {
 	 */
 	private String clientId;
 	/**
-	 * 超时时间，t-io 配置，可为 null
+	 * 超时时间，单位：秒，t-io 配置，可为 null
 	 */
 	private Integer timeout;
 	/**
@@ -82,11 +82,11 @@ public class MqttClientProperties {
 	 */
 	private boolean reconnect = true;
 	/**
-	 * 重连重试时间
+	 * 重连重试时间，单位：毫秒，默认：5000
 	 */
 	private Long reInterval;
 	/**
-	 * mqtt 协议，默认：3_1_1
+	 * mqtt 协议，默认：MQTT_3_1_1
 	 */
 	private MqttVersion version = MqttVersion.MQTT_3_1_1;
 	/**
