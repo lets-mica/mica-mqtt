@@ -22,9 +22,12 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
+import java.lang.reflect.Modifier;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -38,18 +41,34 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 	private final MqttClientTemplate clientTemplate;
 
 	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+	public Object postProcessAfterInitialization(@NonNull Object bean, String beanName) throws BeansException {
 		MqttClient mqttClient = clientTemplate.getMqttClient();
 		Objects.requireNonNull(mqttClient, "MqttClient is null.");
 		Class<?> userClass = ClassUtils.getUserClass(bean);
 		ReflectionUtils.doWithMethods(userClass, method -> {
 			MqttClientSubscribe subscribe = AnnotationUtils.findAnnotation(method, MqttClientSubscribe.class);
 			if (subscribe != null) {
-				// 校验 method，method 入参数必须等于2
+				// 1. 校验必须为 public 和非 static 的方法
+				int modifiers = method.getModifiers();
+				if (Modifier.isStatic(modifiers)) {
+					throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " must not static.");
+				}
+				if (!Modifier.isPublic(modifiers)) {
+					throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " must public.");
+				}
+				// 2. 校验 method 入参数必须等于2
 				int paramCount = method.getParameterCount();
 				if (paramCount != 2) {
 					throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter count must equal to 2.");
 				}
+				// 3. 校验 method 入参类型必须为 String、ByteBuffer
+				Class<?>[] parameterTypes = method.getParameterTypes();
+				Class<?> topicParamType = parameterTypes[0];
+				Class<?> payloadParamType = parameterTypes[1];
+				if (String.class != topicParamType || ByteBuffer.class != payloadParamType) {
+					throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String and ByteBuffer.");
+				}
+				// 4. 订阅
 				mqttClient.subscribe(subscribe.qos(), subscribe.value(), (topic, payload) ->
 					ReflectionUtils.invokeMethod(method, bean, topic, payload)
 				);
