@@ -99,7 +99,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	 * @param payload 消息体
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload) {
+	public boolean publish(String topic, ByteBuffer payload) {
 		return client.publish(topic, payload, MqttQoS.AT_MOST_ONCE);
 	}
 
@@ -111,7 +111,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
+	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
 		return client.publish(topic, payload, qos, false);
 	}
 
@@ -123,7 +123,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload, boolean retain) {
+	public boolean publish(String topic, ByteBuffer payload, boolean retain) {
 		return client.publish(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
 	}
 
@@ -136,7 +136,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		return client.publish(topic, payload, qos, retain);
 	}
 

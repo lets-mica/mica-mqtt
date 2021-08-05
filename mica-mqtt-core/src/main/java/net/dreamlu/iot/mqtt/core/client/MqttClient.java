@@ -139,7 +139,7 @@ public final class MqttClient {
 	 * @param payload 消息体
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload) {
+	public boolean publish(String topic, ByteBuffer payload) {
 		return publish(topic, payload, MqttQoS.AT_MOST_ONCE);
 	}
 
@@ -151,7 +151,7 @@ public final class MqttClient {
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
+	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
 		return publish(topic, payload, qos, false);
 	}
 
@@ -163,7 +163,7 @@ public final class MqttClient {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload, boolean retain) {
+	public boolean publish(String topic, ByteBuffer payload, boolean retain) {
 		return publish(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
 	}
 
@@ -176,7 +176,7 @@ public final class MqttClient {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? MqttClientMessageId.getId() : -1;
 		MqttPublishMessage message = MqttMessageBuilders.publish()
@@ -186,7 +186,7 @@ public final class MqttClient {
 			.retained(retain)
 			.messageId(messageId)
 			.build();
-		Boolean result = Tio.send(context, message);
+		boolean result = Tio.send(context, message);
 		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
