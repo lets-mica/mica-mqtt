@@ -9,11 +9,16 @@ import java.util.regex.Pattern;
  */
 public final class MqttTopicUtil {
 
-	public static Pattern getTopicPattern(String topic) {
-		if (topic.startsWith("$")) {
-			topic = "\\" + topic;
-		}
-		return Pattern.compile(topic
+	/**
+	 * mqtt topicFilter 转正则
+	 *
+	 * @param topicFilter topicFilter
+	 * @return Pattern
+	 */
+	public static Pattern getTopicPattern(String topicFilter) {
+		// mqtt 分享主题 $share/{ShareName}/{filter}
+		String topicRegex = topicFilter.startsWith("$") ? "\\" + topicFilter : topicFilter;
+		return Pattern.compile(topicRegex
 			.replace("+", "[^/]+")
 			.replace("#", ".+")
 			.concat("$")

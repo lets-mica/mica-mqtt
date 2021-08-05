@@ -82,7 +82,7 @@ public final class MqttServer {
 	 * @param payload  消息体
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload) {
 		return publish(clientId, topic, payload, MqttQoS.AT_MOST_ONCE);
 	}
 
@@ -95,7 +95,7 @@ public final class MqttServer {
 	 * @param qos      MqttQoS
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos) {
 		return publish(clientId, topic, payload, qos, false);
 	}
 
@@ -108,7 +108,7 @@ public final class MqttServer {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload, boolean retain) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload, boolean retain) {
 		return publish(clientId, topic, payload, MqttQoS.AT_MOST_ONCE, retain);
 	}
 
@@ -122,7 +122,7 @@ public final class MqttServer {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
 		if (context == null || context.isClosed) {
 			logger.warn("Mqtt publish to clientId:{} ChannelContext is null may be disconnected.", clientId);
@@ -162,7 +162,7 @@ public final class MqttServer {
 			.retained(retain)
 			.messageId(messageId)
 			.build();
-		Boolean result = Tio.send(context, message);
+		boolean result = Tio.send(context, message);
 		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
@@ -179,7 +179,7 @@ public final class MqttServer {
 	 * @param payload 消息体
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload) {
+	public boolean publishAll(String topic, ByteBuffer payload) {
 		return publishAll(topic, payload, MqttQoS.AT_MOST_ONCE);
 	}
 
@@ -191,7 +191,7 @@ public final class MqttServer {
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
+	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
 		return publishAll(topic, payload, qos, false);
 	}
 
@@ -203,7 +203,7 @@ public final class MqttServer {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload, boolean retain) {
+	public boolean publishAll(String topic, ByteBuffer payload, boolean retain) {
 		return publishAll(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
 	}
 
@@ -216,7 +216,7 @@ public final class MqttServer {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		// 查找订阅该 topic 的客户端
 		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {

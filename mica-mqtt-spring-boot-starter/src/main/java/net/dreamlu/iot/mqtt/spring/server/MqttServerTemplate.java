@@ -40,7 +40,7 @@ public class MqttServerTemplate {
 	 * @param payload  消息体
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload) {
 		return mqttServer.publish(clientId, topic, payload);
 	}
 
@@ -53,7 +53,7 @@ public class MqttServerTemplate {
 	 * @param qos      MqttQoS
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos) {
 		return mqttServer.publish(clientId, topic, payload, qos);
 	}
 
@@ -66,7 +66,7 @@ public class MqttServerTemplate {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload, boolean retain) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload, boolean retain) {
 		return mqttServer.publish(clientId, topic, payload, retain);
 	}
 
@@ -80,7 +80,7 @@ public class MqttServerTemplate {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publish(clientId, topic, payload, qos, retain);
 	}
 
@@ -105,7 +105,7 @@ public class MqttServerTemplate {
 	 * @param payload 消息体
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload) {
+	public boolean publishAll(String topic, ByteBuffer payload) {
 		return mqttServer.publishAll(topic, payload);
 	}
 
@@ -117,7 +117,7 @@ public class MqttServerTemplate {
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
+	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
 		return mqttServer.publishAll(topic, payload, qos);
 	}
 
@@ -129,7 +129,7 @@ public class MqttServerTemplate {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload, boolean retain) {
+	public boolean publishAll(String topic, ByteBuffer payload, boolean retain) {
 		return mqttServer.publishAll(topic, payload, retain);
 	}
 
@@ -142,7 +142,7 @@ public class MqttServerTemplate {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public Boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publishAll(topic, payload, qos, retain);
 	}
 }

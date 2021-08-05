@@ -21,30 +21,27 @@ package net.dreamlu.iot.mqtt.codec;
  *
  * @author netty
  */
-public final class MqttConstant {
+public interface MqttConstant {
 
 	/**
 	 * mqtt protocol length
 	 */
-	public static final int MQTT_PROTOCOL_LENGTH = 2;
+	int MQTT_PROTOCOL_LENGTH = 2;
 
 	/**
 	 * Default max bytes in message
 	 */
-	public static final int DEFAULT_MAX_BYTES_IN_MESSAGE = 8092;
+	int DEFAULT_MAX_BYTES_IN_MESSAGE = 8092;
 
 	/**
 	 * min client id length
 	 */
-	public static final int MIN_CLIENT_ID_LENGTH = 1;
+	int MIN_CLIENT_ID_LENGTH = 1;
 
 	/**
 	 * Default max client id length,In the mqtt3.1 protocol,
 	 * the default maximum Client Identifier length is 23
 	 */
-	public static final int DEFAULT_MAX_CLIENT_ID_LENGTH = 23;
-
-	private MqttConstant() {
-	}
+	int DEFAULT_MAX_CLIENT_ID_LENGTH = 23;
 
 }
