@@ -108,3 +108,11 @@ mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()), 
 // 停止服务
 mqttServer.stop();
 ```
+
+## 基于 mq 消息广播集群处理
+
+- 实现 `IMqttConnectStatusListener` 处理设备状态存储。
+- 实现 `IMqttMessageListener` 将消息转发到 mq，业务按需处理 mq 消息。
+- 实现 `IMqttMessageStore` 存储遗嘱和保留消息。
+- 实现 `AbstractMqttMessageDispatcher` 将消息发往 mq，mq 再广播回 mqtt 集群，mqtt 将消息发送到设备。
+- 业务消息发送到 mq，mq 广播到 mqtt 集群，mqtt 将消息发送到设备。
