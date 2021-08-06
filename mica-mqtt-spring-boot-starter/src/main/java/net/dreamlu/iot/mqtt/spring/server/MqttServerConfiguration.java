@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.spring.server;
 
 import net.dreamlu.iot.mqtt.core.server.*;
+import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -149,7 +150,11 @@ public class MqttServerConfiguration {
 		// 6. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
 		MqttServer mqttServer = new MqttServer(tioServer, mqttServerCreator, executor);
-		mqttServerCreator.getMessageDispatcher().config(mqttServer);
+		IMqttMessageDispatcher messageDispatcher = mqttServerCreator.getMessageDispatcher();
+		// 7. 如果是默认的消息转发器，设置 mqttServer
+		if (messageDispatcher instanceof AbstractMqttMessageDispatcher) {
+			((AbstractMqttMessageDispatcher) messageDispatcher).config(mqttServer);
+		}
 		return mqttServer;
 	}
 

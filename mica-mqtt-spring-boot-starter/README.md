@@ -43,15 +43,15 @@ mqtt:
 
 ### 2.3 可实现接口（注册成 Spring Bean 即可）
 
-| 接口                        | 是否必须       | 说明                 |
-| --------------------------- | -------------- | ------------------ |
-| IMqttServerAuthHandler      | 是             | 用于客户端认证       |
-| IMqttMessageListener        | 是             | 消息监听            |
-| IMqttConnectStatusListener  | 是             | 连接状态监听         |
-| IMqttSessionManager         | 否             | session 管理        |
-| IMqttMessageStore           | 集群是，单机否   | 遗嘱和保留消息存储    |
-| IMqttMessageDispatcher      | 集群是，单机否   | 消息转发             |
-| IpStatListener              | 否             | t-io ip 状态监听     |
+| 接口                           | 是否必须       | 说明                        |
+| ---------------------------   | -------------- | ------------------------- |
+| IMqttServerAuthHandler        | 是             | 用于客户端认证               |
+| IMqttMessageListener          | 是             | 消息监听                    |
+| IMqttConnectStatusListener    | 是             | 连接状态监听                 |
+| IMqttSessionManager           | 否             | session 管理               |
+| IMqttMessageStore             | 集群是，单机否   | 遗嘱和保留消息存储            |
+| AbstractMqttMessageDispatcher | 集群是，单机否   | 消息转发，（遗嘱、保留消息转发） |
+| IpStatListener                | 否             | t-io ip 状态监听            |
 
 ### 2.4 IMqttMessageListener (用于监听客户端上传的消息) 使用示例
 
@@ -92,8 +92,6 @@ public class MqttServerCustomizerConfiguration {
 ```java
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -104,7 +102,6 @@ import java.nio.ByteBuffer;
  */
 @Service
 public class ServerService {
-    private static final Logger logger = LoggerFactory.getLogger(ServerService.class);
     @Autowired
     private MqttServerTemplate server;
 

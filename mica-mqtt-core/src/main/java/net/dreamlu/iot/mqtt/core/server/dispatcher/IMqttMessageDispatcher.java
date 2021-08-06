@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server.dispatcher;
 
-import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 
 /**
@@ -25,13 +24,6 @@ import net.dreamlu.iot.mqtt.core.server.model.Message;
  * @author L.cm
  */
 public interface IMqttMessageDispatcher {
-
-	/**
-	 * 配置
-	 *
-	 * @param mqttServer MqttServer
-	 */
-	void config(MqttServer mqttServer);
 
 	/**
 	 * 发送消息

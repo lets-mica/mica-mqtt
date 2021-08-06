@@ -17,8 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server.support;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
-import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 
 import java.nio.ByteBuffer;
@@ -28,31 +27,20 @@ import java.nio.ByteBuffer;
  *
  * @author L.cm
  */
-public class DefaultMqttMessageDispatcher implements IMqttMessageDispatcher {
-	private MqttServer mqttServer;
+public class DefaultMqttMessageDispatcher extends AbstractMqttMessageDispatcher {
 
 	@Override
-	public void config(MqttServer mqttServer) {
-		this.mqttServer = mqttServer;
-	}
-
-	@Override
-	public boolean send(Message message) {
-		if (mqttServer == null) {
-			return false;
-		}
+	public boolean sendAll(Message message) {
 		ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
 		MqttQoS qoS = MqttQoS.valueOf(message.getQos());
 		return mqttServer.publishAll(message.getTopic(), payload, qoS);
 	}
 
 	@Override
-	public boolean send(String clientId, Message message) {
-		if (mqttServer == null) {
-			return false;
-		}
+	public boolean sendTo(String clientId, Message message) {
 		ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
 		MqttQoS qoS = MqttQoS.valueOf(message.getQos());
 		return mqttServer.publish(clientId, message.getTopic(), payload, qoS);
 	}
+
 }

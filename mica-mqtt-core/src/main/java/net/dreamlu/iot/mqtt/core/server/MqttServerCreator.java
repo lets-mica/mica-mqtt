@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
+import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -317,14 +318,17 @@ public class MqttServerCreator {
 		TioServer tioServer = new TioServer(tioConfig);
 		// 6. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
-		// 7. 启动
+		MqttServer mqttServer = new MqttServer(tioServer, this, executor);
+		// 7. 如果是默认的消息转发器，设置 mqttServer
+		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
+			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);
+		}
+		// 8. 启动
 		try {
 			tioServer.start(this.ip, this.port);
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt server start fail.", e);
 		}
-		MqttServer mqttServer = new MqttServer(tioServer, this, executor);
-		messageDispatcher.config(mqttServer);
 		return mqttServer;
 	}
 
