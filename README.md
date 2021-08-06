@@ -44,11 +44,11 @@
 </dependency>
 ```
 
-**配置详见**：[mica-mqtt 使用文档](docs/docs.md)
+**配置详见**：[mica-mqtt 使用文档](mica-mqtt-core/README.md)
 
 ## 文档
 - [mica-mqtt-spring-boot-starter 使用文档](mica-mqtt-spring-boot-starter/README.md)
-- [mica-mqtt 使用文档](docs/docs.md)
+- [mica-mqtt 使用文档](mica-mqtt-core/README.md)
 - [mica-mqtt 发行版本](CHANGELOG.md)
 - [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
