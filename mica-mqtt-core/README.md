@@ -113,10 +113,10 @@ MqttServer mqttServer = MqttServer.create()
 	.start();
 
 // 发送给某个客户端
-mqttServer.publish("clientId","/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
+mqttServer.publish("clientId","/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));
 
 // 发送给所有在线监听这个 topic 的客户端
-mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()), MqttQoS.EXACTLY_ONCE);
+mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));
 
 // 停止服务
 mqttServer.stop();

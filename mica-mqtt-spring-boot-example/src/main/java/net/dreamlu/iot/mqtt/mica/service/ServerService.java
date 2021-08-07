@@ -1,6 +1,5 @@
 package net.dreamlu.iot.mqtt.mica.service;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +18,7 @@ public class ServerService {
 	private MqttServerTemplate server;
 
 	public boolean publish(String body) {
-		boolean result = server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()), MqttQoS.EXACTLY_ONCE);
+		boolean result = server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()));
 		logger.info("Mqtt publishAll result:{}", result);
 		return result;
 	}

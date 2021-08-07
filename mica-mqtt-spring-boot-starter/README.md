@@ -106,7 +106,7 @@ public class ServerService {
     private MqttServerTemplate server;
 
     public boolean publish(String body) {
-        server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()), MqttQoS.EXACTLY_ONCE);
+        server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()));
         return true;
     }
 }
