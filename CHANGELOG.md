@@ -1,6 +1,16 @@
 # 变更记录
 
 ## 发行版本
+### v1.0.2 - 2021-08-08
+- :memo: 文档添加集群处理步骤说明，添加遗嘱消息、保留消息的使用场景。
+- :sparkles: 去除演示中的 qos2 参数，性能损耗大避免误用。
+- :sparkles: 遗嘱、保留消息内部消息转发抽象。
+- :sparkles: 添加 mica-mqtt-spring-boot-example 。感谢 wsq（ @冷月宫主 ）pr。
+- :sparkles: mica-mqtt-spring-boot-starter 支持客户端接入和服务端优化。感谢 wsq（ @冷月宫主 ）pr。
+- :sparkles: mica-mqtt-spring-boot-starter 服务端支持指标收集。可对接 `Prometheus + Grafana` 监控。
+- :sparkles: mqtt server 接受连接时，先判断该 clientId 是否存在其它连接，有则解绑并关闭其他连接。
+- :arrow_up: 升级 mica-auto 到 2.1.3 修复 ide 多模块增量编译问题。
+
 ### v1.0.2-RC - 2021-08-04
 - :sparkles: 添加 mica-mqtt-spring-boot-example 。感谢 wsq（ @冷月宫主 ）pr。
 - :sparkles: mica-mqtt-spring-boot-starter 支持客户端接入和服务端优化。感谢 wsq（ @冷月宫主 ）pr。

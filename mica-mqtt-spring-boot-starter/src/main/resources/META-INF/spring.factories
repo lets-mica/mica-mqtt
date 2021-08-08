@@ -1,4 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  net.dreamlu.iot.mqtt.spring.server.MqttServerMetricsConfiguration,\
-  net.dreamlu.iot.mqtt.spring.server.MqttServerConfiguration,\
-  net.dreamlu.iot.mqtt.spring.client.MqttClientConfiguration

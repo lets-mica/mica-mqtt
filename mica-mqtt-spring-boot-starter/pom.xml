@@ -15,6 +15,7 @@
         <spring-boot.version>2.5.3</spring-boot.version>
         <micrometer-core.version>1.7.2</micrometer-core.version>
         <lombok.version>1.18.20</lombok.version>
+        <mica.auto.version>2.1.3</mica.auto.version>
     </properties>
 
     <dependencies>
@@ -48,16 +49,11 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
         </dependency>
+        <!-- mica-auto 自动生成 spring.factories、spring-devtools.properties 配置  -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <version>${spring-boot.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure-processor</artifactId>
-            <version>${spring-boot.version}</version>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-auto</artifactId>
+            <version>${mica.auto.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
