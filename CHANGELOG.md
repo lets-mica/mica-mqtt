@@ -5,6 +5,7 @@
 - :memo: 文档添加集群处理步骤说明，添加遗嘱消息、保留消息的使用场景。
 - :sparkles: 去除演示中的 qos2 参数，性能损耗大避免误用。
 - :sparkles: 遗嘱、保留消息内部消息转发抽象。
+- :sparkles: mqtt server 连接时先判断 clientId 是否存在连接关系，有则先关闭已有连接。
 - :sparkles: 添加 mica-mqtt-spring-boot-example 。感谢 wsq（ @冷月宫主 ）pr。
 - :sparkles: mica-mqtt-spring-boot-starter 支持客户端接入和服务端优化。感谢 wsq（ @冷月宫主 ）pr。
 - :sparkles: mica-mqtt-spring-boot-starter 服务端支持指标收集。可对接 `Prometheus + Grafana` 监控。
