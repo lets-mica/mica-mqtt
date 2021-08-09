@@ -7,7 +7,6 @@ import org.tio.http.common.HttpConst;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.server.intf.ServerAioListener;
-import org.tio.websocket.common.WsSessionContext;
 
 /**
  * 兼容 websocket，参考 HTTPServerAioListener
@@ -19,8 +18,7 @@ public class MqttWebServerAioListener implements ServerAioListener {
 
 	@Override
 	public void onAfterConnected(ChannelContext channelContext, boolean isConnected, boolean isReconnect) {
-		WsSessionContext wsSessionContext = new WsSessionContext();
-		channelContext.set(wsSessionContext);
+
 	}
 
 	@Override

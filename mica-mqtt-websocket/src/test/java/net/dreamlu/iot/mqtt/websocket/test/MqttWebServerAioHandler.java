@@ -248,7 +248,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws TioDecodeException {
 		WsSessionContext wsSessionContext = (WsSessionContext) channelContext.get();
 		// 尚未握手
-		if (!wsSessionContext.isHandshaked()) {
+		if (wsSessionContext == null) {
 			HttpRequest request = HttpRequestDecoder.decode(buffer, limit, position, readableLength, channelContext, httpConfig);
 			if (request == null) {
 				return null;
@@ -258,6 +258,8 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			if (httpResponse == null) {
 				return request;
 			}
+			wsSessionContext = new WsSessionContext();
+			channelContext.set(wsSessionContext);
 			wsSessionContext.setHandshakeRequest(request);
 			wsSessionContext.setHandshakeResponse(httpResponse);
 			WsRequest wsRequestPacket = new WsRequest();
@@ -410,12 +412,12 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			WsSessionContext wsSessionContext = (WsSessionContext) channelContext.get();
 			HttpRequest request = wsSessionContext.getHandshakeRequest();
 			HttpResponse httpResponse = wsSessionContext.getHandshakeResponse();
-			HttpResponse r = wsMsgHandler.handshake(request, httpResponse, channelContext);
-			if (r == null) {
+			HttpResponse response = wsMsgHandler.handshake(request, httpResponse, channelContext);
+			if (response == null) {
 				Tio.remove(channelContext, "业务层不同意握手");
 				return;
 			}
-			wsSessionContext.setHandshakeResponse(r);
+			wsSessionContext.setHandshakeResponse(response);
 
 			WsResponse wsResponse = new WsResponse();
 			wsResponse.setHandShake(true);

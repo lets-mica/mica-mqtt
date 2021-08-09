@@ -101,7 +101,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 		// 3. 客户端 id 是创建连接之后才有的，如果客户端 id 为空，直接关闭
 		String clientId = context.getBsId();
 		if (StrUtil.isBlank(clientId)) {
-			Tio.close(context, "Mqtt connected but clientId is blank.");
+			Tio.remove(context, "Mqtt connected but clientId is blank.");
 			return;
 		}
 		// 4. 按类型的消息处理
@@ -153,7 +153,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
-			Tio.close(context, cause, "MqttUnacceptableProtocolVersion");
+			Tio.remove(context, cause, "MqttUnacceptableProtocolVersion");
 		} else if (cause instanceof MqttIdentifierRejectedException) {
 			// 不合格的 clientId
 			MqttConnAckMessage message = MqttMessageBuilders.connAck()
@@ -161,13 +161,13 @@ public class MqttServerAioHandler implements ServerAioHandler {
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
-			Tio.close(context, cause, "MqttIdentifierRejected");
+			Tio.remove(context, cause, "MqttIdentifierRejected");
 		} else if (cause instanceof DecoderException) {
 			log.error(cause.getMessage(), cause);
-			Tio.close(context, cause, "MqttDecoderException");
+			Tio.remove(context, cause, "MqttDecoderException");
 		} else {
 			log.error(cause.getMessage(), cause);
-			Tio.close(context, cause, "MqttUnknownException");
+			Tio.remove(context, cause, "MqttUnknownException");
 		}
 	}
 

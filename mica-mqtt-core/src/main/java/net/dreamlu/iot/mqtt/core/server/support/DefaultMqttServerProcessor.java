@@ -86,7 +86,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		ChannelContext otherContext = Tio.getByBsId(context.getTioConfig(), clientId);
 		if (otherContext != null) {
 			Tio.unbindBsId(otherContext);
-			Tio.close(otherContext, "clientId:" + clientId + " now bind on new context id:" + context.getId());
+			Tio.remove(otherContext, "clientId:" + clientId + " now bind on new context id:" + context.getId());
 		}
 		// 4. 绑定 clientId
 		Tio.bindBsId(context, clientId);
@@ -298,7 +298,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		logger.info("DisConnect - clientId:{}", clientId);
 		// 设置正常断开的标识
 		context.set(MqttConst.DIS_CONNECTED, (byte) 1);
-		Tio.close(context, "Mqtt DisConnect");
+		Tio.remove(context, "Mqtt DisConnect");
 	}
 
 	/**

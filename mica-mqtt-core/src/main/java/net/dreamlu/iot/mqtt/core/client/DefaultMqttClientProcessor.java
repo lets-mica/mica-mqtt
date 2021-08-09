@@ -69,7 +69,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			case CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION:
 			default:
 				String remark = "MqttClient connect error error ReturnCode:" + returnCode;
-				Tio.close(context, remark);
+				Tio.remove(context, remark);
 				break;
 		}
 	}
