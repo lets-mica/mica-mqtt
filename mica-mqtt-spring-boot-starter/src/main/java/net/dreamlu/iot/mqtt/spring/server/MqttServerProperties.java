@@ -73,6 +73,10 @@ public class MqttServerProperties {
 	 */
 	private boolean debug = false;
 	/**
+	 * mqtt 3.1 会校验此参数
+	 */
+	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
+	/**
 	 * ssl 配置
 	 */
 	private Ssl ssl = new Ssl();

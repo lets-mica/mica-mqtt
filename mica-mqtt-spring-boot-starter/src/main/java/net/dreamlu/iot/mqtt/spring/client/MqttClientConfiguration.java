@@ -18,11 +18,15 @@ package net.dreamlu.iot.mqtt.spring.client;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import net.dreamlu.iot.mqtt.core.client.MqttWillMessage;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.util.StringUtils;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * mqtt client 配置
@@ -61,6 +65,18 @@ public class MqttClientConfiguration {
 		Long reInterval1 = properties.getReInterval();
 		if (reInterval1 != null && reInterval1 > 0) {
 			clientCreator.reInterval(reInterval1);
+		}
+		// 构造遗嘱消息
+		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();
+		if (willMessage != null && StringUtils.hasText(willMessage.getTopic())) {
+			MqttWillMessage.Builder builder = MqttWillMessage.builder();
+			builder.topic(willMessage.getTopic())
+				.qos(willMessage.getQos())
+				.retain(willMessage.isRetain());
+			if (StringUtils.hasText(willMessage.getMessage())) {
+				builder.message(willMessage.getMessage().getBytes(StandardCharsets.UTF_8));
+			}
+			clientCreator.willMessage(builder.build());
 		}
 		// 自定义处理
 		customizers.ifAvailable((customizer) -> customizer.customize(clientCreator));

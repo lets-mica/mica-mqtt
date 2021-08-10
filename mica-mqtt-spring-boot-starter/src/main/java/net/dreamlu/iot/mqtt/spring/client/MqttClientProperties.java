@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -101,5 +102,30 @@ public class MqttClientProperties {
 	 * ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存
 	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
+	/**
+	 * 遗嘱消息
+	 */
+	private WillMessage willMessage;
+
+	@Getter
+	@Setter
+	public static class WillMessage {
+		/**
+		 * 遗嘱消息 topic
+		 */
+		private String topic;
+		/**
+		 * 遗嘱消息 qos，默认： qos0
+		 */
+		private MqttQoS qos = MqttQoS.AT_MOST_ONCE;
+		/**
+		 * 遗嘱消息 payload
+		 */
+		private String message;
+		/**
+		 * 遗嘱消息保留标识符，默认: false
+		 */
+		private boolean retain = false;
+	}
 
 }

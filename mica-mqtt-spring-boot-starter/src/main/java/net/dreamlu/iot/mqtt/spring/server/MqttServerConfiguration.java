@@ -78,7 +78,8 @@ public class MqttServerConfiguration {
 			.heartbeatTimeout(properties.getHeartbeatTimeout())
 			.readBufferSize(properties.getReadBufferSize())
 			.maxBytesInMessage(properties.getMaxBytesInMessage())
-			.bufferAllocator(properties.getBufferAllocator());
+			.bufferAllocator(properties.getBufferAllocator())
+			.maxClientIdLength(properties.getMaxClientIdLength());
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}

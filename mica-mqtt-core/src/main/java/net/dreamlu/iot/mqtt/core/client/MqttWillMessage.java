@@ -114,6 +114,10 @@ public final class MqttWillMessage {
 		}
 
 		public MqttWillMessage build() {
+			// 遗嘱标志被设置为 false，遗嘱 QoS 也必须设置为 0。
+			if (!this.retain && MqttQoS.AT_MOST_ONCE != this.qos) {
+				throw new IllegalArgumentException("WillMessage retain is false and QoS must be 0");
+			}
 			return new MqttWillMessage(this.topic, this.message, this.retain, this.qos, this.willProperties);
 		}
 	}
