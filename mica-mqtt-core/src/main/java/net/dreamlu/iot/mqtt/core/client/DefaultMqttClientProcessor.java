@@ -24,7 +24,6 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.core.Tio;
-import org.tio.core.TioConfig;
 
 import java.nio.ByteBuffer;
 import java.util.List;

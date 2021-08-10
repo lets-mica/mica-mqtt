@@ -127,7 +127,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			.sessionPresent(false)
 			.build();
 		Tio.send(context, message);
-		logger.debug("Connect ack send - clientId: {} returnCode:{}", clientId, returnCode);
+		logger.info("Connect ack send - clientId: {} returnCode:{}", clientId, returnCode);
 	}
 
 	@Override
@@ -174,7 +174,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubAck(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
-		logger.debug("PubAck - clientId:{}, messageId: {}", clientId, messageId);
+		logger.debug("PubAck - clientId:{}, messageId:{}", clientId, messageId);
 		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish == null) {
 			return;
@@ -188,7 +188,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubRec(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
-		logger.debug("PubRec - clientId:{}, messageId: {}", clientId, messageId);
+		logger.debug("PubRec - clientId:{}, messageId:{}", clientId, messageId);
 		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish == null) {
 			return;
@@ -207,7 +207,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubRel(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		String clientId = context.getBsId();
 		int messageId = variableHeader.messageId();
-		logger.debug("PubRel - clientId:{}, messageId: {}", clientId, messageId);
+		logger.debug("PubRel - clientId:{}, messageId:{}", clientId, messageId);
 		MqttPendingQos2Publish pendingQos2Publish = sessionManager.getPendingQos2Publish(clientId, messageId);
 		if (pendingQos2Publish != null) {
 			MqttPublishMessage incomingPublish = pendingQos2Publish.getIncomingPublish();
@@ -229,7 +229,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processPubComp(ChannelContext context, MqttMessageIdVariableHeader variableHeader) {
 		int messageId = variableHeader.messageId();
 		String clientId = context.getBsId();
-		logger.debug("PubComp - clientId:{}, messageId: {}", clientId, messageId);
+		logger.debug("PubComp - clientId:{}, messageId:{}", clientId, messageId);
 		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish != null) {
 			pendingPublish.getPayload().clear();
@@ -253,8 +253,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			mqttQosList.add(mqttQoS);
 			topicList.add(topicName);
 			sessionManager.addSubscribe(topicName, clientId, mqttQoS);
-			logger.debug("Subscribe - clientId:{} messageId:{} topicFilter:{} mqttQoS:{}", clientId, messageId, topicName, mqttQoS);
 		}
+		logger.info("Subscribe - clientId:{} Topic:{} mqttQoS:{} messageId:{}", clientId, topicList, mqttQosList, messageId);
 		// 3. 返回 ack
 		MqttMessage subAckMessage = MqttMessageBuilders.subAck()
 			.addGrantedQosList(mqttQosList)
@@ -277,8 +277,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		List<String> topicFilterList = message.payload().topics();
 		for (String topicFilter : topicFilterList) {
 			sessionManager.removeSubscribe(topicFilter, clientId);
-			logger.debug("UnSubscribe - clientId:{} messageId:{} topicFilter:{}", clientId, messageId, topicFilter);
 		}
+		logger.info("UnSubscribe - clientId:{} Topic:{} messageId:{}", clientId, topicFilterList, messageId);
 		MqttMessage unSubMessage = MqttMessageBuilders.unsubAck()
 			.packetId(messageId)
 			.build();
@@ -295,7 +295,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	@Override
 	public void processDisConnect(ChannelContext context) {
 		String clientId = context.getBsId();
-		logger.info("DisConnect - clientId:{}", clientId);
+		logger.info("DisConnect - clientId:{} contextId:{}", clientId, context.getId());
 		// 设置正常断开的标识
 		context.set(MqttConst.DIS_CONNECTED, (byte) 1);
 		Tio.remove(context, "Mqtt DisConnect");

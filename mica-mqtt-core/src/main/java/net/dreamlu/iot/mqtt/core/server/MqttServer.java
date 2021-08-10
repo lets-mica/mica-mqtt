@@ -125,12 +125,12 @@ public final class MqttServer {
 	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
 		if (context == null || context.isClosed) {
-			logger.warn("Mqtt publish to clientId:{} ChannelContext is null may be disconnected.", clientId);
+			logger.warn("Mqtt Topic:{} publish to clientId:{} ChannelContext is null may be disconnected.", topic, clientId);
 			return false;
 		}
 		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic, clientId);
 		if (subscribeList.isEmpty()) {
-			logger.warn("Mqtt publish but clientId:{} subscribeList is empty.", clientId);
+			logger.warn("Mqtt Topic:{} publish but clientId:{} subscribeList is empty.", topic, clientId);
 			return false;
 		}
 		for (Subscribe subscribe : subscribeList) {
@@ -163,7 +163,7 @@ public final class MqttServer {
 			.messageId(messageId)
 			.build();
 		boolean result = Tio.send(context, message);
-		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
+		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			sessionManager.addPendingPublish(clientId, messageId, pendingPublish);
@@ -220,14 +220,14 @@ public final class MqttServer {
 		// 查找订阅该 topic 的客户端
 		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {
-			logger.warn("Mqtt publish but topic:{} subscribe client list is empty.", topic);
+			logger.warn("Mqtt Topic:{} publishAll but subscribe client list is empty.", topic);
 			return false;
 		}
 		for (Subscribe subscribe : subscribeList) {
 			String clientId = subscribe.getClientId();
 			ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
 			if (context == null || context.isClosed) {
-				logger.warn("Mqtt publish to clientId:{} ChannelContext may be disconnected.", clientId);
+				logger.warn("Mqtt Topic:{} publish to clientId:{} channel is null may be disconnected.", topic, clientId);
 				continue;
 			}
 			int subMqttQoS = subscribe.getMqttQoS();
@@ -243,7 +243,7 @@ public final class MqttServer {
 		try {
 			sessionManager.clean();
 		} catch (Throwable e) {
-			logger.error("Mqtt server stop session clean error.", e);
+			logger.error("MqttServer stop session clean error.", e);
 		}
 		this.executor.shutdown();
 		return result;
