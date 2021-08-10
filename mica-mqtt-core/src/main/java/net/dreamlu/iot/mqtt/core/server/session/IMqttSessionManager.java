@@ -67,6 +67,7 @@ public interface IMqttSessionManager {
 	/**
 	 * 添加发布过程存储
 	 *
+	 * @param clientId       clientId
 	 * @param messageId      messageId
 	 * @param pendingPublish MqttPendingPublish
 	 */
@@ -75,6 +76,7 @@ public interface IMqttSessionManager {
 	/**
 	 * 获取发布过程存储
 	 *
+	 * @param clientId  clientId
 	 * @param messageId messageId
 	 * @return MqttPendingPublish
 	 */
@@ -83,6 +85,7 @@ public interface IMqttSessionManager {
 	/**
 	 * 删除发布过程中的存储
 	 *
+	 * @param clientId  clientId
 	 * @param messageId messageId
 	 */
 	void removePendingPublish(String clientId, int messageId);
@@ -90,6 +93,7 @@ public interface IMqttSessionManager {
 	/**
 	 * 添加发布过程存储
 	 *
+	 * @param clientId           clientId
 	 * @param messageId          messageId
 	 * @param pendingQos2Publish MqttPendingQos2Publish
 	 */
@@ -98,6 +102,7 @@ public interface IMqttSessionManager {
 	/**
 	 * 获取发布过程存储
 	 *
+	 * @param clientId  clientId
 	 * @param messageId messageId
 	 * @return MqttPendingQos2Publish
 	 */
@@ -106,6 +111,7 @@ public interface IMqttSessionManager {
 	/**
 	 * 删除发布过程中的存储
 	 *
+	 * @param clientId  clientId
 	 * @param messageId messageId
 	 */
 	void removePendingQos2Publish(String clientId, int messageId);
@@ -113,6 +119,7 @@ public interface IMqttSessionManager {
 	/**
 	 * 生成消息 Id
 	 *
+	 * @param clientId clientId
 	 * @return messageId
 	 */
 	int getMessageId(String clientId);

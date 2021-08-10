@@ -49,7 +49,8 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	/**
 	 * 转发消息到设备，如果 clientId 就在本服务，会自行消化
 	 *
-	 * @param message Message
+	 * @param clientId clientId
+	 * @param message  Message
 	 * @return 是否成功
 	 */
 	abstract public boolean sendTo(String clientId, Message message);
