@@ -105,7 +105,7 @@ public final class MqttClient {
 			.build();
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, listener, message);
 		Boolean result = Tio.send(context, message);
-		logger.debug("MQTT subscribe topicFilter:{} mqttQoS:{} messageId:{} result:{}", topicFilter, mqttQoS, messageId, result);
+		logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} subscribing result:{}", topicFilter, mqttQoS, messageId, result);
 		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
 		clientStore.addPaddingSubscribe(messageId, pendingSubscription);
 		return this;
@@ -125,7 +125,7 @@ public final class MqttClient {
 			.build();
 		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilter, message);
 		Boolean result = Tio.send(context, message);
-		logger.debug("MQTT unSubscribe topicFilter:{} messageId:{} result:{}", topicFilter, messageId, result);
+		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilter, messageId, result);
 		// 解绑 subManage listener
 		clientStore.addPaddingUnSubscribe(messageId, pendingUnSubscription);
 		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(context, msg));
@@ -187,7 +187,7 @@ public final class MqttClient {
 			.messageId(messageId)
 			.build();
 		boolean result = Tio.send(context, message);
-		logger.debug("MQTT publish topic:{} qos:{} retain:{} result:{}", topic, qos, retain, result);
+		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			clientStore.addPendingPublish(messageId, pendingPublish);

@@ -22,7 +22,9 @@ import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
+import org.tio.core.Node;
 import org.tio.core.Tio;
+import org.tio.core.TioConfig;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -60,7 +62,10 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		switch (returnCode) {
 			case CONNECTION_ACCEPTED:
 				connLatch.countDown();
-				logger.info("MqttClient connection succeeded!");
+				if (logger.isInfoEnabled()) {
+					Node node = context.getServerNode();
+					logger.info("MqttClient contextId:{} connection:{}:{} succeeded!", context.getId(), node.getIp(), node.getPort());
+				}
 				break;
 			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:
 			case CONNECTION_REFUSED_IDENTIFIER_REJECTED:
@@ -81,6 +86,9 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		MqttPendingSubscription paddingSubscribe = clientStore.getPaddingSubscribe(messageId);
 		if (paddingSubscribe == null) {
 			return;
+		}
+		if (logger.isInfoEnabled()) {
+			logger.info("MQTT Topic:{} successfully subscribed messageId:{}", paddingSubscribe.getTopicFilter(), messageId);
 		}
 		paddingSubscribe.onSubAckReceived();
 		clientStore.removePaddingSubscribe(messageId);
@@ -130,6 +138,9 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (pendingUnSubscription == null) {
 			return;
 		}
+		if (logger.isInfoEnabled()) {
+			logger.info("MQTT Topic:{} successfully unSubscribed  messageId:{}", pendingUnSubscription.getTopic(), messageId);
+		}
 		pendingUnSubscription.onUnSubAckReceived();
 		clientStore.removePaddingUnSubscribe(messageId);
 		clientStore.removeSubscriptions(pendingUnSubscription.getTopic());
@@ -142,6 +153,10 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		MqttPendingPublish pendingPublish = clientStore.getPendingPublish(messageId);
 		if (pendingPublish == null) {
 			return;
+		}
+		if (logger.isInfoEnabled()) {
+			String topicName = pendingPublish.getMessage().variableHeader().topicName();
+			logger.info("MQTT Topic:{} successfully PubAck messageId:{}", topicName, messageId);
 		}
 		pendingPublish.onPubAckReceived();
 		clientStore.removePendingPublish(messageId);
@@ -187,6 +202,10 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		MqttPendingPublish pendingPublish = clientStore.getPendingPublish(messageId);
 		if (pendingPublish == null) {
 			return;
+		}
+		if (logger.isInfoEnabled()) {
+			String topicName = pendingPublish.getMessage().variableHeader().topicName();
+			logger.info("MQTT Topic:{} successfully PubComp", topicName);
 		}
 		pendingPublish.getPayload().clear();
 		pendingPublish.onPubCompReceived();

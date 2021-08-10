@@ -102,7 +102,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 				.build();
 			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, subscription.getListener(), message);
 			Boolean result = Tio.send(context, message);
-			logger.info("MQTT reconnect subscribe topicFilter:{} mqttQoS:{} messageId:{} result:{}", topicFilter, mqttQoS, messageId, result);
+			logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} resubscribing result:{}", topicFilter, mqttQoS, messageId, result);
 			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
 			clientStore.addPaddingSubscribe(messageId, pendingSubscription);
 		}

@@ -223,11 +223,13 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 	 */
 	private static final String NOT_FINAL_WEBSOCKET_PACKET_PARTS = "TIO_N_F_W_P_P";
 	/**
-	 * SEC_WEBSOCKET_KEY后缀
+	 * SEC_WEBSOCKET_KEY 后缀
 	 */
 	private static final String SEC_WEBSOCKET_KEY_SUFFIX = "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-
 	private static final byte[] SEC_WEBSOCKET_KEY_SUFFIX_BYTES = SEC_WEBSOCKET_KEY_SUFFIX.getBytes();
+	/**
+	 * websocket子协议
+	 */
 	private static final String Sec_Websocket_Protocol = "sec-websocket-protocol";
 	private static final HeaderName Header_Name_Sec_Websocket_Protocol = HeaderName.from(Sec_Websocket_Protocol);
 
@@ -254,7 +256,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 				return null;
 			}
 			HttpResponse httpResponse = updateWebSocketProtocol(request);
-			// 并非 websocket
+			// 普通 http 非 websocket
 			if (httpResponse == null) {
 				return request;
 			}
@@ -270,16 +272,16 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 		if (websocketPacket != null) {
 			// 数据包尚未完成
 			if (!websocketPacket.isWsEof()) {
-				List<WsRequest> parts = (List<WsRequest>) channelContext.getAttribute(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
+				List<WsRequest> parts = (List<WsRequest>) channelContext.get(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
 				if (parts == null) {
 					parts = new ArrayList<>();
-					channelContext.setAttribute(NOT_FINAL_WEBSOCKET_PACKET_PARTS, parts);
+					channelContext.set(NOT_FINAL_WEBSOCKET_PACKET_PARTS, parts);
 				}
 				parts.add(websocketPacket);
 			} else {
-				List<WsRequest> parts = (List<WsRequest>) channelContext.getAttribute(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
+				List<WsRequest> parts = (List<WsRequest>) channelContext.get(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
 				if (parts != null) {
-					channelContext.setAttribute(NOT_FINAL_WEBSOCKET_PACKET_PARTS, null);
+					channelContext.set(NOT_FINAL_WEBSOCKET_PACKET_PARTS, null);
 
 					parts.add(websocketPacket);
 					WsRequest first = parts.get(0);
@@ -335,7 +337,6 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			wsResponse = wsMsgHandler.encodeSubProtocol(packet, tioConfig, channelContext);
 			Objects.requireNonNull(wsResponse, "IWsMsgHandler encodeSubProtocol WsResponse is null.");
 		}
-
 		// 握手包
 		if (wsResponse.isHandShake()) {
 			WsSessionContext imSessionContext = (WsSessionContext) channelContext.get();
@@ -350,7 +351,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 		return WsServerEncoder.encode(wsResponse, tioConfig, channelContext);
 	}
 
-	private WsResponse h(WsRequest websocketPacket, byte[] bytes, Opcode opcode, ChannelContext channelContext) throws Exception {
+	private WsResponse handlerWs(WsRequest websocketPacket, byte[] bytes, Opcode opcode, ChannelContext channelContext) throws Exception {
 		if (opcode == Opcode.TEXT) {
 			if (bytes == null || bytes.length == 0) {
 				Tio.remove(channelContext, "错误的websocket包，body为空");
@@ -423,17 +424,13 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			wsResponse.setHandShake(true);
 			Tio.send(channelContext, wsResponse);
 			wsSessionContext.setHandshaked(true);
-
 			wsMsgHandler.onAfterHandshaked(request, httpResponse, channelContext);
 			return;
 		}
-
 		if (!wsRequest.isWsEof()) {
 			return;
 		}
-
-		WsResponse wsResponse = h(wsRequest, wsRequest.getBody(), wsRequest.getWsOpcode(), channelContext);
-
+		WsResponse wsResponse = handlerWs(wsRequest, wsRequest.getBody(), wsRequest.getWsOpcode(), channelContext);
 		if (wsResponse != null) {
 			Tio.send(channelContext, wsResponse);
 		}
@@ -468,21 +465,21 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 	 */
 	public HttpResponse updateWebSocketProtocol(HttpRequest request) {
 		Map<String, String> headers = request.getHeaders();
-		String Sec_WebSocket_Key = headers.get(HttpConst.RequestHeaderKey.Sec_WebSocket_Key);
+		String secWebSocketKey = headers.get(HttpConst.RequestHeaderKey.Sec_WebSocket_Key);
 
-		if (StrUtil.isNotBlank(Sec_WebSocket_Key)) {
-			byte[] Sec_WebSocket_Key_Bytes;
+		if (StrUtil.isNotBlank(secWebSocketKey)) {
+			byte[] secWebSocketKeyBytes;
 			try {
-				Sec_WebSocket_Key_Bytes = Sec_WebSocket_Key.getBytes(request.getCharset());
+				secWebSocketKeyBytes = secWebSocketKey.getBytes(request.getCharset());
 			} catch (UnsupportedEncodingException e) {
 				throw new RuntimeException(e);
 			}
-			byte[] allBs = new byte[Sec_WebSocket_Key_Bytes.length + SEC_WEBSOCKET_KEY_SUFFIX_BYTES.length];
-			System.arraycopy(Sec_WebSocket_Key_Bytes, 0, allBs, 0, Sec_WebSocket_Key_Bytes.length);
-			System.arraycopy(SEC_WEBSOCKET_KEY_SUFFIX_BYTES, 0, allBs, Sec_WebSocket_Key_Bytes.length, SEC_WEBSOCKET_KEY_SUFFIX_BYTES.length);
+			byte[] allBs = new byte[secWebSocketKeyBytes.length + SEC_WEBSOCKET_KEY_SUFFIX_BYTES.length];
+			System.arraycopy(secWebSocketKeyBytes, 0, allBs, 0, secWebSocketKeyBytes.length);
+			System.arraycopy(SEC_WEBSOCKET_KEY_SUFFIX_BYTES, 0, allBs, secWebSocketKeyBytes.length, SEC_WEBSOCKET_KEY_SUFFIX_BYTES.length);
 
-			byte[] key_array = SHA1Util.SHA1(allBs);
-			String acceptKey = BASE64Util.byteArrayToBase64(key_array);
+			byte[] keyArray = SHA1Util.SHA1(allBs);
+			String acceptKey = BASE64Util.byteArrayToBase64(keyArray);
 			HttpResponse httpResponse = new HttpResponse(request);
 
 			httpResponse.setStatus(HttpResponseStatus.C101);
