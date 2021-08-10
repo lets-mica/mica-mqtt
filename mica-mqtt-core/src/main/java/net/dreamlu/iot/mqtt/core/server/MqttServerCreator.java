@@ -114,6 +114,10 @@ public class MqttServerCreator {
 	 * debug
 	 */
 	private boolean debug = false;
+	/**
+	 * mqtt 3.1 会校验此参数
+	 */
+	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 
 	public String getName() {
 		return name;
@@ -272,6 +276,15 @@ public class MqttServerCreator {
 
 	public MqttServerCreator debug() {
 		this.debug = true;
+		return this;
+	}
+
+	public int getMaxClientIdLength() {
+		return maxClientIdLength;
+	}
+
+	public MqttServerCreator maxClientIdLength(int maxClientIdLength) {
+		this.maxClientIdLength = maxClientIdLength;
 		return this;
 	}
 
