@@ -198,6 +198,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
 import org.tio.core.intf.Packet;
 import org.tio.websocket.common.WsResponse;
+import org.tio.websocket.server.handler.IWsMsgHandler;
 
 /**
  * websocket 子协议处理器
@@ -205,27 +206,27 @@ import org.tio.websocket.common.WsResponse;
  * @author L.cm
  * 2021年7月31日 上午10:34:59
  */
-public interface IWsSubProtocolsMsgHandler {
+public interface IWsSubProtocolsMsgHandler extends IWsMsgHandler {
 
-    /**
-     * 获取支持的子协议
-     *
-     * @return 子协议数组
-     */
-    default String[] getSupportedSubProtocols() {
-        return null;
-    }
+	/**
+	 * 获取支持的子协议
+	 *
+	 * @return 子协议数组
+	 */
+	default String[] getSupportedSubProtocols() {
+		return null;
+	}
 
-    /**
-     * 解析子编码
-     *
-     * @param packet         Packet
-     * @param tioConfig      TioConfig
-     * @param channelContext ChannelContext
-     * @return Packet
-     */
-    default WsResponse encodeSubProtocol(Packet packet, TioConfig tioConfig, ChannelContext channelContext) {
-        return null;
-    }
+	/**
+	 * 解析子编码
+	 *
+	 * @param packet         Packet
+	 * @param tioConfig      TioConfig
+	 * @param channelContext ChannelContext
+	 * @return Packet
+	 */
+	default WsResponse encodeSubProtocol(Packet packet, TioConfig tioConfig, ChannelContext channelContext) {
+		return null;
+	}
 
 }

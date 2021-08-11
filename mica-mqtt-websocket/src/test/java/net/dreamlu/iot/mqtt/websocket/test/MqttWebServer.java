@@ -193,7 +193,7 @@
 */
 package net.dreamlu.iot.mqtt.websocket.test;
 
-import net.dreamlu.iot.mqtt.websocket.test.handler.IWsMsgHandler;
+import net.dreamlu.iot.mqtt.websocket.test.handler.IWsSubProtocolsMsgHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.TcpConst;
@@ -219,7 +219,6 @@ public class MqttWebServer {
 	private MqttWebServerAioHandler mqttWebServerAioHandler = null;
 	private MqttWebServerAioListener mqttWebServerAioListener = null;
 	private HttpRequestHandler httpRequestHandler = null;
-	private IWsMsgHandler wsMsgHandler = null;
 	private ServerTioConfig serverTioConfig = null;
 	private TioServer tioServer = null;
 
@@ -228,7 +227,7 @@ public class MqttWebServer {
 	 * @param requestHandler
 	 * @author tanyaowu
 	 */
-	public MqttWebServer(HttpConfig httpConfig, HttpRequestHandler requestHandler, IWsMsgHandler wsMsgHandler) {
+	public MqttWebServer(HttpConfig httpConfig, HttpRequestHandler requestHandler, IWsSubProtocolsMsgHandler wsMsgHandler) {
 		this(httpConfig, requestHandler, wsMsgHandler, null, null);
 	}
 
@@ -239,7 +238,7 @@ public class MqttWebServer {
 	 * @param groupExecutor
 	 * @author tanyaowu
 	 */
-	public MqttWebServer(HttpConfig httpConfig, HttpRequestHandler requestHandler, IWsMsgHandler wsMsgHandler, SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
+	public MqttWebServer(HttpConfig httpConfig, HttpRequestHandler requestHandler, IWsSubProtocolsMsgHandler wsMsgHandler, SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
 		if (tioExecutor == null) {
 			tioExecutor = Threads.getTioExecutor();
 		}
@@ -275,7 +274,7 @@ public class MqttWebServer {
 		return serverTioConfig;
 	}
 
-	private void init(HttpConfig httpConfig, HttpRequestHandler requestHandler, IWsMsgHandler wsMsgHandler,
+	private void init(HttpConfig httpConfig, HttpRequestHandler requestHandler, IWsSubProtocolsMsgHandler wsMsgHandler,
 					  SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
 		String system_timer_period = System.getProperty("tio.system.timer.period");
 		if (StrUtil.isBlank(system_timer_period)) {

@@ -193,7 +193,7 @@
 */
 package net.dreamlu.iot.mqtt.websocket.test;
 
-import net.dreamlu.iot.mqtt.websocket.test.handler.IWsMsgHandler;
+import net.dreamlu.iot.mqtt.websocket.test.handler.IWsSubProtocolsMsgHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -235,11 +235,11 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 
 	private final HttpConfig httpConfig;
 	private final HttpRequestHandler requestHandler;
-	private final IWsMsgHandler wsMsgHandler;
+	private final IWsSubProtocolsMsgHandler wsMsgHandler;
 
 	public MqttWebServerAioHandler(HttpConfig httpConfig,
 								   HttpRequestHandler requestHandler,
-								   IWsMsgHandler wsMsgHandler) {
+								   IWsSubProtocolsMsgHandler wsMsgHandler) {
 		this.httpConfig = httpConfig;
 		this.requestHandler = requestHandler;
 		this.wsMsgHandler = wsMsgHandler;

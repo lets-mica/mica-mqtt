@@ -18,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>net.dreamlu</groupId>
-            <artifactId>mica-mqtt-codec</artifactId>
+            <artifactId>mica-mqtt-core</artifactId>
         </dependency>
     </dependencies>
 

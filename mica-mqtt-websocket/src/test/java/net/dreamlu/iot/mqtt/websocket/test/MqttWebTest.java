@@ -16,11 +16,9 @@
 
 package net.dreamlu.iot.mqtt.websocket.test;
 
-import net.dreamlu.iot.mqtt.websocket.test.handler.IWsMsgHandler;
+import net.dreamlu.iot.mqtt.websocket.test.api.MqttHttpApi;
+import net.dreamlu.iot.mqtt.websocket.test.handler.IWsSubProtocolsMsgHandler;
 import org.tio.http.common.HttpConfig;
-import org.tio.http.common.HttpRequest;
-import org.tio.http.common.HttpResponse;
-import org.tio.http.common.RequestLine;
 import org.tio.http.common.handler.HttpRequestHandler;
 
 /**
@@ -35,19 +33,11 @@ public class MqttWebTest {
 		httpConfig.setCheckHost(false);
 		httpConfig.setMonitorFileChange(false);
 
-		HttpRequestHandler requestHandler = new AbstractMqttWebRequestHandler() {
+		HttpRequestHandler requestHandler = new MqttWebRequestHandler();
 
-			@Override
-			public HttpResponse handler(HttpRequest packet) throws Exception {
-				RequestLine requestLine = packet.getRequestLine();
-				String path = requestLine.getPath();
-				HttpResponse httpResponse = new HttpResponse(packet);
-				httpResponse.setBody("hello".getBytes());
-				return httpResponse;
-			}
-		};
-
-		IWsMsgHandler mqttWsMsgHandler = new MqttWebHandler();
+		MqttHttpApi httpApi = new MqttHttpApi(null);
+		httpApi.register();
+		IWsSubProtocolsMsgHandler mqttWsMsgHandler = new MqttWebHandler();
 		MqttWebServer httpServerStarter = new MqttWebServer(httpConfig, requestHandler, mqttWsMsgHandler);
 		httpServerStarter.start(); //启动http服务器
 	}

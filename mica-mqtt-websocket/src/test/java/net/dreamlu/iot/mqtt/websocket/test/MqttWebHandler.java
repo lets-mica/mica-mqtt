@@ -17,7 +17,7 @@
 package net.dreamlu.iot.mqtt.websocket.test;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import net.dreamlu.iot.mqtt.websocket.test.handler.IWsMsgHandler;
+import net.dreamlu.iot.mqtt.websocket.test.handler.IWsSubProtocolsMsgHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  *
  * @author L.cm
  */
-public class MqttWebHandler implements IWsMsgHandler {
+public class MqttWebHandler implements IWsSubProtocolsMsgHandler {
 	private static final Logger logger = LoggerFactory.getLogger(MqttWebHandler.class);
 	// mqtt websocket message body key
 	private static final String MQTT_WS_MSG_BODY_KEY = "MQTT_WS_MSG_BODY_KEY";
