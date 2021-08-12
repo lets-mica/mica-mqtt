@@ -1,6 +1,16 @@
 # 变更记录
 
 ## 发行版本
+### v1.0.3-RC - 2021-08-12
+- :sparkles: 添加 websocket mqtt 子协议支持（支持 mqtt.js）。
+- :sparkles: mqtt 客户端去除 CountDownLatch 避免启动时未连接上服务端卡住。
+- :sparkles: mica-mqtt 服务端 ip，默认为空，可不设置。
+- :sparkles: 完善 mica-mqtt-spring-boot-starter，添加遗嘱消息配置。
+- :sparkles: mqtt 3.1 协议会校验 clientId 长度，添加设置。
+- :sparkles: mqtt 日志优化，方便查询。
+- :sparkles: 代码优化，部分 Tio.close 改为 Tio.remove。
+- :arrow_up: 升级 t-io 到 3.7.4。
+
 ### v1.0.2 - 2021-08-08
 - :memo: 文档添加集群处理步骤说明，添加遗嘱消息、保留消息的使用场景。
 - :sparkles: 去除演示中的 qos2 参数，性能损耗大避免误用。
