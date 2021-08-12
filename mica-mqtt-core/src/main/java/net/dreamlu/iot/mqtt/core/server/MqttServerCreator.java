@@ -38,6 +38,7 @@ import org.tio.server.TioServer;
 import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.websocket.server.WsServerConfig;
 import org.tio.websocket.server.WsServerStarter;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
@@ -358,10 +359,11 @@ public class MqttServerCreator {
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
 		}
-		// 9. 启动 websocket
+		// 9. 启动 mqtt websocket server
 		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(handler);
+		WsServerConfig wsServerConfig = new WsServerConfig(this.wsPort, false);
 		try {
-			WsServerStarter wsServerStarter = new WsServerStarter(this.wsPort, mqttWsMsgHandler);
+			WsServerStarter wsServerStarter = new WsServerStarter(wsServerConfig, mqttWsMsgHandler);
 			ServerTioConfig wsTioConfig = wsServerStarter.getServerTioConfig();
 			wsTioConfig.share(tioConfig);
 			wsServerStarter.start();
