@@ -295,6 +295,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public int getWsPort() {
+		return wsPort;
+	}
+
+	public MqttServerCreator wsPort(int wsPort) {
+		this.wsPort = wsPort;
+		return this;
+	}
+
 	public MqttServer start() {
 		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		if (this.authHandler == null) {
