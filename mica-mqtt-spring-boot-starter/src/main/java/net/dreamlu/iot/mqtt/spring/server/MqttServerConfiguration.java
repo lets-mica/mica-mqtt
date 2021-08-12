@@ -80,7 +80,7 @@ public class MqttServerConfiguration {
 			.maxBytesInMessage(properties.getMaxBytesInMessage())
 			.bufferAllocator(properties.getBufferAllocator())
 			.maxClientIdLength(properties.getMaxClientIdLength())
-			.enableWebsocket(properties.isWebsocketEnable())
+			.websocketEnable(properties.isWebsocketEnable())
 			.websocketPort(properties.getWebsocketPort());
 		if (properties.isDebug()) {
 			serverCreator.debug();
