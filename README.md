@@ -9,6 +9,7 @@
 
 ## 功能
 - [x] 支持 MQTT v3.1、v3.1.1 以及 v5.0 协议。
+- [x] 支持 websocket mqtt 子协议（支持 mqtt.js）。
 - [x] 支持 MQTT client 客户端。
 - [x] 支持 MQTT server 服务端。
 - [x] 支持 MQTT 遗嘱消息。
@@ -20,7 +21,6 @@
 - [x] mica-mqtt-spring-boot-starter 支持对接 Prometheus + Grafana。
 
 ## 待办
-- [ ] 添加 websocket 支持。
 - [ ] 优化处理 mqtt session，以及支持 v5.0 
 
 ## 依赖
