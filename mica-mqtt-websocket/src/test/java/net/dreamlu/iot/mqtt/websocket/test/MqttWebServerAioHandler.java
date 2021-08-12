@@ -193,7 +193,6 @@
 */
 package net.dreamlu.iot.mqtt.websocket.test;
 
-import net.dreamlu.iot.mqtt.websocket.test.handler.IWsSubProtocolsMsgHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -208,6 +207,7 @@ import org.tio.utils.hutool.StrUtil;
 import org.tio.websocket.common.*;
 import org.tio.websocket.common.util.BASE64Util;
 import org.tio.websocket.common.util.SHA1Util;
+import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
@@ -235,11 +235,11 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 
 	private final HttpConfig httpConfig;
 	private final HttpRequestHandler requestHandler;
-	private final IWsSubProtocolsMsgHandler wsMsgHandler;
+	private final IWsMsgHandler wsMsgHandler;
 
 	public MqttWebServerAioHandler(HttpConfig httpConfig,
 								   HttpRequestHandler requestHandler,
-								   IWsSubProtocolsMsgHandler wsMsgHandler) {
+								   IWsMsgHandler wsMsgHandler) {
 		this.httpConfig = httpConfig;
 		this.requestHandler = requestHandler;
 		this.wsMsgHandler = wsMsgHandler;

@@ -21,8 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
-import org.tio.http.common.HeaderName;
-import org.tio.http.common.HeaderValue;
+import org.tio.core.TioConfig;
+import org.tio.core.intf.Packet;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.websocket.common.WsRequest;
@@ -40,13 +40,13 @@ import java.util.stream.Collectors;
  */
 public class MqttWsMsgHandler implements IWsMsgHandler {
 	private static final Logger logger = LoggerFactory.getLogger(MqttWsMsgHandler.class);
-	// websocket 子协议头
-	private static final String Sec_Websocket_Protocol = "Sec-Websocket-Protocol".toLowerCase();
-	private static final HeaderName Header_Name_Sec_Websocket_Protocol = HeaderName.from(Sec_Websocket_Protocol);
-	// mqtt websocket message body key
+	/**
+	 * mqtt websocket message body key
+	 */
 	private static final String MQTT_WS_MSG_BODY_KEY = "MQTT_WS_MSG_BODY_KEY";
 
 	private final String[] supportedSubProtocols;
+	private final MqttEncoder encoder;
 
 	public MqttWsMsgHandler() {
 		this(new String[]{"mqtt", "mqttv3.1", "mqttv3.1.1"});
@@ -54,16 +54,16 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 
 	public MqttWsMsgHandler(String[] supportedSubProtocols) {
 		this.supportedSubProtocols = supportedSubProtocols;
+		this.encoder = MqttEncoder.INSTANCE;
+	}
+
+	@Override
+	public String[] getSupportedSubProtocols() {
+		return this.supportedSubProtocols;
 	}
 
 	@Override
 	public HttpResponse handshake(HttpRequest request, HttpResponse httpResponse, ChannelContext channelContext) {
-		String requestedSubProtocols = request.getHeader(Sec_Websocket_Protocol);
-		String selectSubProtocol = selectSubProtocol(requestedSubProtocols, this.supportedSubProtocols);
-		if (selectSubProtocol != null) {
-			httpResponse.addHeader(Header_Name_Sec_Websocket_Protocol, HeaderValue.from(selectSubProtocol));
-		}
-		logger.debug("Mqtt websocket handshake requestedSubProtocols:{} selectSubProtocol:{}", requestedSubProtocols, selectSubProtocol);
 		return httpResponse;
 	}
 
@@ -104,18 +104,14 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 		System.out.println(mqttMessage);
 		MqttFixedHeader fixedHeader = mqttMessage.fixedHeader();
 		MqttMessageType messageType = fixedHeader.messageType();
-		MqttEncoder encoder = MqttEncoder.INSTANCE;
-
 		if (MqttMessageType.CONNECT == messageType) {
 			MqttConnAckMessage message = MqttMessageBuilders.connAck()
 				.returnCode(MqttConnectReturnCode.CONNECTION_ACCEPTED)
 				.sessionPresent(false)
 				.build();
-			ByteBuffer encode = encoder.doEncode(context, message, ByteBufferAllocator.HEAP);
-			Tio.send(context, WsResponse.fromBytes(encode.array()));
+			Tio.send(context, message);
 		} else if (MqttMessageType.PINGREQ == messageType) {
-			ByteBuffer encode = encoder.doEncode(context, MqttMessage.PINGRESP, ByteBufferAllocator.HEAP);
-			Tio.send(context, WsResponse.fromBytes(encode.array()));
+			Tio.send(context, MqttMessage.PINGRESP);
 		} else if (MqttMessageType.PUBLISH == messageType) {
 			MqttPublishMessage mqttPublishMessage = (MqttPublishMessage) mqttMessage;
 			ByteBuffer payload = mqttPublishMessage.payload();
@@ -133,10 +129,18 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 				.addGrantedQosList(mqttQosList)
 				.packetId(messageId)
 				.build();
-			ByteBuffer encode = encoder.doEncode(context, subAckMessage, ByteBufferAllocator.HEAP);
-			Tio.send(context, WsResponse.fromBytes(encode.array()));
+			Tio.send(context, subAckMessage);
 		} else if (MqttMessageType.DISCONNECT == messageType) {
 			Tio.close(context, "Mqtt websocket DisConnect");
+		}
+		return null;
+	}
+
+	@Override
+	public WsResponse encodeSubProtocol(Packet packet, TioConfig tioConfig, ChannelContext context) {
+		if (packet instanceof MqttMessage) {
+			ByteBuffer buffer = encoder.doEncode(context, (MqttMessage) packet, ByteBufferAllocator.HEAP);
+			return WsResponse.fromBytes(buffer.array());
 		}
 		return null;
 	}
@@ -159,32 +163,9 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	}
 
 	/**
-	 * Selects the first matching supported sub protocol
-	 *
-	 * @param requestedSubProtocols 请求中的子协议
-	 * @param subProtocols          系统支持得子协议，注意：不支持 * 通配
-	 * @return First matching supported sub protocol. Null if not found.
-	 */
-	private static String selectSubProtocol(String requestedSubProtocols, String[] subProtocols) {
-		if (requestedSubProtocols == null || subProtocols == null || subProtocols.length == 0) {
-			return null;
-		}
-		String[] requestedSubProtocolArray = requestedSubProtocols.split(",");
-		for (String p : requestedSubProtocolArray) {
-			String requestedSubProtocol = p.trim();
-			for (String supportedSubProtocol : subProtocols) {
-				if (requestedSubProtocol.equals(supportedSubProtocol)) {
-					return requestedSubProtocol;
-				}
-			}
-		}
-		// No match found
-		return null;
-	}
-
-	/**
 	 * 读取 mqtt 消息体处理半包的情况
-	 * @param bytes 消息类容
+	 *
+	 * @param bytes   消息类容
 	 * @param context ChannelContext
 	 * @return ByteBuffer
 	 */

@@ -16,10 +16,11 @@
 
 package net.dreamlu.iot.mqtt.websocket.test;
 
+import net.dreamlu.iot.mqtt.websocket.MqttWsMsgHandler;
 import net.dreamlu.iot.mqtt.websocket.test.api.MqttHttpApi;
-import net.dreamlu.iot.mqtt.websocket.test.handler.IWsSubProtocolsMsgHandler;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.handler.HttpRequestHandler;
+import org.tio.websocket.server.handler.IWsMsgHandler;
 
 /**
  * mqtt websocket 子协议测试
@@ -37,7 +38,7 @@ public class MqttWebTest {
 
 		MqttHttpApi httpApi = new MqttHttpApi(null);
 		httpApi.register();
-		IWsSubProtocolsMsgHandler mqttWsMsgHandler = new MqttWebHandler();
+		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler();
 		MqttWebServer httpServerStarter = new MqttWebServer(httpConfig, requestHandler, mqttWsMsgHandler);
 		httpServerStarter.start(); //启动http服务器
 	}
