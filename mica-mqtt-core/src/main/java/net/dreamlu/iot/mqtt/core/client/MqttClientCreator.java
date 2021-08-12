@@ -31,7 +31,6 @@ import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
@@ -282,10 +281,8 @@ public final class MqttClientCreator {
 			this.clientId("MICA-MQTT-" + Long.toString(System.nanoTime(), 36));
 		}
 		MqttClientStore clientStore = new MqttClientStore();
-		// 客户端处理器
-		CountDownLatch connLatch = new CountDownLatch(1);
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
-		IMqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, connLatch, executor);
+		IMqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, executor);
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, processor);
 		ClientAioListener clientAioListener = new MqttClientAioListener(this, clientStore, executor);
@@ -307,8 +304,6 @@ public final class MqttClientCreator {
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
 			ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
-			// 7. 等待连接成功之后继续
-			connLatch.await();
 			return new MqttClient(tioClient, this, context, clientStore, executor);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);

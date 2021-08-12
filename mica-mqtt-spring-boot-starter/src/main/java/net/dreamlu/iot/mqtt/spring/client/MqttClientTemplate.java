@@ -24,6 +24,7 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
 
 import java.nio.ByteBuffer;
@@ -35,7 +36,7 @@ import java.nio.ByteBuffer;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class MqttClientTemplate implements InitializingBean, DisposableBean {
+public class MqttClientTemplate implements InitializingBean, DisposableBean, Ordered {
 	private final MqttClientCreator mqttClientCreator;
 	private MqttClient client;
 
@@ -188,6 +189,11 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	@Override
 	public void destroy() {
 		client.stop();
+	}
+
+	@Override
+	public int getOrder() {
+		return Ordered.LOWEST_PRECEDENCE;
 	}
 
 }

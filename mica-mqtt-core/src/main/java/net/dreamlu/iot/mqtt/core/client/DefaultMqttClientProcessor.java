@@ -27,7 +27,6 @@ import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -38,14 +37,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
 	private final MqttClientStore clientStore;
-	private final CountDownLatch connLatch;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttClientProcessor(MqttClientStore clientStore,
-									  CountDownLatch connLatch,
 									  ScheduledThreadPoolExecutor executor) {
 		this.clientStore = clientStore;
-		this.connLatch = connLatch;
 		this.executor = executor;
 	}
 
@@ -60,7 +56,6 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		MqttConnectReturnCode returnCode = message.variableHeader().connectReturnCode();
 		switch (returnCode) {
 			case CONNECTION_ACCEPTED:
-				connLatch.countDown();
 				if (logger.isInfoEnabled()) {
 					Node node = context.getServerNode();
 					logger.info("MqttClient contextId:{} connection:{}:{} succeeded!", context.getId(), node.getIp(), node.getPort());
