@@ -148,7 +148,7 @@ public class ServerService {
 | mqtt_messages_send_packets     | 已发送消息数      |
 | mqtt_messages_send_bytes       | 已发送消息字节数  |
 
-## 三、mqtt 客户端
+## 三、mqtt 客户端（使用到的场景有限，非必要请不要启用）
 
 ### 3.1 配置项
 | 配置项 | 默认值 | 说明 |

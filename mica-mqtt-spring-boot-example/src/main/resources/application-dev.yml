@@ -10,7 +10,7 @@ mqtt:
     max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     debug: true                 # 如果开启 prometheus 指标收集建议关闭
   client:
-    enabled: true               # 是否开启客户端，默认：false
+    enabled: true               # 是否开启客户端，默认：false 使用到的场景有限，非必要请不要启用
     ip: 127.0.0.1               # 连接的服务端 ip ，默认：127.0.0.1
     port: 3883                  # 端口：默认：1883
     name: Mica-Mqtt-Client      # 名称，默认：Mica-Mqtt-Client
