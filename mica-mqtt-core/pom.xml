@@ -16,6 +16,10 @@
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-mqtt-codec</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.t-io</groupId>
+            <artifactId>tio-websocket-server</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

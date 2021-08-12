@@ -30,6 +30,7 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.websocket.MqttWsMsgHandler;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -37,6 +38,8 @@ import org.tio.server.TioServer;
 import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.websocket.server.WsServerStarter;
+import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -118,6 +121,10 @@ public class MqttServerCreator {
 	 * mqtt 3.1 会校验此参数
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
+	/**
+	 * websocket 端口
+	 */
+	private int wsPort = 8083;
 
 	public String getName() {
 		return name;
@@ -336,11 +343,21 @@ public class MqttServerCreator {
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
 			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);
 		}
-		// 8. 启动
+		// 8. 启动 mqtt tcp
 		try {
 			tioServer.start(this.ip, this.port);
 		} catch (IOException e) {
-			throw new IllegalStateException("Mica mqtt server start fail.", e);
+			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
+		}
+		// 9. 启动 websocket
+		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(handler);
+		try {
+			WsServerStarter wsServerStarter = new WsServerStarter(this.wsPort, mqttWsMsgHandler);
+			ServerTioConfig wsTioConfig = wsServerStarter.getServerTioConfig();
+			wsTioConfig.share(tioConfig);
+			wsServerStarter.start();
+		} catch (IOException e) {
+			throw new IllegalStateException("Mica mqtt websocket server start fail.", e);
 		}
 		return mqttServer;
 	}
