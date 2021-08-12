@@ -49,11 +49,10 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	public void start() {
 		// 1. 启动 mqtt tcp server
 		TioServer tioServer = mqttServer.getTioServer();
-		String ip = serverCreator.getIp();
 		try {
 			int port = serverCreator.getPort();
-			tioServer.start(ip, serverCreator.getPort());
-			log.info("Mica mqtt tcp start successful on {}:{}", ip, port);
+			tioServer.start(serverCreator.getIp(), serverCreator.getPort());
+			log.info("Mica mqtt tcp start successful on {}:{}", tioServer.getServerNode().getIp(), port);
 			running = true;
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt server start fail.", e);
@@ -75,7 +74,7 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 			wsTioConfig.share(tioConfig);
 			try {
 				websocketServer.start(tioServer.getServerNode().getIp(), wsServerConfig.getBindPort());
-				log.info("Mica mqtt websocket start successful on {}:{}", ip, websocketPort);
+				log.info("Mica mqtt websocket start successful on {}:{}", tioServer.getServerNode().getIp(), websocketPort);
 			} catch (IOException e) {
 				throw new IllegalStateException("Mica mqtt websocket server start fail.", e);
 			}

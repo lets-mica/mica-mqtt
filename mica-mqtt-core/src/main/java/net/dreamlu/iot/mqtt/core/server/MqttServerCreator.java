@@ -61,9 +61,9 @@ public class MqttServerCreator {
 	 */
 	private String name = "Mica-Mqtt-Server";
 	/**
-	 * 服务端 ip
+	 * 服务端 ip，默认为空，可不设置
 	 */
-	private String ip = "127.0.0.1";
+	private String ip;
 	/**
 	 * 端口
 	 */

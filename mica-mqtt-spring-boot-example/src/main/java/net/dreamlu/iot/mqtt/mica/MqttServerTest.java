@@ -37,8 +37,8 @@ public class MqttServerTest {
 	public static void main(String[] args) {
 		// 注意：为了能接受更多链接（降低内存），请添加 jvm 参数 -Xss129k
 		MqttServer mqttServer = MqttServer.create()
-			// 默认：127.0.0.1
-			.ip("127.0.0.1")
+			// 服务端 ip 默认为空，0.0.0.0
+			.ip("0.0.0.0")
 			// 默认：1883
 			.port(3883)
 			// 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）

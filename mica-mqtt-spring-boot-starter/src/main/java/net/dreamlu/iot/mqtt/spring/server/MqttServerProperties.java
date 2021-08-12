@@ -47,7 +47,7 @@ public class MqttServerProperties {
 	/**
 	 * 服务端 ip
 	 */
-	private String ip = "127.0.0.1";
+	private String ip;
 	/**
 	 * 端口
 	 */

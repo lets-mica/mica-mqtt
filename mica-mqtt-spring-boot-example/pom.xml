@@ -18,7 +18,7 @@
     <properties>
         <java.version>1.8</java.version>
         <mica.version>2.5.3</mica.version>
-        <mica.mqtt.version>1.0.2-RC</mica.mqtt.version>
+        <mica.mqtt.version>1.0.3-RC</mica.mqtt.version>
         <spring.boot.version>2.5.3</spring.boot.version>
     </properties>
 
