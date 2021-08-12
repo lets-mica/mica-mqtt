@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.spring.client;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
@@ -32,6 +33,7 @@ import java.nio.ByteBuffer;
  *
  * @author wsq（冷月宫主）
  */
+@Slf4j
 @RequiredArgsConstructor
 public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	private final MqttClientCreator mqttClientCreator;
@@ -180,6 +182,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean {
 	@Override
 	public void afterPropertiesSet() {
 		client = mqttClientCreator.connect();
+		log.info("Mica mqtt client connect to {}:{} successful.", mqttClientCreator.getIp(), mqttClientCreator.getPort());
 	}
 
 	@Override

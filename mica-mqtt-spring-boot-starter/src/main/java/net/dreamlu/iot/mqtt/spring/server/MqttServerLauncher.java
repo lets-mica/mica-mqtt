@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.spring.server;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.websocket.MqttWsMsgHandler;
@@ -37,6 +38,7 @@ import java.io.IOException;
  *
  * @author L.cm
  */
+@Slf4j
 @RequiredArgsConstructor
 public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	private final MqttServerCreator serverCreator;
@@ -47,16 +49,20 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 	public void start() {
 		// 1. 启动 mqtt tcp server
 		TioServer tioServer = mqttServer.getTioServer();
+		String ip = serverCreator.getIp();
 		try {
-			tioServer.start(serverCreator.getIp(), serverCreator.getPort());
+			int port = serverCreator.getPort();
+			tioServer.start(ip, serverCreator.getPort());
+			log.info("Mica mqtt tcp start successful on {}:{}", ip, port);
 			running = true;
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt server start fail.", e);
 		}
 		// 2. 启动 mqtt websocket server
 		if (serverCreator.isWebsocketEnable()) {
+			int websocketPort = serverCreator.getWebsocketPort();
 			ServerTioConfig tioConfig = tioServer.getServerTioConfig();
-			WsServerConfig wsServerConfig = new WsServerConfig(serverCreator.getWebsocketPort(), false);
+			WsServerConfig wsServerConfig = new WsServerConfig(websocketPort, false);
 			IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(tioConfig.getServerAioHandler());
 			WsServerAioHandler wsServerAioHandler = new WsServerAioHandler(wsServerConfig, mqttWsMsgHandler);
 			WsServerAioListener wsServerAioListener = new WsServerAioListener();
@@ -69,6 +75,7 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 			wsTioConfig.share(tioConfig);
 			try {
 				websocketServer.start(tioServer.getServerNode().getIp(), wsServerConfig.getBindPort());
+				log.info("Mica mqtt websocket start successful on {}:{}", ip, websocketPort);
 			} catch (IOException e) {
 				throw new IllegalStateException("Mica mqtt websocket server start fail.", e);
 			}

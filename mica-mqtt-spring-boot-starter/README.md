@@ -26,7 +26,7 @@
 | mqtt.server.debug | false | debug，如果开启 prometheus 指标收集建议关闭 |
 | mqtt.server.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.server.websocket-enable | true | 开启 websocket 服务，默认：true |
-| mqtt.server.websocket-port | true | 开启 websocket 服务，默认：true |
+| mqtt.server.websocket-port | 8083 | websocket 端口，默认：8083 |
 
 ### 2.2 配置项示例
 
