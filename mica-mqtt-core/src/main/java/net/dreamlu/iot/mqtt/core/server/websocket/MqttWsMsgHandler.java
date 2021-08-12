@@ -19,8 +19,6 @@ package net.dreamlu.iot.mqtt.core.server.websocket;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.WriteBuffer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
@@ -40,7 +38,6 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 public class MqttWsMsgHandler implements IWsMsgHandler {
-	private static final Logger logger = LoggerFactory.getLogger(MqttWsMsgHandler.class);
 	/**
 	 * mqtt websocket message body key
 	 */
@@ -109,7 +106,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	@Override
 	public WsResponse encodeSubProtocol(Packet packet, TioConfig tioConfig, ChannelContext context) {
 		if (packet instanceof MqttMessage) {
-			ByteBuffer buffer = mqttServerAioHandler.encode((MqttMessage) packet, null, context);
+			ByteBuffer buffer = mqttServerAioHandler.encode(packet, null, context);
 			return WsResponse.fromBytes(buffer.array());
 		}
 		return null;
@@ -120,7 +117,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 */
 	@Override
 	public Object onClose(WsRequest wsRequest, byte[] bytes, ChannelContext context) {
-		Tio.close(context, "Mqtt websocket close.");
+		Tio.remove(context, "Mqtt websocket close.");
 		return null;
 	}
 

@@ -19,9 +19,16 @@ package net.dreamlu.iot.mqtt.spring.server;
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
+import net.dreamlu.iot.mqtt.core.server.websocket.MqttWsMsgHandler;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.core.Ordered;
+import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
+import org.tio.websocket.common.WsTioUuid;
+import org.tio.websocket.server.WsServerAioHandler;
+import org.tio.websocket.server.WsServerAioListener;
+import org.tio.websocket.server.WsServerConfig;
+import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.IOException;
 
@@ -38,12 +45,33 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 
 	@Override
 	public void start() {
+		// 1. 启动 mqtt tcp server
 		TioServer tioServer = mqttServer.getTioServer();
 		try {
 			tioServer.start(serverCreator.getIp(), serverCreator.getPort());
 			running = true;
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt server start fail.", e);
+		}
+		// 2. 启动 mqtt websocket server
+		if (serverCreator.isWebsocketEnable()) {
+			ServerTioConfig tioConfig = tioServer.getServerTioConfig();
+			WsServerConfig wsServerConfig = new WsServerConfig(serverCreator.getWebsocketPort(), false);
+			IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(tioConfig.getServerAioHandler());
+			WsServerAioHandler wsServerAioHandler = new WsServerAioHandler(wsServerConfig, mqttWsMsgHandler);
+			WsServerAioListener wsServerAioListener = new WsServerAioListener();
+			ServerTioConfig wsTioConfig = new ServerTioConfig(tioConfig.getName() + "-Websocket", wsServerAioHandler, wsServerAioListener);
+			wsTioConfig.setHeartbeatTimeout(0);
+			wsTioConfig.setTioUuid(new WsTioUuid());
+			wsTioConfig.setReadBufferSize(1024 * 30);
+			TioServer websocketServer = new TioServer(wsTioConfig);
+			mqttServer.setTioWsServer(websocketServer);
+			wsTioConfig.share(tioConfig);
+			try {
+				websocketServer.start(tioServer.getServerNode().getIp(), wsServerConfig.getBindPort());
+			} catch (IOException e) {
+				throw new IllegalStateException("Mica mqtt websocket server start fail.", e);
+			}
 		}
 	}
 

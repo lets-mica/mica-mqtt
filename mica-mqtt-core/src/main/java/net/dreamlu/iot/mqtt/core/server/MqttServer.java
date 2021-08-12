@@ -43,6 +43,7 @@ public final class MqttServer {
 	private final TioServer tioServer;
 	private final IMqttSessionManager sessionManager;
 	private final ScheduledThreadPoolExecutor executor;
+	private TioServer tioWsServer;
 
 	public MqttServer(TioServer tioServer,
 					  MqttServerCreator serverCreator,
@@ -163,7 +164,7 @@ public final class MqttServer {
 			.messageId(messageId)
 			.build();
 		boolean result = Tio.send(context, message);
-		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, retain, result);
+		logger.info("MQTT Topic:{} qos:{} retain:{} publish clientId:{} result:{}", topic, qos, retain, clientId, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			sessionManager.addPendingPublish(clientId, messageId, pendingPublish);
@@ -237,9 +238,22 @@ public final class MqttServer {
 		return true;
 	}
 
+	/**
+	 * 绑定 websocket 服务
+	 *
+	 * @param tioWsServer TioServer
+	 */
+	public void setTioWsServer(TioServer tioWsServer) {
+		this.tioWsServer = tioWsServer;
+	}
+
 	public boolean stop() {
 		boolean result = this.tioServer.stop();
-		logger.info("MqttServer stop result:{}", result);
+		logger.info("Mqtt tcp server stop result:{}", result);
+		if (tioWsServer != null) {
+			result &= tioWsServer.stop();
+			logger.info("Mqtt websocket server stop result:{}", result);
+		}
 		try {
 			sessionManager.clean();
 		} catch (Throwable e) {

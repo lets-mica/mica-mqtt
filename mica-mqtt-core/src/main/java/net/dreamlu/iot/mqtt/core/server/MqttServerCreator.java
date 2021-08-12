@@ -38,8 +38,10 @@ import org.tio.server.TioServer;
 import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.websocket.common.WsTioUuid;
+import org.tio.websocket.server.WsServerAioHandler;
+import org.tio.websocket.server.WsServerAioListener;
 import org.tio.websocket.server.WsServerConfig;
-import org.tio.websocket.server.WsServerStarter;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.IOException;
@@ -123,9 +125,13 @@ public class MqttServerCreator {
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
-	 * websocket 端口
+	 * 开启 websocket 服务，默认：true
 	 */
-	private int wsPort = 8083;
+	private boolean websocketEnable = true;
+	/**
+	 * websocket 端口，默认：8083
+	 */
+	private int websocketPort = 8083;
 
 	public String getName() {
 		return name;
@@ -296,12 +302,21 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public int getWsPort() {
-		return wsPort;
+	public boolean isWebsocketEnable() {
+		return websocketEnable;
 	}
 
-	public MqttServerCreator wsPort(int wsPort) {
-		this.wsPort = wsPort;
+	public MqttServerCreator websocketEnable(boolean websocketEnable) {
+		this.websocketEnable = websocketEnable;
+		return this;
+	}
+
+	public int getWebsocketPort() {
+		return websocketPort;
+	}
+
+	public MqttServerCreator websocketPort(int websocketPort) {
+		this.websocketPort = websocketPort;
 		return this;
 	}
 
@@ -360,15 +375,23 @@ public class MqttServerCreator {
 			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
 		}
 		// 9. 启动 mqtt websocket server
-		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(handler);
-		WsServerConfig wsServerConfig = new WsServerConfig(this.wsPort, false);
-		try {
-			WsServerStarter wsServerStarter = new WsServerStarter(wsServerConfig, mqttWsMsgHandler);
-			ServerTioConfig wsTioConfig = wsServerStarter.getServerTioConfig();
+		if (this.websocketEnable) {
+			WsServerConfig wsServerConfig = new WsServerConfig(this.websocketPort, false);
+			IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(handler);
+			WsServerAioHandler wsServerAioHandler = new WsServerAioHandler(wsServerConfig, mqttWsMsgHandler);
+			WsServerAioListener wsServerAioListener = new WsServerAioListener();
+			ServerTioConfig wsTioConfig = new ServerTioConfig(this.name + "-Websocket", wsServerAioHandler, wsServerAioListener);
+			wsTioConfig.setHeartbeatTimeout(0);
+			wsTioConfig.setTioUuid(new WsTioUuid());
+			wsTioConfig.setReadBufferSize(1024 * 30);
+			TioServer tioWsServer = new TioServer(wsTioConfig);
+			mqttServer.setTioWsServer(tioWsServer);
 			wsTioConfig.share(tioConfig);
-			wsServerStarter.start();
-		} catch (IOException e) {
-			throw new IllegalStateException("Mica mqtt websocket server start fail.", e);
+			try {
+				tioWsServer.start(this.ip, wsServerConfig.getBindPort());
+			} catch (IOException e) {
+				throw new IllegalStateException("Mica mqtt websocket server start fail.", e);
+			}
 		}
 		return mqttServer;
 	}

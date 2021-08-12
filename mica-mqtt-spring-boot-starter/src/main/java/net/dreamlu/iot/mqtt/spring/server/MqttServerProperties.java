@@ -69,6 +69,10 @@ public class MqttServerProperties {
 	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
 	/**
+	 * ssl 配置
+	 */
+	private Ssl ssl = new Ssl();
+	/**
 	 * debug
 	 */
 	private boolean debug = false;
@@ -77,9 +81,13 @@ public class MqttServerProperties {
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
-	 * ssl 配置
+	 * 开启 websocket 服务，默认：true
 	 */
-	private Ssl ssl = new Ssl();
+	private boolean websocketEnable = true;
+	/**
+	 * websocket 端口，默认：8083
+	 */
+	private int websocketPort = 8083;
 
 	@Getter
 	@Setter

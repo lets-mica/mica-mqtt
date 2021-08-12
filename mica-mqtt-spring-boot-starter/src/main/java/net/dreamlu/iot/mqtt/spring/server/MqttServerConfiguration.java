@@ -79,7 +79,9 @@ public class MqttServerConfiguration {
 			.readBufferSize(properties.getReadBufferSize())
 			.maxBytesInMessage(properties.getMaxBytesInMessage())
 			.bufferAllocator(properties.getBufferAllocator())
-			.maxClientIdLength(properties.getMaxClientIdLength());
+			.maxClientIdLength(properties.getMaxClientIdLength())
+			.enableWebsocket(properties.isWebsocketEnable())
+			.websocketPort(properties.getWebsocketPort());
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}
