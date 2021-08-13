@@ -42,6 +42,8 @@ mqtt:
     read-buffer-size: 8092      # 接收数据的 buffer size，默认：8092
     max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     debug: true                 # 如果开启 prometheus 指标收集建议关闭
+    websocket-enable: true      # 开启 websocket 子协议，默认开启
+    websocket-port: 8083        # websocket 端口，默认：8083
 ```
 
 ### 2.3 可实现接口（注册成 Spring Bean 即可）
@@ -161,8 +163,9 @@ public class ServerService {
 | mqtt.client.password |  | 密码 |
 | mqtt.client.client-id |  | 客户端ID，非常重要， 默认为：MICA-MQTT- 前缀和 36进制的纳秒数 |
 | mqtt.client.clean-session | true | 清除会话 <p> false 表示如果订阅的客户机断线了，那么要保存其要推送的消息，如果其重新连接时，则将这些消息推送。 true 表示消除，表示客户机是第一次连接，消息所以以前的连接信息。 </p> |
-| mqtt.client.buffer-allocator | 8092 | ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存 |
+| mqtt.client.buffer-allocator | 堆内存 | ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存 |
 | mqtt.client.read-buffer-size | 8092 | t-io 每次消息读取长度，跟 maxBytesInMessage 相关 |
+| mqtt.client.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
 | mqtt.client.reconnect | true | 自动重连 |
 | mqtt.client.re-interval | 5000 | 重连重试时间，单位毫秒 |
 | mqtt.client.timeout | 5 | 超时时间，单位秒，t-io 配置，可为 null |
@@ -185,10 +188,17 @@ mqtt:
     re-interval: 5000           # 重连时间，默认 5000 毫秒
     version: MQTT_5             # mqtt 协议版本，默认：3.1.1
     read-buffer-size: 8092      # 接收数据的 buffer size，默认：8092
+    max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
     keep-alive-secs: 60         # keep-alive 时间，单位：秒
     clean-session: true         # mqtt clean session，默认：true
 ```
+
+### 3.3 可实现接口（注册成 Spring Bean 即可）
+
+| 接口                           | 是否必须       | 说明                        |
+| ---------------------------   | -------------- | ------------------------- |
+| IMqttClientConnectListener    | 是             | 客户端连接成功监听            |
 
 ### 3.3 自定义 java 配置（可选）
 

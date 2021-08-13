@@ -22,22 +22,26 @@
 ```java
 // 初始化 mqtt 客户端
 MqttClient client = MqttClient.create()
-    .ip("127.0.0.1")
-    .port(1883)						// 默认：1883
-    .username("admin")
-    .password("123456")
-    .version(MqttVersion.MQTT_5) 	// 默认：3_1_1
-    .clientId("xxxxxx")				// 默认：MICA-MQTT- 前缀和 36进制的纳秒数
+    .ip("127.0.0.1")                // mqtt 服务端 ip 地址
+    .port(1883)                     // 默认：1883
+    .username("admin")              // 账号
+    .password("123456")             // 密码
+    .version(MqttVersion.MQTT_5)    // 默认：3_1_1
+    .clientId("xxxxxx")             // 非常重要务必手动设置，一般设备 sn 号，默认：MICA-MQTT- 前缀和 36进制的纳秒数
     .bufferAllocator(ByteBufferAllocator.DIRECT) // 堆内存和堆外内存，默认：堆内存
-    .readBufferSize(512) 			// 消息一起解析的长度，默认：为 8092 （mqtt 消息最大长度）
-    .keepAliveSecs(120)  			// 默认：60s
-    .timeout(10)					// 超时时间，t-io 配置，可为 null，为 null 时，t-io 默认为 5
-    .reconnect(true)				// 是否重连，默认：true
-    .reInterval(5000)				// 重连重试时间，reconnect 为 true 时有效，t-io 默认为：5000
+    .readBufferSize(512)            // 消息一起解析的长度，默认：为 8092 （mqtt 消息最大长度）
+    .maxBytesInMessage(1024 * 10)   // 最大包体长度,如果包体过大需要设置此参数，默认为： 8092
+    .keepAliveSecs(120)             // 默认：60s
+    .timeout(10)                    // 超时时间，t-io 配置，可为 null，为 null 时，t-io 默认为 5
+    .reconnect(true)                // 是否重连，默认：true
+    .reInterval(5000)               // 重连重试时间，reconnect 为 true 时有效，t-io 默认为：5000
     .willMessage(builder -> {
-    builder.topic("/test/offline").messageText("hello");	// 遗嘱消息
+        builder.topic("/test/offline").messageText("hello");    // 遗嘱消息
     })
-    .properties()					// mqtt5 properties
+    .connectListener((context, isReconnect) -> {
+        logger.info("链接服务器成功...");
+    })
+    .properties()                   // mqtt5 properties
     .connect();
 
     // 消息订阅，同类方法 subxxx
@@ -62,55 +66,57 @@ MqttClient client = MqttClient.create()
 ```java
 // 注意：为了能接受更多链接（降低内存），请添加 jvm 参数 -Xss129k
 MqttServer mqttServer = MqttServer.create()
-	// 默认：127.0.0.1
-	.ip("127.0.0.1")
-	// 默认：1883
-	.port(1883)
-	// 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
-	.readBufferSize(512)
-	// 自定义认证
-	.authHandler((clientId, userName, password) -> true)
-	// 消息监听
-	.messageListener((clientId, topic, mqttQoS, payload) -> {
-		logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));
-	})
-	// 堆内存和堆外内存选择，默认：堆内存
-	.bufferAllocator(ByteBufferAllocator.HEAP)
-	// 心跳超时时间，默认：120s
-	.heartbeatTimeout(120_1000L)
-	// ssl 配置
-	.useSsl("", "", "")
-	// 自定义客户端上下线监听
-	.connectStatusListener(new IMqttConnectStatusListener() {
-		@Override
-		public void online(String clientId) {
+    // 默认：127.0.0.1
+    .ip("127.0.0.1")
+    // 默认：1883
+    .port(1883)
+    // 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
+    .readBufferSize(512)
+    // 最大包体长度，如果包体过大需要设置此参数，默认为： 8092
+    .maxBytesInMessage(1024 * 100)
+    // 自定义认证
+    .authHandler((clientId, userName, password) -> true)
+    // 消息监听
+    .messageListener((clientId, topic, mqttQoS, payload) -> {
+        logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));
+    })
+    // 堆内存和堆外内存选择，默认：堆内存
+    .bufferAllocator(ByteBufferAllocator.HEAP)
+    // 心跳超时时间，默认：120s
+    .heartbeatTimeout(120_1000L)
+    // ssl 配置
+    .useSsl("", "", "")
+    // 自定义客户端上下线监听
+    .connectStatusListener(new IMqttConnectStatusListener() {
+        @Override
+        public void online(String clientId) {
 
-		}
+        }
 
-		@Override
-		public void offline(String clientId) {
+        @Override
+        public void offline(String clientId) {
 
-		}
-	})
-	// 自定义消息转发，可用 mq 广播实现集群化处理
-	.messageDispatcher(new IMqttMessageDispatcher() {
-		@Override
-		public void config(MqttServer mqttServer) {
+        }
+    })
+    // 自定义消息转发，可用 mq 广播实现集群化处理
+    .messageDispatcher(new IMqttMessageDispatcher() {
+        @Override
+        public void config(MqttServer mqttServer) {
 
-		}
+        }
 
-		@Override
-		public boolean send(Message message) {
-			return false;
-		}
+        @Override
+        public boolean send(Message message) {
+            return false;
+        }
 
-		@Override
-		public boolean send(String clientId, Message message) {
-			return false;
-		}
-	})
-	.debug() // 开启 debug 信息日志
-	.start();
+        @Override
+        public boolean send(String clientId, Message message) {
+            return false;
+        }
+    })
+    .debug() // 开启 debug 信息日志
+    .start();
 
 // 发送给某个客户端
 mqttServer.publish("clientId","/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));

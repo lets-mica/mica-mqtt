@@ -47,6 +47,10 @@ public class MqttClientTest {
 //			最大包体长度,如果包体过大需要设置此参数
 //			.maxBytesInMessage(1024 * 10)
 			.version(MqttVersion.MQTT_5)
+//			连接监听
+			.connectListener((context, isReconnect) -> {
+				logger.info("链接服务器成功...");
+			})
 			.connect();
 
 		client.subQos0("/test/#", (topic, payload) -> {
