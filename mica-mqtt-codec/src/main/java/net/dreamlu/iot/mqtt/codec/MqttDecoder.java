@@ -80,7 +80,7 @@ public final class MqttDecoder {
 			Result<?> decodedVariableHeader = decodeVariableHeader(ctx, buffer, mqttFixedHeader, bytesRemainingInVariablePart);
 			variableHeader = decodedVariableHeader.value;
 			if (bytesRemainingInVariablePart > maxBytesInMessage) {
-				throw new DecoderException("too large message: " + bytesRemainingInVariablePart + " bytes");
+				throw new DecoderException("too large message: " + bytesRemainingInVariablePart + " bytes but maxBytesInMessage is " + maxBytesInMessage);
 			}
 			bytesRemainingInVariablePart -= decodedVariableHeader.numberOfBytesConsumed;
 		} catch (Exception cause) {

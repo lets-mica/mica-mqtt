@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
+import org.tio.core.exception.AioDecodeException;
+import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.server.AcceptCompletionHandler;
 import org.tio.server.intf.ServerAioHandler;
@@ -58,8 +60,16 @@ public class MqttServerAioHandler implements ServerAioHandler {
 	 * @return Packet
 	 */
 	@Override
-	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) {
-		return mqttDecoder.decode(context, buffer, limit, position, readableLength);
+	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws TioDecodeException {
+		MqttMessage message = mqttDecoder.decode(context, buffer, limit, position, readableLength);
+		if (message == null) {
+			return null;
+		}
+		DecoderResult decoderResult = message.decoderResult();
+		if (decoderResult.isFailure() && decoderResult.getCause() instanceof DecoderException) {
+			throw new AioDecodeException(decoderResult.getCause());
+		}
+		return message;
 	}
 
 	/**
