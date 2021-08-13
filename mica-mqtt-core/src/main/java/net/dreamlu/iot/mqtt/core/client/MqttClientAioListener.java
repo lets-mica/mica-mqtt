@@ -16,10 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
-import net.dreamlu.iot.mqtt.codec.MqttProperties;
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
-import net.dreamlu.iot.mqtt.codec.MqttSubscribeMessage;
+import net.dreamlu.iot.mqtt.codec.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.DefaultClientAioListener;
@@ -42,6 +39,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	private final MqttClientCreator clientConfig;
 	private final MqttWillMessage willMessage;
 	private final MqttClientStore clientStore;
+	private final IMqttClientConnectListener connectListener;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public MqttClientAioListener(MqttClientCreator clientConfig,
@@ -50,6 +48,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 		this.clientConfig = Objects.requireNonNull(clientConfig);
 		this.willMessage = clientConfig.getWillMessage();
 		this.clientStore = clientStore;
+		this.connectListener = clientConfig.getConnectListener();
 		this.executor = executor;
 	}
 
@@ -83,11 +82,24 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 				builder.properties(properties);
 			}
 			// 5. 发送 mqtt 连接消息
-			Boolean result = Tio.send(context, builder.build());
-			logger.info("MqttClient reconnect send connect result:{}", result);
+			sendConnectMessage(context, builder.build());
 			// 6. 重连时发送重新订阅
 			reSendSubscription(context);
+			// 7. 发布连接通知
+			publishConnectEvent(context, isReconnect);
 		}
+	}
+
+	/**
+	 * 发送连接的消息
+	 *
+	 * @param context ChannelContext
+	 * @param message MqttMessage
+	 */
+	private static void sendConnectMessage(ChannelContext context, MqttMessage message) {
+		// 5. 发送 mqtt 连接消息
+		Boolean result = Tio.send(context, message);
+		logger.info("MqttClient reconnect send connect result:{}", result);
 	}
 
 	private void reSendSubscription(ChannelContext context) {
@@ -105,6 +117,18 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 			logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} resubscribing result:{}", topicFilter, mqttQoS, messageId, result);
 			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
 			clientStore.addPaddingSubscribe(messageId, pendingSubscription);
+		}
+	}
+
+	private void publishConnectEvent(ChannelContext context, boolean isReconnect) {
+		// 先判断是否配置监听
+		if (connectListener == null) {
+			return;
+		}
+		try {
+			connectListener.onConnected(context, isReconnect);
+		} catch (Throwable e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 }

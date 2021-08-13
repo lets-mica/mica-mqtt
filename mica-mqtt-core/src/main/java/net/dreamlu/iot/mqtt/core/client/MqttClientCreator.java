@@ -117,6 +117,10 @@ public final class MqttClientCreator {
 	 * ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存
 	 */
 	private ByteBufferAllocator bufferAllocator = ByteBufferAllocator.HEAP;
+	/**
+	 * 连接监听器
+	 */
+	private IMqttClientConnectListener connectListener;
 
 	public String getName() {
 		return name;
@@ -188,6 +192,10 @@ public final class MqttClientCreator {
 
 	public ByteBufferAllocator getBufferAllocator() {
 		return bufferAllocator;
+	}
+
+	public IMqttClientConnectListener getConnectListener() {
+		return connectListener;
 	}
 
 	public MqttClientCreator name(String name) {
@@ -283,6 +291,11 @@ public final class MqttClientCreator {
 
 	public MqttClientCreator bufferAllocator(ByteBufferAllocator allocator) {
 		this.bufferAllocator = allocator;
+		return this;
+	}
+
+	public MqttClientCreator connectListener(IMqttClientConnectListener connectListener) {
+		this.connectListener = connectListener;
 		return this;
 	}
 
