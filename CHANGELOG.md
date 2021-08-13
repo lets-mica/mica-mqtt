@@ -1,6 +1,18 @@
 # 变更记录
 
 ## 发行版本
+### v1.0.3 - 2021-08-15
+- :sparkles: mica-mqtt server 添加 websocket mqtt 子协议支持（支持 mqtt.js）。
+- :sparkles: mica-mqtt server ip，默认为空，可不设置。
+- :sparkles: mica-mqtt server 3.1 协议会校验 clientId 长度，添加配置项。
+- :sparkles: mica-mqtt client去除 CountDownLatch 避免启动时未连接上服务端卡住。
+- :sparkles: mica-mqtt client 添加最大包体长度字段，避免超过 8092 长度的包体导致解析异常。
+- :sparkles: mica-mqtt client 添加连接监听 IMqttClientConnectListener。
+- :sparkles: mica-mqtt 日志优化，方便查询。
+- :sparkles: mica-mqtt 代码优化，部分 Tio.close 改为 Tio.remove。
+- :sparkles: 完善 mica-mqtt-spring-boot-starter，添加遗嘱消息配置。
+- :arrow_up: 升级 t-io 到 3.7.4。
+
 ### v1.0.3-RC - 2021-08-12
 - :sparkles: 添加 websocket mqtt 子协议支持（支持 mqtt.js）。
 - :sparkles: mqtt 客户端去除 CountDownLatch 避免启动时未连接上服务端卡住。
