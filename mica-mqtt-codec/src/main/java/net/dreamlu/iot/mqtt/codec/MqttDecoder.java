@@ -17,6 +17,8 @@
 package net.dreamlu.iot.mqtt.codec;
 
 import org.tio.core.ChannelContext;
+import org.tio.core.exception.AioDecodeException;
+import org.tio.core.exception.TioDecodeException;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -54,7 +56,21 @@ public final class MqttDecoder {
 		this.maxClientIdLength = maxClientIdLength;
 	}
 
-	public MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) {
+	public MqttMessage doDecode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) throws TioDecodeException {
+		// 1. 半包
+		MqttMessage message = decode(ctx, buffer, limit, position, readableLength);
+		if (message == null) {
+			return null;
+		}
+		// 2. 解码异常
+		DecoderResult decoderResult = message.decoderResult();
+		if (decoderResult.isFailure() && decoderResult.getCause() instanceof DecoderException) {
+			throw new AioDecodeException(decoderResult.getCause());
+		}
+		return message;
+	}
+
+	private MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) {
 		// 1. 首先判断缓存中协议头是否读完（MQTT协议头为2字节）
 		if (readableLength < MQTT_PROTOCOL_LENGTH) {
 			return null;

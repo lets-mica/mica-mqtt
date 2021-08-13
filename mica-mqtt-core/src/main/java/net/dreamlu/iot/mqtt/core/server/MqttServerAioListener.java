@@ -56,19 +56,26 @@ public class MqttServerAioListener extends DefaultAioListener {
 
 	@Override
 	public void onBeforeClose(ChannelContext context, Throwable throwable, String remark, boolean isRemove) {
+		// 1. 业务 id
 		String clientId = context.getBsId();
+		// 2. 判断是否正常断开
+		boolean isNotNormalDisconnect = context.get(MqttConst.DIS_CONNECTED) == null;
+		if (isNotNormalDisconnect || throwable != null) {
+			logger.error("Mqtt server close clientId isBlank, remark:{} isRemove:{}", remark, isRemove, throwable);
+		} else {
+			logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
+		}
+		// 3. 业务 id 不能为空
 		if (StrUtil.isBlank(clientId)) {
-			logger.warn("Mqtt server close clientId isBlank, remark:{} isRemove:{}", remark, isRemove);
 			return;
 		}
-		logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
-		// 1. 对于异常断开连接，处理遗嘱消息
+		// 4. 对于异常断开连接，处理遗嘱消息
 		sendWillMessage(context, clientId);
-		// 2. 会话清理
+		// 5. 会话清理
 		cleanSession(clientId);
-		// 3. 解绑 clientId
+		// 6. 解绑 clientId
 		Tio.unbindBsId(context);
-		// 4. 下线事件
+		// 7. 下线事件
 		notify(clientId);
 	}
 
