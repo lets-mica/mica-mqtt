@@ -10,6 +10,7 @@
 - :sparkles: mica-mqtt client 添加连接监听 IMqttClientConnectListener。
 - :sparkles: mica-mqtt 日志优化，方便查询。
 - :sparkles: mica-mqtt 代码优化，部分 Tio.close 改为 Tio.remove。
+- :sparkles: mica-mqtt-spring-boot-example 添加 Dockerfile，支持 `spring-boot:build-image`。
 - :sparkles: 完善 mica-mqtt-spring-boot-starter，添加遗嘱消息配置。
 - :arrow_up: 升级 t-io 到 3.7.4。
 
