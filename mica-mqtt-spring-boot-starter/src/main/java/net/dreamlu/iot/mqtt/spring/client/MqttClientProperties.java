@@ -75,6 +75,10 @@ public class MqttClientProperties {
 	 */
 	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
+	 * 消息解析最大 bytes 长度，默认：8092
+	 */
+	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	/**
 	 * Keep Alive (s)
 	 */
 	private int keepAliveSecs = 60;

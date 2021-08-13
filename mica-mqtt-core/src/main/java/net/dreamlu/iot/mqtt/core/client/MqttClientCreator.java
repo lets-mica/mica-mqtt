@@ -62,6 +62,10 @@ public final class MqttClientCreator {
 	 */
 	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
+	 * 消息解析最大 bytes 长度，默认：8092
+	 */
+	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	/**
 	 * Keep Alive (s)
 	 */
 	private int keepAliveSecs = 60;
@@ -134,6 +138,10 @@ public final class MqttClientCreator {
 		return readBufferSize;
 	}
 
+	public int getMaxBytesInMessage() {
+		return maxBytesInMessage;
+	}
+
 	public int getKeepAliveSecs() {
 		return keepAliveSecs;
 	}
@@ -204,6 +212,11 @@ public final class MqttClientCreator {
 
 	public MqttClientCreator readBufferSize(int readBufferSize) {
 		this.readBufferSize = readBufferSize;
+		return this;
+	}
+
+	public MqttClientCreator maxBytesInMessage(int maxBytesInMessage) {
+		this.maxBytesInMessage = maxBytesInMessage;
 		return this;
 	}
 
@@ -284,7 +297,7 @@ public final class MqttClientCreator {
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, executor);
 		// 2. 初始化 mqtt 处理器
-		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this.bufferAllocator, processor);
+		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this, processor);
 		ClientAioListener clientAioListener = new MqttClientAioListener(this, clientStore, executor);
 		// 3. 重连配置
 		ReconnConf reconnConf = null;
