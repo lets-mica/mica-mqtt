@@ -6,14 +6,14 @@ RUN java -Djarmode=layertools -jar app.jar extract && rm app.jar
 
 FROM moxm/java:1.8-full
 LABEL maintainer="596392912@qq.com"
-ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms128m -Xmx256m -Djava.security.egd=file:/dev/./urandom"
-WORKDIR mica-mqtt
+ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms256m -Xmx256m -Djava.security.egd=file:/dev/./urandom"
+WORKDIR /wwww/mica-mqtt
 
 COPY --from=builder /build/dependencies/ ./
 COPY --from=builder /build/snapshot-dependencies/ ./
 COPY --from=builder /build/spring-boot-loader/ ./
 COPY --from=builder /build/application/ ./
 
-EXPOSE 5883 8083 30012
+EXPOSE 3883 5883 8083 30012
 
 CMD sleep 60; java $JAVA_OPTS org.springframework.boot.loader.JarLauncher

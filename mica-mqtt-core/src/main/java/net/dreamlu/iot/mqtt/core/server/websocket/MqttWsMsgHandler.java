@@ -88,7 +88,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	@Override
 	public Object onBytes(WsRequest wsRequest, byte[] bytes, ChannelContext context) throws Exception {
 		WriteBuffer wsBody = (WriteBuffer) context.get(MQTT_WS_MSG_BODY_KEY);
-		ByteBuffer buffer = getMqttBody(wsBody, bytes, context);
+		ByteBuffer buffer = getMqttBody(wsBody, bytes);
 		if (buffer == null) {
 			return null;
 		}
@@ -133,10 +133,9 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 * 读取 mqtt 消息体处理半包的情况
 	 *
 	 * @param bytes   消息类容
-	 * @param context ChannelContext
 	 * @return ByteBuffer
 	 */
-	private static synchronized ByteBuffer getMqttBody(WriteBuffer wsBody, byte[] bytes, ChannelContext context) {
+	private static synchronized ByteBuffer getMqttBody(WriteBuffer wsBody, byte[] bytes) {
 		wsBody.writeBytes(bytes);
 		int length = wsBody.size();
 		if (length < 2) {
