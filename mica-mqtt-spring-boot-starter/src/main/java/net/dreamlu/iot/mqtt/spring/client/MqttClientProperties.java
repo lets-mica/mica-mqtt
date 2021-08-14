@@ -79,6 +79,10 @@ public class MqttClientProperties {
 	 */
 	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
+	 * mqtt 3.1 会校验此参数
+	 */
+	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
+	/**
 	 * Keep Alive (s)
 	 */
 	private int keepAliveSecs = 60;

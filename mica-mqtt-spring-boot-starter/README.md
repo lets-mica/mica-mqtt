@@ -23,8 +23,8 @@
 | mqtt.server.heartbeat-timeout | 1000 * 120 | 心跳超时时间(单位: 毫秒 默认: 1000 * 120) |
 | mqtt.server.read-buffer-size | 8092 | 接收数据的 buffer size，默认：8092 |
 | mqtt.server.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
-| mqtt.server.debug | false | debug，如果开启 prometheus 指标收集建议关闭 |
 | mqtt.server.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
+| mqtt.server.debug | false | debug，如果开启 prometheus 指标收集建议关闭 |
 | mqtt.server.websocket-enable | true | 开启 websocket 服务，默认：true |
 | mqtt.server.websocket-port | 8083 | websocket 端口，默认：8083 |
 
@@ -166,6 +166,7 @@ public class ServerService {
 | mqtt.client.buffer-allocator | 堆内存 | ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存 |
 | mqtt.client.read-buffer-size | 8092 | t-io 每次消息读取长度，跟 maxBytesInMessage 相关 |
 | mqtt.client.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
+| mqtt.client.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.client.reconnect | true | 自动重连 |
 | mqtt.client.re-interval | 5000 | 重连重试时间，单位毫秒 |
 | mqtt.client.timeout | 5 | 超时时间，单位秒，t-io 配置，可为 null |

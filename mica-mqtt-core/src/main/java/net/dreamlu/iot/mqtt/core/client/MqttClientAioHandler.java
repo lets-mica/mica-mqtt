@@ -38,7 +38,7 @@ public class MqttClientAioHandler implements ClientAioHandler {
 
 	public MqttClientAioHandler(MqttClientCreator mqttClientCreator,
 								IMqttClientProcessor processor) {
-		this.mqttDecoder = new MqttDecoder(mqttClientCreator.getMaxBytesInMessage());
+		this.mqttDecoder = new MqttDecoder(mqttClientCreator.getMaxBytesInMessage(), mqttClientCreator.getMaxClientIdLength());
 		this.mqttEncoder = MqttEncoder.INSTANCE;
 		this.allocator = mqttClientCreator.getBufferAllocator();
 		this.processor = processor;

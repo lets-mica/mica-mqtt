@@ -66,6 +66,10 @@ public final class MqttClientCreator {
 	 */
 	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
+	 * mqtt 3.1 会校验此参数
+	 */
+	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
+	/**
 	 * Keep Alive (s)
 	 */
 	private int keepAliveSecs = 60;
@@ -144,6 +148,10 @@ public final class MqttClientCreator {
 
 	public int getMaxBytesInMessage() {
 		return maxBytesInMessage;
+	}
+
+	public int getMaxClientIdLength() {
+		return maxClientIdLength;
 	}
 
 	public int getKeepAliveSecs() {
@@ -225,6 +233,11 @@ public final class MqttClientCreator {
 
 	public MqttClientCreator maxBytesInMessage(int maxBytesInMessage) {
 		this.maxBytesInMessage = maxBytesInMessage;
+		return this;
+	}
+
+	public MqttClientCreator maxClientIdLength(int maxClientIdLength) {
+		this.maxClientIdLength = maxClientIdLength;
 		return this;
 	}
 

@@ -56,6 +56,7 @@ public class MqttClientConfiguration {
 			.clientId(properties.getClientId())
 			.readBufferSize(properties.getReadBufferSize())
 			.maxBytesInMessage(properties.getMaxBytesInMessage())
+			.maxClientIdLength(properties.getMaxClientIdLength())
 			.keepAliveSecs(properties.getKeepAliveSecs())
 			.reconnect(properties.isReconnect())
 			.version(properties.getVersion())

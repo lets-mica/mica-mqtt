@@ -4,10 +4,11 @@
 ### v1.0.3 - 2021-08-15
 - :sparkles: mica-mqtt server 添加 websocket mqtt 子协议支持（支持 mqtt.js）。
 - :sparkles: mica-mqtt server ip，默认为空，可不设置。
-- :sparkles: mica-mqtt server 3.1 协议会校验 clientId 长度，添加配置项。
 - :sparkles: mica-mqtt client去除 CountDownLatch 避免启动时未连接上服务端卡住。
 - :sparkles: mica-mqtt client 添加最大包体长度字段，避免超过 8092 长度的包体导致解析异常。
 - :sparkles: mica-mqtt client 添加连接监听 IMqttClientConnectListener。
+- :sparkles: mica-mqtt 3.1 协议会校验 clientId 长度，添加配置项 maxClientIdLength。
+- :sparkles: mica-mqtt 优化 mqtt 解码异常处理。
 - :sparkles: mica-mqtt 日志优化，方便查询。
 - :sparkles: mica-mqtt 代码优化，部分 Tio.close 改为 Tio.remove。
 - :sparkles: mica-mqtt-spring-boot-example 添加 Dockerfile，支持 `spring-boot:build-image`。
