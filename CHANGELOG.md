@@ -1,6 +1,9 @@
 # 变更记录
 
 ## 发行版本
+### v1.0.4 - 2021-08-15
+- :bug: 修复编译导致的 java8 运行期间的部分问题，NoSuchMethodError: java.nio.ByteBuffer.xxx
+
 ### v1.0.3 - 2021-08-15
 - :sparkles: mica-mqtt server 添加 websocket mqtt 子协议支持（支持 mqtt.js）。
 - :sparkles: mica-mqtt server ip，默认为空，可不设置。
