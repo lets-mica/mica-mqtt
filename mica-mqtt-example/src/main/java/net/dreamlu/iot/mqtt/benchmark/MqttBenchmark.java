@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.benchmark;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -44,7 +45,7 @@ public class MqttBenchmark {
 	private static void newClient(String ip, int i) {
 		MqttClient.create()
 			.ip(ip)
-			.clientId("MICA-MQTT-" + i)
+			.clientId(UUID.randomUUID().toString() + '-' + i)
 			.username("admin")
 			.password("123456")
 			.readBufferSize(512)
