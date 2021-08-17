@@ -16,12 +16,10 @@
 
 package net.dreamlu.iot.mqtt.benchmark;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * mqtt 压力测试
@@ -29,26 +27,28 @@ import java.util.concurrent.TimeUnit;
  * @author L.cm
  */
 public class MqttBenchmark {
-	private static final Logger logger = LoggerFactory.getLogger(MqttBenchmark.class);
 
 	public static void main(String[] args) {
 		// 1. 模拟 1w 连接，在开发机（i5-7500 4核4线程 win10 MqttServer 6G）1万连连接很轻松。
 		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
-		int clientCount = 1_0000;
-		long beginTime = System.nanoTime();
-		for (int i = 0; i < clientCount; i++) {
-			// 2. 初始化 mqtt 客户端
-			MqttClient client = MqttClient.create()
-				.username("admin")
-				.password("123456")
-				.readBufferSize(512)
-				.connect();
-			// 3. 订阅服务端消息
-			client.subQos0("/#", (topic, payload) -> {
-				logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
-			});
+		int connCount = 1_0000;
+		int threadCount = 1000;
+		String ip = "8.130.24.89";
+		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+		for (int i = 0; i < connCount; i++) {
+			int num = i;
+			executor.submit(() -> newClient(ip, num));
 		}
-		System.err.println("批量连接完成，耗时：" + TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - beginTime));
+	}
+
+	private static void newClient(String ip, int i) {
+		MqttClient.create()
+			.ip(ip)
+			.clientId("MICA-MQTT-" + i)
+			.username("admin")
+			.password("123456")
+			.readBufferSize(512)
+			.connect();
 	}
 
 }
