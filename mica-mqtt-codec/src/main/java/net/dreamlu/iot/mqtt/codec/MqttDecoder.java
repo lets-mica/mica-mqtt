@@ -58,19 +58,19 @@ public final class MqttDecoder {
 
 	public MqttMessage doDecode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) throws TioDecodeException {
 		// 1. 半包
-		MqttMessage message = decode(ctx, buffer, limit, position, readableLength);
+		MqttMessage message = decode(ctx, buffer, readableLength);
 		if (message == null) {
 			return null;
 		}
 		// 2. 解码异常
 		DecoderResult decoderResult = message.decoderResult();
-		if (decoderResult.isFailure() && decoderResult.getCause() instanceof DecoderException) {
+		if (decoderResult.isFailure()) {
 			throw new AioDecodeException(decoderResult.getCause());
 		}
 		return message;
 	}
 
-	private MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) {
+	private MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int readableLength) {
 		// 1. 首先判断缓存中协议头是否读完（MQTT协议头为2字节）
 		if (readableLength < MQTT_PROTOCOL_LENGTH) {
 			return null;
