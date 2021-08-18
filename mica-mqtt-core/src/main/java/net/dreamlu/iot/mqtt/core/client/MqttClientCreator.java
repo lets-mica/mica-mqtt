@@ -32,6 +32,7 @@ import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -54,7 +55,7 @@ public final class MqttClientCreator {
 	 */
 	private int port = 1883;
 	/**
-	 * 超时时间，t-io 配置，可为 null
+	 * 超时时间，t-io 配置，可为 null，默认为：5秒
 	 */
 	private Integer timeout;
 	/**
@@ -337,9 +338,11 @@ public final class MqttClientCreator {
 		// 4. tioConfig
 		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
 		tioConfig.setName(this.name);
-		// 5. mqtt 消息最大长度
+		// 5. 心跳超时时间
+		tioConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
+		// 6. mqtt 消息最大长度
 		tioConfig.setReadBufferSize(this.readBufferSize);
-		// 6. tioClient
+		// 7. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
 			ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);

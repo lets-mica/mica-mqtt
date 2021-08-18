@@ -51,7 +51,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 	public boolean onHeartbeatTimeout(ChannelContext context, Long interval, int heartbeatTimeoutCount) {
 		String clientId = context.getBsId();
 		logger.info("Mqtt HeartbeatTimeout clientId:{} interval:{} count:{}", clientId, interval, heartbeatTimeoutCount);
-		return true;
+		return false;
 	}
 
 	@Override
