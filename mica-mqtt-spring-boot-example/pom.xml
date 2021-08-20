@@ -16,8 +16,7 @@
     <properties>
         <java.version>1.8</java.version>
         <mica.version>2.5.3</mica.version>
-        <mica.mqtt.version>1.0.5</mica.mqtt.version>
-        <spring.boot.version>2.5.3</spring.boot.version>
+        <spring.boot.version>2.5.4</spring.boot.version>
     </properties>
 
     <dependencies>
@@ -40,7 +39,6 @@
         <dependency>
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-mqtt-spring-boot-starter</artifactId>
-            <version>${mica.mqtt.version}</version>
         </dependency>
         <!-- 开启 prometheus 指标收集，详见： http://localhost:30012/actuator/prometheus -->
         <dependency>
