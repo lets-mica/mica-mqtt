@@ -1,7 +1,17 @@
 # 变更记录
 
 ## 发行版本
-### v1.0.4 - 2021-08-15
+### v1.0.6 - 2021-08-21
+- :sparkles: 添加订阅 topicFilter 校验。
+- :sparkles: 优化压测工具，更新压测说明，添加 tcp 连接数更改文档地址。
+- :sparkles: mica-mqtt-example 添加多设备交互示例。
+- :sparkles: 优化 mica-mqtt-spring-boot-example。
+- :sparkles: 优化 deploy.sh 脚本。
+- :bug: 优化解码异常处理。
+- :bug: 修复心跳超时处理。
+- :arrow_up: 升级 spring boot 到 2.5.4
+
+### v1.0.5 - 2021-08-15
 - :bug: 修复编译导致的 java8 运行期间的部分问题，NoSuchMethodError: java.nio.ByteBuffer.xxx
 
 ### v1.0.3 - 2021-08-15
