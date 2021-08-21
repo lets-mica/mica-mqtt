@@ -16,6 +16,10 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
+import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
+
+import java.util.List;
+
 /**
  * mqtt 服务端，认证处理器
  *
@@ -33,5 +37,15 @@ public interface IMqttServerAuthHandler {
 	 * @return 是否认证成功
 	 */
 	boolean authenticate(String clientId, String userName, String password);
+
+	/**
+	 * 是否可以订阅
+	 *
+	 * @param topicSubscriptionList 订阅 topic 列表
+	 * @return 是否可以订阅
+	 */
+	default boolean isValidSubscribe(List<MqttTopicSubscription> topicSubscriptionList) {
+		return true;
+	}
 
 }

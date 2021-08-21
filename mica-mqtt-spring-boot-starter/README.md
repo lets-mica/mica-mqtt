@@ -169,8 +169,8 @@ public class ServerService {
 | mqtt.client.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.client.reconnect | true | 自动重连 |
 | mqtt.client.re-interval | 5000 | 重连重试时间，单位毫秒 |
-| mqtt.client.timeout | 5 | 超时时间，单位秒，t-io 配置，可为 null |
-| mqtt.client.keep-alive-secs | 60 | Keep Alive (s) |
+| mqtt.client.timeout | 5 | 连接超时时间，单位秒，t-io 配置，可为 null |
+| mqtt.client.keep-alive-secs | 60 | Keep Alive (s) 心跳维持时间 |
 | mqtt.client.version | MQTT_3_1_1 | mqtt 协议，默认：MQTT_3_1_1 |
 
 ### 3.2 配置项示例
@@ -184,14 +184,14 @@ mqtt:
     clientId: 000001            # 客户端Id（非常重要，一般为设备 sn，不可重复）
     user-name: mica             # 认证的用户名
     password: 123456            # 认证的密码
-    timeout: 5                  # 超时时间，单位：秒，默认：5秒
+    timeout: 5                  # 连接超时时间，单位：秒，默认：5秒
     reconnect: true             # 是否重连，默认：true
     re-interval: 5000           # 重连时间，默认 5000 毫秒
     version: MQTT_5             # mqtt 协议版本，默认：3.1.1
     read-buffer-size: 8092      # 接收数据的 buffer size，默认：8092
     max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
-    keep-alive-secs: 60         # keep-alive 时间，单位：秒
+    keep-alive-secs: 60         # keep-alive 心跳维持时间，单位：秒
     clean-session: true         # mqtt clean session，默认：true
 ```
 

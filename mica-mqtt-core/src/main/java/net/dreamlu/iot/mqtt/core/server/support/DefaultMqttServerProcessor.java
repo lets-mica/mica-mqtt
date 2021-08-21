@@ -242,8 +242,12 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	public void processSubscribe(ChannelContext context, MqttSubscribeMessage message) {
 		String clientId = context.getBsId();
 		int messageId = message.variableHeader().messageId();
+		// 1. 校验订阅的 topicFilter
 		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
-		// 1. 校验 topicFilter
+		if (!authHandler.isValidSubscribe(topicSubscriptions)) {
+			Tio.remove(context, "Subscribe - clientId:{} topicFilters Verification failed ");
+			return;
+		}
 		// 2. 存储 clientId 订阅的 topic
 		List<MqttQoS> mqttQosList = new ArrayList<>();
 		List<String> topicList = new ArrayList<>();

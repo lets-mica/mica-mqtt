@@ -35,7 +35,7 @@ public class MqttBenchmark {
 		// 《修改Windows服务器最大的Tcp连接数》：https://www.jianshu.com/p/00136a97d2d8
 		int connCount = 2_0000;
 		int threadCount = 1000;
-		String ip = "8.130.24.89";
+		String ip = "127.0.0.1";
 		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
 		for (int i = 0; i < connCount; i++) {
 			int num = i;
