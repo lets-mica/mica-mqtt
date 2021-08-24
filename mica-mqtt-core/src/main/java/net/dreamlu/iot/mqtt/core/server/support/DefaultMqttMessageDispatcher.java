@@ -16,11 +16,8 @@
 
 package net.dreamlu.iot.mqtt.core.server.support;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
-
-import java.nio.ByteBuffer;
 
 /**
  * 默认的消息转发器
@@ -31,16 +28,12 @@ public class DefaultMqttMessageDispatcher extends AbstractMqttMessageDispatcher 
 
 	@Override
 	public boolean sendAll(Message message) {
-		ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
-		MqttQoS qoS = MqttQoS.valueOf(message.getQos());
-		return mqttServer.publishAll(message.getTopic(), payload, qoS);
+		return true;
 	}
 
 	@Override
 	public boolean sendTo(String clientId, Message message) {
-		ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
-		MqttQoS qoS = MqttQoS.valueOf(message.getQos());
-		return mqttServer.publish(clientId, message.getTopic(), payload, qoS);
+		return true;
 	}
 
 }

@@ -58,13 +58,17 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	@Override
 	public boolean send(Message message) {
 		Objects.requireNonNull(mqttServer, "MqttServer require not Null.");
+		// 1. 先发送到本服务
+		ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
+		MqttQoS qoS = MqttQoS.valueOf(message.getQos());
+		mqttServer.publishAll(message.getTopic(), payload, qoS);
 		return sendAll(message);
 	}
 
 	@Override
 	public boolean send(String clientId, Message message) {
 		Objects.requireNonNull(mqttServer, "MqttServer require not Null.");
-		// 判断如果 clientId 就在本服务
+		// 1. 判断如果 clientId 就在本服务，存在则发送
 		ServerTioConfig config = this.mqttServer.getServerConfig();
 		ChannelContext context = Tio.getByBsId(config, clientId);
 		if (context != null) {
