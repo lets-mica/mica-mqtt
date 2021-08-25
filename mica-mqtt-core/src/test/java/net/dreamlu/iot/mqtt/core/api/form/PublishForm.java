@@ -24,10 +24,6 @@ package net.dreamlu.iot.mqtt.core.api.form;
 public class PublishForm extends BaseForm {
 
 	/**
-	 * 以 , 分割的多个主题，使用此字段能够同时发布消息到多个主题
-	 */
-	private String topics;
-	/**
 	 * 消息正文
 	 */
 	private String payload;
@@ -43,14 +39,6 @@ public class PublishForm extends BaseForm {
 	 * 是否为保留消息
 	 */
 	private boolean retain = false;
-
-	public String getTopics() {
-		return topics;
-	}
-
-	public void setTopics(String topics) {
-		this.topics = topics;
-	}
 
 	public String getPayload() {
 		return payload;

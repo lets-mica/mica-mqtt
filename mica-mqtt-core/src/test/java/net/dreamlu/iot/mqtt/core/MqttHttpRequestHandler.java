@@ -18,12 +18,15 @@ package net.dreamlu.iot.mqtt.core;
 
 import net.dreamlu.iot.mqtt.core.api.code.ResultCode;
 import net.dreamlu.iot.mqtt.core.api.result.Result;
+import net.dreamlu.iot.mqtt.core.core.HttpFilter;
 import net.dreamlu.iot.mqtt.core.core.HttpHandler;
 import net.dreamlu.iot.mqtt.core.core.MqttHttpRoutes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.http.common.*;
 import org.tio.http.common.handler.HttpRequestHandler;
+
+import java.util.List;
 
 /**
  * mqtt http 消息处理
@@ -36,10 +39,24 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 	@Override
 	public HttpResponse handler(HttpRequest request) {
 		RequestLine requestLine = request.getRequestLine();
+		// 1. 处理过滤器
+		List<HttpFilter> httpFilters = MqttHttpRoutes.getFilters();
+		try {
+			for (HttpFilter filter : httpFilters) {
+				if (!filter.filter(request)) {
+					HttpResponse response = new HttpResponse(request);
+					return filter.response(request, response);
+				}
+			}
+		} catch (Exception e) {
+			return resp500(request, requestLine, e);
+		}
+		// 2. 路由处理
 		HttpHandler handler = MqttHttpRoutes.getHandler(requestLine);
 		if (handler == null) {
 			return resp404(request, requestLine);
 		}
+		logger.info("mqtt http api {} path:{}", requestLine.getMethod().name(), requestLine.getPathAndQuery());
 		try {
 			return handler.apply(request);
 		} catch (Exception e) {

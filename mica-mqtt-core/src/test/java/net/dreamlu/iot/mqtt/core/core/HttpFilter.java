@@ -20,12 +20,11 @@ import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 
 /**
- * http 处理器
+ * http 过滤器
  *
  * @author L.cm
  */
-@FunctionalInterface
-public interface HttpHandler {
+public interface HttpFilter {
 
 	/**
 	 * 处理请求
@@ -34,6 +33,15 @@ public interface HttpHandler {
 	 * @return 可以为null
 	 * @throws Exception Exception
 	 */
-	HttpResponse apply(HttpRequest request) throws Exception;
+	boolean filter(HttpRequest request) throws Exception;
+
+	/**
+	 * 响应
+	 *
+	 * @param request  HttpRequest
+	 * @param response HttpResponse
+	 * @return HttpResponse
+	 */
+	HttpResponse response(HttpRequest request, HttpResponse response);
 
 }

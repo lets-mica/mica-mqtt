@@ -19,8 +19,7 @@ package net.dreamlu.iot.mqtt.core.core;
 import org.tio.http.common.Method;
 import org.tio.http.common.RequestLine;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * mqtt http api 路由
@@ -28,7 +27,36 @@ import java.util.Map;
  * @author L.cm
  */
 public final class MqttHttpRoutes {
+	private static final LinkedList<HttpFilter> FILTERS = new LinkedList<>();
 	private static final Map<MappingInfo, HttpHandler> ROUTS = new HashMap<>();
+
+	/**
+	 * 注册路由
+	 *
+	 * @param filter HttpFilter
+	 */
+	public static void addFilter(HttpFilter filter) {
+		FILTERS.add(filter);
+	}
+
+	/**
+	 * 注册路由
+	 *
+	 * @param index  index
+	 * @param filter HttpFilter
+	 */
+	public static void addFilter(int index, HttpFilter filter) {
+		FILTERS.add(index, filter);
+	}
+
+	/**
+	 * 读取所以的过滤器
+	 *
+	 * @return 过滤器集合
+	 */
+	public static List<HttpFilter> getFilters() {
+		return Collections.unmodifiableList(FILTERS);
+	}
 
 	/**
 	 * 注册路由
