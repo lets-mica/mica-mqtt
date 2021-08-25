@@ -187,6 +187,11 @@ Mica-Mqtt-Server
 - `JustAuth` 史上最全的第三方登录开源库: [https://github.com/zhangyd-c/JustAuth](https://github.com/zhangyd-c/JustAuth)
 - `spring-boot-demo` Spring boot 深度学习实战: [https://github.com/xkcoding/spring-boot-demo](https://github.com/xkcoding/spring-boot-demo)
 
+## 鸣谢
+感谢 JetBrains 提供的免费开源 License：
+
+[![JetBrains](docs/img/jetbrains.png)](https://www.jetbrains.com/?from=mica-mqtt)
+
 ## 微信公众号
 
 ![如梦技术](docs/img/dreamlu-weixin.jpg)
