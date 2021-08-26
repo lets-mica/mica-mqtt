@@ -191,7 +191,8 @@
 	   See the License for the specific language governing permissions and
 	   limitations under the License.
 */
-package net.dreamlu.iot.mqtt.core;
+
+package net.dreamlu.iot.mqtt.core.server.http.core;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,7 +215,10 @@ import java.nio.ByteBuffer;
 import java.util.*;
 
 /**
+ * websocket 和 http 共存
+ *
  * @author tanyaowu
+ * @author L.cm
  */
 public class MqttWebServerAioHandler implements ServerAioHandler {
 	private static Logger log = LoggerFactory.getLogger(org.tio.websocket.server.WsServerAioHandler.class);
@@ -230,9 +234,8 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 	/**
 	 * websocket子协议
 	 */
-	private static final String Sec_Websocket_Protocol = "sec-websocket-protocol";
-	private static final HeaderName Header_Name_Sec_Websocket_Protocol = HeaderName.from(Sec_Websocket_Protocol);
-
+	private static final String SEC_WEBSOCKET_PROTOCOL = "sec-websocket-protocol";
+	private static final HeaderName HEADER_NAME_SEC_WEBSOCKET_PROTOCOL = HeaderName.from(SEC_WEBSOCKET_PROTOCOL);
 	private final HttpConfig httpConfig;
 	private final HttpRequestHandler requestHandler;
 	private final IWsMsgHandler wsMsgHandler;
@@ -370,7 +373,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			String methodName = "onBytes";
 			return processRetObj(retObj, methodName, channelContext);
 		} else if (opcode == Opcode.PING || opcode == Opcode.PONG) {
-			log.debug("收到" + opcode);
+			log.debug("收到{}", opcode);
 			return null;
 		} else if (opcode == Opcode.CLOSE) {
 			Object retObj = wsMsgHandler.onClose(websocketPacket, bytes, channelContext);
@@ -391,11 +394,10 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 				HttpResponse httpResponse = request.httpConfig.getRespForBlackIp();
 				if (httpResponse != null) {
 					Tio.send(channelContext, httpResponse);
-					return;
 				} else {
 					Tio.remove(channelContext, ip + "在黑名单中");
-					return;
 				}
+				return;
 			}
 			HttpResponse httpResponse = requestHandler.handler(request);
 			if (httpResponse != null) {
@@ -409,7 +411,8 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			return;
 		}
 		WsRequest wsRequest = (WsRequest) packet;
-		if (wsRequest.isHandShake()) {//是握手包
+		// 判断握手包
+		if (wsRequest.isHandShake()) {
 			WsSessionContext wsSessionContext = (WsSessionContext) channelContext.get();
 			HttpRequest request = wsSessionContext.getHandshakeRequest();
 			HttpResponse httpResponse = wsSessionContext.getHandshakeResponse();
@@ -419,7 +422,6 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 				return;
 			}
 			wsSessionContext.setHandshakeResponse(response);
-
 			WsResponse wsResponse = new WsResponse();
 			wsResponse.setHandShake(true);
 			Tio.send(channelContext, wsResponse);
@@ -436,7 +438,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 		}
 	}
 
-	private WsResponse processRetObj(Object obj, String methodName, ChannelContext channelContext) throws Exception {
+	private WsResponse processRetObj(Object obj, String methodName, ChannelContext channelContext) {
 		if (obj == null) {
 			return null;
 		} else {
@@ -466,7 +468,6 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 	public HttpResponse updateWebSocketProtocol(HttpRequest request) {
 		Map<String, String> headers = request.getHeaders();
 		String secWebSocketKey = headers.get(HttpConst.RequestHeaderKey.Sec_WebSocket_Key);
-
 		if (StrUtil.isNotBlank(secWebSocketKey)) {
 			byte[] secWebSocketKeyBytes;
 			try {
@@ -477,25 +478,22 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			byte[] allBs = new byte[secWebSocketKeyBytes.length + SEC_WEBSOCKET_KEY_SUFFIX_BYTES.length];
 			System.arraycopy(secWebSocketKeyBytes, 0, allBs, 0, secWebSocketKeyBytes.length);
 			System.arraycopy(SEC_WEBSOCKET_KEY_SUFFIX_BYTES, 0, allBs, secWebSocketKeyBytes.length, SEC_WEBSOCKET_KEY_SUFFIX_BYTES.length);
-
 			byte[] keyArray = SHA1Util.SHA1(allBs);
 			String acceptKey = BASE64Util.byteArrayToBase64(keyArray);
 			HttpResponse httpResponse = new HttpResponse(request);
-
+			// 101 协议转换
 			httpResponse.setStatus(HttpResponseStatus.C101);
-
 			Map<HeaderName, HeaderValue> respHeaders = new HashMap<>();
 			respHeaders.put(HeaderName.Connection, HeaderValue.Connection.Upgrade);
 			respHeaders.put(HeaderName.Upgrade, HeaderValue.Upgrade.WebSocket);
 			respHeaders.put(HeaderName.Sec_WebSocket_Accept, HeaderValue.from(acceptKey));
-
 			// websocket 子协议协商
 			String[] supportedSubProtocols = wsMsgHandler.getSupportedSubProtocols();
 			if (supportedSubProtocols != null && supportedSubProtocols.length > 0) {
-				String requestedSubProtocols = headers.get(Sec_Websocket_Protocol);
+				String requestedSubProtocols = headers.get(SEC_WEBSOCKET_PROTOCOL);
 				String selectSubProtocol = selectSubProtocol(requestedSubProtocols, supportedSubProtocols);
 				if (selectSubProtocol != null) {
-					respHeaders.put(Header_Name_Sec_Websocket_Protocol, HeaderValue.from(selectSubProtocol));
+					respHeaders.put(HEADER_NAME_SEC_WEBSOCKET_PROTOCOL, HeaderValue.from(selectSubProtocol));
 				}
 			}
 			httpResponse.addHeaders(respHeaders);

@@ -22,10 +22,10 @@ import net.dreamlu.iot.mqtt.codec.WriteBuffer;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
+import org.tio.core.intf.AioHandler;
 import org.tio.core.intf.Packet;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
-import org.tio.server.intf.ServerAioHandler;
 import org.tio.websocket.common.WsRequest;
 import org.tio.websocket.common.WsResponse;
 import org.tio.websocket.server.handler.IWsMsgHandler;
@@ -42,17 +42,19 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 * mqtt websocket message body key
 	 */
 	private static final String MQTT_WS_MSG_BODY_KEY = "MQTT_WS_MSG_BODY_KEY";
-
+	/**
+	 * websocket 握手端点
+	 */
 	private final String[] supportedSubProtocols;
-	private final ServerAioHandler mqttServerAioHandler;
+	private final AioHandler mqttServerAioHandler;
 
-	public MqttWsMsgHandler(ServerAioHandler mqttServerAioHandler) {
-		this(new String[]{"mqtt", "mqttv3.1", "mqttv3.1.1"}, mqttServerAioHandler);
+	public MqttWsMsgHandler(AioHandler aioHandler) {
+		this(new String[]{"mqtt", "mqttv3.1", "mqttv3.1.1"}, aioHandler);
 	}
 
-	public MqttWsMsgHandler(String[] supportedSubProtocols, ServerAioHandler mqttServerAioHandler) {
+	public MqttWsMsgHandler(String[] supportedSubProtocols, AioHandler aioHandler) {
 		this.supportedSubProtocols = supportedSubProtocols;
-		this.mqttServerAioHandler = mqttServerAioHandler;
+		this.mqttServerAioHandler = aioHandler;
 	}
 
 	@Override
@@ -132,7 +134,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	/**
 	 * 读取 mqtt 消息体处理半包的情况
 	 *
-	 * @param bytes   消息类容
+	 * @param bytes 消息类容
 	 * @return ByteBuffer
 	 */
 	private static synchronized ByteBuffer getMqttBody(WriteBuffer wsBody, byte[] bytes) {

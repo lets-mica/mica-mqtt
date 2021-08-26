@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.api.result;
+package net.dreamlu.iot.mqtt.core.server.http.api.result;
 
 import com.alibaba.fastjson.JSONObject;
-import net.dreamlu.iot.mqtt.core.api.code.ResultCode;
+import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import org.tio.http.common.HeaderName;
 import org.tio.http.common.HeaderValue;
 import org.tio.http.common.HttpResponse;

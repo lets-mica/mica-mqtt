@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.api.code;
+package net.dreamlu.iot.mqtt.core.server.http.api.code;
 
 import org.tio.http.common.HttpResponseStatus;
 
@@ -40,6 +40,10 @@ public enum ResultCode {
 	 * 用户名或密码错误
 	 */
 	E103(HttpResponseStatus.C401, 103),
+	/**
+	 * 请求方法错误
+	 */
+	E104(HttpResponseStatus.C405, 104),
 	/**
 	 * 未知错误
 	 */

@@ -26,13 +26,14 @@ public final class MqttIdentifierRejectedException extends DecoderException {
 	/**
 	 * Creates a new instance
 	 */
-	public MqttIdentifierRejectedException() {}
+	public MqttIdentifierRejectedException() {
+	}
 
 	/**
 	 * Creates a new instance
 	 *
 	 * @param message message
-	 * @param cause Throwable
+	 * @param cause   Throwable
 	 */
 	public MqttIdentifierRejectedException(String message, Throwable cause) {
 		super(message, cause);

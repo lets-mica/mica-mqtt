@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.api.form;
+package net.dreamlu.iot.mqtt.core.server.http.handler;
+
+import org.tio.http.common.HttpRequest;
+import org.tio.http.common.HttpResponse;
 
 /**
- * 订阅表单
+ * http 处理器
  *
  * @author L.cm
  */
-public class SubscribeForm extends BaseForm {
+@FunctionalInterface
+public interface HttpHandler {
 
 	/**
-	 * QoS 等级 0
+	 * 处理请求
+	 *
+	 * @param request HttpRequest
+	 * @return 可以为null
+	 * @throws Exception Exception
 	 */
-	private int qos = 0;
+	HttpResponse apply(HttpRequest request) throws Exception;
 
-	public int getQos() {
-		return qos;
-	}
-
-	public void setQos(int qos) {
-		this.qos = qos;
-	}
 }

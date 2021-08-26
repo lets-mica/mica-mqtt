@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.api.form;
+package net.dreamlu.iot.mqtt.core.server.http.api.form;
 
 import java.io.Serializable;
 

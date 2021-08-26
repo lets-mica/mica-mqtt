@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.api.form;
+package net.dreamlu.iot.mqtt.core.server.http.api.form;
 
 import net.dreamlu.iot.mqtt.core.util.HexUtil;
 import org.tio.utils.hutool.StrUtil;

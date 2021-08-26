@@ -14,32 +14,32 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.core;
+package net.dreamlu.iot.mqtt.core.server.http.handler;
 
 import org.tio.http.common.Method;
 
 import java.util.Objects;
 
 /**
- * http Mapping info
+ * Handler info
  *
  * @author L.cm
  */
-public class MappingInfo {
+public class HandlerInfo {
 	private final Method method;
-	private final String path;
+	private final HttpHandler handler;
 
-	public MappingInfo(Method method, String path) {
+	public HandlerInfo(Method method, HttpHandler handler) {
 		this.method = method;
-		this.path = path;
+		this.handler = handler;
 	}
 
 	public Method getMethod() {
 		return method;
 	}
 
-	public String getPath() {
-		return path;
+	public HttpHandler getHandler() {
+		return handler;
 	}
 
 	@Override
@@ -47,17 +47,16 @@ public class MappingInfo {
 		if (this == o) {
 			return true;
 		}
-		if (o == null || getClass() != o.getClass()) {
+		if (!(o instanceof HandlerInfo)) {
 			return false;
 		}
-		MappingInfo that = (MappingInfo) o;
+		HandlerInfo that = (HandlerInfo) o;
 		return method == that.method &&
-			Objects.equals(path, that.path);
+			Objects.equals(handler, that.handler);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(method, path);
+		return Objects.hash(method, handler);
 	}
-
 }

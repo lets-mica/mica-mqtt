@@ -52,7 +52,7 @@ public class MqttClientTest {
 			.connect();
 
 		client.subQos0("/sys/" + productKey + '/' + deviceName + "/thing/event/property/post_reply", (topic, payload) -> {
-			System.out.println(topic + '\t' +ByteBufferUtil.toString(payload));
+			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 
 		String content = "{\"id\":\"1\",\"version\":\"1.0\",\"params\":{\"LightSwitch\":1}}";

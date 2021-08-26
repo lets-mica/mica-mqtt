@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core;
+package net.dreamlu.iot.mqtt.core.server.http.handler;
 
-import net.dreamlu.iot.mqtt.core.api.code.ResultCode;
-import net.dreamlu.iot.mqtt.core.api.result.Result;
-import net.dreamlu.iot.mqtt.core.core.HttpFilter;
-import net.dreamlu.iot.mqtt.core.core.HttpHandler;
-import net.dreamlu.iot.mqtt.core.core.MqttHttpRoutes;
+import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
+import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.http.common.*;
@@ -52,13 +49,17 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 			return resp500(request, requestLine, e);
 		}
 		// 2. 路由处理
-		HttpHandler handler = MqttHttpRoutes.getHandler(requestLine);
+		HandlerInfo handler = MqttHttpRoutes.getHandler(requestLine);
 		if (handler == null) {
 			return resp404(request, requestLine);
 		}
-		logger.info("mqtt http api {} path:{}", requestLine.getMethod().name(), requestLine.getPathAndQuery());
+		Method method = requestLine.getMethod();
+		if (handler.getMethod() != method) {
+			return Result.fail(new HttpResponse(request), ResultCode.E104);
+		}
+		logger.info("mqtt http api {} path:{}", method.name(), requestLine.getPathAndQuery());
 		try {
-			return handler.apply(request);
+			return handler.getHandler().apply(request);
 		} catch (Exception e) {
 			return resp500(request, requestLine, e);
 		}

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.core;
+package net.dreamlu.iot.mqtt.core.server.http.handler;
 
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;

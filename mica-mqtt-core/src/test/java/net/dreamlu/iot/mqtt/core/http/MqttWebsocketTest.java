@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core;
+package net.dreamlu.iot.mqtt.core.http;
 
 import java.io.IOException;
 

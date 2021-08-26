@@ -11,7 +11,7 @@ public class UdpClusterTest1 {
 
 	public static void main(String[] args) throws IOException {
 		UdpTestHandler udpTestHandler = new UdpTestHandler();
-		UdpClusterConfig udpServerConf = new UdpClusterConfig("224.0.0.1",12345, udpTestHandler, 5000);
+		UdpClusterConfig udpServerConf = new UdpClusterConfig("224.0.0.1", 12345, udpTestHandler, 5000);
 		UdpCluster udpCluster = new UdpCluster(udpServerConf);
 		udpCluster.start();
 

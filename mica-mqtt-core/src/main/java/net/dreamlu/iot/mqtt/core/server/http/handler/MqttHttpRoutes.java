@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.core;
+package net.dreamlu.iot.mqtt.core.server.http.handler;
 
 import org.tio.http.common.Method;
 import org.tio.http.common.RequestLine;
@@ -28,7 +28,7 @@ import java.util.*;
  */
 public final class MqttHttpRoutes {
 	private static final LinkedList<HttpFilter> FILTERS = new LinkedList<>();
-	private static final Map<MappingInfo, HttpHandler> ROUTS = new HashMap<>();
+	private static final Map<String, HandlerInfo> ROUTS = new HashMap<>();
 
 	/**
 	 * 注册路由
@@ -66,18 +66,17 @@ public final class MqttHttpRoutes {
 	 * @param handler HttpHandler
 	 */
 	public static void register(Method method, String path, HttpHandler handler) {
-		ROUTS.put(new MappingInfo(method, path), handler);
+		ROUTS.put(path, new HandlerInfo(method, handler));
 	}
 
 	/**
 	 * 读取路由
 	 *
-	 * @param method 请求方法
-	 * @param path   路径
-	 * @return HttpHandler
+	 * @param path 路径
+	 * @return HandlerInfo
 	 */
-	public static HttpHandler getHandler(Method method, String path) {
-		return ROUTS.get(new MappingInfo(method, path));
+	public static HandlerInfo getHandler(String path) {
+		return ROUTS.get(path);
 	}
 
 	/**
@@ -86,8 +85,8 @@ public final class MqttHttpRoutes {
 	 * @param requestLine RequestLine
 	 * @return HttpHandler
 	 */
-	public static HttpHandler getHandler(RequestLine requestLine) {
-		return getHandler(requestLine.getMethod(), requestLine.getPath());
+	public static HandlerInfo getHandler(RequestLine requestLine) {
+		return getHandler(requestLine.getPath());
 	}
 
 }
