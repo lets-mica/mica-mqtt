@@ -196,7 +196,6 @@ package net.dreamlu.iot.mqtt.core.server.http.core;
 
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
-import org.tio.core.TcpConst;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.HttpUuid;
 import org.tio.http.common.handler.HttpRequestHandler;
@@ -273,16 +272,17 @@ public class MqttWebServer {
 			System.setProperty(TIO_SYSTEM_TIMER_PERIOD, "50");
 		}
 		HttpConfig httpConfig = new HttpConfig(serverCreator.getWebsocketPort(), false);
+		httpConfig.setBindIp(serverCreator.getIp());
 		httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
 		httpConfig.setCheckHost(false);
 		this.httpConfig = httpConfig;
 		this.httpConfig.setHttpRequestHandler(this.httpRequestHandler);
 		this.mqttWebServerAioHandler = new MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
 		this.serverTioConfig = new ServerTioConfig(this.httpConfig.getName(), mqttWebServerAioHandler, mqttWebServerAioListener, tioExecutor, groupExecutor);
-		this.serverTioConfig.setHeartbeatTimeout(1000 * 20);
-		this.serverTioConfig.setReadBufferSize(TcpConst.MAX_DATA_LENGTH);
-		this.tioServer = new TioServer(serverTioConfig);
+		this.serverTioConfig.setHeartbeatTimeout(0);
+		this.serverTioConfig.setReadBufferSize(1024 * 30);
 		this.serverTioConfig.setTioUuid(new HttpUuid());
+		this.tioServer = new TioServer(serverTioConfig);
 	}
 
 	public void start() throws IOException {

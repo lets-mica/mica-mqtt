@@ -387,6 +387,7 @@ public class MqttServerCreator {
 			TioServer tioWsServer = new TioServer(wsTioConfig);
 			mqttServer.setTioWsServer(tioWsServer);
 			wsTioConfig.share(tioConfig);
+			wsTioConfig.groupStat = tioConfig.groupStat;
 			try {
 				tioWsServer.start(this.ip, wsServerConfig.getBindPort());
 			} catch (IOException e) {

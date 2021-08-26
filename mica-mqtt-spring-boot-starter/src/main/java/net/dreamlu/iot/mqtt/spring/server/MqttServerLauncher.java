@@ -72,6 +72,7 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 			TioServer websocketServer = new TioServer(wsTioConfig);
 			mqttServer.setTioWsServer(websocketServer);
 			wsTioConfig.share(tioConfig);
+			wsTioConfig.groupStat = tioConfig.groupStat;
 			try {
 				websocketServer.start(tioServer.getServerNode().getIp(), wsServerConfig.getBindPort());
 				log.info("Mica mqtt websocket start successful on {}:{}", tioServer.getServerNode().getIp(), websocketPort);

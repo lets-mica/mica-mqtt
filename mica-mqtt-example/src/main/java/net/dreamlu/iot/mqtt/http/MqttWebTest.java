@@ -69,6 +69,7 @@ public class MqttWebTest {
 		MqttWebServer httpServerStarter = new MqttWebServer(serverCreator, mqttWsMsgHandler);
 		ServerTioConfig httpIioConfig = httpServerStarter.getServerTioConfig();
 		httpIioConfig.share(serverConfig);
+		httpIioConfig.groupStat = serverConfig.groupStat;
 		// 启动http服务器
 		httpServerStarter.start();
 	}
