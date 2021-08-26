@@ -73,14 +73,14 @@ public class MqttClientConfiguration {
 		// 构造遗嘱消息
 		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();
 		if (willMessage != null && StringUtils.hasText(willMessage.getTopic())) {
-			MqttWillMessage.Builder builder = MqttWillMessage.builder();
-			builder.topic(willMessage.getTopic())
-				.qos(willMessage.getQos())
-				.retain(willMessage.isRetain());
-			if (StringUtils.hasText(willMessage.getMessage())) {
-				builder.message(willMessage.getMessage().getBytes(StandardCharsets.UTF_8));
-			}
-			clientCreator.willMessage(builder.build());
+			clientCreator.willMessage(builder -> {
+				builder.topic(willMessage.getTopic())
+					.qos(willMessage.getQos())
+					.retain(willMessage.isRetain());
+				if (StringUtils.hasText(willMessage.getMessage())) {
+					builder.message(willMessage.getMessage().getBytes(StandardCharsets.UTF_8));
+				}
+			});
 		}
 		// 配置客户端链接监听器
 		clientConnectListenerObjectProvider.ifAvailable(clientCreator::connectListener);
