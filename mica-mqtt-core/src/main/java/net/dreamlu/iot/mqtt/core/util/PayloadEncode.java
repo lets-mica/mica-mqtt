@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.http.api.form;
+package net.dreamlu.iot.mqtt.core.util;
 
-import net.dreamlu.iot.mqtt.core.util.HexUtil;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.charset.StandardCharsets;
@@ -28,10 +27,16 @@ import java.util.Base64;
  * @author L.cm
  */
 public enum PayloadEncode {
+
 	/**
 	 * 纯文本、hex、base64
 	 */
 	plain {
+		@Override
+		public String encode(byte[] data) {
+			return new String(data, StandardCharsets.UTF_8);
+		}
+
 		@Override
 		public byte[] decode(String data) {
 			return data.getBytes(StandardCharsets.UTF_8);
@@ -39,16 +44,33 @@ public enum PayloadEncode {
 	},
 	hex {
 		@Override
+		public String encode(byte[] data) {
+			return HexUtil.encodeToString(data);
+		}
+
+		@Override
 		public byte[] decode(String data) {
 			return HexUtil.decode(data);
 		}
 	},
 	base64 {
 		@Override
+		public String encode(byte[] data) {
+			return Base64.getEncoder().encodeToString(data);
+		}
+
+		@Override
 		public byte[] decode(String data) {
 			return Base64.getDecoder().decode(data);
 		}
 	};
+
+	/**
+	 * 编码
+	 *
+	 * @return byte array
+	 */
+	public abstract String encode(byte[] data);
 
 	/**
 	 * 解码

@@ -22,7 +22,7 @@ import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import net.dreamlu.iot.mqtt.core.server.http.api.form.BaseForm;
-import net.dreamlu.iot.mqtt.core.server.http.api.form.PayloadEncode;
+import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
 import net.dreamlu.iot.mqtt.core.server.http.api.form.PublishForm;
 import net.dreamlu.iot.mqtt.core.server.http.api.form.SubscribeForm;
 import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
