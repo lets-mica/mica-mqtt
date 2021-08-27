@@ -12,6 +12,7 @@
 - :sparkles: 配置项 `mqtt.server.websocket-port` 改为 `mqtt.server.web-port`。
 - :memo: 添加 JetBrains 连接。
 - :bug: 修复默认的消息转发器逻辑。
+- :bug: 修复 websocket 下线无法触发offline gitee #I47K13 感谢 `@willianfu` 同学反馈。 
 
 ### v1.0.6 - 2021-08-21
 - :sparkles: 添加订阅 topicFilter 校验。
