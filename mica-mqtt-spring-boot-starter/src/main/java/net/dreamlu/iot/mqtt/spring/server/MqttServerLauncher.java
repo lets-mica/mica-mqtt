@@ -35,8 +35,7 @@ public class MqttServerLauncher implements SmartLifecycle, Ordered {
 
 	@Override
 	public void start() {
-		mqttServer.start();
-		running = true;
+		running = mqttServer.start();
 	}
 
 	@Override

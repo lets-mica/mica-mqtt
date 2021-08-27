@@ -50,7 +50,6 @@ public class MqttServerTest {
 				logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));
 			})
 			.debug() // 开启 debug 信息日志
-			.build()
 			.start();
 
 		Timer timer = new Timer();

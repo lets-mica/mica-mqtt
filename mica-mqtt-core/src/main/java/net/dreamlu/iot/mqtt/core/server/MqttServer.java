@@ -49,9 +49,9 @@ public final class MqttServer {
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
-					  MqttWebServer webServer,
-					  MqttServerCreator serverCreator,
-					  ScheduledThreadPoolExecutor executor) {
+			   MqttWebServer webServer,
+			   MqttServerCreator serverCreator,
+			   ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
 		this.webServer = webServer;
 		this.serverCreator = serverCreator;
@@ -244,7 +244,7 @@ public final class MqttServer {
 		return true;
 	}
 
-	public MqttServer start() {
+	public boolean start() {
 		// 1. 启动 mqtt tcp
 		try {
 			tioServer.start(this.serverCreator.getIp(), this.serverCreator.getPort());
@@ -259,7 +259,7 @@ public final class MqttServer {
 				throw new IllegalStateException("Mica mqtt http/websocket server start fail.", e);
 			}
 		}
-		return this;
+		return true;
 	}
 
 	public boolean stop() {

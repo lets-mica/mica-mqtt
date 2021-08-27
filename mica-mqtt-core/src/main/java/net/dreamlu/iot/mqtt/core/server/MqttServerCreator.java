@@ -413,4 +413,9 @@ public class MqttServerCreator {
 		return mqttServer;
 	}
 
+	public MqttServer start() {
+		MqttServer mqttServer = this.build();
+		mqttServer.start();
+		return mqttServer;
+	}
 }

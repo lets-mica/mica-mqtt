@@ -55,7 +55,6 @@ public class Server {
 			.messageDispatcher(messageDispatcher)
 			.messageListener(messageListener)
 			.debug()
-			.build()
 			.start();
 	}
 }
