@@ -31,7 +31,6 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
-import net.dreamlu.iot.mqtt.core.server.websocket.MqttWsMsgHandler;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -40,13 +39,7 @@ import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
-import org.tio.websocket.common.WsTioUuid;
-import org.tio.websocket.server.WsServerAioHandler;
-import org.tio.websocket.server.WsServerAioListener;
-import org.tio.websocket.server.WsServerConfig;
-import org.tio.websocket.server.handler.IWsMsgHandler;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;

@@ -73,12 +73,30 @@ public final class MqttServer {
 	}
 
 	/**
+	 * 获取 http、websocket 服务
+	 *
+	 * @return MqttWebServer
+	 */
+	public MqttWebServer getWebServer() {
+		return webServer;
+	}
+
+	/**
 	 * 获取 ServerTioConfig
 	 *
 	 * @return the serverTioConfig
 	 */
 	public ServerTioConfig getServerConfig() {
 		return this.tioServer.getServerTioConfig();
+	}
+
+	/**
+	 * 获取 mqtt 配置
+	 *
+	 * @return MqttServerCreator
+	 */
+	public MqttServerCreator getServerCreator() {
+		return serverCreator;
 	}
 
 	/**
@@ -244,6 +262,30 @@ public final class MqttServer {
 		return true;
 	}
 
+	/**
+	 * 获取 ChannelContext
+	 *
+	 * @param clientId clientId
+	 * @return ChannelContext
+	 */
+	public ChannelContext getChannelContext(String clientId) {
+		return Tio.getByBsId(getServerConfig(), clientId);
+	}
+
+	/**
+	 * 服务端主动断开连接
+	 *
+	 * @param clientId clientId
+	 */
+	public void close(String clientId) {
+		Tio.remove(getChannelContext(clientId), "Mqtt server close this connects.");
+	}
+
+	/**
+	 * 启动服务
+	 *
+	 * @return 是否启动
+	 */
 	public boolean start() {
 		// 1. 启动 mqtt tcp
 		try {
@@ -262,6 +304,11 @@ public final class MqttServer {
 		return true;
 	}
 
+	/**
+	 * 停止服务
+	 *
+	 * @return 是否停止
+	 */
 	public boolean stop() {
 		boolean result = this.tioServer.stop();
 		logger.info("Mqtt tcp server stop result:{}", result);

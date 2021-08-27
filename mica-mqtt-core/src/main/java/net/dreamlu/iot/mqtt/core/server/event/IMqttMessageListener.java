@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.core.server.event;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
-import org.tio.core.ChannelContext;
 
 import java.nio.ByteBuffer;
 
@@ -32,12 +31,11 @@ public interface IMqttMessageListener {
 	/**
 	 * 监听到消息
 	 *
-	 * @param context ChannelContext
 	 * @param clientId clientId
 	 * @param topic    topic
 	 * @param mqttQoS  MqttQoS
 	 * @param payload  payload
 	 */
-	void onMessage(ChannelContext context, String clientId, String topic, MqttQoS mqttQoS, ByteBuffer payload);
+	void onMessage(String clientId, String topic, MqttQoS mqttQoS, ByteBuffer payload);
 
 }

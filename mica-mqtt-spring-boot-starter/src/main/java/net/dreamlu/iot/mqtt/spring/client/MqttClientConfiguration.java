@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.spring.client;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
-import net.dreamlu.iot.mqtt.core.client.MqttWillMessage;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

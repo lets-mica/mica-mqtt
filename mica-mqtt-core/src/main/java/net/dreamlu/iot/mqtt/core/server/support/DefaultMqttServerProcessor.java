@@ -118,7 +118,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 8. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
 		// 9. 在线状态
-		connectStatusListener.online(context, clientId);
+		connectStatusListener.online(clientId);
 	}
 
 	private void connAckByReturnCode(String clientId, ChannelContext context, MqttConnectReturnCode returnCode) {
@@ -141,10 +141,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		logger.debug("Publish - clientId:{} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
 		switch (mqttQoS) {
 			case AT_MOST_ONCE:
-				invokeListenerForPublish(context, clientId, mqttQoS, topicName, message, fixedHeader.isRetain());
+				invokeListenerForPublish(clientId, mqttQoS, topicName, message, fixedHeader.isRetain());
 				break;
 			case AT_LEAST_ONCE:
-				invokeListenerForPublish(context, clientId, mqttQoS, topicName, message, fixedHeader.isRetain());
+				invokeListenerForPublish(clientId, mqttQoS, topicName, message, fixedHeader.isRetain());
 				if (packetId != -1) {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck()
 						.packetId(packetId)
@@ -215,7 +215,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			MqttFixedHeader incomingFixedHeader = incomingPublish.fixedHeader();
 			MqttQoS mqttQoS = incomingFixedHeader.qosLevel();
 			boolean retain = incomingFixedHeader.isRetain();
-			invokeListenerForPublish(context, clientId, mqttQoS, topicName, incomingPublish, retain);
+			invokeListenerForPublish(clientId, mqttQoS, topicName, incomingPublish, retain);
 			pendingQos2Publish.onPubRelReceived();
 			sessionManager.removePendingQos2Publish(clientId, messageId);
 		}
@@ -312,8 +312,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	 * @param topicName topicName
 	 * @param message   MqttPublishMessage
 	 */
-	private void invokeListenerForPublish(ChannelContext context, String clientId, MqttQoS mqttQoS,
-										  String topicName, MqttPublishMessage message, boolean isRetain) {
+	private void invokeListenerForPublish(String clientId, MqttQoS mqttQoS, String topicName,
+										  MqttPublishMessage message, boolean isRetain) {
 		ByteBuffer payload = message.payload();
 		// 1. retain 消息逻辑
 		if (isRetain) {
@@ -331,7 +331,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			}
 		}
 		// 2. 消息发布
-		messageListener.onMessage(context, clientId, topicName, mqttQoS, payload);
+		messageListener.onMessage(clientId, topicName, mqttQoS, payload);
 	}
 
 }

@@ -145,4 +145,24 @@ public class MqttServerTemplate {
 	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publishAll(topic, payload, qos, retain);
 	}
+
+	/**
+	 * 获取 ChannelContext
+	 *
+	 * @param clientId clientId
+	 * @return ChannelContext
+	 */
+	public ChannelContext getChannelContext(String clientId) {
+		return mqttServer.getChannelContext(clientId);
+	}
+
+	/**
+	 * 服务端主动断开连接
+	 *
+	 * @param clientId clientId
+	 */
+	public void close(String clientId) {
+		mqttServer.close(clientId);
+	}
+
 }

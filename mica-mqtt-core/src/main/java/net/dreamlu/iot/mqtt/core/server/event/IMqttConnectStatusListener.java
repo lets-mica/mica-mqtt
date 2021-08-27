@@ -16,8 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server.event;
 
-import org.tio.core.ChannelContext;
-
 /**
  * mqtt 链接状态事件
  *
@@ -28,17 +26,15 @@ public interface IMqttConnectStatusListener {
 	/**
 	 * 设备上线（连接成功）
 	 *
-	 * @param context  ChannelContext
 	 * @param clientId clientId
 	 */
-	void online(ChannelContext context, String clientId);
+	void online(String clientId);
 
 	/**
 	 * 设备离线
 	 *
-	 * @param context  ChannelContext
 	 * @param clientId clientId
 	 */
-	void offline(ChannelContext context, String clientId);
+	void offline(String clientId);
 
 }

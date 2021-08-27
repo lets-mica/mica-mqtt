@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.core.server.support;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.core.ChannelContext;
 
 /**
  * 默认的链接状态监听
@@ -30,12 +29,12 @@ public class DefaultMqttConnectStatusListener implements IMqttConnectStatusListe
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttConnectStatusListener.class);
 
 	@Override
-	public void online(ChannelContext context, String clientId) {
+	public void online(String clientId) {
 		logger.info("Mqtt clientId:{} online.", clientId);
 	}
 
 	@Override
-	public void offline(ChannelContext context, String clientId) {
+	public void offline(String clientId) {
 		logger.info("Mqtt clientId:{} offline.", clientId);
 	}
 }

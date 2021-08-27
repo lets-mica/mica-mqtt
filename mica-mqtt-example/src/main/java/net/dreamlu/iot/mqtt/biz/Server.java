@@ -40,7 +40,7 @@ public class Server {
 		// 1. 消息转发处理器，可用来实现集群
 		IMqttMessageDispatcher messageDispatcher = new DefaultMqttMessageDispatcher();
 		// 2. 收到消息，将消息转发出去
-		IMqttMessageListener messageListener = (context, clientId, topic, mqttQoS, payload) -> {
+		IMqttMessageListener messageListener = (clientId, topic, mqttQoS, payload) -> {
 			Message message = new Message();
 			message.setTopic(topic);
 			message.setQos(mqttQoS.value());
