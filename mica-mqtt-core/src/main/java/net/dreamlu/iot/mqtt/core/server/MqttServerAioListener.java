@@ -76,7 +76,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 		// 6. 解绑 clientId
 		Tio.unbindBsId(context);
 		// 7. 下线事件
-		notify(clientId);
+		notify(context, clientId);
 	}
 
 	private void sendWillMessage(ChannelContext context, String clientId) {
@@ -108,9 +108,9 @@ public class MqttServerAioListener extends DefaultAioListener {
 		}
 	}
 
-	private void notify(String clientId) {
+	private void notify(ChannelContext context, String clientId) {
 		try {
-			connectStatusListener.offline(clientId);
+			connectStatusListener.offline(context, clientId);
 		} catch (Throwable throwable) {
 			logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
 		}

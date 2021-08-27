@@ -22,6 +22,7 @@ import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
+import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
@@ -37,6 +38,7 @@ import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
 import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
+import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 import org.tio.websocket.common.WsTioUuid;
 import org.tio.websocket.server.WsServerAioHandler;
@@ -125,13 +127,25 @@ public class MqttServerCreator {
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
+	 * http、websocket 端口，默认：8083
+	 */
+	private int webPort = 8083;
+	/**
 	 * 开启 websocket 服务，默认：true
 	 */
 	private boolean websocketEnable = true;
 	/**
-	 * websocket 端口，默认：8083
+	 * 开启 http 服务，默认：true
 	 */
-	private int websocketPort = 8083;
+	private boolean httpEnable = false;
+	/**
+	 * http Basic 认证账号
+	 */
+	private String httpBasicUsername;
+	/**
+	 * http Basic 认证密码
+	 */
+	private String httpBasicPassword;
 
 	public String getName() {
 		return name;
@@ -302,6 +316,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public int getWebPort() {
+		return webPort;
+	}
+
+	public MqttServerCreator webPort(int webPort) {
+		this.webPort = webPort;
+		return this;
+	}
+
 	public boolean isWebsocketEnable() {
 		return websocketEnable;
 	}
@@ -311,16 +334,33 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public int getWebsocketPort() {
-		return websocketPort;
+	public boolean isHttpEnable() {
+		return httpEnable;
 	}
 
-	public MqttServerCreator websocketPort(int websocketPort) {
-		this.websocketPort = websocketPort;
+	public MqttServerCreator httpEnable(boolean httpEnable) {
+		this.httpEnable = httpEnable;
 		return this;
 	}
 
-	public MqttServer start() {
+	public String getHttpBasicUsername() {
+		return httpBasicUsername;
+	}
+
+	public MqttServerCreator httpBasicAuth(String username, String password) {
+		if (StrUtil.isBlank(username) || StrUtil.isBlank(password)) {
+			throw new IllegalArgumentException("Mqtt http basic auth username or password is blank.");
+		}
+		this.httpBasicUsername = username;
+		this.httpBasicPassword = password;
+		return this;
+	}
+
+	public String getHttpBasicPassword() {
+		return httpBasicPassword;
+	}
+
+	public MqttServer build() {
 		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		if (this.authHandler == null) {
 			this.authHandler = new DefaultMqttServerAuthHandler();
@@ -343,7 +383,7 @@ public class MqttServerCreator {
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
 		ServerAioListener listener = new MqttServerAioListener(this);
-		// 2. t-io 配置
+		// 3. t-io 配置
 		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
 		// 4. 设置 t-io 心跳 timeout
 		if (this.heartbeatTimeout != null) {
@@ -363,36 +403,12 @@ public class MqttServerCreator {
 		TioServer tioServer = new TioServer(tioConfig);
 		// 6. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
-		MqttServer mqttServer = new MqttServer(tioServer, this, executor);
-		// 7. 如果是默认的消息转发器，设置 mqttServer
+		// 7. 配置 mqtt http/websocket server
+		MqttWebServer webServer = MqttWebServer.config(this, tioConfig);
+		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, executor);
+		// 8. 如果是默认的消息转发器，设置 mqttServer
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
 			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);
-		}
-		// 8. 启动 mqtt tcp
-		try {
-			tioServer.start(this.ip, this.port);
-		} catch (IOException e) {
-			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
-		}
-		// 9. 启动 mqtt websocket server
-		if (this.websocketEnable) {
-			WsServerConfig wsServerConfig = new WsServerConfig(this.websocketPort, false);
-			IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(handler);
-			WsServerAioHandler wsServerAioHandler = new WsServerAioHandler(wsServerConfig, mqttWsMsgHandler);
-			WsServerAioListener wsServerAioListener = new WsServerAioListener();
-			ServerTioConfig wsTioConfig = new ServerTioConfig(this.name + "-Websocket", wsServerAioHandler, wsServerAioListener);
-			wsTioConfig.setHeartbeatTimeout(0);
-			wsTioConfig.setTioUuid(new WsTioUuid());
-			wsTioConfig.setReadBufferSize(1024 * 30);
-			TioServer tioWsServer = new TioServer(wsTioConfig);
-			mqttServer.setTioWsServer(tioWsServer);
-			wsTioConfig.share(tioConfig);
-			wsTioConfig.groupStat = tioConfig.groupStat;
-			try {
-				tioWsServer.start(this.ip, wsServerConfig.getBindPort());
-			} catch (IOException e) {
-				throw new IllegalStateException("Mica mqtt websocket server start fail.", e);
-			}
 		}
 		return mqttServer;
 	}

@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.core.server.websocket;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.WriteBuffer;
+import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
@@ -43,16 +44,23 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 */
 	private static final String MQTT_WS_MSG_BODY_KEY = "MQTT_WS_MSG_BODY_KEY";
 	/**
+	 * MqttServerCreator
+	 */
+	private final MqttServerCreator serverCreator;
+	/**
 	 * websocket 握手端点
 	 */
 	private final String[] supportedSubProtocols;
 	private final AioHandler mqttServerAioHandler;
 
-	public MqttWsMsgHandler(AioHandler aioHandler) {
-		this(new String[]{"mqtt", "mqttv3.1", "mqttv3.1.1"}, aioHandler);
+	public MqttWsMsgHandler(MqttServerCreator serverCreator, AioHandler aioHandler) {
+		this(serverCreator, new String[]{"mqtt", "mqttv3.1", "mqttv3.1.1"}, aioHandler);
 	}
 
-	public MqttWsMsgHandler(String[] supportedSubProtocols, AioHandler aioHandler) {
+	public MqttWsMsgHandler(MqttServerCreator serverCreator,
+							String[] supportedSubProtocols,
+							AioHandler aioHandler) {
+		this.serverCreator = serverCreator;
 		this.supportedSubProtocols = supportedSubProtocols;
 		this.mqttServerAioHandler = aioHandler;
 	}
@@ -64,7 +72,10 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 
 	@Override
 	public HttpResponse handshake(HttpRequest request, HttpResponse httpResponse, ChannelContext channelContext) {
-		return httpResponse;
+		if (serverCreator.isWebsocketEnable()) {
+			return httpResponse;
+		}
+		return null;
 	}
 
 	/**

@@ -20,6 +20,7 @@ import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
+import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.slf4j.Logger;
@@ -29,6 +30,7 @@ import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -41,14 +43,18 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public final class MqttServer {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
 	private final TioServer tioServer;
+	private final MqttWebServer webServer;
+	private final MqttServerCreator serverCreator;
 	private final IMqttSessionManager sessionManager;
 	private final ScheduledThreadPoolExecutor executor;
-	private TioServer tioWsServer;
 
-	public MqttServer(TioServer tioServer,
+	MqttServer(TioServer tioServer,
+					  MqttWebServer webServer,
 					  MqttServerCreator serverCreator,
 					  ScheduledThreadPoolExecutor executor) {
 		this.tioServer = tioServer;
+		this.webServer = webServer;
+		this.serverCreator = serverCreator;
 		this.sessionManager = serverCreator.getSessionManager();
 		this.executor = executor;
 	}
@@ -238,20 +244,29 @@ public final class MqttServer {
 		return true;
 	}
 
-	/**
-	 * 绑定 websocket 服务
-	 *
-	 * @param tioWsServer TioServer
-	 */
-	public void setTioWsServer(TioServer tioWsServer) {
-		this.tioWsServer = tioWsServer;
+	public MqttServer start() {
+		// 1. 启动 mqtt tcp
+		try {
+			tioServer.start(this.serverCreator.getIp(), this.serverCreator.getPort());
+		} catch (IOException e) {
+			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
+		}
+		// 2. 启动 mqtt web
+		if (webServer != null) {
+			try {
+				webServer.start();
+			} catch (IOException e) {
+				throw new IllegalStateException("Mica mqtt http/websocket server start fail.", e);
+			}
+		}
+		return this;
 	}
 
 	public boolean stop() {
 		boolean result = this.tioServer.stop();
 		logger.info("Mqtt tcp server stop result:{}", result);
-		if (tioWsServer != null) {
-			result &= tioWsServer.stop();
+		if (webServer != null) {
+			result &= webServer.stop();
 			logger.info("Mqtt websocket server stop result:{}", result);
 		}
 		try {

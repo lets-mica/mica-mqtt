@@ -81,13 +81,21 @@ public class MqttServerProperties {
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
+	 * http、websocket 端口，默认：8083
+	 */
+	private int webPort = 8083;
+	/**
 	 * 开启 websocket 服务，默认：true
 	 */
 	private boolean websocketEnable = true;
 	/**
-	 * websocket 端口，默认：8083
+	 * 开启 http 服务，默认：true
 	 */
-	private int websocketPort = 8083;
+	private boolean httpEnable = false;
+	/**
+	 * http basic auth
+	 */
+	private HttpBasicAuth httpBasicAuth = new HttpBasicAuth();
 
 	@Getter
 	@Setter
@@ -102,6 +110,23 @@ public class MqttServerProperties {
 		private String trustStorePath;
 		/**
 		 * 证书密钥
+		 */
+		private String password;
+	}
+
+	@Getter
+	@Setter
+	public static class HttpBasicAuth {
+		/**
+		 * 是否启用，默认：关闭
+		 */
+		private boolean enable = false;
+		/**
+		 * http Basic 认证账号
+		 */
+		private String username;
+		/**
+		 * http Basic 认证密码
 		 */
 		private String password;
 	}

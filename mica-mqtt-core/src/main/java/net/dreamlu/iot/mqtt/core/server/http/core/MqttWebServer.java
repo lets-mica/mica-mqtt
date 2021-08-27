@@ -195,7 +195,12 @@
 package net.dreamlu.iot.mqtt.core.server.http.core;
 
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
+import net.dreamlu.iot.mqtt.core.server.http.api.MqttHttpApi;
+import net.dreamlu.iot.mqtt.core.server.http.api.auth.BasicAuthFilter;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
+import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
+import net.dreamlu.iot.mqtt.core.server.websocket.MqttWsMsgHandler;
+import org.tio.core.intf.AioHandler;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.HttpUuid;
 import org.tio.http.common.handler.HttpRequestHandler;
@@ -207,6 +212,7 @@ import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -265,13 +271,13 @@ public class MqttWebServer {
 		return serverTioConfig;
 	}
 
+	public TioServer getTioServer() {
+		return tioServer;
+	}
+
 	private void init(MqttServerCreator serverCreator, IWsMsgHandler wsMsgHandler,
 					  SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
-		String systemTimerPeriod = System.getProperty(TIO_SYSTEM_TIMER_PERIOD);
-		if (StrUtil.isBlank(systemTimerPeriod)) {
-			System.setProperty(TIO_SYSTEM_TIMER_PERIOD, "50");
-		}
-		HttpConfig httpConfig = new HttpConfig(serverCreator.getWebsocketPort(), false);
+		HttpConfig httpConfig = new HttpConfig(serverCreator.getWebPort(), false);
 		httpConfig.setBindIp(serverCreator.getIp());
 		httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
 		httpConfig.setCheckHost(false);
@@ -289,12 +295,50 @@ public class MqttWebServer {
 		tioServer.start(this.httpConfig.getBindIp(), this.httpConfig.getBindPort());
 	}
 
-	public void stop() {
-		tioServer.stop();
+	public boolean stop() {
+		return tioServer.stop();
 	}
 
-	public TioServer getTioServer() {
-		return tioServer;
+	/**
+	 * 配置 web 服务
+	 *
+	 * @param serverCreator    MqttServerCreator
+	 * @param mqttServerConfig ServerTioConfig
+	 * @return MqttWebServer
+	 */
+	public static MqttWebServer config(MqttServerCreator serverCreator, ServerTioConfig mqttServerConfig) {
+		// 1. 判断是否开启
+		boolean httpEnable = serverCreator.isHttpEnable();
+		boolean websocketEnable = serverCreator.isWebsocketEnable();
+		if (!httpEnable && !websocketEnable) {
+			return null;
+		}
+		// 2. 如果开启 mqtt http api
+		if (httpEnable) {
+			// 2.1 http 特有的配置
+			String systemTimerPeriod = System.getProperty(TIO_SYSTEM_TIMER_PERIOD);
+			if (StrUtil.isBlank(systemTimerPeriod)) {
+				System.setProperty(TIO_SYSTEM_TIMER_PERIOD, "50");
+			}
+			// 2.2 http 路由配置
+			MqttHttpApi httpApi = new MqttHttpApi(serverCreator.getMessageDispatcher(), serverCreator.getSessionManager());
+			httpApi.register();
+			// 2.3 认证配置
+			String username = serverCreator.getHttpBasicUsername();
+			String password = serverCreator.getHttpBasicPassword();
+			if (Objects.nonNull(username) && Objects.nonNull(password)) {
+				MqttHttpRoutes.addFilter(new BasicAuthFilter(username, password));
+			}
+		}
+		// 3. 初始化处理器
+		AioHandler mqttAioHandler = mqttServerConfig.getAioHandler();
+		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(serverCreator, mqttAioHandler);
+		MqttWebServer httpServerStarter = new MqttWebServer(serverCreator, mqttWsMsgHandler);
+		ServerTioConfig httpIioConfig = httpServerStarter.getServerTioConfig();
+		// 4. tcp + websocket mqtt 共享公共配置
+		httpIioConfig.share(mqttServerConfig);
+		httpIioConfig.groupStat = mqttServerConfig.groupStat;
+		return httpServerStarter;
 	}
 
 }
