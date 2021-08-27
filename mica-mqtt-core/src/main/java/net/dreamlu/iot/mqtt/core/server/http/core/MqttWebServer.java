@@ -199,7 +199,9 @@ import net.dreamlu.iot.mqtt.core.server.http.api.MqttHttpApi;
 import net.dreamlu.iot.mqtt.core.server.http.api.auth.BasicAuthFilter;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
-import net.dreamlu.iot.mqtt.core.server.websocket.MqttWsMsgHandler;
+import net.dreamlu.iot.mqtt.core.server.http.websocket.MqttWsMsgHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.intf.AioHandler;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.HttpUuid;
@@ -222,6 +224,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @author L.cm
  */
 public class MqttWebServer {
+	private static final Logger logger = LoggerFactory.getLogger(MqttWebServer.class);
 	private static final String TIO_SYSTEM_TIMER_PERIOD = "tio.system.timer.period";
 	private final MqttWebServerAioListener mqttWebServerAioListener;
 	private final HttpRequestHandler httpRequestHandler;
@@ -310,6 +313,7 @@ public class MqttWebServer {
 		// 1. 判断是否开启
 		boolean httpEnable = serverCreator.isHttpEnable();
 		boolean websocketEnable = serverCreator.isWebsocketEnable();
+		logger.info("Mica mqtt http api enable:{} websocket enable:{}", httpEnable, websocketEnable);
 		if (!httpEnable && !websocketEnable) {
 			return null;
 		}
