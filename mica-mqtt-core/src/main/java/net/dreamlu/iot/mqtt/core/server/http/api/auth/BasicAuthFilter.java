@@ -16,6 +16,8 @@
 
 package net.dreamlu.iot.mqtt.core.server.http.api.auth;
 
+import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
+import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import net.dreamlu.iot.mqtt.core.server.http.handler.HttpFilter;
 import org.tio.http.common.*;
 import org.tio.utils.hutool.StrUtil;
@@ -56,7 +58,7 @@ public class BasicAuthFilter implements HttpFilter {
 	@Override
 	public HttpResponse response(HttpRequest request, HttpResponse response) {
 		response.addHeader(WWW_AUTHENTICATE, BASIC_REALM);
-		response.setStatus(HttpResponseStatus.C401);
+		Result.fail(response, ResultCode.E103);
 		return response;
 	}
 
