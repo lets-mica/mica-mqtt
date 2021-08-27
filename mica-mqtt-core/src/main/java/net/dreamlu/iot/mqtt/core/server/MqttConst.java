@@ -27,5 +27,9 @@ public interface MqttConst {
 	 * 正常断开连接
 	 */
 	String DIS_CONNECTED = "disconnected";
+	/**
+	 * 是 http 协议
+	 */
+	String IS_HTTP = "is_http";
 
 }

@@ -194,6 +194,7 @@
 
 package net.dreamlu.iot.mqtt.core.server.http.core;
 
+import net.dreamlu.iot.mqtt.core.server.MqttConst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -250,41 +251,42 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext channelContext) throws TioDecodeException {
-		WsSessionContext wsSessionContext = (WsSessionContext) channelContext.get();
+	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws TioDecodeException {
+		WsSessionContext wsSessionContext = (WsSessionContext) context.get();
 		// 尚未握手
 		if (wsSessionContext == null) {
-			HttpRequest request = HttpRequestDecoder.decode(buffer, limit, position, readableLength, channelContext, httpConfig);
+			HttpRequest request = HttpRequestDecoder.decode(buffer, limit, position, readableLength, context, httpConfig);
 			if (request == null) {
 				return null;
 			}
 			HttpResponse httpResponse = updateWebSocketProtocol(request);
 			// 普通 http 非 websocket
 			if (httpResponse == null) {
+				context.set(MqttConst.IS_HTTP, (byte) 1);
 				return request;
 			}
 			wsSessionContext = new WsSessionContext();
-			channelContext.set(wsSessionContext);
+			context.set(wsSessionContext);
 			wsSessionContext.setHandshakeRequest(request);
 			wsSessionContext.setHandshakeResponse(httpResponse);
 			WsRequest wsRequestPacket = new WsRequest();
 			wsRequestPacket.setHandShake(true);
 			return wsRequestPacket;
 		}
-		WsRequest websocketPacket = WsServerDecoder.decode(buffer, channelContext);
+		WsRequest websocketPacket = WsServerDecoder.decode(buffer, context);
 		if (websocketPacket != null) {
 			// 数据包尚未完成
 			if (!websocketPacket.isWsEof()) {
-				List<WsRequest> parts = (List<WsRequest>) channelContext.get(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
+				List<WsRequest> parts = (List<WsRequest>) context.get(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
 				if (parts == null) {
 					parts = new ArrayList<>();
-					channelContext.set(NOT_FINAL_WEBSOCKET_PACKET_PARTS, parts);
+					context.set(NOT_FINAL_WEBSOCKET_PACKET_PARTS, parts);
 				}
 				parts.add(websocketPacket);
 			} else {
-				List<WsRequest> parts = (List<WsRequest>) channelContext.get(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
+				List<WsRequest> parts = (List<WsRequest>) context.get(NOT_FINAL_WEBSOCKET_PACKET_PARTS);
 				if (parts != null) {
-					channelContext.set(NOT_FINAL_WEBSOCKET_PACKET_PARTS, null);
+					context.set(NOT_FINAL_WEBSOCKET_PACKET_PARTS, null);
 
 					parts.add(websocketPacket);
 					WsRequest first = parts.get(0);
