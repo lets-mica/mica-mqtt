@@ -1,6 +1,17 @@
 # 变更记录
 
 ## 发行版本
+### v1.1.0 - 2021-08-29
+- :sparkles: 重构，内置 http，http 和 websocket 公用端口。
+- :sparkles: 添加 mica-core 中的 HexUtil。
+- :sparkles: 添加 PayloadEncode 工具。
+- :sparkles: ServerTioConfig#share 方法添加 groupStat。
+- :sparkles: 考虑使用 udp 多播做集群。
+- :sparkles: MqttServer、MqttServerTemplate 添加 close、getChannelContext 等方法。
+- :sparkles: 重构 MqttServerConfiguration 简化代码。
+- :memo: 添加 JetBrains 连接。
+- :bug: 修复默认的消息转发器逻辑。
+
 ### v1.0.6 - 2021-08-21
 - :sparkles: 添加订阅 topicFilter 校验。
 - :sparkles: 优化压测工具，更新压测说明，添加 tcp 连接数更改文档地址。
