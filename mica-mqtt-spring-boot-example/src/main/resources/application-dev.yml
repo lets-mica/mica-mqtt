@@ -9,8 +9,13 @@ mqtt:
     read-buffer-size: 8092      # 接收数据的 buffer size，默认：8092
     max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     debug: true                 # 如果开启 prometheus 指标收集建议关闭
+    web-port: 8083              # http、websocket 端口，默认：8083
     websocket-enable: true      # 是否开启 websocket，默认： true
-    websocket-port: 8083        # websocket 端口，默认：8083
+    http-enable: false          # 是否开启 http api，默认： false
+    http-basic-auth:
+      enable: false             # 是否开启 http basic auth，默认： false
+      username: "mica"          # http basic auth 用户名
+      password: "mica"          # http basic auth 密码
   client:
     enabled: true               # 是否开启客户端，默认：false 使用到的场景有限，非必要请不要启用
     ip: 127.0.0.1               # 连接的服务端 ip ，默认：127.0.0.1

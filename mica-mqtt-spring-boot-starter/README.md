@@ -25,16 +25,20 @@
 | mqtt.server.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
 | mqtt.server.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.server.debug | false | debug，如果开启 prometheus 指标收集建议关闭 |
+| mqtt.server.web-port | 8083 | http、websocket 端口，默认：8083 |
 | mqtt.server.websocket-enable | true | 开启 websocket 服务，默认：true |
-| mqtt.server.websocket-port | 8083 | websocket 端口，默认：8083 |
+| mqtt.server.http-enable | false | 开启 http 服务，默认：true |
+| mqtt.server.http-basic-auth.enable | false | 是否启用，默认：关闭 |
+| mqtt.server.http-basic-auth.password |  | http Basic 认证密码 |
+| mqtt.server.http-basic-auth.username |  | http Basic 认证账号 |
 
 ### 2.2 配置项示例
 
 ```yaml
 mqtt:
   server:
-    enabled: true               # 是否开启，默认：true
-    ip: 127.0.0.1               # 服务端 ip 默认：127.0.0.1
+    enabled: true               # 是否开启服务端，默认：true
+#    ip: 0.0.0.0                 # 服务端 ip 默认为空，0.0.0.0
     port: 5883                  # 端口，默认：1883
     name: Mica-Mqtt-Server      # 名称，默认：Mica-Mqtt-Server
     buffer-allocator: HEAP      # 堆内存和堆外内存，默认：堆内存
@@ -42,8 +46,13 @@ mqtt:
     read-buffer-size: 8092      # 接收数据的 buffer size，默认：8092
     max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     debug: true                 # 如果开启 prometheus 指标收集建议关闭
-    websocket-enable: true      # 开启 websocket 子协议，默认开启
-    websocket-port: 8083        # websocket 端口，默认：8083
+    web-port: 8083              # http、websocket 端口，默认：8083
+    websocket-enable: true      # 是否开启 websocket，默认： true
+    http-enable: false          # 是否开启 http api，默认： false
+    http-basic-auth:
+      enable: false             # 是否开启 http basic auth，默认： false
+      username: "mica"          # http basic auth 用户名
+      password: "mica"          # http basic auth 密码
 ```
 
 ### 2.3 可实现接口（注册成 Spring Bean 即可）

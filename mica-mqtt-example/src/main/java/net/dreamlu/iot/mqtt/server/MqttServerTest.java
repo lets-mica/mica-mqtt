@@ -49,6 +49,10 @@ public class MqttServerTest {
 			.messageListener((clientId, topic, mqttQoS, payload) -> {
 				logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));
 			})
+			// 开启 http
+			.httpEnable(true)
+			// http basic 认证，自定义认证，实现 HttpFilter， 注册到 MqttHttpRoutes 即可
+			.httpBasicAuth("mica", "mica")
 			.debug() // 开启 debug 信息日志
 			.start();
 

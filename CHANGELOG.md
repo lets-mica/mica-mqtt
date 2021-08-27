@@ -9,6 +9,7 @@
 - :sparkles: 考虑使用 udp 多播做集群。
 - :sparkles: MqttServer、MqttServerTemplate 添加 close、getChannelContext 等方法。
 - :sparkles: 重构 MqttServerConfiguration 简化代码。
+- :sparkles: 配置项 `mqtt.server.websocket-port` 改为 `mqtt.server.web-port`。
 - :memo: 添加 JetBrains 连接。
 - :bug: 修复默认的消息转发器逻辑。
 

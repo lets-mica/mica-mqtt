@@ -15,6 +15,7 @@
 ## 功能
 - [x] 支持 MQTT v3.1、v3.1.1 以及 v5.0 协议。
 - [x] 支持 websocket mqtt 子协议（支持 mqtt.js）。
+- [x] 支持 http rest api，[http api 文档详见](docs/http-api.md)。
 - [x] 支持 MQTT client 客户端。
 - [x] 支持 MQTT server 服务端。
 - [x] 支持 MQTT 遗嘱消息。
@@ -54,6 +55,7 @@
 ## 文档
 - [mica-mqtt-spring-boot-starter 使用文档](mica-mqtt-spring-boot-starter/README.md)
 - [mica-mqtt 使用文档](mica-mqtt-core/README.md)
+- [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 发行版本](CHANGELOG.md)
 - [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
