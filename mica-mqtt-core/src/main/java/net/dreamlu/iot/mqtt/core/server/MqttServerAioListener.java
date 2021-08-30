@@ -71,7 +71,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 		// 3. 判断是否正常断开
 		boolean isNotNormalDisconnect = context.get(MqttConst.DIS_CONNECTED) == null;
 		if (isNotNormalDisconnect || throwable != null) {
-			logger.error("Mqtt server close clientId isBlank, remark:{} isRemove:{}", remark, isRemove, throwable);
+			logger.error("Mqtt server close clientId:{}, remark:{} isRemove:{}", clientId, remark, isRemove, throwable);
 		} else {
 			logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
 		}
