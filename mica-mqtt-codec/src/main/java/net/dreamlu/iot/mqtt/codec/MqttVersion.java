@@ -65,11 +65,11 @@ public enum MqttVersion {
 				mv = MQTT_5;
 				break;
 			default:
-				throw new MqttUnacceptableProtocolVersionException(protocolName + "is unknown protocol name");
+				throw new MqttUnacceptableProtocolVersionException(protocolName + " is an unknown protocol name");
 		}
 		if (mv.name.equals(protocolName)) {
 			return mv;
 		}
-		throw new MqttUnacceptableProtocolVersionException(protocolName + " and " + protocolLevel + " are not match");
+		throw new MqttUnacceptableProtocolVersionException(protocolName + " and " + protocolLevel + " don't match");
 	}
 }
