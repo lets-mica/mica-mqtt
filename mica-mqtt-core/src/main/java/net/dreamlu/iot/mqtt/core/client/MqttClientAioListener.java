@@ -16,7 +16,9 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.*;
+import net.dreamlu.iot.mqtt.codec.MqttConnectMessage;
+import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
+import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.DefaultClientAioListener;
@@ -25,9 +27,7 @@ import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 客户端监听器
@@ -36,99 +36,56 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class MqttClientAioListener extends DefaultClientAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
-	private final MqttClientCreator clientConfig;
-	private final MqttWillMessage willMessage;
-	private final MqttClientStore clientStore;
-	private final IMqttClientConnectListener connectListener;
-	private final ScheduledThreadPoolExecutor executor;
+	private final MqttConnectMessage connectMessage;
 
-	public MqttClientAioListener(MqttClientCreator clientConfig,
-								 MqttClientStore clientStore,
-								 ScheduledThreadPoolExecutor executor) {
-		this.clientConfig = Objects.requireNonNull(clientConfig);
-		this.willMessage = clientConfig.getWillMessage();
-		this.clientStore = clientStore;
-		this.connectListener = clientConfig.getConnectListener();
-		this.executor = executor;
+	public MqttClientAioListener(MqttClientCreator mqttClientCreator) {
+		this.connectMessage = getConnectMessage(Objects.requireNonNull(mqttClientCreator));
+	}
+
+	/**
+	 * 构造连接消息
+	 *
+	 * @param mqttClientCreator MqttClientCreator
+	 * @return MqttConnectMessage
+	 */
+	private static MqttConnectMessage getConnectMessage(MqttClientCreator mqttClientCreator) {
+		MqttWillMessage willMessage = mqttClientCreator.getWillMessage();
+		// 1. 建立连接后发送 mqtt 连接的消息
+		MqttMessageBuilders.ConnectBuilder builder = MqttMessageBuilders.connect()
+			.clientId(mqttClientCreator.getClientId())
+			.username(mqttClientCreator.getUsername())
+			.keepAlive(mqttClientCreator.getKeepAliveSecs())
+			.cleanSession(mqttClientCreator.isCleanSession())
+			.protocolVersion(mqttClientCreator.getVersion())
+			.willFlag(willMessage != null);
+		// 2. 密码
+		String password = mqttClientCreator.getPassword();
+		if (StrUtil.isNotBlank(password)) {
+			builder.password(password.getBytes(StandardCharsets.UTF_8));
+		}
+		// 3. 遗嘱消息
+		if (willMessage != null) {
+			builder.willTopic(willMessage.getTopic())
+				.willMessage(willMessage.getMessage())
+				.willRetain(willMessage.isRetain())
+				.willQoS(willMessage.getQos())
+				.willProperties(willMessage.getWillProperties());
+		}
+		// 4. mqtt5 properties
+		MqttProperties properties = mqttClientCreator.getProperties();
+		if (properties != null) {
+			builder.properties(properties);
+		}
+		return builder.build();
 	}
 
 	@Override
 	public void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) {
 		if (isConnected) {
-			// 1. 建立连接后发送 mqtt 连接的消息
-			MqttMessageBuilders.ConnectBuilder builder = MqttMessageBuilders.connect()
-				.clientId(clientConfig.getClientId())
-				.username(clientConfig.getUsername())
-				.keepAlive(clientConfig.getKeepAliveSecs())
-				.cleanSession(clientConfig.isCleanSession())
-				.protocolVersion(clientConfig.getVersion())
-				.willFlag(willMessage != null);
-			// 2. 密码
-			String password = clientConfig.getPassword();
-			if (StrUtil.isNotBlank(password)) {
-				builder.password(password.getBytes(StandardCharsets.UTF_8));
-			}
-			// 3. 遗嘱消息
-			if (willMessage != null) {
-				builder.willTopic(willMessage.getTopic())
-					.willMessage(willMessage.getMessage())
-					.willRetain(willMessage.isRetain())
-					.willQoS(willMessage.getQos())
-					.willProperties(willMessage.getWillProperties());
-			}
-			// 4. mqtt5 properties
-			MqttProperties properties = clientConfig.getProperties();
-			if (properties != null) {
-				builder.properties(properties);
-			}
-			// 5. 发送 mqtt 连接消息
-			sendConnectMessage(context, builder.build());
-			// 6. 重连时发送重新订阅
-			reSendSubscription(context);
-			// 7. 发布连接通知
-			publishConnectEvent(context, isReconnect);
+			// 重连时，发送 mqtt 连接消息
+			Boolean result = Tio.send(context, this.connectMessage);
+			logger.info("MqttClient reconnect send connect result:{}", result);
 		}
 	}
 
-	/**
-	 * 发送连接的消息
-	 *
-	 * @param context ChannelContext
-	 * @param message MqttMessage
-	 */
-	private static void sendConnectMessage(ChannelContext context, MqttMessage message) {
-		// 5. 发送 mqtt 连接消息
-		Boolean result = Tio.send(context, message);
-		logger.info("MqttClient reconnect send connect result:{}", result);
-	}
-
-	private void reSendSubscription(ChannelContext context) {
-		List<MqttClientSubscription> subscriptionList = clientStore.getAndCleanSubscription();
-		for (MqttClientSubscription subscription : subscriptionList) {
-			int messageId = MqttClientMessageId.getId();
-			MqttQoS mqttQoS = subscription.getMqttQoS();
-			String topicFilter = subscription.getTopicFilter();
-			MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-				.addSubscription(mqttQoS, topicFilter)
-				.messageId(messageId)
-				.build();
-			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, subscription.getListener(), message);
-			Boolean result = Tio.send(context, message);
-			logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} resubscribing result:{}", topicFilter, mqttQoS, messageId, result);
-			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
-			clientStore.addPaddingSubscribe(messageId, pendingSubscription);
-		}
-	}
-
-	private void publishConnectEvent(ChannelContext context, boolean isReconnect) {
-		// 先判断是否配置监听
-		if (connectListener == null) {
-			return;
-		}
-		try {
-			connectListener.onConnected(context, isReconnect);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
-	}
 }

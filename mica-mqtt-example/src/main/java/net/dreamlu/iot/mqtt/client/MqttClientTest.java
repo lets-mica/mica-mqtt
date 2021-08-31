@@ -48,8 +48,8 @@ public class MqttClientTest {
 //			.maxBytesInMessage(1024 * 10)
 			.version(MqttVersion.MQTT_5)
 //			连接监听
-			.connectListener((context, isReconnect) -> {
-				logger.info("链接服务器成功...");
+			.connectListener((context) -> {
+				logger.info("连接服务器成功...");
 			})
 			.connect();
 

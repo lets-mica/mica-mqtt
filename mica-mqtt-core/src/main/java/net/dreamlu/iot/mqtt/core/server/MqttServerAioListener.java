@@ -80,7 +80,9 @@ public class MqttServerAioListener extends DefaultAioListener {
 			return;
 		}
 		// 5. 对于异常断开连接，处理遗嘱消息
-		sendWillMessage(context, clientId);
+		if (isNotNormalDisconnect) {
+			sendWillMessage(clientId);
+		}
 		// 6. 会话清理
 		cleanSession(clientId);
 		// 7. 解绑 clientId
@@ -89,13 +91,8 @@ public class MqttServerAioListener extends DefaultAioListener {
 		notify(clientId);
 	}
 
-	private void sendWillMessage(ChannelContext context, String clientId) {
-		// 1. 判断是否正常断开
-		Object normalDisconnectMark = context.get(MqttConst.DIS_CONNECTED);
-		if (normalDisconnectMark != null) {
-			return;
-		}
-		// 2. 发送遗嘱消息
+	private void sendWillMessage(String clientId) {
+		// 发送遗嘱消息
 		try {
 			Message willMessage = messageStore.getWillMessage(clientId);
 			if (willMessage == null) {

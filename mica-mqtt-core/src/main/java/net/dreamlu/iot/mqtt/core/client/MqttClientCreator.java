@@ -322,10 +322,10 @@ public final class MqttClientCreator {
 		}
 		MqttClientStore clientStore = new MqttClientStore();
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
-		IMqttClientProcessor processor = new DefaultMqttClientProcessor(clientStore, executor);
+		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, clientStore, executor);
 		// 2. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this, processor);
-		ClientAioListener clientAioListener = new MqttClientAioListener(this, clientStore, executor);
+		ClientAioListener clientAioListener = new MqttClientAioListener(this);
 		// 3. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {

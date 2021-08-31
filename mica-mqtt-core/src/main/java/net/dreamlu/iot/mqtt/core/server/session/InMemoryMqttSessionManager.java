@@ -162,7 +162,10 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public boolean hasSession(String clientId) {
-		return false;
+		return pendingQos2PublishStore.containsKey(clientId)
+			|| pendingPublishStore.containsKey(clientId)
+			|| messageIdStore.containsKey(clientId)
+			|| subscribeStore.values().stream().anyMatch(data -> data.containsKey(clientId));
 	}
 
 	@Override

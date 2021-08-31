@@ -37,11 +37,14 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
 	private final MqttClientStore clientStore;
+	private final IMqttClientConnectListener connectListener;
 	private final ScheduledThreadPoolExecutor executor;
 
-	public DefaultMqttClientProcessor(MqttClientStore clientStore,
+	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator,
+									  MqttClientStore clientStore,
 									  ScheduledThreadPoolExecutor executor) {
 		this.clientStore = clientStore;
+		this.connectListener = mqttClientCreator.getConnectListener();
 		this.executor = executor;
 	}
 
@@ -53,12 +56,20 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 
 	@Override
 	public void processConAck(ChannelContext context, MqttConnAckMessage message) {
-		MqttConnectReturnCode returnCode = message.variableHeader().connectReturnCode();
+		MqttConnAckVariableHeader connAckVariableHeader = message.variableHeader();
+		MqttConnectReturnCode returnCode = connAckVariableHeader.connectReturnCode();
 		switch (returnCode) {
 			case CONNECTION_ACCEPTED:
+				// 1. 连接成功的日志
 				if (logger.isInfoEnabled()) {
 					Node node = context.getServerNode();
 					logger.info("MqttClient contextId:{} connection:{}:{} succeeded!", context.getId(), node.getIp(), node.getPort());
+				}
+				// 2. 发布连接通知
+				publishConnectEvent(context);
+				// 3. 如果 session 不存在重连时发送重新订阅
+				if (!connAckVariableHeader.isSessionPresent()) {
+					reSendSubscription(context);
 				}
 				break;
 			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:
@@ -70,6 +81,36 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				String remark = "MqttClient connect error error ReturnCode:" + returnCode;
 				Tio.remove(context, remark);
 				break;
+		}
+	}
+
+	private void reSendSubscription(ChannelContext context) {
+		List<MqttClientSubscription> subscriptionList = clientStore.getAndCleanSubscription();
+		for (MqttClientSubscription subscription : subscriptionList) {
+			int messageId = MqttClientMessageId.getId();
+			MqttQoS mqttQoS = subscription.getMqttQoS();
+			String topicFilter = subscription.getTopicFilter();
+			MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+				.addSubscription(mqttQoS, topicFilter)
+				.messageId(messageId)
+				.build();
+			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, subscription.getListener(), message);
+			Boolean result = Tio.send(context, message);
+			logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} resubscribing result:{}", topicFilter, mqttQoS, messageId, result);
+			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
+			clientStore.addPaddingSubscribe(messageId, pendingSubscription);
+		}
+	}
+
+	private void publishConnectEvent(ChannelContext context) {
+		// 先判断是否配置监听
+		if (connectListener == null) {
+			return;
+		}
+		try {
+			connectListener.onConnected(context);
+		} catch (Throwable e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 
