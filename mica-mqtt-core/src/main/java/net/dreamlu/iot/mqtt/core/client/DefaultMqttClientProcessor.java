@@ -259,7 +259,11 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		subscriptionList.forEach(subscription -> {
 			IMqttClientMessageListener listener = subscription.getListener();
 			payload.rewind();
-			listener.onMessage(topicName, payload);
+			try {
+				listener.onMessage(topicName, payload);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
 		});
 	}
 
