@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.core.client;
 import net.dreamlu.iot.mqtt.codec.MqttConnectMessage;
 import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
+import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.DefaultClientAioListener;
@@ -38,8 +39,8 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
 	private final MqttConnectMessage connectMessage;
 
-	public MqttClientAioListener(MqttClientCreator mqttClientCreator) {
-		this.connectMessage = getConnectMessage(Objects.requireNonNull(mqttClientCreator));
+	public MqttClientAioListener(MqttClientCreator clientCreator) {
+		this.connectMessage = getConnectMessage(Objects.requireNonNull(clientCreator));
 	}
 
 	/**
@@ -50,13 +51,14 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	 */
 	private static MqttConnectMessage getConnectMessage(MqttClientCreator mqttClientCreator) {
 		MqttWillMessage willMessage = mqttClientCreator.getWillMessage();
+		MqttVersion version = mqttClientCreator.getVersion();
 		// 1. 建立连接后发送 mqtt 连接的消息
 		MqttMessageBuilders.ConnectBuilder builder = MqttMessageBuilders.connect()
 			.clientId(mqttClientCreator.getClientId())
 			.username(mqttClientCreator.getUsername())
 			.keepAlive(mqttClientCreator.getKeepAliveSecs())
 			.cleanSession(mqttClientCreator.isCleanSession())
-			.protocolVersion(mqttClientCreator.getVersion())
+			.protocolVersion(version)
 			.willFlag(willMessage != null);
 		// 2. 密码
 		String password = mqttClientCreator.getPassword();
@@ -71,10 +73,20 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 				.willQoS(willMessage.getQos())
 				.willProperties(willMessage.getWillProperties());
 		}
-		// 4. mqtt5 properties
-		MqttProperties properties = mqttClientCreator.getProperties();
-		if (properties != null) {
-			builder.properties(properties);
+		// 4. mqtt5 特性
+		if (MqttVersion.MQTT_5 == version) {
+			MqttProperties properties = mqttClientCreator.getProperties();
+			// Session Expiry Interval
+			Integer sessionExpiryInterval = mqttClientCreator.getSessionExpiryIntervalSecs();
+			if (sessionExpiryInterval != null && sessionExpiryInterval > 0) {
+				if (properties == null) {
+					properties = new MqttProperties();
+				}
+				properties.add(new MqttProperties.IntegerProperty(MqttProperties.MqttPropertyType.SESSION_EXPIRY_INTERVAL, sessionExpiryInterval));
+			}
+			if (properties != null) {
+				builder.properties(properties);
+			}
 		}
 		return builder.build();
 	}

@@ -111,6 +111,10 @@ public final class MqttClientCreator {
 	 */
 	private boolean cleanSession = true;
 	/**
+	 * mqtt 5.0 session 有效期，单位秒
+	 */
+	private Integer sessionExpiryIntervalSecs;
+	/**
 	 * 遗嘱消息
 	 */
 	private MqttWillMessage willMessage;
@@ -189,6 +193,10 @@ public final class MqttClientCreator {
 
 	public boolean isCleanSession() {
 		return cleanSession;
+	}
+
+	public Integer getSessionExpiryIntervalSecs() {
+		return sessionExpiryIntervalSecs;
 	}
 
 	public MqttWillMessage getWillMessage() {
@@ -284,6 +292,11 @@ public final class MqttClientCreator {
 
 	public MqttClientCreator cleanSession(boolean cleanSession) {
 		this.cleanSession = cleanSession;
+		return this;
+	}
+
+	public MqttClientCreator sessionExpiryIntervalSecs(Integer sessionExpiryIntervalSecs) {
+		this.sessionExpiryIntervalSecs = sessionExpiryIntervalSecs;
 		return this;
 	}
 
