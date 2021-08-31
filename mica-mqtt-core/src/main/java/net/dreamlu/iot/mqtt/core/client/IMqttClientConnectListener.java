@@ -30,7 +30,8 @@ public interface IMqttClientConnectListener {
 	 * 监听到消息
 	 *
 	 * @param context     ChannelContext
+	 * @param isReconnect 是否重连
 	 */
-	void onConnected(ChannelContext context);
+	void onConnected(ChannelContext context, boolean isReconnect);
 
 }

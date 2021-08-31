@@ -108,7 +108,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			return;
 		}
 		try {
-			connectListener.onConnected(context);
+			connectListener.onConnected(context, context.isReconnect);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
