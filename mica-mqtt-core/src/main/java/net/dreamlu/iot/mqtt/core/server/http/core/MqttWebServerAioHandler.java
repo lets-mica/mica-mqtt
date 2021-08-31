@@ -467,7 +467,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 	 * @return HttpResponse
 	 * @author tanyaowu
 	 */
-	public HttpResponse updateWebSocketProtocol(HttpRequest request) {
+	public HttpResponse updateWebSocketProtocol(HttpRequest request) throws TioDecodeException {
 		Map<String, String> headers = request.getHeaders();
 		String secWebSocketKey = headers.get(HttpConst.RequestHeaderKey.Sec_WebSocket_Key);
 		if (StrUtil.isNotBlank(secWebSocketKey)) {
@@ -475,7 +475,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 			try {
 				secWebSocketKeyBytes = secWebSocketKey.getBytes(request.getCharset());
 			} catch (UnsupportedEncodingException e) {
-				throw new RuntimeException(e);
+				throw new TioDecodeException(e);
 			}
 			byte[] allBs = new byte[secWebSocketKeyBytes.length + SEC_WEBSOCKET_KEY_SUFFIX_BYTES.length];
 			System.arraycopy(secWebSocketKeyBytes, 0, allBs, 0, secWebSocketKeyBytes.length);
