@@ -423,11 +423,14 @@ public final class MqttProperties {
 		if (props == null && subscriptionIds == null && userProperties == null) {
 			return Collections.emptyList();
 		}
-		if (subscriptionIds == null && userProperties == null) {
-			return props.values();
-		}
 		if (props == null && userProperties == null) {
 			return subscriptionIds;
+		}
+		if (props == null && subscriptionIds == null) {
+			return userProperties;
+		}
+		if (subscriptionIds == null && userProperties == null) {
+			return props.values();
 		}
 		List<MqttProperty> propValues = new ArrayList<>(props != null ? props.size() : 1);
 		if (props != null) {
