@@ -239,6 +239,10 @@ public final class MqttProperties {
 
 	public static final class IntegerProperty extends MqttProperty<Integer> {
 
+		public IntegerProperty(MqttPropertyType propertyType, Integer value) {
+			super(propertyType.value, value);
+		}
+
 		public IntegerProperty(int propertyId, Integer value) {
 			super(propertyId, value);
 		}
