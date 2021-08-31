@@ -51,13 +51,13 @@ public enum ResultCode {
 
 	;
 
+	private final HttpResponseStatus statusCode;
+	private final int resultCode;
+
 	ResultCode(HttpResponseStatus statusCode, int resultCode) {
 		this.statusCode = statusCode;
 		this.resultCode = resultCode;
 	}
-
-	private final HttpResponseStatus statusCode;
-	private final int resultCode;
 
 	public HttpResponseStatus getStatusCode() {
 		return statusCode;
