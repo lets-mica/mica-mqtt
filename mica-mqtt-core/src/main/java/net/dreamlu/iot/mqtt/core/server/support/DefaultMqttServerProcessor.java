@@ -245,7 +245,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 1. 校验订阅的 topicFilter
 		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
 		if (!authHandler.isValidSubscribe(topicSubscriptions)) {
-			logger.error("Subscribe - clientId:{} topicFilters verification failed", messageId);
+			logger.error("Subscribe - clientId:{} topicFilters:{} verification failed messageId:{}", clientId, topicSubscriptions, messageId);
 			// 3. 返回 ack
 			MqttMessage subAckMessage = MqttMessageBuilders.subAck()
 				.addGrantedQos(MqttQoS.FAILURE)
