@@ -122,8 +122,26 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (paddingSubscribe == null) {
 			return;
 		}
+		String topicFilter = paddingSubscribe.getTopicFilter();
+		MqttSubAckPayload subAckPayload = message.payload();
+		List<Integer> reasonCodes = subAckPayload.reasonCodes();
+		// reasonCodes 为空
+		if (reasonCodes.isEmpty()) {
+			logger.error("MqttClient topicFilter:{} subscribe failed reasonCode is empty messageId:{}", topicFilter, messageId);
+			paddingSubscribe.onSubAckReceived();
+			clientStore.removePaddingSubscribe(messageId);
+			return;
+		}
+		// reasonCodes 范围
+		Integer qos = reasonCodes.get(0);
+		if (qos == null || qos < 0 || qos > 2) {
+			logger.error("MqttClient topicFilter:{} subscribe failed reasonCodes:{} messageId:{}", topicFilter, reasonCodes, messageId);
+			paddingSubscribe.onSubAckReceived();
+			clientStore.removePaddingSubscribe(messageId);
+			return;
+		}
 		if (logger.isInfoEnabled()) {
-			logger.info("MQTT Topic:{} successfully subscribed messageId:{}", paddingSubscribe.getTopicFilter(), messageId);
+			logger.info("MQTT Topic:{} successfully subscribed messageId:{}", topicFilter, messageId);
 		}
 		paddingSubscribe.onSubAckReceived();
 		clientStore.removePaddingSubscribe(messageId);
