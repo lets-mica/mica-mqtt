@@ -331,7 +331,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			}
 		}
 		// 2. 消息发布
-		messageListener.onMessage(clientId, topicName, mqttQoS, payload);
+		try {
+			messageListener.onMessage(clientId, topicName, mqttQoS, payload);
+		} catch (Throwable e) {
+			logger.error(e.getMessage(), e);
+		}
 	}
 
 }
