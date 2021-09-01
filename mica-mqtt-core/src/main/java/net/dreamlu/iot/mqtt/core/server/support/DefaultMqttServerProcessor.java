@@ -245,7 +245,13 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 1. 校验订阅的 topicFilter
 		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
 		if (!authHandler.isValidSubscribe(topicSubscriptions)) {
-			Tio.remove(context, "Subscribe - clientId:{} topicFilters Verification failed ");
+			logger.error("Subscribe - clientId:{} topicFilters verification failed", messageId);
+			// 3. 返回 ack
+			MqttMessage subAckMessage = MqttMessageBuilders.subAck()
+				.addGrantedQos(MqttQoS.FAILURE)
+				.packetId(messageId)
+				.build();
+			Tio.send(context, subAckMessage);
 			return;
 		}
 		// 2. 存储 clientId 订阅的 topic
