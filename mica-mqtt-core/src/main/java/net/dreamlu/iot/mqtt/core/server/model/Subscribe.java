@@ -32,6 +32,11 @@ public class Subscribe implements Serializable {
 	public Subscribe() {
 	}
 
+	public Subscribe(String topicFilter, String clientId) {
+		this.topicFilter = topicFilter;
+		this.clientId = clientId;
+	}
+
 	public Subscribe(String topicFilter, int mqttQoS) {
 		this.topicFilter = topicFilter;
 		this.mqttQoS = mqttQoS;
@@ -72,18 +77,17 @@ public class Subscribe implements Serializable {
 		if (this == o) {
 			return true;
 		}
-		if (o == null || getClass() != o.getClass()) {
+		if (!(o instanceof Subscribe)) {
 			return false;
 		}
 		Subscribe subscribe = (Subscribe) o;
-		return mqttQoS == subscribe.mqttQoS &&
-			Objects.equals(topicFilter, subscribe.topicFilter) &&
+		return Objects.equals(topicFilter, subscribe.topicFilter) &&
 			Objects.equals(clientId, subscribe.clientId);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(topicFilter, clientId, mqttQoS);
+		return Objects.hash(topicFilter, clientId);
 	}
 
 	@Override

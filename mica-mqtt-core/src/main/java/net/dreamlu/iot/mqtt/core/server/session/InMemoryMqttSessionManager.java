@@ -56,7 +56,11 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	@Override
 	public void addSubscribe(String topicFilter, String clientId, MqttQoS mqttQoS) {
 		Map<String, Integer> data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
-		data.put(clientId, mqttQoS.value());
+		// 如果不存在或者老的订阅 qos 比较小也重新设置
+		Integer existingQos = data.get(clientId);
+		if (existingQos == null || existingQos < mqttQoS.value()) {
+			data.put(clientId, mqttQoS.value());
+		}
 	}
 
 	@Override
