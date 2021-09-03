@@ -94,7 +94,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 5. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
 		if (keepAliveSeconds > 0) {
-			context.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(keepAliveSeconds));
+			int heartbeatTimeout = (int) (keepAliveSeconds * 1.5f);
+			context.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(heartbeatTimeout));
 		}
 		// 6. session 处理，先默认全部连接关闭时清除
 //		boolean cleanSession = variableHeader.isCleanSession();
