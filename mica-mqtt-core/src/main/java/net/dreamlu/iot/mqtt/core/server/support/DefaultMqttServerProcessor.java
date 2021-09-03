@@ -39,7 +39,6 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * mqtt broker 处理器
@@ -48,6 +47,11 @@ import java.util.concurrent.TimeUnit;
  */
 public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttServerProcessor.class);
+	/**
+	 * 2 倍客户端 keepAlive 时间
+	 */
+	private static final long KEEP_ALIVE_UNIT = 2000L;
+	private final long heartbeatTimeout;
 	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttServerAuthHandler authHandler;
@@ -57,6 +61,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
+		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? 120_000L : serverCreator.getHeartbeatTimeout();
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.authHandler = serverCreator.getAuthHandler();
@@ -93,9 +98,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
 		// 5. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
-		if (keepAliveSeconds > 0) {
-			int heartbeatTimeout = (int) (keepAliveSeconds * 1.5f);
-			context.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(heartbeatTimeout));
+		// 2倍客户端 keepAlive 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
+		if (keepAliveSeconds > 0 && heartbeatTimeout != keepAliveSeconds * KEEP_ALIVE_UNIT) {
+			context.setHeartbeatTimeout(keepAliveSeconds * KEEP_ALIVE_UNIT);
 		}
 		// 6. session 处理，先默认全部连接关闭时清除
 //		boolean cleanSession = variableHeader.isCleanSession();
