@@ -1,6 +1,19 @@
 # 变更记录
 
 ## 发行版本
+### v1.1.1 - 2021-09-05
+- :sparkles: mqtt-server 优化连接关闭日志。
+- :sparkles: mqtt-server 优化订阅，相同 topicFilter 订阅对 qos 判断。
+- :sparkles: mqtt-server 监听器添加 try catch，避免因业务问题导致连接断开。
+- :sparkles: mqtt-server 优化 topicFilters 校验。
+- :sparkles: mqtt-client 优化订阅 reasonCodes 判断。
+- :sparkles: mqtt-client 监听器添加 try catch，避免因业务问题导致连接断开。
+- :sparkles: mqtt-client 添加 session 有效期。
+- :sparkles: 代码优化，减少 codacy 上的问题。
+- :bug: mqtt-server 修复心跳时间问题。
+- :bug: mqtt-client 优化连接处理的逻辑，mqtt 连接之后再订阅。
+- :bug: 修复 MqttProperties 潜在的一个空指针。
+
 ### v1.1.0 - 2021-08-29
 - :sparkles: 重构，内置 http，http 和 websocket 公用端口。
 - :sparkles: 添加 mica-core 中的 HexUtil。
