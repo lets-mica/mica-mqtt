@@ -48,13 +48,13 @@ public interface IMqttSessionManager {
 	void removeSubscribe(String topicFilter, String clientId);
 
 	/**
-	 * 查找订阅信息
+	 * 查找订阅 qos 信息
 	 *
 	 * @param topicName topicName
 	 * @param clientId  客户端 Id
 	 * @return 订阅存储列表
 	 */
-	List<Subscribe> searchSubscribe(String topicName, String clientId);
+	Integer searchSubscribe(String topicName, String clientId);
 
 	/**
 	 * 查找订阅信息

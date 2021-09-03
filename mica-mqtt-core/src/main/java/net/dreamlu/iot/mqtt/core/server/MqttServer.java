@@ -153,16 +153,13 @@ public final class MqttServer {
 			logger.warn("Mqtt Topic:{} publish to clientId:{} ChannelContext is null may be disconnected.", topic, clientId);
 			return false;
 		}
-		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic, clientId);
-		if (subscribeList.isEmpty()) {
-			logger.warn("Mqtt Topic:{} publish but clientId:{} subscribeList is empty.", topic, clientId);
+		Integer subMqttQoS = sessionManager.searchSubscribe(topic, clientId);
+		if (subMqttQoS == null) {
+			logger.warn("Mqtt Topic:{} publish but clientId:{} not subscribed.", topic, clientId);
 			return false;
 		}
-		for (Subscribe subscribe : subscribeList) {
-			int subMqttQoS = subscribe.getMqttQoS();
-			MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
-			publish(context, clientId, topic, payload, mqttQoS, retain);
-		}
+		MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
+		publish(context, clientId, topic, payload, mqttQoS, retain);
 		return true;
 	}
 

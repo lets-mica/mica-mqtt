@@ -22,10 +22,7 @@ import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,8 +74,8 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	}
 
 	@Override
-	public List<Subscribe> searchSubscribe(String topicName, String clientId) {
-		List<Subscribe> list = new ArrayList<>();
+	public Integer searchSubscribe(String topicName, String clientId) {
+		Integer qosValue = null;
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
 			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
@@ -86,29 +83,39 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 				if (data != null && !data.isEmpty()) {
 					Integer mqttQoS = data.get(clientId);
 					if (mqttQoS != null) {
-						list.add(new Subscribe(topicFilter, mqttQoS));
+						if (qosValue == null) {
+							qosValue = mqttQoS;
+						} else {
+							qosValue = Math.min(qosValue, mqttQoS);
+						}
 					}
 				}
 			}
 		}
-		return list;
+		return qosValue;
 	}
 
 	@Override
 	public List<Subscribe> searchSubscribe(String topicName) {
-		List<Subscribe> list = new ArrayList<>();
+		// 排除重复订阅，例如： /test/# 和 /# 只发一份
+		Map<String, Integer> subscribeMap = new HashMap<>(32);
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
 			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
 				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					data.forEach((clientId, qos) -> {
-						list.add(new Subscribe(topicFilter, clientId, qos));
+						subscribeMap.merge(clientId, qos, Math::min);
 					});
 				}
 			}
 		}
-		return list;
+		List<Subscribe> subscribeList = new ArrayList<>();
+		subscribeMap.forEach((clientId, qos) -> {
+			subscribeList.add(new Subscribe(clientId, qos));
+		});
+		subscribeMap.clear();
+		return subscribeList;
 	}
 
 	@Override
