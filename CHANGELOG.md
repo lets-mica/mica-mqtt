@@ -11,6 +11,7 @@
 - :sparkles: mqtt-client 添加 session 有效期。
 - :sparkles: 代码优化，减少 codacy 上的问题。
 - :bug: mqtt-server 修复心跳时间问题。
+- :bug: 修复 mqtt-server 多个订阅同时匹配时消息重复的问题。
 - :bug: mqtt-client 优化连接处理的逻辑，mqtt 连接之后再订阅。
 - :bug: 修复 MqttProperties 潜在的一个空指针。
 
