@@ -28,6 +28,7 @@
         <module>mica-mqtt-spring-boot-starter</module>
         <module>mica-mqtt-example</module>
         <module>mica-mqtt-spring-boot-example</module>
+        <module>mica-mqtt-broker</module>
     </modules>
 
     <dependencyManagement>

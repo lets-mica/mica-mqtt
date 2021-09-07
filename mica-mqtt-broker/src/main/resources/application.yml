@@ -1,0 +1,29 @@
+server:
+  port: 30001
+spring:
+  application:
+    name: mica-mqtt-broker
+  profiles:
+    active: dev
+# actuator management
+management:
+  info:
+    defaults:
+      enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  endpoint:
+    health:
+      show-details: ALWAYS
+    prometheus:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+logging:
+  level:
+    root: info
+    server: info # t-io 服务端默认日志
+    org.tio: info # t-io 服务端默认日志
