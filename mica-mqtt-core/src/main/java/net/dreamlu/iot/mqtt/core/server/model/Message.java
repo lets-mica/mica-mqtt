@@ -58,7 +58,7 @@ public class Message implements Serializable {
 	/**
 	 * 存储时间
 	 */
-	private long storeTime;
+	private long timestamp;
 
 	public String getClientId() {
 		return clientId;
@@ -116,12 +116,12 @@ public class Message implements Serializable {
 		this.payload = payload;
 	}
 
-	public long getStoreTime() {
-		return storeTime;
+	public long getTimestamp() {
+		return timestamp;
 	}
 
-	public void setStoreTime(long storeTime) {
-		this.storeTime = storeTime;
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	@Override
@@ -137,7 +137,7 @@ public class Message implements Serializable {
 			qos == message.qos &&
 			retain == message.retain &&
 			dup == message.dup &&
-			storeTime == message.storeTime &&
+			timestamp == message.timestamp &&
 			Objects.equals(clientId, message.clientId) &&
 			Objects.equals(topic, message.topic) &&
 			Arrays.equals(payload, message.payload);
@@ -145,7 +145,7 @@ public class Message implements Serializable {
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash(clientId, messageType, topic, qos, retain, dup, storeTime);
+		int result = Objects.hash(clientId, messageType, topic, qos, retain, dup, timestamp);
 		result = 31 * result + Arrays.hashCode(payload);
 		return result;
 	}
@@ -160,7 +160,7 @@ public class Message implements Serializable {
 			", retain=" + retain +
 			", dup=" + dup +
 			", payload=" + Arrays.toString(payload) +
-			", storeTime=" + storeTime +
+			", timestamp=" + timestamp +
 			'}';
 	}
 }

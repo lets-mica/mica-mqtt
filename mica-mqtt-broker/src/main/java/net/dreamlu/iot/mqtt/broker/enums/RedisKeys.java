@@ -14,29 +14,49 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.broker.listener;
+package net.dreamlu.iot.mqtt.broker.enums;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
 
 /**
- * mqtt 连接监听
+ * redis key 汇总，方便统一处理
  *
  * @author L.cm
  */
+@Getter
 @RequiredArgsConstructor
-public class MqttBrokerConnectListener implements IMqttConnectStatusListener {
-	private final MicaRedisCache redisCache;
-	private final String connectStatusKey;
+public enum RedisKeys {
 
-	@Override
-	public void online(String clientId) {
-		redisCache.sAdd(connectStatusKey, clientId);
+	/**
+	 * mqtt <-> redis pug/sub 消息交互
+	 */
+	REDIS_CHANNEL("mqtt:channel:exchange"),
+	/**
+	 * 连接状态存储
+	 */
+	CONNECT_STATUS("mqtt:connect:status"),
+	/**
+	 * 遗嘱消息存储
+	 */
+	MESSAGE_STORE_WILL("mqtt:messages:will:"),
+	/**
+	 * 保留消息存储
+	 */
+	MESSAGE_STORE_RETAIN("mqtt:messages:retain:"),
+	;
+
+
+	private final String key;
+
+	/**
+	 * 用于拼接后缀
+	 *
+	 * @param suffix 后缀
+	 * @return 完整的 redis key
+	 */
+	public String getKey(String suffix) {
+		return this.key.concat(suffix);
 	}
 
-	@Override
-	public void offline(String clientId) {
-		redisCache.sRem(connectStatusKey, clientId);
-	}
 }

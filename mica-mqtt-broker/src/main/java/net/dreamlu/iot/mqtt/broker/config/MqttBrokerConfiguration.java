@@ -16,9 +16,15 @@
 
 package net.dreamlu.iot.mqtt.broker.config;
 
+import net.dreamlu.iot.mqtt.broker.cluster.RedisMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.broker.cluster.RedisMqttMessageReceiver;
+import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
+import net.dreamlu.iot.mqtt.broker.listener.MqttBrokerConnectListener;
 import net.dreamlu.iot.mqtt.broker.listener.MqttBrokerMessageListener;
+import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,14 +37,24 @@ import org.springframework.context.annotation.Configuration;
 public class MqttBrokerConfiguration {
 
 	@Bean
-	public IMqttMessageDispatcher messageDispatcher() {
-		// TODO L.cm 此处采用 redis 实现广播
-		return new DefaultMqttMessageDispatcher();
+	public IMqttConnectStatusListener mqttBrokerConnectListener(MicaRedisCache redisCache) {
+		return new MqttBrokerConnectListener(redisCache, RedisKeys.CONNECT_STATUS.getKey());
 	}
 
 	@Bean
-	public MqttBrokerMessageListener brokerMessageListener(IMqttMessageDispatcher dispatcher) {
-		return new MqttBrokerMessageListener(dispatcher);
+	public RedisMqttMessageReceiver mqttMessageReceiver(MicaRedisCache redisCache,
+														MqttServer mqttServer) {
+		return new RedisMqttMessageReceiver(redisCache, RedisKeys.REDIS_CHANNEL.getKey(), mqttServer);
+	}
+
+	@Bean
+	public IMqttMessageDispatcher mqttMessageDispatcher(MicaRedisCache redisCache) {
+		return new RedisMqttMessageDispatcher(redisCache, RedisKeys.REDIS_CHANNEL.getKey());
+	}
+
+	@Bean
+	public MqttBrokerMessageListener brokerMessageListener(IMqttMessageDispatcher mqttMessageDispatcher) {
+		return new MqttBrokerMessageListener(mqttMessageDispatcher);
 	}
 
 }

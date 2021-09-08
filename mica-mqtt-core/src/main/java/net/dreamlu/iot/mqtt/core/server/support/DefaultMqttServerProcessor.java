@@ -270,7 +270,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			topicList.add(topicName);
 			sessionManager.addSubscribe(topicName, clientId, mqttQoS);
 		}
-		logger.info("Subscribe - clientId:{} Topic:{} mqttQoS:{} messageId:{}", clientId, topicList, mqttQosList, messageId);
+		logger.info("Subscribe - clientId:{} TopicFilters:{} mqttQoS:{} messageId:{}", clientId, topicList, mqttQosList, messageId);
 		// 3. 返回 ack
 		MqttMessage subAckMessage = MqttMessageBuilders.subAck()
 			.addGrantedQosList(mqttQosList)

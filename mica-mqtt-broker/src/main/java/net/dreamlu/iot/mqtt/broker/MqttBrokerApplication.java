@@ -18,8 +18,6 @@ package net.dreamlu.iot.mqtt.broker;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * mica mqtt broker
@@ -27,8 +25,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
  * @author L.cm
  */
 @SpringBootApplication
-@EnableScheduling
-@EnableCaching
 public class MqttBrokerApplication {
 
 	public static void main(String[] args) {

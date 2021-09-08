@@ -14,62 +14,54 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.store;
+package net.dreamlu.iot.mqtt.broker.cluster;
 
-
+import lombok.RequiredArgsConstructor;
+import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
 
 /**
- * message store
+ * redis mqtt 遗嘱和保留消息存储
  *
  * @author L.cm
  */
-public class InMemoryMqttMessageStore implements IMqttMessageStore {
-	/**
-	 * 遗嘱消息 clientId: Message
-	 */
-	private final ConcurrentMap<String, Message> willStore = new ConcurrentHashMap<>();
-	/**
-	 * 保持消息 clientId: Message
-	 */
-	private final ConcurrentMap<String, Message> retainStore = new ConcurrentHashMap<>();
+@RequiredArgsConstructor
+public class RedisMqttMessageStore implements IMqttMessageStore {
+	private final MicaRedisCache redisCache;
 
 	@Override
 	public boolean addWillMessage(String clientId, Message message) {
-		willStore.put(clientId, message);
+		redisCache.set(RedisKeys.MESSAGE_STORE_WILL.getKey(clientId), message);
 		return true;
 	}
 
 	@Override
 	public boolean clearWillMessage(String clientId) {
-		willStore.remove(clientId);
+		redisCache.del(RedisKeys.MESSAGE_STORE_WILL.getKey(clientId));
 		return true;
 	}
 
 	@Override
 	public Message getWillMessage(String clientId) {
-		return willStore.get(clientId);
+		return redisCache.get(RedisKeys.MESSAGE_STORE_WILL.getKey(clientId));
 	}
 
 	@Override
 	public boolean addRetainMessage(String topic, Message message) {
-		retainStore.put(topic, message);
+		redisCache.set(RedisKeys.MESSAGE_STORE_RETAIN.getKey(topic), message);
 		return true;
 	}
 
 	@Override
 	public boolean clearRetainMessage(String topic) {
-		retainStore.remove(topic);
+		redisCache.del(RedisKeys.MESSAGE_STORE_RETAIN.getKey(topic));
 		return true;
 	}
 
 	@Override
-	public Message getRetainMessage(String topicFilter) {
-		// TODO L.cm 改成匹配
-		return retainStore.get(topicFilter);
+	public Message getRetainMessage(String topic) {
+		return null;
 	}
-
 }

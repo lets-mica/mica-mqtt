@@ -70,9 +70,9 @@ public interface IMqttMessageStore {
 	/**
 	 * 获取所有 retain 消息
 	 *
-	 * @param topic topic
+	 * @param topicFilter topicFilter
 	 * @return Message
 	 */
-	Message getRetainMessage(String topic);
+	Message getRetainMessage(String topicFilter);
 
 }

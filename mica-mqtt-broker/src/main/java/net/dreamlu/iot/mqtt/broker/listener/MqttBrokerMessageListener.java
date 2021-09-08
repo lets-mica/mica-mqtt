@@ -46,7 +46,7 @@ public class MqttBrokerMessageListener implements IMqttMessageListener {
 			message.setPayload(payload.array());
 		}
 		message.setMessageType(MqttMessageType.PUBLISH.value());
-		message.setStoreTime(System.currentTimeMillis());
+		message.setTimestamp(System.currentTimeMillis());
 		dispatcher.send(message);
 	}
 }

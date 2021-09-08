@@ -25,6 +25,7 @@
 - [x] 支持 GraalVM 编译成本机可执行程序。
 - [x] 支持 Spring boot 项目快速接入（mica-mqtt-spring-boot-starter）。
 - [x] mica-mqtt-spring-boot-starter 支持对接 Prometheus + Grafana。
+- [x] 基于 redis pub/sub 实现集群，详见 [mica-mqtt-broker 模块](mica-mqtt-broker)。
 
 ## 待办
 - [ ] 优化处理 mqtt session，以及支持 v5.0 

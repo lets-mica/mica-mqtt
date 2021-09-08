@@ -22,6 +22,7 @@ management:
     web:
       exposure:
         include: '*'
+# 日志配置
 logging:
   level:
     root: info
