@@ -61,7 +61,7 @@ public class RedisMqttMessageStore implements IMqttMessageStore {
 	}
 
 	@Override
-	public Message getRetainMessage(String topic) {
-		return null;
+	public Message getRetainMessage(String topicFilter) {
+		return redisCache.get(RedisKeys.MESSAGE_STORE_RETAIN.getKey(topicFilter));
 	}
 }

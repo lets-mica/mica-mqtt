@@ -37,7 +37,7 @@ public interface IMqttSessionManager {
 	 * @param clientId    客户端 Id
 	 * @param mqttQoS     MqttQoS
 	 */
-	void addSubscribe(String topicFilter, String clientId, MqttQoS mqttQoS);
+	void addSubscribe(String topicFilter, String clientId, int mqttQoS);
 
 	/**
 	 * 删除订阅

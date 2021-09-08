@@ -317,7 +317,7 @@ public class MqttWebServer {
 				System.setProperty(TIO_SYSTEM_TIMER_PERIOD, "50");
 			}
 			// 2.2 http 路由配置
-			MqttHttpApi httpApi = new MqttHttpApi(serverCreator.getMessageDispatcher(), serverCreator.getSessionManager());
+			MqttHttpApi httpApi = new MqttHttpApi(serverCreator.getMessageDispatcher());
 			httpApi.register();
 			// 2.3 认证配置
 			String username = serverCreator.getHttpBasicUsername();

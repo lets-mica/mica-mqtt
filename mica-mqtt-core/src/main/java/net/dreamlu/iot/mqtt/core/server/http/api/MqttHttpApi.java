@@ -18,7 +18,6 @@ package net.dreamlu.iot.mqtt.core.server.http.api;
 
 import com.alibaba.fastjson.JSON;
 import net.dreamlu.iot.mqtt.codec.MqttMessageType;
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import net.dreamlu.iot.mqtt.core.server.http.api.form.BaseForm;
@@ -27,7 +26,6 @@ import net.dreamlu.iot.mqtt.core.server.http.api.form.SubscribeForm;
 import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
-import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
@@ -45,12 +43,9 @@ import java.util.function.Function;
  */
 public class MqttHttpApi {
 	private final IMqttMessageDispatcher messageDispatcher;
-	private final IMqttSessionManager sessionManager;
 
-	public MqttHttpApi(IMqttMessageDispatcher messageDispatcher,
-					   IMqttSessionManager sessionManager) {
+	public MqttHttpApi(IMqttMessageDispatcher messageDispatcher) {
 		this.messageDispatcher = messageDispatcher;
-		this.sessionManager = sessionManager;
 	}
 
 	/**
@@ -74,7 +69,7 @@ public class MqttHttpApi {
 		if (validResponse != null) {
 			return validResponse;
 		}
-		send(form);
+		sendPublish(form);
 		return Result.ok(response);
 	}
 
@@ -105,12 +100,12 @@ public class MqttHttpApi {
 		}
 		// 批量发送
 		for (PublishForm form : formList) {
-			send(form);
+			sendPublish(form);
 		}
 		return Result.ok(response);
 	}
 
-	private void send(PublishForm form) {
+	private void sendPublish(PublishForm form) {
 		String payload = form.getPayload();
 		Message message = new Message();
 		message.setMessageType(MqttMessageType.PUBLISH.value());
@@ -151,7 +146,7 @@ public class MqttHttpApi {
 			return Result.fail(response, ResultCode.E101);
 		}
 		// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
-		sessionManager.addSubscribe(form.getTopic(), form.getClientId(), MqttQoS.valueOf(qos));
+		sendSubscribe(form);
 		return Result.ok(response);
 	}
 
@@ -187,7 +182,7 @@ public class MqttHttpApi {
 		// 批量处理
 		for (SubscribeForm form : formList) {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
-			sessionManager.addSubscribe(form.getTopic(), form.getClientId(), MqttQoS.valueOf(form.getQos()));
+			sendSubscribe(form);
 		}
 		return Result.ok(response);
 	}
@@ -214,7 +209,7 @@ public class MqttHttpApi {
 			return validResponse;
 		}
 		// 接口手动取消的订阅关系，可用来调试，不建议其他场景使用
-		sessionManager.removeSubscribe(form.getTopic(), form.getClientId());
+		sendSubscribe(form);
 		return Result.ok(response);
 	}
 
@@ -246,9 +241,22 @@ public class MqttHttpApi {
 		// 批量处理
 		for (BaseForm form : formList) {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
-			sessionManager.removeSubscribe(form.getTopic(), form.getClientId());
+			sendSubscribe(form);
 		}
 		return Result.ok(response);
+	}
+
+	private void sendSubscribe(BaseForm form) {
+		Message message = new Message();
+		message.setClientId(form.getClientId());
+		message.setTopic(form.getTopic());
+		if (form instanceof SubscribeForm) {
+			message.setQos(((SubscribeForm) form).getQos());
+			message.setMessageType(MqttMessageType.SUBSCRIBE.value());
+		} else {
+			message.setMessageType(MqttMessageType.UNSUBSCRIBE.value());
+		}
+		messageDispatcher.send(message);
 	}
 
 	/**

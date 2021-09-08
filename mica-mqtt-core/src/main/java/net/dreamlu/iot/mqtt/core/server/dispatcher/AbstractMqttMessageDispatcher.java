@@ -16,9 +16,11 @@
 
 package net.dreamlu.iot.mqtt.core.server.dispatcher;
 
+import net.dreamlu.iot.mqtt.codec.MqttMessageType;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
@@ -33,9 +35,11 @@ import java.util.Objects;
  */
 public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispatcher {
 	protected MqttServer mqttServer;
+	protected IMqttSessionManager sessionManager;
 
 	public void config(MqttServer mqttServer) {
 		this.mqttServer = mqttServer;
+		this.sessionManager = mqttServer.getServerCreator().getSessionManager();
 	}
 
 	/**
@@ -59,9 +63,16 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	public boolean send(Message message) {
 		Objects.requireNonNull(mqttServer, "MqttServer require not Null.");
 		// 1. 先发送到本服务
-		ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
-		MqttQoS qoS = MqttQoS.valueOf(message.getQos());
-		mqttServer.publishAll(message.getTopic(), payload, qoS);
+		MqttMessageType messageType = MqttMessageType.valueOf(message.getMessageType());
+		if (MqttMessageType.PUBLISH == messageType) {
+			ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
+			MqttQoS qoS = MqttQoS.valueOf(message.getQos());
+			mqttServer.publishAll(message.getTopic(), payload, qoS, message.isRetain());
+		} else if (MqttMessageType.SUBSCRIBE == messageType) {
+			sessionManager.addSubscribe(message.getTopic(), message.getClientId(), message.getQos());
+		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
+			sessionManager.removeSubscribe(message.getTopic(), message.getClientId());
+		}
 		return sendAll(message);
 	}
 

@@ -16,9 +16,11 @@
 
 package net.dreamlu.iot.mqtt.broker.cluster;
 
+import net.dreamlu.iot.mqtt.codec.MqttMessageType;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.mica.core.utils.JsonUtil;
 import net.dreamlu.mica.core.utils.StringUtil;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
@@ -40,6 +42,7 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final String channel;
 	private final MqttServer mqttServer;
+	private final IMqttSessionManager sessionManager;
 
 	public RedisMqttMessageReceiver(MicaRedisCache redisCache,
 									String channel,
@@ -47,6 +50,7 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 		this.redisTemplate = redisCache.getRedisTemplate();
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.mqttServer = mqttServer;
+		this.sessionManager = mqttServer.getServerCreator().getSessionManager();
 	}
 
 	@Override
@@ -57,14 +61,25 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 		if (mqttMessage == null) {
 			return;
 		}
-		String clientId = mqttMessage.getClientId();
-		String topic = mqttMessage.getTopic();
-		MqttQoS mqttQoS = MqttQoS.valueOf(mqttMessage.getQos());
-		boolean retain = mqttMessage.isRetain();
-		if (StringUtil.isBlank(clientId)) {
-			mqttServer.publishAll(topic, ByteBuffer.wrap(mqttMessage.getPayload()), mqttQoS, retain);
-		} else {
-			mqttServer.publish(clientId, topic, ByteBuffer.wrap(mqttMessage.getPayload()), mqttQoS, retain);
+		messageProcessing(mqttMessage);
+	}
+
+	public void messageProcessing(Message message) {
+		MqttMessageType messageType = MqttMessageType.valueOf(message.getMessageType());
+		if (MqttMessageType.PUBLISH == messageType) {
+			String clientId = message.getClientId();
+			String topic = message.getTopic();
+			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
+			boolean retain = message.isRetain();
+			if (StringUtil.isBlank(clientId)) {
+				mqttServer.publishAll(topic, ByteBuffer.wrap(message.getPayload()), mqttQoS, retain);
+			} else {
+				mqttServer.publish(clientId, topic, ByteBuffer.wrap(message.getPayload()), mqttQoS, retain);
+			}
+		} else if (MqttMessageType.SUBSCRIBE == messageType) {
+			sessionManager.addSubscribe(message.getTopic(), message.getClientId(), message.getQos());
+		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
+			sessionManager.removeSubscribe(message.getTopic(), message.getClientId());
 		}
 	}
 
