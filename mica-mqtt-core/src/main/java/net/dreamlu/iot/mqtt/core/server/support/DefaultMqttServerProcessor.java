@@ -342,6 +342,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				retainMessage.setClientId(clientId);
 				retainMessage.setMessageType(MqttMessageType.PUBLISH.value());
 				retainMessage.setRetain(true);
+				retainMessage.setTimestamp(System.currentTimeMillis());
 				this.messageStore.addRetainMessage(topicName, retainMessage);
 			}
 		}
