@@ -279,9 +279,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Tio.send(context, subAckMessage);
 		// 4. 发送保留消息
 		for (String topic : topicList) {
-			Message retainMessage = messageStore.getRetainMessage(topic);
-			if (retainMessage != null) {
-				messageDispatcher.send(clientId, retainMessage);
+			List<Message> retainMessageList = messageStore.getRetainMessage(topic);
+			if (retainMessageList != null && !retainMessageList.isEmpty()) {
+				for (Message retainMessage : retainMessageList) {
+					messageDispatcher.send(clientId, retainMessage);
+				}
 			}
 		}
 	}
@@ -339,6 +341,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				retainMessage.setPayload(payload.array());
 				retainMessage.setClientId(clientId);
 				retainMessage.setMessageType(MqttMessageType.PUBLISH.value());
+				retainMessage.setRetain(true);
 				this.messageStore.addRetainMessage(topicName, retainMessage);
 			}
 		}

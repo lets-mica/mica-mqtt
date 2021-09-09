@@ -18,9 +18,13 @@ package net.dreamlu.iot.mqtt.core.server.store;
 
 
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Pattern;
 
 /**
  * message store
@@ -33,7 +37,7 @@ public class InMemoryMqttMessageStore implements IMqttMessageStore {
 	 */
 	private final ConcurrentMap<String, Message> willStore = new ConcurrentHashMap<>();
 	/**
-	 * 保持消息 clientId: Message
+	 * 保持消息 topic: Message
 	 */
 	private final ConcurrentMap<String, Message> retainStore = new ConcurrentHashMap<>();
 
@@ -67,9 +71,15 @@ public class InMemoryMqttMessageStore implements IMqttMessageStore {
 	}
 
 	@Override
-	public Message getRetainMessage(String topicFilter) {
-		// TODO L.cm 改成匹配
-		return retainStore.get(topicFilter);
+	public List<Message> getRetainMessage(String topicFilter) {
+		Pattern topicPattern = MqttTopicUtil.getTopicPattern(topicFilter);
+		List<Message> retainMessageList = new ArrayList<>();
+		retainStore.forEach((topic, message) -> {
+			if (topicPattern.matcher(topic).matches()) {
+				retainMessageList.add(message);
+			}
+		});
+		return retainMessageList;
 	}
 
 }

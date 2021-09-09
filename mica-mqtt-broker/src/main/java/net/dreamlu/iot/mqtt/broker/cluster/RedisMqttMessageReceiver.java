@@ -29,6 +29,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
+import org.tio.core.ChannelContext;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -66,9 +67,9 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 
 	public void messageProcessing(Message message) {
 		MqttMessageType messageType = MqttMessageType.valueOf(message.getMessageType());
+		String clientId = message.getClientId();
+		String topic = message.getTopic();
 		if (MqttMessageType.PUBLISH == messageType) {
-			String clientId = message.getClientId();
-			String topic = message.getTopic();
 			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
 			boolean retain = message.isRetain();
 			if (StringUtil.isBlank(clientId)) {
@@ -77,9 +78,15 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 				mqttServer.publish(clientId, topic, ByteBuffer.wrap(message.getPayload()), mqttQoS, retain);
 			}
 		} else if (MqttMessageType.SUBSCRIBE == messageType) {
-			sessionManager.addSubscribe(message.getTopic(), message.getClientId(), message.getQos());
+			ChannelContext context = mqttServer.getChannelContext(clientId);
+			if (context != null) {
+				sessionManager.addSubscribe(topic, clientId, message.getQos());
+			}
 		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
-			sessionManager.removeSubscribe(message.getTopic(), message.getClientId());
+			ChannelContext context = mqttServer.getChannelContext(clientId);
+			if (context != null) {
+				sessionManager.removeSubscribe(topic, clientId);
+			}
 		}
 	}
 

@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.core.server.store;
 
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 
+import java.util.List;
+
 /**
  * message store
  *
@@ -73,6 +75,6 @@ public interface IMqttMessageStore {
 	 * @param topicFilter topicFilter
 	 * @return Message
 	 */
-	Message getRetainMessage(String topicFilter);
+	List<Message> getRetainMessage(String topicFilter);
 
 }
