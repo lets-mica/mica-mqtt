@@ -147,10 +147,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		logger.debug("Publish - clientId:{} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
 		switch (mqttQoS) {
 			case AT_MOST_ONCE:
-				invokeListenerForPublish(clientId, mqttQoS, topicName, message, fixedHeader.isRetain());
+				invokeListenerForPublish(clientId, mqttQoS, topicName, message);
 				break;
 			case AT_LEAST_ONCE:
-				invokeListenerForPublish(clientId, mqttQoS, topicName, message, fixedHeader.isRetain());
+				invokeListenerForPublish(clientId, mqttQoS, topicName, message);
 				if (packetId != -1) {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck()
 						.packetId(packetId)
@@ -220,8 +220,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			String topicName = incomingPublish.variableHeader().topicName();
 			MqttFixedHeader incomingFixedHeader = incomingPublish.fixedHeader();
 			MqttQoS mqttQoS = incomingFixedHeader.qosLevel();
-			boolean retain = incomingFixedHeader.isRetain();
-			invokeListenerForPublish(clientId, mqttQoS, topicName, incomingPublish, retain);
+			invokeListenerForPublish(clientId, mqttQoS, topicName, incomingPublish);
 			pendingQos2Publish.onPubRelReceived();
 			sessionManager.removePendingQos2Publish(clientId, messageId);
 		}
@@ -326,8 +325,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	 * @param topicName topicName
 	 * @param message   MqttPublishMessage
 	 */
-	private void invokeListenerForPublish(String clientId, MqttQoS mqttQoS, String topicName,
-										  MqttPublishMessage message, boolean isRetain) {
+	private void invokeListenerForPublish(String clientId, MqttQoS mqttQoS, String topicName, MqttPublishMessage message) {
+		MqttFixedHeader fixedHeader = message.fixedHeader();
+		boolean isRetain = fixedHeader.isRetain();
 		ByteBuffer payload = message.payload();
 		// 1. retain 消息逻辑
 		if (isRetain) {
@@ -342,13 +342,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				retainMessage.setClientId(clientId);
 				retainMessage.setMessageType(MqttMessageType.PUBLISH.value());
 				retainMessage.setRetain(true);
+				retainMessage.setDup(fixedHeader.isDup());
 				retainMessage.setTimestamp(System.currentTimeMillis());
 				this.messageStore.addRetainMessage(topicName, retainMessage);
 			}
 		}
 		// 2. 消息发布
 		try {
-			messageListener.onMessage(clientId, topicName, mqttQoS, payload);
+			messageListener.onMessage(clientId, message);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}

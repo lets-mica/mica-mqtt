@@ -16,7 +16,9 @@
 
 package net.dreamlu.iot.mqtt.core.server.broker;
 
+import net.dreamlu.iot.mqtt.codec.MqttFixedHeader;
 import net.dreamlu.iot.mqtt.codec.MqttMessageType;
+import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -38,7 +40,14 @@ public class MqttBrokerMessageListener implements IMqttMessageListener {
 	}
 
 	@Override
-	public void onMessage(String clientId, String topic, MqttQoS mqttQoS, ByteBuffer payload) {
+	public void onMessage(String clientId, MqttPublishMessage publishMessage) {
+		MqttFixedHeader fixedHeader = publishMessage.fixedHeader();
+		// topic
+		String topic = publishMessage.variableHeader().topicName();
+		MqttQoS mqttQoS = fixedHeader.qosLevel();
+		// payload
+		ByteBuffer payload = publishMessage.payload();
+		// message
 		Message message = new Message();
 		message.setTopic(topic);
 		message.setQos(mqttQoS.value());
@@ -46,7 +55,14 @@ public class MqttBrokerMessageListener implements IMqttMessageListener {
 			message.setPayload(payload.array());
 		}
 		message.setMessageType(MqttMessageType.PUBLISH.value());
+		message.setRetain(fixedHeader.isRetain());
+		message.setDup(fixedHeader.isDup());
 		message.setTimestamp(System.currentTimeMillis());
 		dispatcher.send(message);
+	}
+
+	@Override
+	public void onMessage(String clientId, String topic, MqttQoS mqttQoS, ByteBuffer payload) {
+
 	}
 }
