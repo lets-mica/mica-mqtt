@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.biz;
+package net.dreamlu.iot.mqtt.broker;
 
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
+import net.dreamlu.iot.mqtt.core.server.broker.MqttBrokerMessageListener;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
-import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
 
 /**
@@ -39,14 +39,8 @@ public class Server {
 	public static void main(String[] args) {
 		// 1. 消息转发处理器，可用来实现集群
 		IMqttMessageDispatcher messageDispatcher = new DefaultMqttMessageDispatcher();
-		// 2. 收到消息，将消息转发出去
-		IMqttMessageListener messageListener = (clientId, topic, mqttQoS, payload) -> {
-			Message message = new Message();
-			message.setTopic(topic);
-			message.setQos(mqttQoS.value());
-			message.setPayload(payload.array());
-			messageDispatcher.send(message);
-		};
+		// 2. mqtt broker 消息转发处理
+		IMqttMessageListener messageListener = new MqttBrokerMessageListener(messageDispatcher);
 		// 3. 启动服务
 		MqttServer.create()
 			.ip("0.0.0.0")

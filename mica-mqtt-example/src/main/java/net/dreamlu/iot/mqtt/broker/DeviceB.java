@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.biz;
+package net.dreamlu.iot.mqtt.broker;
 
 import net.dreamlu.iot.mqtt.client.MqttClientTest;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;

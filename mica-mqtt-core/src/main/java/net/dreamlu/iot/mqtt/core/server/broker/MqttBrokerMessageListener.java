@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.broker.listener;
+package net.dreamlu.iot.mqtt.core.server.broker;
 
 import net.dreamlu.iot.mqtt.codec.MqttMessageType;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
@@ -26,7 +26,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
- * 集群消息监听器
+ * broker 消息监听转发
  *
  * @author L.cm
  */

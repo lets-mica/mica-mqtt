@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.broker.listener;
+package net.dreamlu.iot.mqtt.broker.cluster;
 
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
@@ -26,7 +26,7 @@ import net.dreamlu.mica.redis.cache.MicaRedisCache;
  * @author L.cm
  */
 @RequiredArgsConstructor
-public class MqttBrokerConnectListener implements IMqttConnectStatusListener {
+public class RedisMqttConnectStatusListener implements IMqttConnectStatusListener {
 	private final MicaRedisCache redisCache;
 	private final String connectStatusKey;
 
