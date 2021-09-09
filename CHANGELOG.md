@@ -1,6 +1,14 @@
 # 变更记录
 
 ## 发行版本
+### v1.1.2 - 2021-09-05
+- :sparkles: 添加 mica-mqtt-broker 模块，基于 redis pub/sub 实现 mqtt 集群。
+- :sparkles: mica-mqtt-broker 基于 redis 实现客户端状态存储。
+- :sparkles: mica-mqtt-broker 基于 redis 实现遗嘱、保留消息存储。
+- :sparkles: mqtt-server http api 调整订阅和取消订阅，方便集群处理。
+- :sparkles: mica-mqtt-spring-boot-example 添加 mqtt 和 http api 认证示例。
+- :bug: 修复 mqtt-server 保留消息匹配规则。
+
 ### v1.1.1 - 2021-09-05
 - :sparkles: mqtt-server 优化连接关闭日志。
 - :sparkles: mqtt-server 优化订阅，相同 topicFilter 订阅对 qos 判断。
