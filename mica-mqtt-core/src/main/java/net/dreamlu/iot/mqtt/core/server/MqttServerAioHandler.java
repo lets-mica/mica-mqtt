@@ -150,7 +150,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 		if (cause instanceof MqttUnacceptableProtocolVersionException) {
 			// 不支持的协议版本
 			MqttConnAckMessage message = MqttMessageBuilders.connAck()
-				.returnCode(MqttConnectReturnCode.CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION)
+				.returnCode(MqttConnectReasonCode.CONNECTION_REFUSED_UNACCEPTABLE_PROTOCOL_VERSION)
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);
@@ -158,7 +158,7 @@ public class MqttServerAioHandler implements ServerAioHandler {
 		} else if (cause instanceof MqttIdentifierRejectedException) {
 			// 不合格的 clientId
 			MqttConnAckMessage message = MqttMessageBuilders.connAck()
-				.returnCode(MqttConnectReturnCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED)
+				.returnCode(MqttConnectReasonCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED)
 				.sessionPresent(false)
 				.build();
 			Tio.send(context, message);

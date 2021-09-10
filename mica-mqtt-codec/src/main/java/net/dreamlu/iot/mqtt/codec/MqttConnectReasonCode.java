@@ -21,7 +21,7 @@ package net.dreamlu.iot.mqtt.codec;
  *
  * @author netty
  */
-public enum MqttConnectReturnCode {
+public enum MqttConnectReasonCode implements MqttReasonCode {
 	/**
 	 * ReturnCode
 	 */
@@ -55,39 +55,25 @@ public enum MqttConnectReturnCode {
 	CONNECTION_REFUSED_SERVER_MOVED((byte) 0x9D),
 	CONNECTION_REFUSED_CONNECTION_RATE_EXCEEDED((byte) 0x9F);
 
-	private static final MqttConnectReturnCode[] VALUES;
+	private static final MqttConnectReasonCode[] VALUES = new MqttConnectReasonCode[160];
 
 	static {
-		MqttConnectReturnCode[] values = values();
-		VALUES = new MqttConnectReturnCode[160];
-		for (MqttConnectReturnCode code : values) {
-			final int unsignedByte = code.byteValue & 0xFF;
-			// Suppress a warning about out of bounds access since the enum contains only correct values
-			VALUES[unsignedByte] = code;    // lgtm [java/index-out-of-bounds]
-		}
+		ReasonCodeUtils.fillValuesByCode(VALUES, values());
 	}
 
 	private final byte byteValue;
 
-	MqttConnectReturnCode(byte byteValue) {
+	MqttConnectReasonCode(byte byteValue) {
 		this.byteValue = byteValue;
 	}
 
-	public byte byteValue() {
+	public static MqttConnectReasonCode valueOf(byte b) {
+		return ReasonCodeUtils.codeLoopUp(VALUES, b, "Connect");
+	}
+
+	@Override
+	public byte value() {
 		return byteValue;
 	}
 
-	public static MqttConnectReturnCode valueOf(byte b) {
-		final int unsignedByte = b & 0xFF;
-		MqttConnectReturnCode mqttConnectReturnCode = null;
-		try {
-			mqttConnectReturnCode = VALUES[unsignedByte];
-		} catch (ArrayIndexOutOfBoundsException ignored) {
-			// no op
-		}
-		if (mqttConnectReturnCode == null) {
-			throw new IllegalArgumentException("unknown connect return code: " + unsignedByte);
-		}
-		return mqttConnectReturnCode;
-	}
 }

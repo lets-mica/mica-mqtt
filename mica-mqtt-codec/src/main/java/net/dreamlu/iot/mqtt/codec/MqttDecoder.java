@@ -261,7 +261,7 @@ public final class MqttDecoder {
 		}
 
 		final MqttConnAckVariableHeader mqttConnAckVariableHeader =
-			new MqttConnAckVariableHeader(MqttConnectReturnCode.valueOf(returnCode), sessionPresent, properties);
+			new MqttConnAckVariableHeader(MqttConnectReasonCode.valueOf(returnCode), sessionPresent, properties);
 		return new Result<>(mqttConnAckVariableHeader, numberOfBytesConsumed);
 	}
 

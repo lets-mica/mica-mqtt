@@ -208,7 +208,7 @@ public final class MqttEncoder {
 		buf.put((byte) getFixedHeaderByte1(message.fixedHeader()));
 		writeVariableLengthInt(buf, 2 + propertiesBytes.length);
 		buf.put((byte) (message.variableHeader().isSessionPresent() ? 0x01 : 0x00));
-		buf.put(message.variableHeader().connectReturnCode().byteValue());
+		buf.put(message.variableHeader().connectReturnCode().value());
 		buf.put(propertiesBytes);
 		return buf;
 	}

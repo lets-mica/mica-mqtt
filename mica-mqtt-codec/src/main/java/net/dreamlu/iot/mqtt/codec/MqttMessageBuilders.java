@@ -288,7 +288,7 @@ public final class MqttMessageBuilders {
 
 	public static final class ConnAckBuilder {
 
-		private MqttConnectReturnCode returnCode;
+		private MqttConnectReasonCode returnCode;
 		private boolean sessionPresent;
 		private MqttProperties properties = MqttProperties.NO_PROPERTIES;
 		private ConnAckPropertiesBuilder propsBuilder;
@@ -296,7 +296,7 @@ public final class MqttMessageBuilders {
 		private ConnAckBuilder() {
 		}
 
-		public ConnAckBuilder returnCode(MqttConnectReturnCode returnCode) {
+		public ConnAckBuilder returnCode(MqttConnectReasonCode returnCode) {
 			this.returnCode = returnCode;
 			return this;
 		}

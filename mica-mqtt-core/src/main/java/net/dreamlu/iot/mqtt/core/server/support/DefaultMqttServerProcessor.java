@@ -77,14 +77,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		String clientId = payload.clientIdentifier();
 		// 1. 客户端必须提供 clientId, 不管 cleanSession 是否为1, 此处没有参考标准协议实现
 		if (StrUtil.isBlank(clientId)) {
-			connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED);
+			connAckByReturnCode(clientId, context, MqttConnectReasonCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED);
 			return;
 		}
 		// 2. 认证
 		String userName = payload.userName();
 		String password = payload.password();
 		if (!authHandler.authenticate(clientId, userName, password)) {
-			connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
+			connAckByReturnCode(clientId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}
 		// 3. 判断 clientId 是否在多个地方使用，如果在其他地方有使用，先解绑
@@ -122,12 +122,12 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			messageStore.addWillMessage(clientId, willMessage);
 		}
 		// 8. 返回 ack
-		connAckByReturnCode(clientId, context, MqttConnectReturnCode.CONNECTION_ACCEPTED);
+		connAckByReturnCode(clientId, context, MqttConnectReasonCode.CONNECTION_ACCEPTED);
 		// 9. 在线状态
 		connectStatusListener.online(clientId);
 	}
 
-	private void connAckByReturnCode(String clientId, ChannelContext context, MqttConnectReturnCode returnCode) {
+	private void connAckByReturnCode(String clientId, ChannelContext context, MqttConnectReasonCode returnCode) {
 		MqttConnAckMessage message = MqttMessageBuilders.connAck()
 			.returnCode(returnCode)
 			.sessionPresent(false)

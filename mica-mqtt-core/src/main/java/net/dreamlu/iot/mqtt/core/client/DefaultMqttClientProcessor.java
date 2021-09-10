@@ -57,7 +57,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	@Override
 	public void processConAck(ChannelContext context, MqttConnAckMessage message) {
 		MqttConnAckVariableHeader connAckVariableHeader = message.variableHeader();
-		MqttConnectReturnCode returnCode = connAckVariableHeader.connectReturnCode();
+		MqttConnectReasonCode returnCode = connAckVariableHeader.connectReturnCode();
 		switch (returnCode) {
 			case CONNECTION_ACCEPTED:
 				// 1. 连接成功的日志
