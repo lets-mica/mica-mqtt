@@ -36,16 +36,16 @@ public enum MqttPubAckReasonCode implements MqttReasonCode {
 	QUOTA_EXCEEDED((byte) 0x97),
 	PAYLOAD_FORMAT_INVALID((byte) 0x99);
 
-	MqttPubAckReasonCode(byte byteValue) {
-		this.byteValue = byteValue;
-	}
-
-	private final byte byteValue;
-
 	private static final MqttPubAckReasonCode[] VALUES = new MqttPubAckReasonCode[0x9A];
 
 	static {
 		ReasonCodeUtils.fillValuesByCode(VALUES, values());
+	}
+
+	private final byte byteValue;
+
+	MqttPubAckReasonCode(byte byteValue) {
+		this.byteValue = byteValue;
 	}
 
 	public static MqttPubAckReasonCode valueOf(byte b) {

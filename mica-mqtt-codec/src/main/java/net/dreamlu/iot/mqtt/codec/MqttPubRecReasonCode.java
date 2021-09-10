@@ -36,11 +36,17 @@ public enum MqttPubRecReasonCode implements MqttReasonCode {
 	QUOTA_EXCEEDED((byte) 0x97),
 	PAYLOAD_FORMAT_INVALID((byte) 0x99);
 
-	MqttPubRecReasonCode(byte byteValue) {
-		this.byteValue = byteValue;
+	private static final MqttPubRecReasonCode[] VALUES = new MqttPubRecReasonCode[0x9A];
+
+	static {
+		ReasonCodeUtils.fillValuesByCode(VALUES, values());
 	}
 
 	private final byte byteValue;
+
+	MqttPubRecReasonCode(byte byteValue) {
+		this.byteValue = byteValue;
+	}
 
 	@Override
 	public byte value() {
@@ -50,12 +56,6 @@ public enum MqttPubRecReasonCode implements MqttReasonCode {
 	@Override
 	public boolean isError() {
 		return Byte.toUnsignedInt(byteValue) >= Byte.toUnsignedInt(UNSPECIFIED_ERROR.byteValue);
-	}
-
-	private static final MqttPubRecReasonCode[] VALUES = new MqttPubRecReasonCode[0x9A];
-
-	static {
-		ReasonCodeUtils.fillValuesByCode(VALUES, values());
 	}
 
 	public static MqttPubRecReasonCode valueOf(byte b) {

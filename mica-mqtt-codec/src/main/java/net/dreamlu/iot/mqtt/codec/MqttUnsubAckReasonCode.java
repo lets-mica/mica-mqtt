@@ -34,11 +34,11 @@ public enum MqttUnsubAckReasonCode implements MqttReasonCode {
 	TOPIC_FILTER_INVALID((byte) 0x8F),
 	PACKET_IDENTIFIER_IN_USE((byte) 0x91);
 
+	private final byte byteValue;
+
 	MqttUnsubAckReasonCode(byte byteValue) {
 		this.byteValue = byteValue;
 	}
-
-	private final byte byteValue;
 
 	@Override
 	public byte value() {

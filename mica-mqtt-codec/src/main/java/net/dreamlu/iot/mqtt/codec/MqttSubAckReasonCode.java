@@ -38,11 +38,11 @@ public enum MqttSubAckReasonCode implements MqttReasonCode {
 	SUBSCRIPTION_IDENTIFIERS_NOT_SUPPORTED((byte) 0xA1),
 	WILDCARD_SUBSCRIPTIONS_NOT_SUPPORTED((byte) 0xA2);
 
+	private final byte byteValue;
+
 	MqttSubAckReasonCode(byte byteValue) {
 		this.byteValue = byteValue;
 	}
-
-	private final byte byteValue;
 
 	@Override
 	public byte value() {

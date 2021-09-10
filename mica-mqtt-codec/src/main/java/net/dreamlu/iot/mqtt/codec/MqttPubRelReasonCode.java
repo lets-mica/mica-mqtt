@@ -29,11 +29,11 @@ public enum MqttPubRelReasonCode implements MqttReasonCode {
 	SUCCESS((byte) 0x0),
 	PACKET_IDENTIFIER_NOT_FOUND((byte) 0x92);
 
+	private final byte byteValue;
+
 	MqttPubRelReasonCode(byte byteValue) {
 		this.byteValue = byteValue;
 	}
-
-	private final byte byteValue;
 
 	@Override
 	public byte value() {

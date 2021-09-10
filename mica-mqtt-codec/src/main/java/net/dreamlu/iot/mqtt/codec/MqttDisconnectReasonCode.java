@@ -56,21 +56,22 @@ public enum MqttDisconnectReasonCode implements MqttReasonCode {
 	SUBSCRIPTION_IDENTIFIERS_NOT_SUPPORTED((byte) 0xA1),
 	WILDCARD_SUBSCRIPTIONS_NOT_SUPPORTED((byte) 0xA2);
 
-	MqttDisconnectReasonCode(byte byteValue) {
-		this.byteValue = byteValue;
-	}
-
-	private final byte byteValue;
-
-	@Override
-	public byte value() {
-		return byteValue;
-	}
-
 	private static final MqttDisconnectReasonCode[] VALUES = new MqttDisconnectReasonCode[0xA3];
 
 	static {
 		ReasonCodeUtils.fillValuesByCode(VALUES, values());
+	}
+
+	private final byte byteValue;
+
+	MqttDisconnectReasonCode(byte byteValue) {
+		this.byteValue = byteValue;
+	}
+
+
+	@Override
+	public byte value() {
+		return byteValue;
 	}
 
 	public static MqttDisconnectReasonCode valueOf(byte b) {
