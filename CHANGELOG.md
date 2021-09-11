@@ -8,6 +8,8 @@
 - :sparkles: mqtt-server http api 调整订阅和取消订阅，方便集群处理。
 - :sparkles: mica-mqtt-spring-boot-example 添加 mqtt 和 http api 认证示例。
 - :sparkles: 添加 mqtt 5 所有 ReasonCode。
+- :sparkles: 优化解码 PacketNeededLength 计算。
+- :bug: 修复遗嘱消息，添加消息类型。
 - :bug: 修复 mqtt-server 保留消息匹配规则。
 
 ### v1.1.1 - 2021-09-05
