@@ -115,6 +115,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		boolean willFlag = variableHeader.isWillFlag();
 		if (willFlag) {
 			Message willMessage = new Message();
+			willMessage.setMessageType(MqttMessageType.PUBLISH.value());
 			willMessage.setTopic(payload.willTopic());
 			willMessage.setPayload(payload.willMessageInBytes());
 			willMessage.setQos(variableHeader.willQos());
