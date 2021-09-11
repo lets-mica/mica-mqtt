@@ -84,10 +84,12 @@ public final class MqttDecoder {
 		} catch (Exception cause) {
 			return MqttMessageFactory.newInvalidMessage(cause);
 		}
-		// 3. 判断消息长度
-		int packetNeededLength = bytesRemainingInVariablePart + MQTT_PROTOCOL_LENGTH - readableLength;
-		if (packetNeededLength > 0) {
-			ctx.setPacketNeededLength(packetNeededLength);
+		// 3. 判断消息长度，消息长度
+		int messageLength = bytesRemainingInVariablePart + MQTT_PROTOCOL_LENGTH;
+		// 还需要的长度
+		int stillNeededLength = messageLength - readableLength;
+		if (stillNeededLength > 0) {
+			ctx.setPacketNeededLength(messageLength);
 			return null;
 		}
 		// 4. 解析头信息
