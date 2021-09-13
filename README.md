@@ -30,6 +30,14 @@
 ## 待办
 - [ ] 优化处理 mqtt session，以及支持 v5.0 
 
+
+## 默认端口
+
+| 端口号 | 协议            | 说明                             |
+| ------ | --------------- | -------------------------------- |
+| 1883   | tcp             | mqtt tcp 端口                    |
+| 8083   | http、websocket | http api 和 websocket mqtt 子协议端口 |
+
 ## 依赖
 ### Spring boot 项目
 ```xml
