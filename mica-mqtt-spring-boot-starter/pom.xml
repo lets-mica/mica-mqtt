@@ -12,7 +12,6 @@
     <name>${project.artifactId}</name>
 
     <properties>
-        <spring-boot.version>2.5.4</spring-boot.version>
         <micrometer-core.version>1.7.2</micrometer-core.version>
         <lombok.version>1.18.20</lombok.version>
         <mica.auto.version>2.1.3</mica.auto.version>
@@ -26,14 +25,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
-            <version>${spring-boot.version}</version>
+            <version>${spring.boot.version}</version>
             <scope>provided</scope>
         </dependency>
         <!-- 对接 micrometer 方便指标收集 begin -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-actuator-autoconfigure</artifactId>
-            <version>${spring-boot.version}</version>
+            <version>${spring.boot.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
