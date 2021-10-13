@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server.support;
 
 import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
+import org.tio.core.ChannelContext;
 
 /**
  * 默认的认证处理
@@ -26,7 +27,7 @@ import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
 public class DefaultMqttServerAuthHandler implements IMqttServerAuthHandler {
 
 	@Override
-	public boolean authenticate(String clientId, String userName, String password) {
+	public boolean authenticate(ChannelContext context, String clientId, String userName, String password) {
 		return true;
 	}
 

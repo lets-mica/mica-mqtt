@@ -4,6 +4,7 @@ import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
 import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
 import org.springframework.context.annotation.Configuration;
+import org.tio.core.ChannelContext;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
 public class MqttAuthHandler implements IMqttServerAuthHandler {
 
 	@Override
-	public boolean authenticate(String clientId, String userName, String password) {
+	public boolean authenticate(ChannelContext context, String clientId, String userName, String password) {
 		// 客户端认证逻辑实现
 		return true;
 	}
