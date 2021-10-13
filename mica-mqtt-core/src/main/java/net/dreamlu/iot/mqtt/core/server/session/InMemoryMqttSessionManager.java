@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server.session;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
