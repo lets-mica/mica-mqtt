@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.broker.cluster;
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
+import org.tio.core.ChannelContext;
 
 /**
  * mqtt 连接监听
@@ -31,12 +32,12 @@ public class RedisMqttConnectStatusListener implements IMqttConnectStatusListene
 	private final String connectStatusKey;
 
 	@Override
-	public void online(String clientId) {
+	public void online(ChannelContext context, String clientId) {
 		redisCache.sAdd(connectStatusKey, clientId);
 	}
 
 	@Override
-	public void offline(String clientId) {
+	public void offline(ChannelContext context, String clientId) {
 		redisCache.sRem(connectStatusKey, clientId);
 	}
 }

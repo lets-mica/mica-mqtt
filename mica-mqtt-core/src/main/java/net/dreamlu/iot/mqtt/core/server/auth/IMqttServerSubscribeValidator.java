@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server;
+package net.dreamlu.iot.mqtt.core.server.auth;
 
 import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
 import org.tio.core.ChannelContext;
@@ -26,28 +26,16 @@ import java.util.List;
  *
  * @author L.cm
  */
-@FunctionalInterface
-public interface IMqttServerAuthHandler {
-
-	/**
-	 * 认证
-	 *
-	 * @param context ChannelContext
-	 * @param clientId 客户端 ID
-	 * @param userName 用户名
-	 * @param password 密码
-	 * @return 是否认证成功
-	 */
-	boolean authenticate(ChannelContext context, String clientId, String userName, String password);
+public interface IMqttServerSubscribeValidator {
 
 	/**
 	 * 是否可以订阅
 	 *
+	 * @param context               ChannelContext
+	 * @param clientId              客户端 id
 	 * @param topicSubscriptionList 订阅 topic 列表
 	 * @return 是否可以订阅
 	 */
-	default boolean isValidSubscribe(List<MqttTopicSubscription> topicSubscriptionList) {
-		return true;
-	}
+	boolean isValid(ChannelContext context, String clientId, List<MqttTopicSubscription> topicSubscriptionList);
 
 }

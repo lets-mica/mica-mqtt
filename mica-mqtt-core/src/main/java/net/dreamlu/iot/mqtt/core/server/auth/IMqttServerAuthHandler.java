@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.support;
+package net.dreamlu.iot.mqtt.core.server.auth;
 
-import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import org.tio.core.ChannelContext;
 
 /**
- * 默认的认证处理
+ * mqtt 服务端，认证处理器
  *
  * @author L.cm
  */
-public class DefaultMqttServerAuthHandler implements IMqttServerAuthHandler {
+@FunctionalInterface
+public interface IMqttServerAuthHandler {
 
-	@Override
-	public boolean authenticate(ChannelContext context, String clientId, String userName, String password) {
-		return true;
-	}
+	/**
+	 * 认证
+	 *
+	 * @param context ChannelContext
+	 * @param clientId 客户端 ID
+	 * @param userName 用户名
+	 * @param password 密码
+	 * @return 是否认证成功
+	 */
+	boolean authenticate(ChannelContext context, String clientId, String userName, String password);
 
 }

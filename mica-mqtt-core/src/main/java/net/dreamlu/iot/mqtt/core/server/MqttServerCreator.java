@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
@@ -31,6 +32,7 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -91,6 +93,10 @@ public class MqttServerCreator {
 	 * 认证处理器
 	 */
 	private IMqttServerAuthHandler authHandler;
+	/**
+	 * 订阅校验器
+	 */
+	private IMqttServerSubscribeValidator subscribeValidator;
 	/**
 	 * 消息处理器
 	 */
@@ -243,6 +249,15 @@ public class MqttServerCreator {
 
 	public MqttServerCreator authHandler(IMqttServerAuthHandler authHandler) {
 		this.authHandler = authHandler;
+		return this;
+	}
+
+	public IMqttServerSubscribeValidator getSubscribeValidator() {
+		return subscribeValidator;
+	}
+
+	public MqttServerCreator subscribeValidator(IMqttServerSubscribeValidator subscribeValidator) {
+		this.subscribeValidator = subscribeValidator;
 		return this;
 	}
 

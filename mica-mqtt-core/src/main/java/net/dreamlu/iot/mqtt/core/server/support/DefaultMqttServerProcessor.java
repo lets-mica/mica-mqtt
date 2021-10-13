@@ -19,10 +19,11 @@ package net.dreamlu.iot.mqtt.core.server.support;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.MqttConst;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -55,6 +56,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttServerAuthHandler authHandler;
+	private final IMqttServerSubscribeValidator subscribeValidator;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final IMqttMessageListener messageListener;
@@ -65,6 +67,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.authHandler = serverCreator.getAuthHandler();
+		this.subscribeValidator = serverCreator.getSubscribeValidator();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 		this.messageListener = serverCreator.getMessageListener();
@@ -125,7 +128,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 8. 返回 ack
 		connAckByReturnCode(clientId, context, MqttConnectReasonCode.CONNECTION_ACCEPTED);
 		// 9. 在线状态
-		connectStatusListener.online(clientId);
+		connectStatusListener.online(context, clientId);
 	}
 
 	private void connAckByReturnCode(String clientId, ChannelContext context, MqttConnectReasonCode returnCode) {
@@ -250,7 +253,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int messageId = message.variableHeader().messageId();
 		// 1. 校验订阅的 topicFilter
 		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
-		if (!authHandler.isValidSubscribe(topicSubscriptions)) {
+		if (subscribeValidator != null && !subscribeValidator.isValid(context, clientId, topicSubscriptions)) {
 			logger.error("Subscribe - clientId:{} topicFilters:{} verification failed messageId:{}", clientId, topicSubscriptions, messageId);
 			// 3. 返回 ack
 			MqttMessage subAckMessage = MqttMessageBuilders.subAck()

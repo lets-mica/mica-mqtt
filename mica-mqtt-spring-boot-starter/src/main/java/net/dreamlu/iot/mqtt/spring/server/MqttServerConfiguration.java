@@ -16,9 +16,10 @@
 
 package net.dreamlu.iot.mqtt.spring.server;
 
-import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -57,6 +58,7 @@ public class MqttServerConfiguration {
 	@Bean
 	public MqttServerCreator mqttServerCreator(MqttServerProperties properties,
 											   ObjectProvider<IMqttServerAuthHandler> authHandlerObjectProvider,
+											   ObjectProvider<IMqttServerSubscribeValidator> subscribeValidatorObjectProvider,
 											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
 											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
@@ -99,6 +101,8 @@ public class MqttServerConfiguration {
 		// 认证处理器
 		IMqttServerAuthHandler authHandler = authHandlerObjectProvider.getIfAvailable(DefaultMqttServerAuthHandler::new);
 		serverCreator.authHandler(authHandler);
+		// 订阅校验
+		subscribeValidatorObjectProvider.ifAvailable(serverCreator::subscribeValidator);
 		// 消息转发
 		IMqttMessageDispatcher messageDispatcher = messageDispatcherObjectProvider.getIfAvailable(DefaultMqttMessageDispatcher::new);
 		serverCreator.messageDispatcher(messageDispatcher);
