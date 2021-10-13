@@ -59,7 +59,8 @@ mqtt:
 
 | 接口                           | 是否必须       | 说明                        |
 | ---------------------------   | -------------- | ------------------------- |
-| IMqttServerAuthHandler        | 是             | 用于客户端认证               |
+| IMqttServerAuthHandler        | 是             | 用于服务端认证               |
+| IMqttServerSubscribeValidator | 是             | 1.1.3 新增，用于服务端订阅校验 |
 | IMqttMessageListener          | 是             | 消息监听                    |
 | IMqttConnectStatusListener    | 是             | 连接状态监听                 |
 | IMqttSessionManager           | 否             | session 管理               |
