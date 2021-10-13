@@ -19,7 +19,12 @@ package net.dreamlu.iot.mqtt.broker.auth;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
 import net.dreamlu.iot.mqtt.core.server.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
+import org.tio.core.ChannelContext;
+import org.tio.core.Node;
 
 import java.util.List;
 
@@ -30,9 +35,15 @@ import java.util.List;
  */
 @Configuration(proxyBeanMethods = false)
 public class MqttAuthHandler implements IMqttServerAuthHandler {
+	@Lazy
+	@Autowired
+	private MqttServerTemplate mqttServerTemplate;
 
 	@Override
 	public boolean authenticate(String clientId, String userName, String password) {
+		ChannelContext context = mqttServerTemplate.getChannelContext(clientId);
+		// 获取客户端信息
+		Node clientNode = context.getClientNode();
 		// 客户端认证逻辑实现
 		return true;
 	}
