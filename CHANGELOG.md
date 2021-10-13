@@ -1,6 +1,13 @@
 # 变更记录
 
 ## 发行版本
+### v1.1.3 - 2021-10-13
+- :sparkles: 状态事件接口 `IMqttConnectStatusListener` 添加 ChannelContext 参数。
+- :sparkles: 从认证中拆分 `IMqttServerSubscribeValidator` 订阅校验接口，添加 ChannelContext、clientId 参数。
+- :sparkles: 认证 `IMqttServerAuthHandler` 调整包、添加 ChannelContext 参数。
+- :sparkles: 完善文档和示例，添加默认端口号说明。
+- :arrow_up: 依赖升级
+
 ### v1.1.2 - 2021-09-12
 - :sparkles: 添加 mica-mqtt-broker 模块，基于 redis pub/sub 实现 mqtt 集群。
 - :sparkles: mica-mqtt-broker 基于 redis 实现客户端状态存储。
