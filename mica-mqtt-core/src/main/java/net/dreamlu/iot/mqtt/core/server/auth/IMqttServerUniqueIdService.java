@@ -31,8 +31,9 @@ public interface IMqttServerUniqueIdService {
 	 * @param context  ChannelContext
 	 * @param clientId clientId
 	 * @param userName userName
+	 * @param password password
 	 * @return uniqueId
 	 */
-	String getUniqueId(ChannelContext context, String clientId, String userName);
+	String getUniqueId(ChannelContext context, String clientId, String userName, String password);
 
 }

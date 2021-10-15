@@ -27,7 +27,7 @@ import org.tio.core.ChannelContext;
 public class DefaultMqttServerUniqueIdServiceImpl implements IMqttServerUniqueIdService {
 
 	@Override
-	public String getUniqueId(ChannelContext context, String clientId, String userName) {
+	public String getUniqueId(ChannelContext context, String clientId, String userName, String password) {
 		return clientId;
 	}
 

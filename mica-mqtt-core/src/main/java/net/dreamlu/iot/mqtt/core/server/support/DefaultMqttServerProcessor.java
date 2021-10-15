@@ -80,18 +80,18 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	@Override
 	public void processConnect(ChannelContext context, MqttConnectMessage mqttMessage) {
 		MqttConnectPayload payload = mqttMessage.payload();
-		// 客户端id和用户名
+		// 参数
 		String clientId = payload.clientIdentifier();
 		String userName = payload.userName();
+		String password = payload.password();
 		// 1. 获取唯一id，用于 mqtt 内部绑定，部分用户的业务采用 userName 作为唯一id，故抽象之，默认：uniqueId == clientId
-		String uniqueId = uniqueIdService.getUniqueId(context, clientId, userName);
+		String uniqueId = uniqueIdService.getUniqueId(context, clientId, userName, password);
 		// 2. 客户端必须提供 uniqueId, 不管 cleanSession 是否为1, 此处没有参考标准协议实现
 		if (StrUtil.isBlank(uniqueId)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED);
 			return;
 		}
 		// 3. 认证
-		String password = payload.password();
 		if (!authHandler.authenticate(context, uniqueId, clientId, userName, password)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
