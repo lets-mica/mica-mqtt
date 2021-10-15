@@ -30,11 +30,12 @@ public interface IMqttServerAuthHandler {
 	 * 认证
 	 *
 	 * @param context ChannelContext
+	 * @param uniqueId mqtt 内唯一id，默认和 clientId 相同
 	 * @param clientId 客户端 ID
 	 * @param userName 用户名
 	 * @param password 密码
 	 * @return 是否认证成功
 	 */
-	boolean authenticate(ChannelContext context, String clientId, String userName, String password);
+	boolean authenticate(ChannelContext context, String uniqueId, String clientId, String userName, String password);
 
 }

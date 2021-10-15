@@ -20,6 +20,7 @@ import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
@@ -29,10 +30,7 @@ import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.support.*;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -94,6 +92,10 @@ public class MqttServerCreator {
 	 */
 	private IMqttServerAuthHandler authHandler;
 	/**
+	 * 唯一 id 服务
+	 */
+	private IMqttServerUniqueIdService uniqueIdService;
+	/**
 	 * 订阅校验器
 	 */
 	private IMqttServerSubscribeValidator subscribeValidator;
@@ -114,7 +116,7 @@ public class MqttServerCreator {
 	 */
 	private IMqttMessageListener messageListener;
 	/**
-	 * 链接状态监听
+	 * 连接状态监听
 	 */
 	private IMqttConnectStatusListener connectStatusListener;
 	/**
@@ -252,6 +254,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public IMqttServerUniqueIdService getUniqueIdService() {
+		return uniqueIdService;
+	}
+
+	public MqttServerCreator uniqueIdService(IMqttServerUniqueIdService uniqueIdService) {
+		this.uniqueIdService = uniqueIdService;
+		return this;
+	}
+
 	public IMqttServerSubscribeValidator getSubscribeValidator() {
 		return subscribeValidator;
 	}
@@ -372,6 +383,9 @@ public class MqttServerCreator {
 		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		if (this.authHandler == null) {
 			this.authHandler = new DefaultMqttServerAuthHandler();
+		}
+		if (this.uniqueIdService == null) {
+			this.uniqueIdService = new DefaultMqttServerUniqueIdServiceImpl();
 		}
 		if (this.messageDispatcher == null) {
 			this.messageDispatcher = new DefaultMqttMessageDispatcher();

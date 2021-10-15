@@ -16,19 +16,19 @@
 
 package net.dreamlu.iot.mqtt.core.server.support;
 
-import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import org.tio.core.ChannelContext;
 
 /**
- * 默认的认证处理
+ * 默认的 mqtt 服务端唯一 id 绑定，使用 clientId
  *
  * @author L.cm
  */
-public class DefaultMqttServerAuthHandler implements IMqttServerAuthHandler {
+public class DefaultMqttServerUniqueIdServiceImpl implements IMqttServerUniqueIdService {
 
 	@Override
-	public boolean authenticate(ChannelContext context, String uniqueId, String clientId, String userName, String password) {
-		return true;
+	public String getUniqueId(ChannelContext context, String clientId, String userName) {
+		return clientId;
 	}
 
 }

@@ -20,16 +20,12 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
-import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
-import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -58,6 +54,7 @@ public class MqttServerConfiguration {
 	@Bean
 	public MqttServerCreator mqttServerCreator(MqttServerProperties properties,
 											   ObjectProvider<IMqttServerAuthHandler> authHandlerObjectProvider,
+											   ObjectProvider<IMqttServerUniqueIdService> uniqueIdServiceObjectProvider,
 											   ObjectProvider<IMqttServerSubscribeValidator> subscribeValidatorObjectProvider,
 											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
@@ -99,25 +96,21 @@ public class MqttServerConfiguration {
 		Objects.requireNonNull(messageListener, "Mqtt server IMqttMessageListener Bean not found.");
 		serverCreator.messageListener(messageListener);
 		// 认证处理器
-		IMqttServerAuthHandler authHandler = authHandlerObjectProvider.getIfAvailable(DefaultMqttServerAuthHandler::new);
-		serverCreator.authHandler(authHandler);
+		authHandlerObjectProvider.ifAvailable(serverCreator::authHandler);
+		// mqtt 内唯一id
+		uniqueIdServiceObjectProvider.ifAvailable(serverCreator::uniqueIdService);
 		// 订阅校验
 		subscribeValidatorObjectProvider.ifAvailable(serverCreator::subscribeValidator);
 		// 消息转发
-		IMqttMessageDispatcher messageDispatcher = messageDispatcherObjectProvider.getIfAvailable(DefaultMqttMessageDispatcher::new);
-		serverCreator.messageDispatcher(messageDispatcher);
+		messageDispatcherObjectProvider.ifAvailable(serverCreator::messageDispatcher);
 		// 消息存储
-		IMqttMessageStore messageStore = messageStoreObjectProvider.getIfAvailable(InMemoryMqttMessageStore::new);
-		serverCreator.messageStore(messageStore);
+		messageStoreObjectProvider.ifAvailable(serverCreator::messageStore);
 		// session 管理
-		IMqttSessionManager sessionManager = sessionManagerObjectProvider.getIfAvailable(InMemoryMqttSessionManager::new);
-		serverCreator.sessionManager(sessionManager);
+		sessionManagerObjectProvider.ifAvailable(serverCreator::sessionManager);
 		// 状态监听
-		IMqttConnectStatusListener connectStatusListener = connectStatusListenerObjectProvider.getIfAvailable(DefaultMqttConnectStatusListener::new);
-		serverCreator.connectStatusListener(connectStatusListener);
+		connectStatusListenerObjectProvider.ifAvailable(serverCreator::connectStatusListener);
 		// ip 状态监听
-		IpStatListener ipStatListener = ipStatListenerObjectProvider.getIfAvailable();
-		serverCreator.ipStatListener(ipStatListener);
+		ipStatListenerObjectProvider.ifAvailable(serverCreator::ipStatListener);
 		// 自定义处理
 		customizers.ifAvailable((customizer) -> customizer.customize(serverCreator));
 		return serverCreator;

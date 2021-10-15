@@ -14,21 +14,25 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.support;
+package net.dreamlu.iot.mqtt.core.server.auth;
 
-import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import org.tio.core.ChannelContext;
 
 /**
- * 默认的认证处理
+ * mqtt 服务端唯一 id 绑定
  *
  * @author L.cm
  */
-public class DefaultMqttServerAuthHandler implements IMqttServerAuthHandler {
+public interface IMqttServerUniqueIdService {
 
-	@Override
-	public boolean authenticate(ChannelContext context, String uniqueId, String clientId, String userName, String password) {
-		return true;
-	}
+	/**
+	 * 获取 mqtt 唯一id，用来绑定 mqtt 内的 session 等功能
+	 *
+	 * @param context  ChannelContext
+	 * @param clientId clientId
+	 * @param userName userName
+	 * @return uniqueId
+	 */
+	String getUniqueId(ChannelContext context, String clientId, String userName);
 
 }

@@ -24,6 +24,7 @@ import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -56,6 +57,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttServerAuthHandler authHandler;
+	private final IMqttServerUniqueIdService uniqueIdService;
 	private final IMqttServerSubscribeValidator subscribeValidator;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
@@ -67,6 +69,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.authHandler = serverCreator.getAuthHandler();
+		this.uniqueIdService = serverCreator.getUniqueIdService();
 		this.subscribeValidator = serverCreator.getSubscribeValidator();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
@@ -77,35 +80,39 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	@Override
 	public void processConnect(ChannelContext context, MqttConnectMessage mqttMessage) {
 		MqttConnectPayload payload = mqttMessage.payload();
+		// 客户端id和用户名
 		String clientId = payload.clientIdentifier();
-		// 1. 客户端必须提供 clientId, 不管 cleanSession 是否为1, 此处没有参考标准协议实现
-		if (StrUtil.isBlank(clientId)) {
-			connAckByReturnCode(clientId, context, MqttConnectReasonCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED);
-			return;
-		}
-		// 2. 认证
 		String userName = payload.userName();
-		String password = payload.password();
-		if (!authHandler.authenticate(context, clientId, userName, password)) {
-			connAckByReturnCode(clientId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
+		// 1. 获取唯一id，用于 mqtt 内部绑定，部分用户的业务采用 userName 作为唯一id，故抽象之，默认：uniqueId == clientId
+		String uniqueId = uniqueIdService.getUniqueId(context, clientId, userName);
+		// 2. 客户端必须提供 uniqueId, 不管 cleanSession 是否为1, 此处没有参考标准协议实现
+		if (StrUtil.isBlank(uniqueId)) {
+			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED);
 			return;
 		}
-		// 3. 判断 clientId 是否在多个地方使用，如果在其他地方有使用，先解绑
-		ChannelContext otherContext = Tio.getByBsId(context.getTioConfig(), clientId);
+		// 3. 认证
+		String password = payload.password();
+		if (!authHandler.authenticate(context, uniqueId, clientId, userName, password)) {
+			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
+			return;
+		}
+		// 4. 判断 uniqueId 是否在多个地方使用，如果在其他地方有使用，先解绑
+		ChannelContext otherContext = Tio.getByBsId(context.getTioConfig(), uniqueId);
 		if (otherContext != null) {
 			Tio.unbindBsId(otherContext);
-			Tio.remove(otherContext, "clientId:" + clientId + " now bind on new context id:" + context.getId());
+			String remark = String.format("uniqueId:[%s] clientId:[%s] now bind on new context id:[%s]", uniqueId, clientId, context.getId());
+			Tio.remove(otherContext, remark);
 		}
-		// 4. 绑定 clientId
-		Tio.bindBsId(context, clientId);
+		// 5. 绑定 uniqueId
+		Tio.bindBsId(context, uniqueId);
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
-		// 5. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
+		// 6. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
 		// 2倍客户端 keepAlive 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
 		if (keepAliveSeconds > 0 && heartbeatTimeout != keepAliveSeconds * KEEP_ALIVE_UNIT) {
 			context.setHeartbeatTimeout(keepAliveSeconds * KEEP_ALIVE_UNIT);
 		}
-		// 6. session 处理，先默认全部连接关闭时清除
+		// 7. session 处理，先默认全部连接关闭时清除
 //		boolean cleanSession = variableHeader.isCleanSession();
 //		if (cleanSession) {
 //			// TODO L.cm 考虑 session 处理 可参数： https://www.emqx.com/zh/blog/mqtt-session
@@ -114,7 +121,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 //			Integer sessionExpiryInterval = properties.getPropertyValue(MqttProperties.MqttPropertyType.SESSION_EXPIRY_INTERVAL);
 //			System.out.println(sessionExpiryInterval);
 //		}
-		// 7. 存储遗嘱消息
+		// 8. 存储遗嘱消息
 		boolean willFlag = variableHeader.isWillFlag();
 		if (willFlag) {
 			Message willMessage = new Message();
@@ -123,21 +130,21 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setPayload(payload.willMessageInBytes());
 			willMessage.setQos(variableHeader.willQos());
 			willMessage.setRetain(variableHeader.isWillRetain());
-			messageStore.addWillMessage(clientId, willMessage);
+			messageStore.addWillMessage(uniqueId, willMessage);
 		}
-		// 8. 返回 ack
-		connAckByReturnCode(clientId, context, MqttConnectReasonCode.CONNECTION_ACCEPTED);
-		// 9. 在线状态
-		connectStatusListener.online(context, clientId);
+		// 9. 返回 ack
+		connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_ACCEPTED);
+		// 10. 在线状态
+		connectStatusListener.online(context, uniqueId);
 	}
 
-	private void connAckByReturnCode(String clientId, ChannelContext context, MqttConnectReasonCode returnCode) {
+	private void connAckByReturnCode(String clientId, String uniqueId, ChannelContext context, MqttConnectReasonCode returnCode) {
 		MqttConnAckMessage message = MqttMessageBuilders.connAck()
 			.returnCode(returnCode)
 			.sessionPresent(false)
 			.build();
 		Tio.send(context, message);
-		logger.info("Connect ack send - clientId: {} returnCode:{}", clientId, returnCode);
+		logger.info("Connect ack send - clientId: {} uniqueId:{} returnCode:{}", clientId, uniqueId, returnCode);
 	}
 
 	@Override
