@@ -1,7 +1,7 @@
 # 变更记录
 
 ## 发行版本
-### v1.2.0 - 2021-10-17
+### v1.1.4 - 2021-10-16
 - :sparkles: 添加 uniqueId 概念，用来处理 clientId 不唯一的场景。详见：gitee #I4DXQU
 - :sparkles: 微调 `IMqttServerAuthHandler` 认证，添加 uniqueId 参数。
 
