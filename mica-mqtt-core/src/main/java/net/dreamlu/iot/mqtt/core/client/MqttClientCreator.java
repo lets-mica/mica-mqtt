@@ -357,6 +357,8 @@ public final class MqttClientCreator {
 		tioConfig.setReadBufferSize(this.readBufferSize);
 		// 7. tioClient
 		try {
+			// 8. ssl 证书设置
+			tioConfig.setSslConfig(this.sslConfig);
 			TioClient tioClient = new TioClient(tioConfig);
 			ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
 			return new MqttClient(tioClient, this, context, clientStore, executor);
