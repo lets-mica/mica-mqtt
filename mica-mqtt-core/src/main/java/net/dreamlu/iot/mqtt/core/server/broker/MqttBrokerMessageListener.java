@@ -49,6 +49,8 @@ public class MqttBrokerMessageListener implements IMqttMessageListener {
 		ByteBuffer payload = publishMessage.payload();
 		// message
 		Message message = new Message();
+		// 注意：broker 消息转发是不需要设置 toClientId 而是应该按 topic 找到订阅的客户端进行发送
+		message.setFormClientId(clientId);
 		message.setTopic(topic);
 		message.setQos(mqttQoS.value());
 		if (payload != null) {

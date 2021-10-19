@@ -67,25 +67,29 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 
 	public void messageProcessing(Message message) {
 		MqttMessageType messageType = MqttMessageType.valueOf(message.getMessageType());
-		String clientId = message.getClientId();
 		String topic = message.getTopic();
 		if (MqttMessageType.PUBLISH == messageType) {
 			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
 			boolean retain = message.isRetain();
+			// 消息需要发送到的客户端
+			String clientId = message.getToClientId();
+			// TODO L.cm 待添加处理逻辑 https://gitee.com/596392912/mica-mqtt/issues/I4ECEO
 			if (StringUtil.isBlank(clientId)) {
 				mqttServer.publishAll(topic, ByteBuffer.wrap(message.getPayload()), mqttQoS, retain);
 			} else {
 				mqttServer.publish(clientId, topic, ByteBuffer.wrap(message.getPayload()), mqttQoS, retain);
 			}
 		} else if (MqttMessageType.SUBSCRIBE == messageType) {
-			ChannelContext context = mqttServer.getChannelContext(clientId);
+			String formClientId = message.getFormClientId();
+			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
-				sessionManager.addSubscribe(topic, clientId, message.getQos());
+				sessionManager.addSubscribe(topic, formClientId, message.getQos());
 			}
 		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
-			ChannelContext context = mqttServer.getChannelContext(clientId);
+			String formClientId = message.getFormClientId();
+			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
-				sessionManager.removeSubscribe(topic, clientId);
+				sessionManager.removeSubscribe(topic, formClientId);
 			}
 		}
 	}

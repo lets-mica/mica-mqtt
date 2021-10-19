@@ -109,7 +109,7 @@ public class MqttHttpApi {
 		String payload = form.getPayload();
 		Message message = new Message();
 		message.setMessageType(MqttMessageType.PUBLISH.value());
-		message.setClientId(form.getClientId());
+		message.setToClientId(form.getClientId());
 		message.setTopic(form.getTopic());
 		message.setQos(form.getQos());
 		message.setRetain(form.isRetain());
@@ -146,7 +146,7 @@ public class MqttHttpApi {
 			return Result.fail(response, ResultCode.E101);
 		}
 		// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
-		sendSubscribe(form);
+		sendSubOrUnSubscribe(form);
 		return Result.ok(response);
 	}
 
@@ -182,7 +182,7 @@ public class MqttHttpApi {
 		// 批量处理
 		for (SubscribeForm form : formList) {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
-			sendSubscribe(form);
+			sendSubOrUnSubscribe(form);
 		}
 		return Result.ok(response);
 	}
@@ -209,7 +209,7 @@ public class MqttHttpApi {
 			return validResponse;
 		}
 		// 接口手动取消的订阅关系，可用来调试，不建议其他场景使用
-		sendSubscribe(form);
+		sendSubOrUnSubscribe(form);
 		return Result.ok(response);
 	}
 
@@ -241,14 +241,14 @@ public class MqttHttpApi {
 		// 批量处理
 		for (BaseForm form : formList) {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
-			sendSubscribe(form);
+			sendSubOrUnSubscribe(form);
 		}
 		return Result.ok(response);
 	}
 
-	private void sendSubscribe(BaseForm form) {
+	private void sendSubOrUnSubscribe(BaseForm form) {
 		Message message = new Message();
-		message.setClientId(form.getClientId());
+		message.setFormClientId(form.getClientId());
 		message.setTopic(form.getTopic());
 		if (form instanceof SubscribeForm) {
 			message.setQos(((SubscribeForm) form).getQos());

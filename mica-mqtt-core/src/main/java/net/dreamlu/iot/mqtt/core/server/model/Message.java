@@ -30,7 +30,11 @@ public class Message implements Serializable {
 	/**
 	 * 客户端 id
 	 */
-	private String clientId;
+	private String formClientId;
+	/**
+	 * 主要是在遗嘱消息用
+	 */
+	private String toClientId;
 	/**
 	 * 消息类型
 	 */
@@ -60,12 +64,20 @@ public class Message implements Serializable {
 	 */
 	private long timestamp;
 
-	public String getClientId() {
-		return clientId;
+	public String getFormClientId() {
+		return formClientId;
 	}
 
-	public void setClientId(String clientId) {
-		this.clientId = clientId;
+	public void setFormClientId(String formClientId) {
+		this.formClientId = formClientId;
+	}
+
+	public String getToClientId() {
+		return toClientId;
+	}
+
+	public void setToClientId(String toClientId) {
+		this.toClientId = toClientId;
 	}
 
 	public int getMessageType() {
@@ -133,19 +145,20 @@ public class Message implements Serializable {
 			return false;
 		}
 		Message message = (Message) o;
-		return messageType == message.messageType &&
-			qos == message.qos &&
-			retain == message.retain &&
-			dup == message.dup &&
-			timestamp == message.timestamp &&
-			Objects.equals(clientId, message.clientId) &&
-			Objects.equals(topic, message.topic) &&
-			Arrays.equals(payload, message.payload);
+		return messageType == message.messageType
+			&& qos == message.qos
+			&& retain == message.retain
+			&& dup == message.dup
+			&& timestamp == message.timestamp
+			&& Objects.equals(formClientId, message.formClientId)
+			&& Objects.equals(toClientId, message.toClientId)
+			&& Objects.equals(topic, message.topic)
+			&& Arrays.equals(payload, message.payload);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash(clientId, messageType, topic, qos, retain, dup, timestamp);
+		int result = Objects.hash(formClientId, toClientId, messageType, topic, qos, retain, dup, timestamp);
 		result = 31 * result + Arrays.hashCode(payload);
 		return result;
 	}
@@ -153,7 +166,8 @@ public class Message implements Serializable {
 	@Override
 	public String toString() {
 		return "Message{" +
-			"clientId='" + clientId + '\'' +
+			"formClientId='" + formClientId + '\'' +
+			", toClientId='" + toClientId + '\'' +
 			", messageType=" + messageType +
 			", topic='" + topic + '\'' +
 			", qos=" + qos +

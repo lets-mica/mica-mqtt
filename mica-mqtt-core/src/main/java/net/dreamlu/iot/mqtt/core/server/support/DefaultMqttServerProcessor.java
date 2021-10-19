@@ -126,6 +126,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		if (willFlag) {
 			Message willMessage = new Message();
 			willMessage.setMessageType(MqttMessageType.PUBLISH.value());
+			willMessage.setFormClientId(uniqueId);
 			willMessage.setTopic(payload.willTopic());
 			willMessage.setPayload(payload.willMessageInBytes());
 			willMessage.setQos(variableHeader.willQos());
@@ -350,7 +351,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				retainMessage.setTopic(topicName);
 				retainMessage.setQos(mqttQoS.value());
 				retainMessage.setPayload(payload.array());
-				retainMessage.setClientId(clientId);
+				retainMessage.setFormClientId(clientId);
 				retainMessage.setMessageType(MqttMessageType.PUBLISH.value());
 				retainMessage.setRetain(true);
 				retainMessage.setDup(fixedHeader.isDup());
