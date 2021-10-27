@@ -13,14 +13,15 @@
 
     <properties>
         <!-- mica-mqtt version -->
-        <revision>1.1.4</revision>
+        <revision>1.1.5-SNAPSHOT</revision>
         <!-- java version -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- tio version -->
-        <tio.version>3.7.4.v20210808-RELEASE</tio.version>
-        <spring.boot.version>2.5.5</spring.boot.version>
+        <tio.version>3.7.5.v20211028-RELEASE</tio.version>
+        <spring.boot.version>2.5.6</spring.boot.version>
+        <mica.version>2.5.6</mica.version>
     </properties>
 
     <modules>

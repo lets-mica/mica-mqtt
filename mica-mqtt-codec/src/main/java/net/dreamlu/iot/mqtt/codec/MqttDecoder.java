@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.codec;
 
 import org.tio.core.ChannelContext;
-import org.tio.core.exception.AioDecodeException;
 import org.tio.core.exception.TioDecodeException;
 
 import java.nio.ByteBuffer;
@@ -65,7 +64,7 @@ public final class MqttDecoder {
 		// 2. 解码异常
 		DecoderResult decoderResult = message.decoderResult();
 		if (decoderResult.isFailure()) {
-			throw new AioDecodeException(decoderResult.getCause());
+			throw new TioDecodeException(decoderResult.getCause());
 		}
 		return message;
 	}
