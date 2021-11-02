@@ -21,6 +21,7 @@ import net.dreamlu.iot.mqtt.broker.cluster.RedisMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.broker.cluster.RedisMqttMessageReceiver;
 import net.dreamlu.iot.mqtt.broker.cluster.RedisMqttMessageStore;
 import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
+import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.broker.MqttBrokerMessageListener;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
@@ -50,8 +51,9 @@ public class MqttBrokerConfiguration {
 
 	@Bean
 	public RedisMqttMessageReceiver mqttMessageReceiver(MicaRedisCache redisCache,
-														MqttServer mqttServer) {
-		return new RedisMqttMessageReceiver(redisCache, RedisKeys.REDIS_CHANNEL.getKey(), mqttServer);
+														MqttServer mqttServer,
+														IMqttMessageService mqttMessageService) {
+		return new RedisMqttMessageReceiver(redisCache, RedisKeys.REDIS_CHANNEL.getKey(), mqttServer, mqttMessageService);
 	}
 
 	@Bean
