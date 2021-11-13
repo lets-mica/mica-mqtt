@@ -96,6 +96,10 @@ public class MqttServerProperties {
 	 * http basic auth
 	 */
 	private HttpBasicAuth httpBasicAuth = new HttpBasicAuth();
+	/**
+	 * 节点名称，用于处理集群
+	 */
+	private String nodeName;
 
 	@Getter
 	@Setter

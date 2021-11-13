@@ -31,6 +31,7 @@
 | mqtt.server.http-basic-auth.enable | false | 是否启用，默认：关闭 |
 | mqtt.server.http-basic-auth.password |  | http Basic 认证密码 |
 | mqtt.server.http-basic-auth.username |  | http Basic 认证账号 |
+| mqtt.server.node-name | pid@ip:port | 集群节点名 |
 
 ### 2.2 配置项示例
 

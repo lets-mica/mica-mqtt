@@ -74,7 +74,8 @@ public class MqttServerConfiguration {
 			.maxClientIdLength(properties.getMaxClientIdLength())
 			.webPort(properties.getWebPort())
 			.websocketEnable(properties.isWebsocketEnable())
-			.httpEnable(properties.isHttpEnable());
+			.httpEnable(properties.isHttpEnable())
+			.nodeName(properties.getNodeName());
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}
