@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.core.server.event;
 import net.dreamlu.iot.mqtt.codec.MqttFixedHeader;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import org.tio.core.ChannelContext;
 
 import java.nio.ByteBuffer;
 
@@ -36,20 +37,6 @@ public interface IMqttMessageListener {
 	 * @param clientId clientId
 	 * @param message  MqttPublishMessage
 	 */
-	default void onMessage(String clientId, MqttPublishMessage message) {
-		MqttFixedHeader fixedHeader = message.fixedHeader();
-		String topic = message.variableHeader().topicName();
-		onMessage(clientId, topic, fixedHeader.qosLevel(), message.payload());
-	}
-
-	/**
-	 * 监听到消息
-	 *
-	 * @param clientId clientId
-	 * @param topic    topic
-	 * @param mqttQoS  MqttQoS
-	 * @param payload  payload
-	 */
-	void onMessage(String clientId, String topic, MqttQoS mqttQoS, ByteBuffer payload);
+	void onMessage(ChannelContext context, String clientId, MqttPublishMessage message);
 
 }

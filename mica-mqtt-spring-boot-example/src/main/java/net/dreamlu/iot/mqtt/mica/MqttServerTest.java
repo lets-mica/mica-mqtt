@@ -45,8 +45,8 @@ public class MqttServerTest {
 			.readBufferSize(512)
 			// 关闭 websocket，避免和 spring boot 启动的冲突
 			.websocketEnable(false)
-			.messageListener((clientId, topic, mqttQoS, payload) -> {
-				logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));
+			.messageListener((context, clientId, message) -> {
+				logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.payload()));
 			})
 			.debug() // 开启 debug 信息日志
 			.start();

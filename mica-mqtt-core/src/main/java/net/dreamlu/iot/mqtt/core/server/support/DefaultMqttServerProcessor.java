@@ -34,6 +34,7 @@ import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
+import org.tio.core.Node;
 import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
@@ -127,10 +128,15 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			Message willMessage = new Message();
 			willMessage.setMessageType(MqttMessageType.PUBLISH.value());
 			willMessage.setFromClientId(uniqueId);
+			willMessage.setFromUsername(userName);
 			willMessage.setTopic(payload.willTopic());
 			willMessage.setPayload(payload.willMessageInBytes());
 			willMessage.setQos(variableHeader.willQos());
 			willMessage.setRetain(variableHeader.isWillRetain());
+			willMessage.setTimestamp(System.currentTimeMillis());
+			Node clientNode = context.getClientNode();
+			// 客户端 ip:端口
+			willMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
 			messageStore.addWillMessage(uniqueId, willMessage);
 		}
 		// 9. 返回 ack
@@ -159,10 +165,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		logger.debug("Publish - clientId:{} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
 		switch (mqttQoS) {
 			case AT_MOST_ONCE:
-				invokeListenerForPublish(clientId, mqttQoS, topicName, message);
+				invokeListenerForPublish(context, clientId, mqttQoS, topicName, message);
 				break;
 			case AT_LEAST_ONCE:
-				invokeListenerForPublish(clientId, mqttQoS, topicName, message);
+				invokeListenerForPublish(context, clientId, mqttQoS, topicName, message);
 				if (packetId != -1) {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck()
 						.packetId(packetId)
@@ -232,7 +238,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			String topicName = incomingPublish.variableHeader().topicName();
 			MqttFixedHeader incomingFixedHeader = incomingPublish.fixedHeader();
 			MqttQoS mqttQoS = incomingFixedHeader.qosLevel();
-			invokeListenerForPublish(clientId, mqttQoS, topicName, incomingPublish);
+			invokeListenerForPublish(context, clientId, mqttQoS, topicName, incomingPublish);
 			pendingQos2Publish.onPubRelReceived();
 			sessionManager.removePendingQos2Publish(clientId, messageId);
 		}
@@ -333,11 +339,13 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	/**
 	 * 处理订阅的消息
 	 *
+	 * @param context   ChannelContext
 	 * @param clientId  clientId
 	 * @param topicName topicName
 	 * @param message   MqttPublishMessage
 	 */
-	private void invokeListenerForPublish(String clientId, MqttQoS mqttQoS, String topicName, MqttPublishMessage message) {
+	private void invokeListenerForPublish(ChannelContext context, String clientId, MqttQoS mqttQoS,
+										  String topicName, MqttPublishMessage message) {
 		MqttFixedHeader fixedHeader = message.fixedHeader();
 		boolean isRetain = fixedHeader.isRetain();
 		ByteBuffer payload = message.payload();
@@ -356,12 +364,15 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				retainMessage.setRetain(true);
 				retainMessage.setDup(fixedHeader.isDup());
 				retainMessage.setTimestamp(System.currentTimeMillis());
+				Node clientNode = context.getClientNode();
+				// 客户端 ip:端口
+				retainMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
 				this.messageStore.addRetainMessage(topicName, retainMessage);
 			}
 		}
 		// 2. 消息发布
 		try {
-			messageListener.onMessage(clientId, message);
+			messageListener.onMessage(context, clientId, message);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
