@@ -63,6 +63,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final IMqttMessageListener messageListener;
+	private final String nodeName;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
@@ -75,6 +76,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 		this.messageListener = serverCreator.getMessageListener();
+		this.nodeName = serverCreator.getNodeName();
 		this.executor = executor;
 	}
 
@@ -137,6 +139,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			Node clientNode = context.getClientNode();
 			// 客户端 ip:端口
 			willMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+			willMessage.setNode(nodeName);
 			messageStore.addWillMessage(uniqueId, willMessage);
 		}
 		// 9. 返回 ack
@@ -339,16 +342,16 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	/**
 	 * 处理订阅的消息
 	 *
-	 * @param context   ChannelContext
-	 * @param clientId  clientId
-	 * @param topicName topicName
-	 * @param message   MqttPublishMessage
+	 * @param context        ChannelContext
+	 * @param clientId       clientId
+	 * @param topicName      topicName
+	 * @param publishMessage MqttPublishMessage
 	 */
 	private void invokeListenerForPublish(ChannelContext context, String clientId, MqttQoS mqttQoS,
-										  String topicName, MqttPublishMessage message) {
-		MqttFixedHeader fixedHeader = message.fixedHeader();
+										  String topicName, MqttPublishMessage publishMessage) {
+		MqttFixedHeader fixedHeader = publishMessage.fixedHeader();
 		boolean isRetain = fixedHeader.isRetain();
-		ByteBuffer payload = message.payload();
+		ByteBuffer payload = publishMessage.payload();
 		// 1. retain 消息逻辑
 		if (isRetain) {
 			// qos == 0 or payload is none,then clear previous retain message
@@ -367,10 +370,32 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				Node clientNode = context.getClientNode();
 				// 客户端 ip:端口
 				retainMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+				retainMessage.setNode(nodeName);
 				this.messageStore.addRetainMessage(topicName, retainMessage);
 			}
 		}
-		// 2. 消息发布
+		// 2. message
+		MqttPublishVariableHeader variableHeader = publishMessage.variableHeader();
+		// messageId
+		int packetId = variableHeader.packetId();
+		Message message = new Message();
+		message.setId(packetId);
+		// 注意：broker 消息转发是不需要设置 toClientId 而是应该按 topic 找到订阅的客户端进行发送
+		message.setFromClientId(clientId);
+		message.setTopic(topicName);
+		message.setQos(mqttQoS.value());
+		if (payload != null) {
+			message.setPayload(payload.array());
+		}
+		message.setMessageType(MqttMessageType.PUBLISH.value());
+		message.setRetain(fixedHeader.isRetain());
+		message.setDup(fixedHeader.isDup());
+		message.setTimestamp(System.currentTimeMillis());
+		Node clientNode = context.getClientNode();
+		// 客户端 ip:端口
+		message.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+		message.setNode(nodeName);
+		// 3. 消息发布
 		try {
 			messageListener.onMessage(context, clientId, message);
 		} catch (Throwable e) {

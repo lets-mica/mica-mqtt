@@ -41,6 +41,7 @@ import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -147,6 +148,10 @@ public class MqttServerCreator {
 	 * http Basic 认证密码
 	 */
 	private String httpBasicPassword;
+	/**
+	 * 节点名称，用于处理集群
+	 */
+	private String nodeName;
 
 	public String getName() {
 		return name;
@@ -379,6 +384,15 @@ public class MqttServerCreator {
 		return httpBasicPassword;
 	}
 
+	public String getNodeName() {
+		return nodeName;
+	}
+
+	public MqttServerCreator nodeName(String nodeName) {
+		this.nodeName = nodeName;
+		return this;
+	}
+
 	public MqttServer build() {
 		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		if (this.authHandler == null) {
@@ -419,6 +433,10 @@ public class MqttServerCreator {
 		}
 		if (this.debug) {
 			tioConfig.debug = true;
+		}
+		// 默认的节点名称，用于集群
+		if (StrUtil.isBlank(this.nodeName)) {
+			this.nodeName = ManagementFactory.getRuntimeMXBean().getName() + ':' + port;
 		}
 		// 5. mqtt 消息最大长度
 		tioConfig.setReadBufferSize(this.readBufferSize);
