@@ -72,13 +72,13 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 		if (MqttMessageType.PUBLISH == messageType) {
 			messageService.publishProcessing(message);
 		} else if (MqttMessageType.SUBSCRIBE == messageType) {
-			String formClientId = message.getFormClientId();
+			String formClientId = message.getFromClientId();
 			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
 				sessionManager.addSubscribe(topic, formClientId, message.getQos());
 			}
 		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
-			String formClientId = message.getFormClientId();
+			String formClientId = message.getFromClientId();
 			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
 				sessionManager.removeSubscribe(topic, formClientId);

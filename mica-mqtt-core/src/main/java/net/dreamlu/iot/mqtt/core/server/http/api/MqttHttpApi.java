@@ -109,7 +109,7 @@ public class MqttHttpApi {
 		String payload = form.getPayload();
 		Message message = new Message();
 		message.setMessageType(MqttMessageType.PUBLISH.value());
-		message.setToClientId(form.getClientId());
+		message.setClientId(form.getClientId());
 		message.setTopic(form.getTopic());
 		message.setQos(form.getQos());
 		message.setRetain(form.isRetain());
@@ -248,7 +248,7 @@ public class MqttHttpApi {
 
 	private void sendSubOrUnSubscribe(BaseForm form) {
 		Message message = new Message();
-		message.setFormClientId(form.getClientId());
+		message.setFromClientId(form.getClientId());
 		message.setTopic(form.getTopic());
 		if (form instanceof SubscribeForm) {
 			message.setQos(((SubscribeForm) form).getQos());

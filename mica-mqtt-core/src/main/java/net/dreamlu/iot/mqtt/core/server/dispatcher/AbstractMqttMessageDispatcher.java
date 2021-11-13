@@ -69,9 +69,9 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 			MqttQoS qoS = MqttQoS.valueOf(message.getQos());
 			mqttServer.publishAll(message.getTopic(), payload, qoS, message.isRetain());
 		} else if (MqttMessageType.SUBSCRIBE == messageType) {
-			sessionManager.addSubscribe(message.getTopic(), message.getFormClientId(), message.getQos());
+			sessionManager.addSubscribe(message.getTopic(), message.getFromClientId(), message.getQos());
 		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
-			sessionManager.removeSubscribe(message.getTopic(), message.getFormClientId());
+			sessionManager.removeSubscribe(message.getTopic(), message.getFromClientId());
 		}
 		return sendAll(message);
 	}

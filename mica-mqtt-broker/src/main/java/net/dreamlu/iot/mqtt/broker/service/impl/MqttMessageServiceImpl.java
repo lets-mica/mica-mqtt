@@ -42,7 +42,7 @@ public class MqttMessageServiceImpl implements IMqttMessageService {
 		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
 		boolean retain = message.isRetain();
 		// 消息需要发送到的客户端
-		String clientId = message.getToClientId();
+		String clientId = message.getClientId();
 		// TODO L.cm 待添加处理逻辑 https://gitee.com/596392912/mica-mqtt/issues/I4ECEO
 		// TODO L.cm 示例是将消息转发给订阅的客户端，可对接规则引擎
 		if (StringUtil.isBlank(clientId)) {
