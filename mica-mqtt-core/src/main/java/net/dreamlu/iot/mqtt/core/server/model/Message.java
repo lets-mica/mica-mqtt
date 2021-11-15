@@ -17,7 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server.model;
 
 import java.io.Serializable;
-import java.util.Arrays;
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -69,7 +69,7 @@ public class Message implements Serializable {
 	/**
 	 * 消息内容
 	 */
-	private byte[] payload;
+	private ByteBuffer payload;
 	/**
 	 * 客户端的 IPAddress
 	 */
@@ -167,11 +167,11 @@ public class Message implements Serializable {
 		this.dup = dup;
 	}
 
-	public byte[] getPayload() {
+	public ByteBuffer getPayload() {
 		return payload;
 	}
 
-	public void setPayload(byte[] payload) {
+	public void setPayload(ByteBuffer payload) {
 		this.payload = payload;
 	}
 
@@ -209,17 +209,19 @@ public class Message implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		Message message = (Message) o;
-		return messageType == message.messageType && qos == message.qos && retain == message.retain && dup == message.dup && timestamp == message.timestamp && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && Arrays.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt) && Objects.equals(node, message.node);
+		return messageType == message.messageType && qos == message.qos && retain == message.retain && dup == message.dup && timestamp == message.timestamp && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && Objects.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt) && Objects.equals(node, message.node);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = Objects.hash(id, fromClientId, fromUsername, clientId, username, messageType, topic, qos, retain, dup, peerHost, timestamp, publishReceivedAt, node);
-		result = 31 * result + Arrays.hashCode(payload);
-		return result;
+		return Objects.hash(id, fromClientId, fromUsername, clientId, username, messageType, topic, qos, retain, dup, payload, peerHost, timestamp, publishReceivedAt, node);
 	}
 
 	@Override
@@ -235,7 +237,7 @@ public class Message implements Serializable {
 			", qos=" + qos +
 			", retain=" + retain +
 			", dup=" + dup +
-			", payload=" + Arrays.toString(payload) +
+			", payload=" + payload +
 			", peerHost='" + peerHost + '\'' +
 			", timestamp=" + timestamp +
 			", publishReceivedAt=" + publishReceivedAt +

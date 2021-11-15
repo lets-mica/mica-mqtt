@@ -132,7 +132,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setFromClientId(uniqueId);
 			willMessage.setFromUsername(userName);
 			willMessage.setTopic(payload.willTopic());
-			willMessage.setPayload(payload.willMessageInBytes());
+			byte[] willMessageInBytes = payload.willMessageInBytes();
+			if (willMessageInBytes != null) {
+				willMessage.setPayload(ByteBuffer.wrap(willMessageInBytes));
+			}
 			willMessage.setQos(variableHeader.willQos());
 			willMessage.setRetain(variableHeader.isWillRetain());
 			willMessage.setTimestamp(System.currentTimeMillis());
@@ -361,7 +364,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				Message retainMessage = new Message();
 				retainMessage.setTopic(topicName);
 				retainMessage.setQos(mqttQoS.value());
-				retainMessage.setPayload(payload.array());
+				retainMessage.setPayload(payload);
 				retainMessage.setFromClientId(clientId);
 				retainMessage.setMessageType(MqttMessageType.PUBLISH.value());
 				retainMessage.setRetain(true);
@@ -385,7 +388,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		message.setTopic(topicName);
 		message.setQos(mqttQoS.value());
 		if (payload != null) {
-			message.setPayload(payload.array());
+			message.setPayload(payload);
 		}
 		message.setMessageType(MqttMessageType.PUBLISH.value());
 		message.setRetain(fixedHeader.isRetain());

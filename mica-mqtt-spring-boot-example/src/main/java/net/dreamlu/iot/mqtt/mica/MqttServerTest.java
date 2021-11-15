@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.mica;
 
+import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.slf4j.Logger;
@@ -45,7 +46,7 @@ public class MqttServerTest {
 			// 关闭 websocket，避免和 spring boot 启动的冲突
 			.websocketEnable(false)
 			.messageListener((context, clientId, message) -> {
-				logger.info("clientId:{} message:{} payload:{}", clientId, message, new String(message.getPayload()));
+				logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
 			})
 			.debug() // 开启 debug 信息日志
 			.start();

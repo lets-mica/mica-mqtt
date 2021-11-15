@@ -25,7 +25,6 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -65,9 +64,8 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 		// 1. 先发送到本服务
 		MqttMessageType messageType = MqttMessageType.valueOf(message.getMessageType());
 		if (MqttMessageType.PUBLISH == messageType) {
-			ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
 			MqttQoS qoS = MqttQoS.valueOf(message.getQos());
-			mqttServer.publishAll(message.getTopic(), payload, qoS, message.isRetain());
+			mqttServer.publishAll(message.getTopic(), message.getPayload(), qoS, message.isRetain());
 		} else if (MqttMessageType.SUBSCRIBE == messageType) {
 			sessionManager.addSubscribe(message.getTopic(), message.getFromClientId(), message.getQos());
 		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
@@ -83,9 +81,8 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 		ServerTioConfig config = this.mqttServer.getServerConfig();
 		ChannelContext context = Tio.getByBsId(config, clientId);
 		if (context != null) {
-			ByteBuffer payload = ByteBuffer.wrap(message.getPayload());
 			MqttQoS qoS = MqttQoS.valueOf(message.getQos());
-			return this.mqttServer.publish(context, clientId, message.getTopic(), payload, qoS, false);
+			return this.mqttServer.publish(context, clientId, message.getTopic(), message.getPayload(), qoS, false);
 		}
 		return this.sendTo(clientId, message);
 	}
