@@ -28,6 +28,7 @@ import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -40,8 +41,9 @@ import org.springframework.context.annotation.Configuration;
 public class MqttBrokerConfiguration {
 
 	@Bean
-	public IMqttConnectStatusListener mqttBrokerConnectListener(MicaRedisCache redisCache) {
-		return new RedisMqttConnectStatusListener(redisCache, RedisKeys.CONNECT_STATUS.getKey());
+	public IMqttConnectStatusListener mqttBrokerConnectListener(ApplicationContext context,
+																MicaRedisCache redisCache) {
+		return new RedisMqttConnectStatusListener(context, redisCache, RedisKeys.CONNECT_STATUS.getKey());
 	}
 
 	@Bean
