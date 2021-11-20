@@ -37,7 +37,7 @@ public class MqttServerTest {
 	public static void main(String[] args) {
 		// 注意：为了能接受更多链接（降低内存），请添加 jvm 参数 -Xss129k
 		MqttServer mqttServer = MqttServer.create()
-			// 服务端 ip 默认为空，0.0.0.0
+			// 服务端 ip 默认为空，0.0.0.0，建议不要设置
 			.ip("0.0.0.0")
 			// 默认：1883
 			.port(3883)

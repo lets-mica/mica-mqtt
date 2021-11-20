@@ -1,7 +1,7 @@
 mqtt:
   server:
     enabled: true               # 是否开启服务端，默认：true
-#    ip: 0.0.0.0                 # 服务端 ip 默认为空，0.0.0.0
+#    ip: 0.0.0.0                 # 服务端 ip 默认为空，0.0.0.0，建议不要设置
     port: 1883                  # 端口，默认：1883
     name: Mica-Mqtt-Server      # 名称，默认：Mica-Mqtt-Server
     buffer-allocator: HEAP      # 堆内存和堆外内存，默认：堆内存
