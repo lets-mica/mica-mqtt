@@ -1,6 +1,20 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.0 - 2021-11-28
+- :sparkles: mica-core IMqttMessageListener 接口调整，不兼容老版本。
+- :sparkles: mica-mqtt-broker 添加节点管理。
+- :sparkles: mica-mqtt-broker 调整默认的 Message 序列化方式，不兼容老版本。
+- :sparkles: mica-mqtt-broker 优化设备上下线，处理节点停机的情况。
+- :sparkles: 抽取 mica-mqtt-model 模块，方便后期支持消息桥接，Message 添加默认的消息序列化。
+- :sparkles: mica-mqtt-model 完善 Message 消息模型，方便集群。
+- :sparkles: 优化 broker 集群对业务的处理能力。 gitee #I4ECEO
+- :sparkles: 优化 broker 集群对业务的处理能力。 gitee #I4ECEO
+- :bug: mica-mqtt-core MqttClient 修复 ssl 没有设置。
+- :memo: 统一 mica-mqtt server ip 文档。
+- :memo: 更新 README.md
+- :arrow_up: 升级 tio 到 3.7.5.v20211028-RELEASE AioDecodeException 改为 TioDecodeException，
+
 ### v1.1.4 - 2021-10-16
 - :sparkles: 添加 uniqueId 概念，用来处理 clientId 不唯一的场景。详见：gitee #I4DXQU
 - :sparkles: 微调 `IMqttServerAuthHandler` 认证，添加 uniqueId 参数。
