@@ -29,6 +29,10 @@ import lombok.RequiredArgsConstructor;
 public enum RedisKeys {
 
 	/**
+	 * mqtt 服务端节点
+	 */
+	SERVER_NODES("mqtt:server:nodes"),
+	/**
 	 * mqtt <-> redis pug/sub 消息交互
 	 */
 	REDIS_CHANNEL("mqtt:channel:exchange"),
