@@ -26,6 +26,7 @@
 
     <modules>
         <module>mica-mqtt-codec</module>
+        <module>mica-mqtt-model</module>
         <module>mica-mqtt-core</module>
         <module>mica-mqtt-spring-boot-starter</module>
         <module>mica-mqtt-example</module>
@@ -48,6 +49,11 @@
             <dependency>
                 <groupId>net.dreamlu</groupId>
                 <artifactId>mica-mqtt-codec</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-mqtt-model</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
