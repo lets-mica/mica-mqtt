@@ -25,7 +25,7 @@ import net.dreamlu.iot.mqtt.core.server.model.Message;
  */
 public interface IMessageSerializer {
 
-    /**
+	/**
 	 * 消息序列化
 	 *
 	 * @param message Message
@@ -36,9 +36,9 @@ public interface IMessageSerializer {
 	/**
 	 * 消息反序列化
 	 *
-	 * @param bytes byte array
+	 * @param data byte array
 	 * @return Message
 	 */
-	Message deserialize(byte[] bytes);
+	Message deserialize(byte[] data);
 
 }
