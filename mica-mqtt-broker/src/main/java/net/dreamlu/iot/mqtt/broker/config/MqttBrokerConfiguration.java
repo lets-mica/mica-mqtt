@@ -26,6 +26,8 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.broker.MqttBrokerMessageListener;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.serializer.DefaultMessageSerializer;
+import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.context.ApplicationContext;
@@ -41,26 +43,33 @@ import org.springframework.context.annotation.Configuration;
 public class MqttBrokerConfiguration {
 
 	@Bean
+	public IMessageSerializer messageSerializer() {
+		return DefaultMessageSerializer.INSTANCE;
+	}
+
+	@Bean
 	public IMqttConnectStatusListener mqttBrokerConnectListener(ApplicationContext context,
 																MicaRedisCache redisCache) {
 		return new RedisMqttConnectStatusListener(context, redisCache, RedisKeys.CONNECT_STATUS.getKey());
 	}
 
 	@Bean
-	public IMqttMessageStore mqttMessageStore(MicaRedisCache redisCache) {
-		return new RedisMqttMessageStore(redisCache);
+	public IMqttMessageStore mqttMessageStore(MicaRedisCache redisCache, IMessageSerializer messageSerializer) {
+		return new RedisMqttMessageStore(redisCache, messageSerializer);
 	}
 
 	@Bean
 	public RedisMqttMessageReceiver mqttMessageReceiver(MicaRedisCache redisCache,
+														IMessageSerializer messageSerializer,
 														MqttServer mqttServer,
 														IMqttMessageService mqttMessageService) {
-		return new RedisMqttMessageReceiver(redisCache, RedisKeys.REDIS_CHANNEL.getKey(), mqttServer, mqttMessageService);
+		return new RedisMqttMessageReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL.getKey(), mqttServer, mqttMessageService);
 	}
 
 	@Bean
-	public IMqttMessageDispatcher mqttMessageDispatcher(MicaRedisCache redisCache) {
-		return new RedisMqttMessageDispatcher(redisCache, RedisKeys.REDIS_CHANNEL.getKey());
+	public IMqttMessageDispatcher mqttMessageDispatcher(MicaRedisCache redisCache,
+														IMessageSerializer messageSerializer) {
+		return new RedisMqttMessageDispatcher(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL.getKey());
 	}
 
 	@Bean

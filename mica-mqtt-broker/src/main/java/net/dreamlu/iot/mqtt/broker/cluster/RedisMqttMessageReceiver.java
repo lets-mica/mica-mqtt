@@ -20,6 +20,7 @@ import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
 import net.dreamlu.iot.mqtt.codec.MqttMessageType;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.mica.core.utils.JsonUtil;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
@@ -39,16 +40,19 @@ import java.util.Objects;
  */
 public class RedisMqttMessageReceiver implements MessageListener, InitializingBean {
 	private final RedisTemplate<String, Object> redisTemplate;
+	private final IMessageSerializer messageSerializer;
 	private final String channel;
 	private final MqttServer mqttServer;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageService messageService;
 
 	public RedisMqttMessageReceiver(MicaRedisCache redisCache,
+									IMessageSerializer messageSerializer,
 									String channel,
 									MqttServer mqttServer,
 									IMqttMessageService messageService) {
 		this.redisTemplate = redisCache.getRedisTemplate();
+		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.mqttServer = mqttServer;
 		this.sessionManager = mqttServer.getServerCreator().getSessionManager();
@@ -59,7 +63,7 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 	public void onMessage(org.springframework.data.redis.connection.Message message, byte[] bytes) {
 		byte[] messageBody = message.getBody();
 		// 手动序列化和反序列化，避免 redis 序列化不一致问题
-		Message mqttMessage = JsonUtil.readValue(messageBody, Message.class);
+		Message mqttMessage = messageSerializer.deserialize(messageBody);
 		if (mqttMessage == null) {
 			return;
 		}
