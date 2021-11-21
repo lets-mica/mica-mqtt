@@ -24,6 +24,8 @@ import net.dreamlu.mica.core.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.nio.ByteBuffer;
+
 /**
  * mqtt 消息服务，用于自定义业务
  *
@@ -41,12 +43,13 @@ public class MqttMessageServiceImpl implements IMqttMessageService {
 		boolean retain = message.isRetain();
 		// 消息需要发送到的客户端
 		String clientId = message.getClientId();
+		ByteBuffer payload = message.getPayload();
 		// TODO L.cm 待添加处理逻辑 https://gitee.com/596392912/mica-mqtt/issues/I4ECEO
 		// TODO L.cm 示例是将消息转发给订阅的客户端，可对接规则引擎
 		if (StringUtil.isBlank(clientId)) {
-			mqttServer.publishAll(topic, message.getPayload(), mqttQoS, retain);
+			mqttServer.publishAll(topic, payload, mqttQoS, retain);
 		} else {
-			mqttServer.publish(clientId, topic, message.getPayload(), mqttQoS, retain);
+			mqttServer.publish(clientId, topic, payload, mqttQoS, retain);
 		}
 	}
 

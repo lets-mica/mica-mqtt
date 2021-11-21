@@ -176,7 +176,12 @@ public final class MqttServer {
 	public boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
-		payload.rewind();
+		// 下行 payload 为空时，构造一个空结构体
+		if (payload == null) {
+			payload = ByteBuffer.allocate(0);
+		} else {
+			payload.rewind();
+		}
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)
@@ -244,6 +249,10 @@ public final class MqttServer {
 		if (subscribeList.isEmpty()) {
 			logger.warn("Mqtt Topic:{} publishAll but subscribe client list is empty.", topic);
 			return false;
+		}
+		// 下行 payload 为空时，构造一个空结构体
+		if (payload == null) {
+			payload = ByteBuffer.allocate(0);
 		}
 		for (Subscribe subscribe : subscribeList) {
 			String clientId = subscribe.getClientId();
