@@ -8,6 +8,10 @@
 - 基于 redis 实现客户端状态存储。
 - 基于 redis 实现遗嘱、保留消息存储。
 
+## 二开说明
+- 修改 auth 包下的 MqttAuthHandler、MqttSubscribeValidator 和 MqttHttpAuthFilter 认证实现。
+- 在 MqttMessageServiceImpl 中添加业务逻辑。
+
 ## 依赖文档
 - [mica-lite 文档](https://gitee.com/596392912/mica/tree/master/mica-lite)
 - [mica-redis 文档](https://gitee.com/596392912/mica/tree/master/mica-redis)
