@@ -37,9 +37,24 @@ public interface IMqttBrokerService {
 	/**
 	 * 获取所有在线的客户端
 	 *
+	 * @return 在线数
+	 */
+	long getOnlineClientSize();
+
+	/**
+	 * 获取所有在线的客户端
+	 *
 	 * @return 客户端集合
 	 */
 	List<String> getOnlineClients();
+
+	/**
+	 * 获取所有在线的客户端
+	 *
+	 * @param nodeName 集群节点
+	 * @return 在线数
+	 */
+	long getOnlineClientSize(String nodeName);
 
 	/**
 	 * 获取所有在线的客户端

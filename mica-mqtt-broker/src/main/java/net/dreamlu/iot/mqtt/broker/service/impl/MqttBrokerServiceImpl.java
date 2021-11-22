@@ -49,6 +49,22 @@ public class MqttBrokerServiceImpl implements IMqttBrokerService {
 	}
 
 	@Override
+	public long getOnlineClientSize() {
+		Set<String> keySet = redisCache.scan(RedisKeys.CONNECT_STATUS.getKey(StringPool.STAR));
+		if (keySet.isEmpty()) {
+			return 0L;
+		}
+		long result = 0;
+		for (String redisKey : keySet) {
+			Long count = redisCache.getSetOps().size(redisKey);
+			if (count != null) {
+				result += count;
+			}
+		}
+		return result;
+	}
+
+	@Override
 	public List<String> getOnlineClients() {
 		Set<String> keySet = redisCache.scan(RedisKeys.CONNECT_STATUS.getKey(StringPool.STAR));
 		if (keySet.isEmpty()) {
@@ -62,6 +78,12 @@ public class MqttBrokerServiceImpl implements IMqttBrokerService {
 			}
 		}
 		return clientList;
+	}
+
+	@Override
+	public long getOnlineClientSize(String nodeName) {
+		Long count = redisCache.getSetOps().size(RedisKeys.CONNECT_STATUS.getKey(nodeName));
+		return count == null ? 0L : count;
 	}
 
 	@Override
