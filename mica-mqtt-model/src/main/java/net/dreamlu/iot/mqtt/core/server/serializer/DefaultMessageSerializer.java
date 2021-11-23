@@ -126,28 +126,28 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// 消息来源 客户端 id
-		if (fromClientId != null) {
+		if (fromClientIdBytes != null) {
 			buffer.putInt(fromClientIdBytes.length);
 			buffer.put(fromClientIdBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// 消息来源 用户名
-		if (fromUsername != null) {
+		if (fromUsernameBytes != null) {
 			buffer.putInt(fromUsernameBytes.length);
 			buffer.put(fromUsernameBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// 消息目的 Client ID，主要是在遗嘱消息用
-		if (clientId != null) {
+		if (clientIdBytes != null) {
 			buffer.putInt(clientIdBytes.length);
 			buffer.put(clientIdBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// 消息来源 用户名
-		if (username != null) {
+		if (usernameBytes != null) {
 			buffer.putInt(usernameBytes.length);
 			buffer.put(usernameBytes);
 		} else {
