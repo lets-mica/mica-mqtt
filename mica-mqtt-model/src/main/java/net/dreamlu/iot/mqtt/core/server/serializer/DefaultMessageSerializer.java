@@ -51,8 +51,8 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		if (message == null) {
 			return EMPTY_BYTES;
 		}
-		// 4 + 4 * 4 + 4 + 4 + 4 + 1 * 2 + 4 + 4 + 4 + 8 + 8
-		int protocolLength = 62;
+		// 4 + 4 + 4 * 5 + 1 + 4 + 4 + 8 + 8
+		int protocolLength = 53;
 		String fromClientId = message.getFromClientId();
 		// 消息来源 客户端 id
 		byte[] fromClientIdBytes = null;
@@ -111,6 +111,13 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			protocolLength += nodeBytes.length;
 		}
 		ByteBuffer buffer = ByteBuffer.allocate(protocolLength);
+		// 事件触发所在节点
+		if (nodeBytes != null) {
+			buffer.putInt(nodeBytes.length);
+			buffer.put(nodeBytes);
+		} else {
+			buffer.put(EMPTY_INT_BYTES);
+		}
 		// MQTT 消息 ID
 		Integer messageId = message.getId();
 		if (messageId != null) {
@@ -146,9 +153,6 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
-		// 消息类型
-		int messageType = message.getMessageType();
-		buffer.put((byte) messageType);
 		// topic
 		if (topicBytes != null) {
 			buffer.putInt(topicBytes.length);
@@ -156,12 +160,17 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
-		// qos
-		buffer.put((byte) message.getQos());
-		// retain
-		buffer.put(message.isRetain() ? (byte) 1 : (byte) 0);
-		// dup
-		buffer.put(message.isDup() ? (byte) 1 : (byte) 0);
+		// 消息类型、dup、qos、retain
+		int byte1 = 0;
+		byte1 |= message.getMessageType() << 4;
+		if (message.isDup()) {
+			byte1 |= 0x08;
+		}
+		byte1 |= message.getQos() << 1;
+		if (message.isRetain()) {
+			byte1 |= 0x01;
+		}
+		buffer.put((byte) byte1);
 		// 消息内容
 		if (payloadBytes != null) {
 			buffer.putInt(payloadBytes.length);
@@ -185,13 +194,6 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		} else {
 			buffer.put(EMPTY_LONG_BYTES);
 		}
-		// 事件触发所在节点
-		if (nodeBytes != null) {
-			buffer.putInt(nodeBytes.length);
-			buffer.put(nodeBytes);
-		} else {
-			buffer.put(EMPTY_INT_BYTES);
-		}
 		return buffer.array();
 	}
 
@@ -203,6 +205,13 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		}
 		Message message = new Message();
 		ByteBuffer buffer = ByteBuffer.wrap(data);
+		// 事件触发所在节点
+		int nodeLength = buffer.getInt();
+		if (nodeLength > 0) {
+			byte[] nodeBytes = new byte[nodeLength];
+			buffer.get(nodeBytes);
+			message.setNode(new String(nodeBytes, StandardCharsets.UTF_8));
+		}
 		// MQTT 消息 ID
 		int messageId = buffer.getInt();
 		if (messageId > 0) {
@@ -236,11 +245,6 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			buffer.get(usernameBytes);
 			message.setUsername(new String(usernameBytes, StandardCharsets.UTF_8));
 		}
-		// 消息类型
-		short messageType = readUnsignedByte(buffer);
-		if (messageType > 0) {
-			message.setMessageType(messageType);
-		}
 		// topic
 		int topicLength = buffer.getInt();
 		if (topicLength > 0) {
@@ -248,17 +252,20 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			buffer.get(topicBytes);
 			message.setTopic(new String(topicBytes, StandardCharsets.UTF_8));
 		}
-		// qos
-		short qos = readUnsignedByte(buffer);
-		if (qos >= 0) {
-			message.setQos(qos);
+		// 消息类型、dup、qos、retain
+		short byte1 = readUnsignedByte(buffer);
+		int messageType = byte1 >> 4;
+		if (messageType > 0) {
+			message.setMessageType(messageType);
 		}
+		boolean isDup = (byte1 & 0x08) == 0x08;
+		message.setDup(isDup);
+		// qos
+		int qosLevel = (byte1 & 0x06) >> 1;
+		message.setQos(qosLevel);
 		// retain
-		byte isRetain = buffer.get();
-		message.setRetain(isRetain == 1);
-		// 是否重发
-		byte isDup = buffer.get();
-		message.setDup(isDup == 1);
+		boolean retain = (byte1 & 0x01) != 0;
+		message.setRetain(retain);
 		// 消息内容
 		int payloadLen = buffer.getInt();
 		if (payloadLen > 0) {
@@ -280,13 +287,6 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		long publishReceivedAt = buffer.getLong();
 		if (publishReceivedAt > 0) {
 			message.setPublishReceivedAt(publishReceivedAt);
-		}
-		// 事件触发所在节点
-		int nodeLength = buffer.getInt();
-		if (nodeLength > 0) {
-			byte[] nodeBytes = new byte[nodeLength];
-			buffer.get(nodeBytes);
-			message.setNode(new String(nodeBytes, StandardCharsets.UTF_8));
 		}
 		return message;
 	}

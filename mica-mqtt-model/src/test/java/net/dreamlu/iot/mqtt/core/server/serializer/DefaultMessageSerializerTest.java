@@ -49,6 +49,7 @@ public class DefaultMessageSerializerTest {
 		message.setPublishReceivedAt(System.currentTimeMillis());
 		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
+		System.out.println(message);
 		System.out.println(message1);
 		Assert.assertEquals(message, message1);
 	}

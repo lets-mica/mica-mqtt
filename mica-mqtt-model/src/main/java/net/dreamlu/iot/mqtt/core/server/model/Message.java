@@ -26,6 +26,11 @@ import java.util.Objects;
  * @author L.cm
  */
 public class Message implements Serializable {
+
+	/**
+	 * 事件触发所在节点
+	 */
+	private String node;
 	/**
 	 * MQTT 消息 ID
 	 */
@@ -47,13 +52,17 @@ public class Message implements Serializable {
 	 */
 	private String username;
 	/**
+	 * topic
+	 */
+	private String topic;
+	/**
 	 * 消息类型
 	 */
 	private int messageType;
 	/**
-	 * topic
+	 * 是否重发
 	 */
-	private String topic;
+	private boolean dup;
 	/**
 	 * qos
 	 */
@@ -62,10 +71,6 @@ public class Message implements Serializable {
 	 * retain
 	 */
 	private boolean retain;
-	/**
-	 * 是否重发
-	 */
-	private boolean dup;
 	/**
 	 * 消息内容
 	 */
@@ -82,10 +87,14 @@ public class Message implements Serializable {
 	 * PUBLISH 消息到达 Broker 的时间 (ms)
 	 */
 	private Long publishReceivedAt;
-	/**
-	 * 事件触发所在节点
-	 */
-	private String node;
+
+	public String getNode() {
+		return node;
+	}
+
+	public void setNode(String node) {
+		this.node = node;
+	}
 
 	public Integer getId() {
 		return id;
@@ -127,6 +136,14 @@ public class Message implements Serializable {
 		this.username = username;
 	}
 
+	public String getTopic() {
+		return topic;
+	}
+
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
+
 	public int getMessageType() {
 		return messageType;
 	}
@@ -135,12 +152,12 @@ public class Message implements Serializable {
 		this.messageType = messageType;
 	}
 
-	public String getTopic() {
-		return topic;
+	public boolean isDup() {
+		return dup;
 	}
 
-	public void setTopic(String topic) {
-		this.topic = topic;
+	public void setDup(boolean dup) {
+		this.dup = dup;
 	}
 
 	public int getQos() {
@@ -157,14 +174,6 @@ public class Message implements Serializable {
 
 	public void setRetain(boolean retain) {
 		this.retain = retain;
-	}
-
-	public boolean isDup() {
-		return dup;
-	}
-
-	public void setDup(boolean dup) {
-		this.dup = dup;
 	}
 
 	public ByteBuffer getPayload() {
@@ -199,49 +208,38 @@ public class Message implements Serializable {
 		this.publishReceivedAt = publishReceivedAt;
 	}
 
-	public String getNode() {
-		return node;
-	}
-
-	public void setNode(String node) {
-		this.node = node;
-	}
-
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
 		Message message = (Message) o;
-		return messageType == message.messageType && qos == message.qos && retain == message.retain && dup == message.dup && timestamp == message.timestamp && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && Objects.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt) && Objects.equals(node, message.node);
+		return messageType == message.messageType && dup == message.dup && qos == message.qos && retain == message.retain && timestamp == message.timestamp && Objects.equals(node, message.node) && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && Objects.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(id, fromClientId, fromUsername, clientId, username, messageType, topic, qos, retain, dup, payload, peerHost, timestamp, publishReceivedAt, node);
+		return Objects.hash(node, id, fromClientId, fromUsername, clientId, username, topic, messageType, dup, qos, retain, payload, peerHost, timestamp, publishReceivedAt);
 	}
 
 	@Override
 	public String toString() {
 		return "Message{" +
-			"id=" + id +
+			"node='" + node + '\'' +
+			", id=" + id +
 			", fromClientId='" + fromClientId + '\'' +
 			", fromUsername='" + fromUsername + '\'' +
 			", clientId='" + clientId + '\'' +
 			", username='" + username + '\'' +
-			", messageType=" + messageType +
 			", topic='" + topic + '\'' +
+			", messageType=" + messageType +
+			", dup=" + dup +
 			", qos=" + qos +
 			", retain=" + retain +
-			", dup=" + dup +
 			", payload=" + payload +
 			", peerHost='" + peerHost + '\'' +
 			", timestamp=" + timestamp +
 			", publishReceivedAt=" + publishReceivedAt +
-			", node='" + node + '\'' +
 			'}';
 	}
+
 }
