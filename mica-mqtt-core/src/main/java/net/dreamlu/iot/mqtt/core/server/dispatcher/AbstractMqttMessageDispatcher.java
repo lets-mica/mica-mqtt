@@ -16,9 +16,9 @@
 
 package net.dreamlu.iot.mqtt.core.server.dispatcher;
 
-import net.dreamlu.iot.mqtt.codec.MqttMessageType;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.tio.core.ChannelContext;
@@ -62,13 +62,13 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	public boolean send(Message message) {
 		Objects.requireNonNull(mqttServer, "MqttServer require not Null.");
 		// 1. 先发送到本服务
-		MqttMessageType messageType = MqttMessageType.valueOf(message.getMessageType());
-		if (MqttMessageType.PUBLISH == messageType) {
+		MessageType messageType = message.getMessageType();
+		if (MessageType.UP_STREAM == messageType) {
 			MqttQoS qoS = MqttQoS.valueOf(message.getQos());
 			mqttServer.publishAll(message.getTopic(), message.getPayload(), qoS, message.isRetain());
-		} else if (MqttMessageType.SUBSCRIBE == messageType) {
+		} else if (MessageType.SUBSCRIBE == messageType) {
 			sessionManager.addSubscribe(message.getTopic(), message.getFromClientId(), message.getQos());
-		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
+		} else if (MessageType.UNSUBSCRIBE == messageType) {
 			sessionManager.removeSubscribe(message.getTopic(), message.getFromClientId());
 		}
 		return sendAll(message);

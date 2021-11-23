@@ -26,6 +26,7 @@ import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
@@ -128,7 +129,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		boolean willFlag = variableHeader.isWillFlag();
 		if (willFlag) {
 			Message willMessage = new Message();
-			willMessage.setMessageType(MqttMessageType.PUBLISH.value());
+			willMessage.setMessageType(MessageType.DOWN_STREAM);
 			willMessage.setFromClientId(uniqueId);
 			willMessage.setFromUsername(userName);
 			willMessage.setTopic(payload.willTopic());
@@ -366,7 +367,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				retainMessage.setQos(mqttQoS.value());
 				retainMessage.setPayload(payload);
 				retainMessage.setFromClientId(clientId);
-				retainMessage.setMessageType(MqttMessageType.PUBLISH.value());
+				retainMessage.setMessageType(MessageType.DOWN_STREAM);
 				retainMessage.setRetain(true);
 				retainMessage.setDup(fixedHeader.isDup());
 				retainMessage.setTimestamp(System.currentTimeMillis());
@@ -390,7 +391,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		if (payload != null) {
 			message.setPayload(payload);
 		}
-		message.setMessageType(MqttMessageType.PUBLISH.value());
+		message.setMessageType(MessageType.UP_STREAM);
 		message.setRetain(fixedHeader.isRetain());
 		message.setDup(fixedHeader.isDup());
 		message.setTimestamp(System.currentTimeMillis());

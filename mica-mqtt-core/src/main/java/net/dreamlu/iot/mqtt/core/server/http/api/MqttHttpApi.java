@@ -17,8 +17,8 @@
 package net.dreamlu.iot.mqtt.core.server.http.api;
 
 import com.alibaba.fastjson.JSON;
-import net.dreamlu.iot.mqtt.codec.MqttMessageType;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import net.dreamlu.iot.mqtt.core.server.http.api.form.BaseForm;
 import net.dreamlu.iot.mqtt.core.server.http.api.form.PublishForm;
@@ -109,7 +109,7 @@ public class MqttHttpApi {
 	private void sendPublish(PublishForm form) {
 		String payload = form.getPayload();
 		Message message = new Message();
-		message.setMessageType(MqttMessageType.PUBLISH.value());
+		message.setMessageType(MessageType.DOWN_STREAM);
 		message.setClientId(form.getClientId());
 		message.setTopic(form.getTopic());
 		message.setQos(form.getQos());
@@ -253,9 +253,9 @@ public class MqttHttpApi {
 		message.setTopic(form.getTopic());
 		if (form instanceof SubscribeForm) {
 			message.setQos(((SubscribeForm) form).getQos());
-			message.setMessageType(MqttMessageType.SUBSCRIBE.value());
+			message.setMessageType(MessageType.SUBSCRIBE);
 		} else {
-			message.setMessageType(MqttMessageType.UNSUBSCRIBE.value());
+			message.setMessageType(MessageType.UNSUBSCRIBE);
 		}
 		messageDispatcher.send(message);
 	}

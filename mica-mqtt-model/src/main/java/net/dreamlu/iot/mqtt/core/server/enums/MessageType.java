@@ -26,36 +26,59 @@ public enum MessageType {
 	/**
 	 * 连接
 	 */
-	CONNECT((byte) 1),
+	CONNECT(1),
 	/**
 	 * 主题订阅
 	 */
-	SUBSCRIBE((byte) 2),
+	SUBSCRIBE(2),
 	/**
 	 * 取消订阅
 	 */
-	UNSUBSCRIBE((byte) 3),
+	UNSUBSCRIBE(3),
 	/**
 	 * 上行数据
 	 */
-	UP_STREAM((byte) 4),
+	UP_STREAM(4),
 	/**
 	 * 下行数据
 	 */
-	DOWN_STREAM((byte) 5),
+	DOWN_STREAM(5),
 	/**
 	 * 断开连接
 	 */
-	DISCONNECT((byte) 6),
+	DISCONNECT(6),
 	;
 
-	private final byte value;
+	private static final MessageType[] VALUES;
 
-	MessageType(byte value) {
+	static {
+		// this prevent values to be assigned with the wrong order
+		// and ensure valueOf to work fine
+		final MessageType[] values = values();
+		VALUES = new MessageType[values.length + 1];
+		for (MessageType mqttMessageType : values) {
+			final int value = mqttMessageType.value;
+			if (VALUES[value] != null) {
+				throw new AssertionError("value already in use: " + value);
+			}
+			VALUES[value] = mqttMessageType;
+		}
+	}
+
+	private final int value;
+
+	MessageType(int value) {
 		this.value = value;
 	}
 
-	public byte getValue() {
+	public int getValue() {
 		return value;
+	}
+
+	public static MessageType valueOf(int type) {
+		if (type <= 0 || type >= VALUES.length) {
+			throw new IllegalArgumentException("unknown message type: " + type);
+		}
+		return VALUES[type];
 	}
 }

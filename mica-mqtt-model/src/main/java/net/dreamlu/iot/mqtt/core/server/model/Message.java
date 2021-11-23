@@ -16,6 +16,8 @@
 
 package net.dreamlu.iot.mqtt.core.server.model;
 
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
+
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -58,7 +60,7 @@ public class Message implements Serializable {
 	/**
 	 * 消息类型
 	 */
-	private int messageType;
+	private MessageType messageType;
 	/**
 	 * 是否重发
 	 */
@@ -144,11 +146,11 @@ public class Message implements Serializable {
 		this.topic = topic;
 	}
 
-	public int getMessageType() {
+	public MessageType getMessageType() {
 		return messageType;
 	}
 
-	public void setMessageType(int messageType) {
+	public void setMessageType(MessageType messageType) {
 		this.messageType = messageType;
 	}
 
@@ -210,10 +212,14 @@ public class Message implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
 		Message message = (Message) o;
-		return messageType == message.messageType && dup == message.dup && qos == message.qos && retain == message.retain && timestamp == message.timestamp && Objects.equals(node, message.node) && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && Objects.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt);
+		return dup == message.dup && qos == message.qos && retain == message.retain && timestamp == message.timestamp && Objects.equals(node, message.node) && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && messageType == message.messageType && Objects.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt);
 	}
 
 	@Override

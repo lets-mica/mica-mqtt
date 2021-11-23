@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.server.serializer;
 
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 
 import java.nio.ByteBuffer;
@@ -162,7 +163,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		}
 		// 消息类型、dup、qos、retain
 		int byte1 = 0;
-		byte1 |= message.getMessageType() << 4;
+		byte1 |= message.getMessageType().getValue() << 4;
 		if (message.isDup()) {
 			byte1 |= 0x08;
 		}
@@ -256,7 +257,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		short byte1 = readUnsignedByte(buffer);
 		int messageType = byte1 >> 4;
 		if (messageType > 0) {
-			message.setMessageType(messageType);
+			message.setMessageType(MessageType.valueOf(messageType));
 		}
 		boolean isDup = (byte1 & 0x08) == 0x08;
 		message.setDup(isDup);

@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.server.serializer;
 
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import org.junit.Assert;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class DefaultMessageSerializerTest {
 		message.setClientId("123");
 		message.setUsername("userName");
 		message.setNode("node");
-		message.setMessageType(3);
+		message.setMessageType(MessageType.UP_STREAM);
 		message.setTopic("/mica/mqtt/123");
 		message.setQos(1);
 		message.setRetain(true);

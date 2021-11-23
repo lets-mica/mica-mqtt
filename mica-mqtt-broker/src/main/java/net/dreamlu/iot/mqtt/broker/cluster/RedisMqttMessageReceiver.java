@@ -17,12 +17,13 @@
 package net.dreamlu.iot.mqtt.broker.cluster;
 
 import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
-import net.dreamlu.iot.mqtt.codec.MqttMessageType;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
-import net.dreamlu.mica.core.utils.JsonUtil;
+import net.dreamlu.mica.core.utils.StringUtil;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.MessageListener;
@@ -31,6 +32,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.tio.core.ChannelContext;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -71,21 +73,32 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 	}
 
 	public void messageProcessing(Message message) {
-		MqttMessageType messageType = MqttMessageType.valueOf(message.getMessageType());
+		MessageType messageType = message.getMessageType();
 		String topic = message.getTopic();
-		if (MqttMessageType.PUBLISH == messageType) {
-			messageService.publishProcessing(message);
-		} else if (MqttMessageType.SUBSCRIBE == messageType) {
+		if (MessageType.SUBSCRIBE == messageType) {
 			String formClientId = message.getFromClientId();
 			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
 				sessionManager.addSubscribe(topic, formClientId, message.getQos());
 			}
-		} else if (MqttMessageType.UNSUBSCRIBE == messageType) {
+		} else if (MessageType.UNSUBSCRIBE == messageType) {
 			String formClientId = message.getFromClientId();
 			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
 				sessionManager.removeSubscribe(topic, formClientId);
+			}
+		} else if (MessageType.UP_STREAM == messageType) {
+			messageService.publishProcessing(message);
+		} else if (MessageType.DOWN_STREAM == messageType) {
+			// 下行数据, TODO L.cm 将 redis 拆分成2个通道
+			String clientId = message.getClientId();
+			ByteBuffer payload = message.getPayload();
+			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
+			boolean retain = message.isRetain();
+			if (StringUtil.isBlank(clientId)) {
+				mqttServer.publishAll(topic, payload, mqttQoS, retain);
+			} else {
+				mqttServer.publish(clientId, topic, payload, mqttQoS, retain);
 			}
 		}
 	}

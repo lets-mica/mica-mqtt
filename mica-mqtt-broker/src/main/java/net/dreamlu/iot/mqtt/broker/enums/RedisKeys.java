@@ -37,6 +37,14 @@ public enum RedisKeys {
 	 */
 	REDIS_CHANNEL("mqtt:channel:exchange"),
 	/**
+	 * mqtt -> 云端 redis pug/sub 上行数据通道
+	 */
+	REDIS_CHANNEL_UP("mqtt:channel:up"),
+	/**
+	 * mqtt <- 云端 redis pug/sub 下行数据通道
+	 */
+	REDIS_CHANNEL_DOWN("mqtt:channel:down"),
+	/**
 	 * 连接状态存储
 	 */
 	CONNECT_STATUS("mqtt:connect:status"),
