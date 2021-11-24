@@ -36,11 +36,11 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
- * 监听集群消息，上行消息，设备到云端
+ * 监听集群消息，上行和内部集群通道
  *
  * @author L.cm
  */
-public class RedisMqttMessageUpReceiver implements MessageListener, InitializingBean {
+public class RedisMqttMessageExchangeReceiver implements MessageListener, InitializingBean {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final IMessageSerializer messageSerializer;
 	private final String channel;
@@ -48,11 +48,11 @@ public class RedisMqttMessageUpReceiver implements MessageListener, Initializing
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageService messageService;
 
-	public RedisMqttMessageUpReceiver(MicaRedisCache redisCache,
-									  IMessageSerializer messageSerializer,
-									  String channel,
-									  MqttServer mqttServer,
-									  IMqttMessageService messageService) {
+	public RedisMqttMessageExchangeReceiver(MicaRedisCache redisCache,
+											IMessageSerializer messageSerializer,
+											String channel,
+											MqttServer mqttServer,
+											IMqttMessageService messageService) {
 		this.redisTemplate = redisCache.getRedisTemplate();
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
@@ -107,7 +107,7 @@ public class RedisMqttMessageUpReceiver implements MessageListener, Initializing
 	public void afterPropertiesSet() throws Exception {
 		byte[] channelBytes = RedisSerializer.string().serialize(channel);
 		redisTemplate.execute((RedisCallback<Void>) connection -> {
-			connection.subscribe(RedisMqttMessageUpReceiver.this, channelBytes);
+			connection.subscribe(RedisMqttMessageExchangeReceiver.this, channelBytes);
 			return null;
 		});
 	}

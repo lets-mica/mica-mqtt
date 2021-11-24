@@ -33,9 +33,9 @@ public enum RedisKeys {
 	 */
 	SERVER_NODES("mqtt:server:nodes"),
 	/**
-	 * mqtt -> 云端 redis pug/sub 上行数据通道
+	 * mqtt <-> redis pug/sub 消息交互，集群内消息和上行消息交换通道
 	 */
-	REDIS_CHANNEL_UP("mqtt:channel:up"),
+	REDIS_CHANNEL_EXCHANGE("mqtt:channel:exchange"),
 	/**
 	 * mqtt <- 云端 redis pug/sub 下行数据通道
 	 */

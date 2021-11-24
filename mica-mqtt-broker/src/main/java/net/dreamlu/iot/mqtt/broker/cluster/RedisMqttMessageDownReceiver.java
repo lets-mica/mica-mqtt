@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.broker.cluster;
 
 import lombok.extern.slf4j.Slf4j;
-import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
@@ -34,7 +33,7 @@ import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
- * 监听集群消息，下行消息，发送到设备
+ * 下行消息，发送到设备
  *
  * @author L.cm
  */
