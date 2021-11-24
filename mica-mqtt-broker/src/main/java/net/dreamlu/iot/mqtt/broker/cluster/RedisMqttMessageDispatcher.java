@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.broker.cluster;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.mica.core.utils.JsonUtil;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
