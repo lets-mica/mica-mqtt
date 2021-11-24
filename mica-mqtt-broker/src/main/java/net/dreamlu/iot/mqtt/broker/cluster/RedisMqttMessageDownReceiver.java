@@ -16,13 +16,12 @@
 
 package net.dreamlu.iot.mqtt.broker.cluster;
 
+import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.mica.core.utils.StringUtil;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.InitializingBean;
@@ -30,35 +29,30 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.tio.core.ChannelContext;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
- * 监听集群消息
+ * 监听集群消息，下行消息，发送到设备
  *
  * @author L.cm
  */
-public class RedisMqttMessageReceiver implements MessageListener, InitializingBean {
+@Slf4j
+public class RedisMqttMessageDownReceiver implements MessageListener, InitializingBean {
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final IMessageSerializer messageSerializer;
 	private final String channel;
 	private final MqttServer mqttServer;
-	private final IMqttSessionManager sessionManager;
-	private final IMqttMessageService messageService;
 
-	public RedisMqttMessageReceiver(MicaRedisCache redisCache,
-									IMessageSerializer messageSerializer,
-									String channel,
-									MqttServer mqttServer,
-									IMqttMessageService messageService) {
+	public RedisMqttMessageDownReceiver(MicaRedisCache redisCache,
+										IMessageSerializer messageSerializer,
+										String channel,
+										MqttServer mqttServer) {
 		this.redisTemplate = redisCache.getRedisTemplate();
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.mqttServer = mqttServer;
-		this.sessionManager = mqttServer.getServerCreator().getSessionManager();
-		this.messageService = messageService;
 	}
 
 	@Override
@@ -69,37 +63,20 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 		if (mqttMessage == null) {
 			return;
 		}
-		messageProcessing(mqttMessage);
-	}
-
-	public void messageProcessing(Message message) {
-		MessageType messageType = message.getMessageType();
-		String topic = message.getTopic();
-		if (MessageType.SUBSCRIBE == messageType) {
-			String formClientId = message.getFromClientId();
-			ChannelContext context = mqttServer.getChannelContext(formClientId);
-			if (context != null) {
-				sessionManager.addSubscribe(topic, formClientId, message.getQos());
-			}
-		} else if (MessageType.UNSUBSCRIBE == messageType) {
-			String formClientId = message.getFromClientId();
-			ChannelContext context = mqttServer.getChannelContext(formClientId);
-			if (context != null) {
-				sessionManager.removeSubscribe(topic, formClientId);
-			}
-		} else if (MessageType.UP_STREAM == messageType) {
-			messageService.publishProcessing(message);
-		} else if (MessageType.DOWN_STREAM == messageType) {
-			// 下行数据, TODO L.cm 将 redis 拆分成2个通道
-			String clientId = message.getClientId();
-			ByteBuffer payload = message.getPayload();
-			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
-			boolean retain = message.isRetain();
-			if (StringUtil.isBlank(clientId)) {
-				mqttServer.publishAll(topic, payload, mqttQoS, retain);
-			} else {
-				mqttServer.publish(clientId, topic, payload, mqttQoS, retain);
-			}
+		// 下行消息，发送到设备
+		String topic = mqttMessage.getTopic();
+		if (StringUtil.isBlank(topic)) {
+			log.error("Mqtt down stream topic is blank.");
+			return;
+		}
+		String clientId = mqttMessage.getClientId();
+		ByteBuffer payload = mqttMessage.getPayload();
+		MqttQoS mqttQoS = MqttQoS.valueOf(mqttMessage.getQos());
+		boolean retain = mqttMessage.isRetain();
+		if (StringUtil.isBlank(clientId)) {
+			mqttServer.publishAll(topic, payload, mqttQoS, retain);
+		} else {
+			mqttServer.publish(clientId, topic, payload, mqttQoS, retain);
 		}
 	}
 
@@ -107,7 +84,7 @@ public class RedisMqttMessageReceiver implements MessageListener, InitializingBe
 	public void afterPropertiesSet() throws Exception {
 		byte[] channelBytes = RedisSerializer.string().serialize(channel);
 		redisTemplate.execute((RedisCallback<Void>) connection -> {
-			connection.subscribe(RedisMqttMessageReceiver.this, channelBytes);
+			connection.subscribe(RedisMqttMessageDownReceiver.this, channelBytes);
 			return null;
 		});
 	}

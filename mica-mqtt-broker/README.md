@@ -11,7 +11,7 @@
 ## 二开说明
 - 修改 auth 包下的 MqttAuthHandler、MqttSubscribeValidator 和 MqttHttpAuthFilter 认证实现。
 - 上行消息（设备 -> 云端）在 MqttMessageServiceImpl 中添加业务逻辑。
-- 下行消息（云端 -> 设备）云端 redis pub Message（使用 mica-mqtt-model 中的模型和序列化）到 `mqtt:channel:exchange`（详见：`RedisKeys`） 即可。
+- 下行消息（云端 -> 设备）云端 redis pub Message（使用 mica-mqtt-model 中的模型和序列化）到 `mqtt:channel:down`（详见：`RedisKeys`） 即可。
 
 注意：云端发送到设备不指定 clientId 会按 topic 订阅关系进行广播消息到设备。
 

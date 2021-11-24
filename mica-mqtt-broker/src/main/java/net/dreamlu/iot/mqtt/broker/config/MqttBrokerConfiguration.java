@@ -57,17 +57,24 @@ public class MqttBrokerConfiguration {
 	}
 
 	@Bean
-	public RedisMqttMessageReceiver mqttMessageReceiver(MicaRedisCache redisCache,
-														IMessageSerializer messageSerializer,
-														MqttServer mqttServer,
-														IMqttMessageService mqttMessageService) {
-		return new RedisMqttMessageReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL.getKey(), mqttServer, mqttMessageService);
+	public RedisMqttMessageUpReceiver mqttMessageUpReceiver(MicaRedisCache redisCache,
+															IMessageSerializer messageSerializer,
+															MqttServer mqttServer,
+															IMqttMessageService mqttMessageService) {
+		return new RedisMqttMessageUpReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_UP.getKey(), mqttServer, mqttMessageService);
+	}
+
+	@Bean
+	public RedisMqttMessageDownReceiver mqttMessageDownReceiver(MicaRedisCache redisCache,
+																IMessageSerializer messageSerializer,
+																MqttServer mqttServer) {
+		return new RedisMqttMessageDownReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_DOWN.getKey(), mqttServer);
 	}
 
 	@Bean
 	public IMqttMessageDispatcher mqttMessageDispatcher(MicaRedisCache redisCache,
 														IMessageSerializer messageSerializer) {
-		return new RedisMqttMessageDispatcher(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL.getKey());
+		return new RedisMqttMessageDispatcher(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_UP.getKey());
 	}
 
 	@Bean
