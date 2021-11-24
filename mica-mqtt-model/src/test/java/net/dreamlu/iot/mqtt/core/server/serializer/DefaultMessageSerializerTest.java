@@ -33,7 +33,7 @@ public class DefaultMessageSerializerTest {
 	@Test
 	public void test() {
 		Message message = new Message();
-		message.setId(null);
+		message.setId(0xffff);
 		message.setFromClientId("123");
 		message.setFromUsername("name");
 		message.setClientId("123");

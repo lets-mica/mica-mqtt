@@ -39,6 +39,10 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 	 */
 	private static final byte[] EMPTY_BYTES = new byte[0];
 	/**
+	 * 空 short byte 数组，2 个长度
+	 */
+	private static final byte[] EMPTY_SHORT_BYTES = new byte[2];
+	/**
 	 * 空 int byte 数组，4 个长度
 	 */
 	private static final byte[] EMPTY_INT_BYTES = new byte[4];
@@ -52,8 +56,8 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		if (message == null) {
 			return EMPTY_BYTES;
 		}
-		// 4 + 4 + 4 * 5 + 1 + 4 + 4 + 8 + 8
-		int protocolLength = 53;
+		// 4 + 2 + 4 * 5 + 1 + 4 + 4 + 8 + 8
+		int protocolLength = 51;
 		String fromClientId = message.getFromClientId();
 		// 消息来源 客户端 id
 		byte[] fromClientIdBytes = null;
@@ -122,9 +126,9 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		// MQTT 消息 ID
 		Integer messageId = message.getId();
 		if (messageId != null) {
-			buffer.putInt(messageId);
+			buffer.putShort(messageId.shortValue());
 		} else {
-			buffer.put(EMPTY_INT_BYTES);
+			buffer.put(EMPTY_SHORT_BYTES);
 		}
 		// 消息来源 客户端 id
 		if (fromClientIdBytes != null) {
@@ -214,7 +218,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			message.setNode(new String(nodeBytes, StandardCharsets.UTF_8));
 		}
 		// MQTT 消息 ID
-		int messageId = buffer.getInt();
+		int messageId = getMessageId(buffer);
 		if (messageId > 0) {
 			message.setId(messageId);
 		}
@@ -300,6 +304,21 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 	 */
 	private static short readUnsignedByte(ByteBuffer buffer) {
 		return (short) (buffer.get() & 0xFF);
+	}
+
+	/**
+	 * MessageId numberOfBytesConsumed = 2. return decoded result.
+	 */
+	private static int getMessageId(ByteBuffer buffer) {
+		int min = 0;
+		int max = 65535;
+		short msbSize = readUnsignedByte(buffer);
+		short lsbSize = readUnsignedByte(buffer);
+		int result = msbSize << 8 | lsbSize;
+		if (result < min || result > max) {
+			result = -1;
+		}
+		return result;
 	}
 
 }
