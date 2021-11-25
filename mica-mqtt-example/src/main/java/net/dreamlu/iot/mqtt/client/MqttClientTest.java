@@ -48,13 +48,7 @@ public class MqttClientTest {
 //			.maxBytesInMessage(1024 * 10)
 			.version(MqttVersion.MQTT_5)
 //			连接监听
-			.connectListener((context, isReconnect) -> {
-				if (isReconnect) {
-					logger.info("重连 mqtt 服务器成功...");
-				} else {
-					logger.info("连接 mqtt 服务器成功...");
-				}
-			})
+			.connectListener(new MqttClientConnectListener())
 			.connect();
 
 		client.subQos0("/test/#", (topic, payload) -> {

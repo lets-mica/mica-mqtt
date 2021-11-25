@@ -38,9 +38,11 @@ import java.util.Objects;
 public class MqttClientAioListener extends DefaultClientAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
 	private final MqttConnectMessage connectMessage;
+	private final IMqttClientConnectListener connectListener;
 
 	public MqttClientAioListener(MqttClientCreator clientCreator) {
 		this.connectMessage = getConnectMessage(Objects.requireNonNull(clientCreator));
+		this.connectListener = clientCreator.getConnectListener();
 	}
 
 	/**
@@ -97,6 +99,15 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 			// 重连时，发送 mqtt 连接消息
 			Boolean result = Tio.send(context, this.connectMessage);
 			logger.info("MqttClient reconnect send connect result:{}", result);
+		}
+	}
+
+	@Override
+	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+		try {
+			connectListener.onBeforeClose(channelContext, throwable, remark, isRemove);
+		} catch (Throwable e) {
+			logger.error(e.getMessage(), e);
 		}
 	}
 

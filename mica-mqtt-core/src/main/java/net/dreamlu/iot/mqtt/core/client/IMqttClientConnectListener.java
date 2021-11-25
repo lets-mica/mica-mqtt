@@ -23,7 +23,6 @@ import org.tio.core.ChannelContext;
  *
  * @author L.cm
  */
-@FunctionalInterface
 public interface IMqttClientConnectListener {
 
 	/**
@@ -33,5 +32,15 @@ public interface IMqttClientConnectListener {
 	 * @param isReconnect 是否重连
 	 */
 	void onConnected(ChannelContext context, boolean isReconnect);
+
+	/**
+	 * 连接关闭前触发本方法
+	 *
+	 * @param channelContext the channelContext
+	 * @param throwable      the throwable 有可能为空
+	 * @param remark         the remark 有可能为空
+	 * @param isRemove       is removed
+	 */
+	void onDisconnect(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove);
 
 }
