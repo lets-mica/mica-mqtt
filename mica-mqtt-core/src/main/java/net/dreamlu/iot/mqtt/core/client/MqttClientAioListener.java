@@ -105,7 +105,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	@Override
 	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
 		try {
-			connectListener.onBeforeClose(channelContext, throwable, remark, isRemove);
+			connectListener.onDisconnect(channelContext, throwable, remark, isRemove);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}
