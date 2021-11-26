@@ -105,14 +105,22 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 		if (buffer == null) {
 			return null;
 		}
-		// 重置 buffer
-		buffer.rewind();
-		// 解析 mqtt 消息
-		Packet packet = mqttServerAioHandler.decode(buffer, 0, 0, buffer.remaining(), context);
-		if (packet == null) {
-			return null;
+		// 可能会一次有多个包，所以需要进行拆包
+		while (buffer.hasRemaining()) {
+			// 解析 mqtt 消息
+			Packet packet = mqttServerAioHandler.decode(buffer, 0, 0, buffer.remaining(), context);
+			if (packet == null) {
+				// 如果拆包之后还有剩余，写回到 WriteBuffer
+				int remaining = buffer.remaining();
+				if (remaining > 0) {
+					byte[] data = new byte[remaining];
+					buffer.get(data);
+					wsBody.writeBytes(data);
+				}
+				return null;
+			}
+			mqttServerAioHandler.handler(packet, context);
 		}
-		mqttServerAioHandler.handler(packet, context);
 		return null;
 	}
 
@@ -159,8 +167,10 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 		if (length < mqttLength) {
 			return null;
 		}
-		// 数据已经读取完毕
+		// 数据已经读取完毕，此处需要重构
 		wsBody.reset();
+		// 重置 buffer
+		buffer.rewind();
 		return buffer;
 	}
 
