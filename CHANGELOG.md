@@ -10,7 +10,8 @@
 - :sparkles: mica-mqtt-broker 优化设备上下线，处理节点停机的情况。
 - :sparkles: 抽取 mica-mqtt-model 模块，方便后期支持消息桥接，Message 添加默认的消息序列化。 gitee #I4ECEO
 - :sparkles: mica-mqtt-model 完善 Message 消息模型，方便集群。
-- :bug: mica-mqtt-core MqttClient 修复 ssl 没有设置。
+- :bug: mica-mqtt-core MqttClient 修复 ssl 没有设置，感谢 `@hjkJOJO` 同学反馈。
+- :bug: 修复 websocket mqtt.js 需要拆包 gitee #I4JYJX 感谢 `@Symous` 同学反馈。
 - :memo: 完善 mica-mqtt-broker README.md，添加二开说明。
 - :memo: 统一 mica-mqtt server ip 文档。
 - :memo: 更新 README.md
