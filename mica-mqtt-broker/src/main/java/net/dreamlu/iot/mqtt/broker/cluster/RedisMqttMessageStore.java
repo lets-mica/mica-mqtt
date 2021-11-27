@@ -24,9 +24,6 @@ import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +41,7 @@ public class RedisMqttMessageStore implements IMqttMessageStore {
 
 	@Override
 	public boolean addWillMessage(String clientId, Message message) {
-		byte[] value = messageSerializer.serialize(message);
-		redis((redis) -> redis.set(keySerialize(RedisKeys.MESSAGE_STORE_WILL, clientId), value));
+		redisCache.set(RedisKeys.MESSAGE_STORE_WILL.getKey(clientId), message, messageSerializer::serialize);
 		return true;
 	}
 
@@ -57,14 +53,12 @@ public class RedisMqttMessageStore implements IMqttMessageStore {
 
 	@Override
 	public Message getWillMessage(String clientId) {
-		byte[] value = redis((redis) -> redis.get(keySerialize(RedisKeys.MESSAGE_STORE_WILL, clientId)));
-		return messageSerializer.deserialize(value);
+		return redisCache.get(RedisKeys.MESSAGE_STORE_WILL.getKey(clientId), messageSerializer::deserialize);
 	}
 
 	@Override
 	public boolean addRetainMessage(String topic, Message message) {
-		byte[] value = messageSerializer.serialize(message);
-		redis((redis) -> redis.set(keySerialize(RedisKeys.MESSAGE_STORE_RETAIN, topic), value));
+		redisCache.set(RedisKeys.MESSAGE_STORE_RETAIN.getKey(topic), message, messageSerializer::serialize);
 		return true;
 	}
 
@@ -85,27 +79,13 @@ public class RedisMqttMessageStore implements IMqttMessageStore {
 		redisCache.scan(redisKeyPattern, (key) -> {
 			String keySuffix = key.substring(keyPrefixLength);
 			if (topicPattern.matcher(keySuffix).matches()) {
-				byte[] value = redis((redis) -> redis.get(keySerialize(key)));
-				Message message = messageSerializer.deserialize(value);
+				Message message = redisCache.get(key, messageSerializer::deserialize);
 				if (message != null) {
 					retainMessageList.add(message);
 				}
 			}
 		});
 		return retainMessageList;
-	}
-
-	private byte[] keySerialize(String redisKey) {
-		return RedisSerializer.string().serialize(redisKey);
-	}
-
-	private byte[] keySerialize(RedisKeys suffix, String clientId) {
-		return RedisSerializer.string().serialize(suffix.getKey(clientId));
-	}
-
-	private <T> T redis(RedisCallback<T> callback) {
-		RedisTemplate<String, Object> redisTemplate = redisCache.getRedisTemplate();
-		return redisTemplate.execute(callback);
 	}
 
 }
