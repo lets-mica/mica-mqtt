@@ -78,8 +78,8 @@ public class MqttServerMessageListener implements IMqttMessageListener {
     private static final Logger logger = LoggerFactory.getLogger(MqttServerMessageListener.class);
 
     @Override
-    public void onMessage(String clientId, String topic, MqttQoS mqttQoS, ByteBuffer byteBuffer) {
-        logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(byteBuffer));
+    public void onMessage(ChannelContext context, String clientId, Message message) {
+        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
     }
 }
 ```

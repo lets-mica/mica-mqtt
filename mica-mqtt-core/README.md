@@ -44,10 +44,18 @@ MqttClient client = MqttClient.create()
     .reconnect(true)                // 是否重连，默认：true
     .reInterval(5000)               // 重连重试时间，reconnect 为 true 时有效，t-io 默认为：5000
     .willMessage(builder -> {
-        builder.topic("/test/offline").messageText("hello");    // 遗嘱消息
+        builder.topic("/test/offline").messageText("down");    // 遗嘱消息
     })
-    .connectListener((context, isReconnect) -> {
-        logger.info("链接服务器成功...");
+    .connectListener(new IMqttClientConnectListener() {
+        @Override
+        public void onConnected(ChannelContext context, boolean isReconnect) {
+            logger.info("链接服务器成功...");
+        }
+        
+        @Override
+        public void onDisconnect(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+            logger.info("与链接服务器断开连接...");
+        }
     })
     .properties()                   // mqtt5 properties
     .connect();
@@ -85,8 +93,8 @@ MqttServer mqttServer = MqttServer.create()
     // 自定义认证
     .authHandler((clientId, userName, password) -> true)
     // 消息监听
-    .messageListener((clientId, topic, mqttQoS, payload) -> {
-        logger.info("clientId:{} topic:{} mqttQoS:{} message:{}", clientId, topic, mqttQoS, ByteBufferUtil.toString(payload));
+    .messageListener((context, clientId, message) -> {
+        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
     })
     // 堆内存和堆外内存选择，默认：堆内存
     .bufferAllocator(ByteBufferAllocator.HEAP)
