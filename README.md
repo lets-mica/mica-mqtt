@@ -7,6 +7,13 @@
 
 基于 `t-io` 实现的**低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
 
+## 使用场景
+
+- 物联网（云端 mqtt broker）
+- 物联网（边缘端消息通信）
+- 群组类 IM
+- 消息推送
+
 ## 优势
 - 平凡却不单调，简单却不失精彩。
 - 手动档（更加易于二次开发或扩展）。
@@ -28,8 +35,9 @@
 - [x] 基于 redis pub/sub 实现集群，详见 [mica-mqtt-broker 模块](mica-mqtt-broker)。
 
 ## 待办
-- [ ] 优化处理 mqtt session，以及支持 v5.0 
 
+- [ ] 优化处理 mqtt session，以及支持 v5.0 
+- [ ] 基于 easy-rule + druid sql 解析，实现规则引擎。
 
 ## 默认端口
 
