@@ -31,6 +31,7 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -45,6 +46,7 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 	private final IMessageSerializer messageSerializer;
 	private final String channel;
 	private final MqttServer mqttServer;
+	private final String nodeName;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageService messageService;
 
@@ -57,6 +59,7 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.mqttServer = mqttServer;
+		this.nodeName = mqttServer.getServerCreator().getNodeName();
 		this.sessionManager = mqttServer.getServerCreator().getSessionManager();
 		this.messageService = messageService;
 	}
@@ -75,22 +78,36 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 	public void messageProcessing(Message message) {
 		MessageType messageType = message.getMessageType();
 		String topic = message.getTopic();
-		if (MessageType.SUBSCRIBE == messageType) {
+		if (MessageType.CONNECT == messageType) {
+			// 1. 如果一个 clientId 在集群多个服务上连接时断开其他的
+			String node = message.getNode();
+			if (nodeName.equals(node)) {
+				return;
+			}
+			String clientId = message.getClientId();
+			ChannelContext context = Tio.getByBsId(mqttServer.getServerConfig(), clientId);
+			if (context != null) {
+				Tio.remove(context, String.format("clientId:[%s] now bind on mqtt node:[%s]", clientId, node));
+			}
+		} else if (MessageType.SUBSCRIBE == messageType) {
+			// http api 订阅广播
 			String formClientId = message.getFromClientId();
 			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
 				sessionManager.addSubscribe(topic, formClientId, message.getQos());
 			}
 		} else if (MessageType.UNSUBSCRIBE == messageType) {
+			// http api 取消订阅广播
 			String formClientId = message.getFromClientId();
 			ChannelContext context = mqttServer.getChannelContext(formClientId);
 			if (context != null) {
 				sessionManager.removeSubscribe(topic, formClientId);
 			}
 		} else if (MessageType.UP_STREAM == messageType) {
+			// mqtt 上行消息
 			messageService.publishProcessing(message);
 		} else if (MessageType.DOWN_STREAM == messageType) {
-			// http rest api 也会转发到此
+			// http rest api 下行消息也会转发到此
 			String clientId = message.getClientId();
 			ByteBuffer payload = message.getPayload();
 			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());

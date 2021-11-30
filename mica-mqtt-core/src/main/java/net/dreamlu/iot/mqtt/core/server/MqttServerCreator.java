@@ -395,6 +395,10 @@ public class MqttServerCreator {
 
 	public MqttServer build() {
 		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
+		// 默认的节点名称，用于集群
+		if (StrUtil.isBlank(this.nodeName)) {
+			this.nodeName = ManagementFactory.getRuntimeMXBean().getName() + ':' + port;
+		}
 		if (this.authHandler == null) {
 			this.authHandler = new DefaultMqttServerAuthHandler();
 		}
@@ -433,10 +437,6 @@ public class MqttServerCreator {
 		}
 		if (this.debug) {
 			tioConfig.debug = true;
-		}
-		// 默认的节点名称，用于集群
-		if (StrUtil.isBlank(this.nodeName)) {
-			this.nodeName = ManagementFactory.getRuntimeMXBean().getName() + ':' + port;
 		}
 		// 5. mqtt 消息最大长度
 		tioConfig.setReadBufferSize(this.readBufferSize);

@@ -107,6 +107,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			String remark = String.format("uniqueId:[%s] clientId:[%s] now bind on new context id:[%s]", uniqueId, clientId, context.getId());
 			Tio.remove(otherContext, remark);
 		}
+		// 4.5 广播上线消息，避免一个 uniqueId 多个集群服务器中连接。
+		sendConnected(context, uniqueId);
 		// 5. 绑定 uniqueId
 		Tio.bindBsId(context, uniqueId);
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
@@ -152,13 +154,24 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		connectStatusListener.online(context, uniqueId);
 	}
 
-	private void connAckByReturnCode(String clientId, String uniqueId, ChannelContext context, MqttConnectReasonCode returnCode) {
+	private static void connAckByReturnCode(String clientId, String uniqueId, ChannelContext context, MqttConnectReasonCode returnCode) {
 		MqttConnAckMessage message = MqttMessageBuilders.connAck()
 			.returnCode(returnCode)
 			.sessionPresent(false)
 			.build();
 		Tio.send(context, message);
 		logger.info("Connect ack send - clientId: {} uniqueId:{} returnCode:{}", clientId, uniqueId, returnCode);
+	}
+
+	private void sendConnected(ChannelContext context, String uniqueId) {
+		Message message = new Message();
+		message.setClientId(uniqueId);
+		message.setMessageType(MessageType.CONNECT);
+		message.setNode(nodeName);
+		message.setTimestamp(System.currentTimeMillis());
+		Node clientNode = context.getClientNode();
+		message.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+		messageDispatcher.send(message);
 	}
 
 	@Override
