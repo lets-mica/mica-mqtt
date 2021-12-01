@@ -106,6 +106,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			Tio.unbindBsId(otherContext);
 			String remark = String.format("uniqueId:[%s] clientId:[%s] now bind on new context id:[%s]", uniqueId, clientId, context.getId());
 			Tio.remove(otherContext, remark);
+			cleanSession(uniqueId);
 		}
 		// 4.5 广播上线消息，避免一个 uniqueId 多个集群服务器中连接。
 		sendConnected(context, uniqueId);
@@ -172,6 +173,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Node clientNode = context.getClientNode();
 		message.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
 		messageDispatcher.send(message);
+	}
+
+	private void cleanSession(String clientId) {
+		try {
+			sessionManager.remove(clientId);
+		} catch (Throwable throwable) {
+			logger.error("Mqtt server clientId:{} session clean error.", clientId, throwable);
+		}
 	}
 
 	@Override
