@@ -17,9 +17,9 @@
 package net.dreamlu.iot.mqtt.broker.cluster;
 
 import lombok.RequiredArgsConstructor;
+import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
-import net.dreamlu.mica.core.utils.CharPool;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContext;
 import org.tio.core.ChannelContext;
 
 /**
- * mqtt 连接监听
+ * mqtt 连接监听，此处也可以添加发送到 mq 的逻辑，方便影子服务处理
  *
  * @author L.cm
  */
@@ -35,7 +35,6 @@ import org.tio.core.ChannelContext;
 public class RedisMqttConnectStatusListener implements IMqttConnectStatusListener, SmartInitializingSingleton, DisposableBean {
 	private final ApplicationContext context;
 	private final MicaRedisCache redisCache;
-	private final String connectStatusKey;
 	private MqttServerCreator serverCreator;
 
 	@Override
@@ -54,7 +53,7 @@ public class RedisMqttConnectStatusListener implements IMqttConnectStatusListene
 	 * @return redis key
 	 */
 	private String getRedisKey() {
-		return connectStatusKey + CharPool.COLON + serverCreator.getNodeName();
+		return RedisKeys.CONNECT_STATUS.getKey(serverCreator.getNodeName());
 	}
 
 	@Override

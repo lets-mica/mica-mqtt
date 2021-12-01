@@ -33,17 +33,21 @@ public enum RedisKeys {
 	 */
 	SERVER_NODES("mqtt:server:nodes"),
 	/**
-	 * mqtt <-> redis pug/sub 消息交互，集群内消息和上行消息交换通道
+	 * mqtt <-> redis pug/sub 集群内消息交互
 	 */
 	REDIS_CHANNEL_EXCHANGE("mqtt:channel:exchange"),
 	/**
-	 * mqtt <- 云端 redis pug/sub 下行数据通道
+	 * 设备 -> 云端 redis pug/sub 上行消息通道，适合 mq 的集群模式消费
+	 */
+	REDIS_CHANNEL_UP("mqtt:channel:up"),
+	/**
+	 * 云端 -> 设备 redis pug/sub 下行数据通道，广播到 mqtt 集群
 	 */
 	REDIS_CHANNEL_DOWN("mqtt:channel:down"),
 	/**
 	 * 连接状态存储
 	 */
-	CONNECT_STATUS("mqtt:connect:status"),
+	CONNECT_STATUS("mqtt:connect:status:"),
 	/**
 	 * 遗嘱消息存储
 	 */

@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.broker.cluster;
 
-import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
@@ -33,7 +32,6 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 
 /**
@@ -48,20 +46,17 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 	private final MqttServer mqttServer;
 	private final String nodeName;
 	private final IMqttSessionManager sessionManager;
-	private final IMqttMessageService messageService;
 
 	public RedisMqttMessageExchangeReceiver(MicaRedisCache redisCache,
 											IMessageSerializer messageSerializer,
 											String channel,
-											MqttServer mqttServer,
-											IMqttMessageService messageService) {
+											MqttServer mqttServer) {
 		this.redisTemplate = redisCache.getRedisTemplate();
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.mqttServer = mqttServer;
 		this.nodeName = mqttServer.getServerCreator().getNodeName();
 		this.sessionManager = mqttServer.getServerCreator().getSessionManager();
-		this.messageService = messageService;
 	}
 
 	@Override
@@ -75,7 +70,7 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 		messageProcessing(mqttMessage);
 	}
 
-	public void messageProcessing(Message message) {
+	private void messageProcessing(Message message) {
 		MessageType messageType = message.getMessageType();
 		String topic = message.getTopic();
 		if (MessageType.CONNECT == messageType) {
@@ -104,19 +99,28 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 				sessionManager.removeSubscribe(topic, formClientId);
 			}
 		} else if (MessageType.UP_STREAM == messageType) {
-			// mqtt 上行消息
-			messageService.publishProcessing(message);
+			// mqtt 上行消息，需要发送到对应的监听的客户端
+			sendToClient(topic, message);
 		} else if (MessageType.DOWN_STREAM == messageType) {
 			// http rest api 下行消息也会转发到此
-			String clientId = message.getClientId();
-			ByteBuffer payload = message.getPayload();
-			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
-			boolean retain = message.isRetain();
-			if (StringUtil.isBlank(clientId)) {
-				mqttServer.publishAll(topic, payload, mqttQoS, retain);
-			} else {
-				mqttServer.publish(clientId, topic, payload, mqttQoS, retain);
-			}
+			sendToClient(topic, message);
+		}
+	}
+
+	/**
+	 * 发送消息到客户端
+	 *
+	 * @param topic   topic
+	 * @param message Message
+	 */
+	private void sendToClient(String topic, Message message) {
+		// 客户端id
+		String clientId = message.getClientId();
+		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
+		if (StringUtil.isBlank(clientId)) {
+			mqttServer.publishAll(topic, message.getPayload(), mqttQoS, message.isRetain());
+		} else {
+			mqttServer.publish(clientId, topic, message.getPayload(), mqttQoS, message.isRetain());
 		}
 	}
 

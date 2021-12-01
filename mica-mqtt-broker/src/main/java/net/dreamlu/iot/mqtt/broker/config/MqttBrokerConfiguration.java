@@ -47,7 +47,7 @@ public class MqttBrokerConfiguration {
 	@Bean
 	public IMqttConnectStatusListener mqttBrokerConnectListener(ApplicationContext context,
 																MicaRedisCache redisCache) {
-		return new RedisMqttConnectStatusListener(context, redisCache, RedisKeys.CONNECT_STATUS.getKey());
+		return new RedisMqttConnectStatusListener(context, redisCache);
 	}
 
 	@Bean
@@ -59,9 +59,8 @@ public class MqttBrokerConfiguration {
 	@Bean
 	public RedisMqttMessageExchangeReceiver mqttMessageUpReceiver(MicaRedisCache redisCache,
 																  IMessageSerializer messageSerializer,
-																  MqttServer mqttServer,
-																  IMqttMessageService mqttMessageService) {
-		return new RedisMqttMessageExchangeReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey(), mqttServer, mqttMessageService);
+																  MqttServer mqttServer) {
+		return new RedisMqttMessageExchangeReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey(), mqttServer);
 	}
 
 	@Bean
@@ -72,9 +71,10 @@ public class MqttBrokerConfiguration {
 	}
 
 	@Bean
-	public IMqttMessageDispatcher mqttMessageDispatcher(MicaRedisCache redisCache,
+	public IMqttMessageDispatcher mqttMessageDispatcher(IMqttMessageService messageService,
+														MicaRedisCache redisCache,
 														IMessageSerializer messageSerializer) {
-		return new RedisMqttMessageDispatcher(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey());
+		return new RedisMqttMessageDispatcher(messageService, redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey());
 	}
 
 	@Bean
