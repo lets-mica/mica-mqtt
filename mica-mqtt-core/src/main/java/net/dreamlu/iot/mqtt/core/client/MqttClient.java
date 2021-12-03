@@ -215,7 +215,7 @@ public final class MqttClient {
 	public boolean disconnect() {
 		boolean result = Tio.send(context, MqttMessage.DISCONNECT);
 		if (result) {
-			Tio.close(context, "MqttClient disconnect.");
+			Tio.close(context, null, "MqttClient disconnect.", true);
 		}
 		return result;
 	}
