@@ -83,9 +83,13 @@ public final class MqttClientCreator {
 	 */
 	private boolean reconnect = true;
 	/**
-	 * 重连重试时间
+	 * 重连的间隔时间，单位毫秒，默认：5000
 	 */
-	private Long reInterval;
+	private long reInterval = 5000;
+	/**
+	 * 连续重连次数，当连续重连这么多次都失败时，不再重连。0和负数则一直重连
+	 */
+	private int retryCount = 0;
 	/**
 	 * 客户端 id，默认：随机生成
 	 */
@@ -171,7 +175,11 @@ public final class MqttClientCreator {
 		return reconnect;
 	}
 
-	public Long getReInterval() {
+	public int getRetryCount() {
+		return retryCount;
+	}
+
+	public long getReInterval() {
 		return reInterval;
 	}
 
@@ -265,6 +273,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator setRetryCount(int retryCount) {
+		this.retryCount = retryCount;
+		return this;
+	}
+
 	public MqttClientCreator reInterval(long reInterval) {
 		this.reInterval = reInterval;
 		return this;
@@ -342,11 +355,7 @@ public final class MqttClientCreator {
 		// 3. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
-			if (this.reInterval != null && this.reInterval > 0) {
-				reconnConf = new ReconnConf(this.reInterval);
-			} else {
-				reconnConf = new ReconnConf();
-			}
+			reconnConf = new ReconnConf(this.reInterval, this.retryCount);
 		}
 		// 4. tioConfig
 		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);

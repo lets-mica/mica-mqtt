@@ -91,9 +91,13 @@ public class MqttClientProperties {
 	 */
 	private boolean reconnect = true;
 	/**
-	 * 重连重试时间，单位：毫秒，默认：5000
+	 * 重连的间隔时间，单位毫秒，默认：5000
 	 */
-	private Long reInterval;
+	private long reInterval = 5000;
+	/**
+	 * 连续重连次数，当连续重连这么多次都失败时，不再重连。0和负数则一直重连
+	 */
+	private int retryCount = 0;
 	/**
 	 * mqtt 协议，默认：MQTT_3_1_1
 	 */

@@ -58,16 +58,14 @@ public class MqttClientConfiguration {
 			.maxClientIdLength(properties.getMaxClientIdLength())
 			.keepAliveSecs(properties.getKeepAliveSecs())
 			.reconnect(properties.isReconnect())
+			.reInterval(properties.getReInterval())
+			.setRetryCount(properties.getRetryCount())
 			.version(properties.getVersion())
 			.cleanSession(properties.isCleanSession())
 			.bufferAllocator(properties.getBufferAllocator());
 		Integer timeout = properties.getTimeout();
 		if (timeout != null && timeout > 0) {
 			clientCreator.timeout(timeout);
-		}
-		Long reInterval1 = properties.getReInterval();
-		if (reInterval1 != null && reInterval1 > 0) {
-			clientCreator.reInterval(reInterval1);
 		}
 		// 构造遗嘱消息
 		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();

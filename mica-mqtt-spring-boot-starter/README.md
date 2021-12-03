@@ -181,6 +181,7 @@ public class ServerService {
 | mqtt.client.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.client.reconnect | true | 自动重连 |
 | mqtt.client.re-interval | 5000 | 重连重试时间，单位毫秒 |
+| mqtt.client.retry-count | 0 | 连续重连次数，当连续重连这么多次都失败时，不再重连。0和负数则一直重连  |
 | mqtt.client.timeout | 5 | 连接超时时间，单位秒，t-io 配置，可为 null |
 | mqtt.client.keep-alive-secs | 60 | Keep Alive (s) 心跳维持时间 |
 | mqtt.client.version | MQTT_3_1_1 | mqtt 协议，默认：MQTT_3_1_1 |
