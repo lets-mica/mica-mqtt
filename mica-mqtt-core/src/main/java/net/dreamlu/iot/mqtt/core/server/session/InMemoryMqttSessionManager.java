@@ -179,6 +179,16 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	}
 
 	@Override
+	public boolean expire(String clientId, int sessionExpiryInterval) {
+		return false;
+	}
+
+	@Override
+	public boolean active(String clientId) {
+		return false;
+	}
+
+	@Override
 	public void remove(String clientId) {
 		removeSubscribe(clientId);
 		pendingPublishStore.remove(clientId);

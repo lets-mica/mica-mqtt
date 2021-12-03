@@ -119,7 +119,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		if (keepAliveSeconds > 0 && heartbeatTimeout != keepAliveSeconds * KEEP_ALIVE_UNIT) {
 			context.setHeartbeatTimeout(keepAliveSeconds * KEEP_ALIVE_UNIT);
 		}
-		// 7. session 处理，先默认全部连接关闭时清除
+		// 7. session 处理，先默认全部连接关闭时清除，mqtt5 为 CleanStart，
+		// 按照 mqtt 协议的规则是下一次连接时清除，emq 是添加了全局 session 超时，关闭时激活 session 有效期倒计时
 //		boolean cleanSession = variableHeader.isCleanSession();
 //		if (cleanSession) {
 //			// TODO L.cm 考虑 session 处理 可参数： https://www.emqx.com/zh/blog/mqtt-session

@@ -132,6 +132,23 @@ public interface IMqttSessionManager {
 	boolean hasSession(String clientId);
 
 	/**
+	 * 标记 session 超时时间
+	 *
+	 * @param clientId              clientId
+	 * @param sessionExpiryInterval sessionExpiryInterval
+	 * @return 是否成功
+	 */
+	boolean expire(String clientId, int sessionExpiryInterval);
+
+	/**
+	 * 激活 session，标记 expire 的 session 为永久
+	 *
+	 * @param clientId clientId
+	 * @return 是否成功
+	 */
+	boolean active(String clientId);
+
+	/**
 	 * 清除 session
 	 *
 	 * @param clientId clientId

@@ -28,10 +28,9 @@ import java.nio.ByteBuffer;
  *
  * @author L.cm
  */
-public class DefaultMessageSerializerTest {
+public class MessageSerializerTest {
 
-	@Test
-	public void test() {
+	private static Message getMessage() {
 		Message message = new Message();
 		message.setId(0xffff);
 		message.setFromClientId("123");
@@ -44,12 +43,29 @@ public class DefaultMessageSerializerTest {
 		message.setQos(1);
 		message.setRetain(true);
 		message.setDup(true);
-		message.setPayload(ByteBuffer.wrap(new byte[]{1,2,3}));
+		message.setPayload(ByteBuffer.wrap(new byte[]{1, 2, 3}));
 		message.setPeerHost("127.0.0.1:1883");
 		message.setTimestamp(System.currentTimeMillis());
 		message.setPublishReceivedAt(System.currentTimeMillis());
+		return message;
+	}
+
+	@Test
+	public void testDefaultMessageSerializer() {
+		Message message = getMessage();
 		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
+		System.out.println(message);
+		System.out.println(message1);
+		Assert.assertEquals(message, message1);
+	}
+
+	@Test
+	public void testFastJsonMessageSerializer() {
+		Message message = getMessage();
+		FastJsonMessageSerializer serializer = new FastJsonMessageSerializer();
+		byte[] data = serializer.serialize(message);
+		Message message1 = serializer.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
 		Assert.assertEquals(message, message1);

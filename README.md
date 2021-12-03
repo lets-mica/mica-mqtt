@@ -197,6 +197,7 @@ Mica-Mqtt-Server
 
 ## mqtt 客户端工具
 - [mqttx 优雅的跨平台 MQTT 5.0 客户端工具](https://mqttx.app/cn/)
+- [mqtt websocket 调试](http://tools.emqx.io/)
 - [mqttx.fx mqtt 客户端](http://mqttfx.org/)
 
 ## 开源推荐

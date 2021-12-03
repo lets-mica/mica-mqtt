@@ -1,13 +1,13 @@
 FROM moxm/java:1.8-full as builder
 WORKDIR /build
-ARG JAR_FILE=target/mica-mqtt-spring-boot-example.jar.jar
+ARG JAR_FILE=target/mica-mqtt-spring-boot-example.jar
 COPY ${JAR_FILE} app.jar
 RUN java -Djarmode=layertools -jar app.jar extract && rm app.jar
 
 FROM moxm/java:1.8-full
 LABEL maintainer="596392912@qq.com"
 ENV TZ=Asia/Shanghai JAVA_OPTS="-Xms256m -Xmx256m -Djava.security.egd=file:/dev/./urandom"
-WORKDIR /wwww/mica-mqtt
+WORKDIR /www/mica-mqtt
 
 COPY --from=builder /build/dependencies/ ./
 COPY --from=builder /build/snapshot-dependencies/ ./
