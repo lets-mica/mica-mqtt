@@ -147,10 +147,9 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 * 重连
 	 *
 	 * @return MqttClient
-	 * @throws Exception 异常
 	 */
-	public MqttClient reconnect() throws Exception {
-		return client.reconnect();
+	public void reconnect() {
+		client.reconnect();
 	}
 
 	/**

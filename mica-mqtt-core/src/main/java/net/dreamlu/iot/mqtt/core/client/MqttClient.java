@@ -200,11 +200,13 @@ public final class MqttClient {
 	 * 重连
 	 *
 	 * @return MqttClient
-	 * @throws Exception 异常
 	 */
-	public MqttClient reconnect() throws Exception {
-		tioClient.reconnect(context, config.getTimeout());
-		return this;
+	public void reconnect() {
+		try {
+			tioClient.reconnect(context, config.getTimeout());
+		} catch (Exception e) {
+			logger.error("mqtt client reconnect error", e);
+		}
 	}
 
 	/**
