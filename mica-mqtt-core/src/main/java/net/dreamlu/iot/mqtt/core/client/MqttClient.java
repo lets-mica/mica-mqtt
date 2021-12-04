@@ -203,6 +203,10 @@ public final class MqttClient {
 	 */
 	public void reconnect() {
 		try {
+			// 判断是否 removed
+			if (context.isRemoved) {
+				context.setRemoved(false);
+			}
 			tioClient.reconnect(context, config.getTimeout());
 		} catch (Exception e) {
 			logger.error("mqtt client reconnect error", e);
@@ -215,7 +219,7 @@ public final class MqttClient {
 	 * @return 是否成功
 	 */
 	public boolean disconnect() {
-		boolean result = Tio.send(context, MqttMessage.DISCONNECT);
+		boolean result = Tio.bSend(context, MqttMessage.DISCONNECT);
 		if (result) {
 			Tio.close(context, null, "MqttClient disconnect.", true);
 		}
