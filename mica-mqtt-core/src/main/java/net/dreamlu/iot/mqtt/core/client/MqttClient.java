@@ -198,8 +198,6 @@ public final class MqttClient {
 
 	/**
 	 * 重连
-	 *
-	 * @return MqttClient
 	 */
 	public void reconnect() {
 		try {

@@ -38,6 +38,7 @@ public final class Result {
 	 * 响应成功
 	 *
 	 * @param response HttpResponse
+	 * @return HttpResponse
 	 */
 	public static HttpResponse ok(HttpResponse response) {
 		ResultCode resultCode = ResultCode.SUCCESS;
@@ -51,6 +52,7 @@ public final class Result {
 	 *
 	 * @param response HttpResponse
 	 * @param data     Object
+	 * @return HttpResponse
 	 */
 	public static HttpResponse ok(HttpResponse response, Object data) {
 		ResultCode resultCode = ResultCode.SUCCESS;
@@ -65,6 +67,7 @@ public final class Result {
 	 *
 	 * @param response   HttpResponse
 	 * @param resultCode ResultCode
+	 * @return HttpResponse
 	 */
 	public static HttpResponse fail(HttpResponse response, ResultCode resultCode) {
 		JSONObject json = new JSONObject();

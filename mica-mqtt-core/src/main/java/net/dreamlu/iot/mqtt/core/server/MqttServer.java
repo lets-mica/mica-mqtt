@@ -166,11 +166,12 @@ public final class MqttServer {
 	/**
 	 * 发布消息
 	 *
-	 * @param context ChannelContext
-	 * @param topic   topic
-	 * @param payload 消息体
-	 * @param qos     MqttQoS
-	 * @param retain  是否在服务器上保留消息
+	 * @param context  ChannelContext
+	 * @param clientId clientId
+	 * @param topic    topic
+	 * @param payload  消息体
+	 * @param qos      MqttQoS
+	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
 	public boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {

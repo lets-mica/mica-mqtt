@@ -406,7 +406,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 				Tio.send(channelContext, httpResponse);
 			} else {
 				if (log.isInfoEnabled()) {
-					log.info("{}, {}, handler return null, request line: {}", channelContext.tioConfig.getName(), channelContext.toString(), request.getRequestLine().toString());
+					log.info("{}, {}, handler return null, request line: {}", channelContext.tioConfig.getName(), channelContext, request.getRequestLine().toString());
 				}
 				request.close("handler return null");
 			}
@@ -465,6 +465,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 	 *
 	 * @param request HttpRequest
 	 * @return HttpResponse
+	 * @throws TioDecodeException TioDecodeException
 	 * @author tanyaowu
 	 */
 	public HttpResponse updateWebSocketProtocol(HttpRequest request) throws TioDecodeException {

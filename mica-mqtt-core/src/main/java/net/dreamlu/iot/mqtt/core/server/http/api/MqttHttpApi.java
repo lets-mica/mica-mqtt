@@ -56,6 +56,7 @@ public class MqttHttpApi {
 	 *
 	 * @param request HttpRequest
 	 * @return HttpResponse
+	 * @throws Exception Exception
 	 */
 	public HttpResponse publish(HttpRequest request) throws Exception {
 		PublishForm form = readForm(request, (requestBody) ->
@@ -82,7 +83,7 @@ public class MqttHttpApi {
 	 * @param request HttpRequest
 	 * @return HttpResponse
 	 */
-	public HttpResponse publishBatch(HttpRequest request) throws Exception {
+	public HttpResponse publishBatch(HttpRequest request) {
 		List<PublishForm> formList = readForm(request, (requestBody) -> {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, PublishForm.class);
@@ -128,6 +129,7 @@ public class MqttHttpApi {
 	 *
 	 * @param request HttpRequest
 	 * @return HttpResponse
+	 * @throws Exception Exception
 	 */
 	public HttpResponse subscribe(HttpRequest request) throws Exception {
 		SubscribeForm form = readForm(request, (requestBody) ->
@@ -159,7 +161,7 @@ public class MqttHttpApi {
 	 * @param request HttpRequest
 	 * @return HttpResponse
 	 */
-	public HttpResponse subscribeBatch(HttpRequest request) throws Exception {
+	public HttpResponse subscribeBatch(HttpRequest request) {
 		List<SubscribeForm> formList = readForm(request, (requestBody) -> {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, SubscribeForm.class);
@@ -196,7 +198,7 @@ public class MqttHttpApi {
 	 * @param request HttpRequest
 	 * @return HttpResponse
 	 */
-	public HttpResponse unsubscribe(HttpRequest request) throws Exception {
+	public HttpResponse unsubscribe(HttpRequest request) {
 		BaseForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, BaseForm.class)
 		);
@@ -222,7 +224,7 @@ public class MqttHttpApi {
 	 * @param request HttpRequest
 	 * @return HttpResponse
 	 */
-	public HttpResponse unsubscribeBatch(HttpRequest request) throws Exception {
+	public HttpResponse unsubscribeBatch(HttpRequest request) {
 		List<BaseForm> formList = readForm(request, (requestBody) -> {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, BaseForm.class);
