@@ -25,11 +25,18 @@ import static net.dreamlu.iot.mqtt.codec.MqttConstant.MIN_CLIENT_ID_LENGTH;
  *
  * @author netty
  */
-final class MqttCodecUtil {
-	private static final char[] TOPIC_WILDCARDS = {'#', '+'};
-	private static final String MQTT_VERSION_KEY = "TIO_CODEC_MQTT_VERSION";
+public final class MqttCodecUtil {
+	public static final char TOPIC_WILDCARDS_ONE = '+';
+	public static final char TOPIC_WILDCARDS_MORE = '#';
+	private static final String MQTT_VERSION_KEY = "MICA_MQTT_CODEC_VERSION";
 
-	protected static MqttVersion getMqttVersion(ChannelContext ctx) {
+	/**
+	 * mqtt 版本
+	 *
+	 * @param ctx ChannelContext
+	 * @return MqttVersion
+	 */
+	public static MqttVersion getMqttVersion(ChannelContext ctx) {
 		MqttVersion version = (MqttVersion) ctx.get(MQTT_VERSION_KEY);
 		if (version == null) {
 			return MqttVersion.MQTT_3_1_1;
@@ -41,14 +48,25 @@ final class MqttCodecUtil {
 		ctx.set(MQTT_VERSION_KEY, version);
 	}
 
-	protected static boolean isValidPublishTopicName(String topicName) {
+	/**
+	 * 判断是否 topic filter
+	 *
+	 * @param topicFilter topicFilter
+	 * @return 是否 topic filter
+	 */
+	public static boolean isTopicFilter(String topicFilter) {
+		return topicFilter.indexOf(TOPIC_WILDCARDS_ONE) >= 0 || topicFilter.indexOf(TOPIC_WILDCARDS_MORE) >= 0;
+	}
+
+	/**
+	 * 是否校验过的 topicName
+	 *
+	 * @param topicName topicName
+	 * @return 是否校验过的 topicName
+	 */
+	public static boolean isValidPublishTopicName(String topicName) {
 		// publish topic name must not contain any wildcard
-		for (char c : TOPIC_WILDCARDS) {
-			if (topicName.indexOf(c) >= 0) {
-				return false;
-			}
-		}
-		return true;
+		return !isTopicFilter(topicName);
 	}
 
 	protected static boolean isValidMessageId(int messageId) {

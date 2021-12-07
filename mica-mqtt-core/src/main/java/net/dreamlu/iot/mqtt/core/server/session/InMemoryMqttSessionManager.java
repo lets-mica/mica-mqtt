@@ -37,7 +37,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	 */
 	private final ConcurrentMap<String, AtomicInteger> messageIdStore = new ConcurrentHashMap<>();
 	/**
-	 * 订阅存储 topicFilter: {clientId: SubscribeStore}
+	 * 订阅存储 topicFilter: {clientId: qos}
 	 */
 	private final ConcurrentMap<String, ConcurrentMap<String, Integer>> subscribeStore = new ConcurrentHashMap<>();
 	/**
@@ -74,6 +74,15 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public Integer searchSubscribe(String topicName, String clientId) {
+		// 1. 如果订阅的就是普通的 topic
+		ConcurrentMap<String, Integer> subscribeData = subscribeStore.get(topicName);
+		if (subscribeData != null && !subscribeData.isEmpty()) {
+			Integer qos = subscribeData.get(clientId);
+			if (qos != null) {
+				return qos;
+			}
+		}
+		// 2. 如果订阅的事通配符
 		Integer qosValue = null;
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
@@ -100,7 +109,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		Map<String, Integer> subscribeMap = new HashMap<>(32);
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
-			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
+			if (MqttTopicUtil.match(topicFilter, topicName)) {
 				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					data.forEach((clientId, qos) -> {
@@ -179,7 +188,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	}
 
 	@Override
-	public boolean expire(String clientId, int sessionExpiryInterval) {
+	public boolean expire(String clientId, int sessionExpirySeconds) {
 		return false;
 	}
 

@@ -134,11 +134,11 @@ public interface IMqttSessionManager {
 	/**
 	 * 标记 session 超时时间
 	 *
-	 * @param clientId              clientId
-	 * @param sessionExpiryInterval sessionExpiryInterval
+	 * @param clientId             clientId
+	 * @param sessionExpirySeconds sessionExpirySeconds
 	 * @return 是否成功
 	 */
-	boolean expire(String clientId, int sessionExpiryInterval);
+	boolean expire(String clientId, int sessionExpirySeconds);
 
 	/**
 	 * 激活 session，标记 expire 的 session 为永久
