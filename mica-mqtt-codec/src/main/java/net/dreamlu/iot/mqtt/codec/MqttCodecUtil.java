@@ -24,6 +24,7 @@ import static net.dreamlu.iot.mqtt.codec.MqttConstant.MIN_CLIENT_ID_LENGTH;
  * 编解码工具
  *
  * @author netty
+ * @author L.cm
  */
 public final class MqttCodecUtil {
 	public static final char TOPIC_WILDCARDS_ONE = '+';
