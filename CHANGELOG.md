@@ -3,12 +3,14 @@
 ## 发行版本
 ### v1.2.1 - 2021-12-11
 - :sparkles: mica-mqtt 优化 topic 匹配。
-- :sparkles: mica-mqtt client disconnect 不再自动重连 gitee #I4L0WK。
-- :sparkles: mica-mqtt client 添加 retryCount 配置 gitee #I4L0WK。
+- :sparkles: mica-mqtt client disconnect 不再自动重连 gitee #I4L0WK 感谢 `@willianfu`。
+- :sparkles: mica-mqtt client 添加 retryCount 配置 gitee #I4L0WK 感谢 `@willianfu`。
 - :sparkles: mica-mqtt-model message 添加 json 序列化。
 - :sparkles: mica-mqtt-broker 重新梳理逻辑。
+- :bug: mica-mqtt-spring-boot-starter 在 boot 2.6.x 下 bean 循环依赖 gitee #I4LUZP 感谢 `@hongfeng11`。
 - :bug: mica-mqtt server 同一个 clientId 踢出时清除老的 session。
 - :bug: mica-mqtt server 集群下一个 clientId 只允许连接到一台服务器。
+- :memo: mica-mqtt-model 添加 README.md
 
 ### v1.2.0 - 2021-11-28
 - :sparkles: mqtt-mqtt-core client IMqttClientConnectListener 添加 onDisconnect 方法。gitee #I4JT1D 感谢 `@willianfu` 同学反馈。
