@@ -10,6 +10,7 @@
 - :bug: mica-mqtt-spring-boot-starter 在 boot 2.6.x 下 bean 循环依赖 gitee #I4LUZP 感谢 `@hongfeng11`。
 - :bug: mica-mqtt server 同一个 clientId 踢出时清除老的 session。
 - :bug: mica-mqtt server 集群下一个 clientId 只允许连接到一台服务器。
+- :bug: mica-mqtt client 修复 IMqttClientConnectListener onDisconnect 空指针。
 - :memo: mica-mqtt-model 添加 README.md
 
 ### v1.2.0 - 2021-11-28
