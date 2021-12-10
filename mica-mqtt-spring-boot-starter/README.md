@@ -16,12 +16,13 @@
 
 | 配置项 | 默认值 | 说明 |
 | ----- | ------ | ------ |
+| mqtt.server.enabled | true | 是否启用，默认：true |
 | mqtt.server.name | Mica-Mqtt-Server | 名称 |
 | mqtt.server.port | 1883 | 端口 |
 | mqtt.server.ip | 0.0.0.0 | 服务端 ip 默认为空，0.0.0.0，建议不要设置 |
 | mqtt.server.buffer-allocator | 堆内存 | 堆内存和堆外内存 |
 | mqtt.server.heartbeat-timeout | 1000 * 120 | 心跳超时时间(单位: 毫秒 默认: 1000 * 120) |
-| mqtt.server.read-buffer-size | 8092 | 接收数据的 buffer size，默认：8092 |
+| mqtt.server.read-buffer-size | 8092 | 一次读取接收数据的 buffer size，超过这个长度的消息会多次读取，默认：8092 |
 | mqtt.server.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
 | mqtt.server.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.server.debug | false | debug，如果开启 prometheus 指标收集建议关闭 |
@@ -44,7 +45,7 @@ mqtt:
     name: Mica-Mqtt-Server      # 名称，默认：Mica-Mqtt-Server
     buffer-allocator: HEAP      # 堆内存和堆外内存，默认：堆内存
     heartbeat-timeout: 120000   # 心跳超时，单位毫秒，默认: 1000 * 120
-    read-buffer-size: 8092      # 接收数据的 buffer size，默认：8092
+    read-buffer-size: 8092      # 一次读取接收数据的 buffer size，超过这个长度的消息会多次读取，默认：8092
     max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     debug: true                 # 如果开启 prometheus 指标收集建议关闭
     web-port: 8083              # http、websocket 端口，默认：8083
@@ -176,7 +177,7 @@ public class ServerService {
 | mqtt.client.client-id |  | 客户端ID，非常重要， 默认为：MICA-MQTT- 前缀和 36进制的纳秒数 |
 | mqtt.client.clean-session | true | 清除会话 <p> false 表示如果订阅的客户机断线了，那么要保存其要推送的消息，如果其重新连接时，则将这些消息推送。 true 表示消除，表示客户机是第一次连接，消息所以以前的连接信息。 </p> |
 | mqtt.client.buffer-allocator | 堆内存 | ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存 |
-| mqtt.client.read-buffer-size | 8092 | t-io 每次消息读取长度，跟 maxBytesInMessage 相关 |
+| mqtt.client.read-buffer-size | 8092 | t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：8092 |
 | mqtt.client.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
 | mqtt.client.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.client.reconnect | true | 自动重连 |
@@ -201,7 +202,7 @@ mqtt:
     reconnect: true             # 是否重连，默认：true
     re-interval: 5000           # 重连时间，默认 5000 毫秒
     version: MQTT_5             # mqtt 协议版本，默认：3.1.1
-    read-buffer-size: 8092      # 接收数据的 buffer size，默认：8092
+    read-buffer-size: 8092      # t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：8092
     max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
     buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
     keep-alive-secs: 60         # keep-alive 心跳维持时间，单位：秒
