@@ -31,9 +31,4 @@ public class DefaultMqttMessageDispatcher extends AbstractMqttMessageDispatcher 
 		return true;
 	}
 
-	@Override
-	public boolean sendTo(String clientId, Message message) {
-		return true;
-	}
-
 }

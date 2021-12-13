@@ -21,9 +21,7 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
-import org.tio.core.ChannelContext;
-import org.tio.core.Tio;
-import org.tio.server.ServerTioConfig;
+import org.tio.utils.hutool.StrUtil;
 
 import java.util.Objects;
 
@@ -49,27 +47,19 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	 */
 	abstract public boolean sendAll(Message message);
 
-	/**
-	 * 转发消息到设备，如果 clientId 就在本服务，会自行消化
-	 *
-	 * @param clientId clientId
-	 * @param message  Message
-	 * @return 是否成功
-	 */
-	abstract public boolean sendTo(String clientId, Message message);
-
 	@Override
 	public boolean send(Message message) {
 		Objects.requireNonNull(mqttServer, "MqttServer require not Null.");
 		// 1. 先发送到本服务
 		MessageType messageType = message.getMessageType();
-		if (MessageType.UP_STREAM == messageType) {
-			MqttQoS qoS = MqttQoS.valueOf(message.getQos());
-			mqttServer.publishAll(message.getTopic(), message.getPayload(), qoS, message.isRetain());
-		} else if (MessageType.SUBSCRIBE == messageType) {
+		if (MessageType.SUBSCRIBE == messageType) {
 			sessionManager.addSubscribe(message.getTopic(), message.getFromClientId(), message.getQos());
 		} else if (MessageType.UNSUBSCRIBE == messageType) {
 			sessionManager.removeSubscribe(message.getTopic(), message.getFromClientId());
+		} else if (MessageType.UP_STREAM == messageType) {
+			sendToClient(message.getTopic(), message);
+		} else if (MessageType.DOWN_STREAM == messageType) {
+			sendToClient(message.getTopic(), message);
 		}
 		return sendAll(message);
 	}
@@ -77,14 +67,25 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	@Override
 	public boolean send(String clientId, Message message) {
 		Objects.requireNonNull(mqttServer, "MqttServer require not Null.");
-		// 1. 判断如果 clientId 就在本服务，存在则发送
-		ServerTioConfig config = this.mqttServer.getServerConfig();
-		ChannelContext context = Tio.getByBsId(config, clientId);
-		if (context != null) {
-			MqttQoS qoS = MqttQoS.valueOf(message.getQos());
-			return this.mqttServer.publish(context, clientId, message.getTopic(), message.getPayload(), qoS, false);
+		message.setClientId(clientId);
+		return send(message);
+	}
+
+	/**
+	 * 发送消息到客户端
+	 *
+	 * @param topic   topic
+	 * @param message Message
+	 */
+	private void sendToClient(String topic, Message message) {
+		// 客户端id
+		String clientId = message.getClientId();
+		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
+		if (StrUtil.isBlank(clientId)) {
+			mqttServer.publishAll(topic, message.getPayload(), mqttQoS, message.isRetain());
+		} else {
+			mqttServer.publish(clientId, topic, message.getPayload(), mqttQoS, message.isRetain());
 		}
-		return this.sendTo(clientId, message);
 	}
 
 }
