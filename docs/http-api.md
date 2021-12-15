@@ -61,8 +61,6 @@
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/publish" -d '{"topic":"a/b/c","payload":"Hello World","qos":1,"retain":false,"clientId":"example"}'
 
 {"code":0}
- 
-Copied!    
 ```
 
 ## 主题订阅
@@ -93,8 +91,6 @@ Copied!
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/subscribe" -d '{"topic":"a/b/c","qos":1,"clientId":"example"}'
 
 {"code":0}
- 
-Copied! 
 ```
 
 ### POST /api/v1/mqtt/unsubscribe
@@ -122,8 +118,6 @@ Copied!
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubscribe" -d '{"topic":"a","qos":1,"clientId":"example"}'
 
 {"code":0}
- 
-Copied!
 ```
 
 ## 消息批量发布
@@ -155,8 +149,6 @@ Copied!
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/publish/batch" -d '[{"topic":"a/b/c","payload":"Hello World","qos":1,"retain":false,"clientId":"example"},{"topic":"a/b/c","payload":"Hello World Again","qos":0,"retain":false,"clientId":"example"}]'
 
 {"code":0}
- 
-Copied!
 ```
 
 ## 主题批量订阅
@@ -187,8 +179,6 @@ Copied!
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/subscribe/batch" -d '[{"topic":"a","qos":1,"clientId":"example"},{"topic":"b","qos":1,"clientId":"example"},{"topic":"c","qos":1,"clientId":"example"}]'
 
 {"code":0}
- 
-Copied!
 ```
 
 ### POST /api/v1/mqtt/unsubscribe/batch
@@ -216,6 +206,4 @@ Copied!
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubscribe/batch" -d '[{"topic":"a","qos":1,"clientId":"example"},{"topic":"b","qos":1,"clientId":"example"}]'
 
 {"code":0}
- 
-Copied!
 ```
