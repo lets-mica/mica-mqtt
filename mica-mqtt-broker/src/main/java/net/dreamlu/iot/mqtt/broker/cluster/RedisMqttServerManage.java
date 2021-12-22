@@ -16,9 +16,7 @@
 
 package net.dreamlu.iot.mqtt.broker.cluster;
 
-import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
-import net.dreamlu.iot.mqtt.broker.model.ServerNode;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.mica.core.utils.CharPool;
@@ -32,30 +30,29 @@ import org.springframework.beans.factory.SmartInitializingSingleton;
  *
  * @author L.cm
  */
-@RequiredArgsConstructor
 public class RedisMqttServerManage implements SmartInitializingSingleton, DisposableBean {
 	private final MicaRedisCache redisCache;
-	private final MqttServer mqttServer;
+	private final String nodeName;
+	private final String hostName;
+
+	public RedisMqttServerManage(MicaRedisCache redisCache, MqttServer mqttServer) {
+		this.redisCache = redisCache;
+		this.nodeName = mqttServer.getServerCreator().getNodeName();
+		this.hostName = getHostName(mqttServer.getServerCreator());
+	}
 
 	@Override
 	public void afterSingletonsInstantiated() {
-		redisCache.sAdd(RedisKeys.SERVER_NODES.getKey(), getServerNode());
+		redisCache.set(RedisKeys.SERVER_NODES.getKey(nodeName), hostName);
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		redisCache.sRem(RedisKeys.SERVER_NODES.getKey(), getServerNode());
+		redisCache.del(RedisKeys.SERVER_NODES.getKey(nodeName));
 	}
 
-	private ServerNode getServerNode() {
-		MqttServerCreator serverCreator = mqttServer.getServerCreator();
-		String nodeName = serverCreator.getNodeName();
-		String ip = INetUtil.getHostIp();
-		int port = serverCreator.getPort();
-		ServerNode node = new ServerNode();
-		node.setName(nodeName);
-		node.setPeerHost(ip + CharPool.COLON + port);
-		return node;
+	private static String getHostName(MqttServerCreator mqttServerCreator) {
+		return INetUtil.getHostIp() + CharPool.COLON + mqttServerCreator.getPort();
 	}
 
 }

@@ -41,11 +41,17 @@ public class MqttBrokerServiceImpl implements IMqttBrokerService {
 
 	@Override
 	public List<ServerNode> getNodes() {
-		Set<ServerNode> nodeSet = redisCache.sMembers(RedisKeys.SERVER_NODES.getKey());
-		if (nodeSet == null || nodeSet.isEmpty()) {
+		Set<String> nodeKeySet = redisCache.scan(RedisKeys.SERVER_NODES.getKey(StringPool.STAR));
+		if (nodeKeySet.isEmpty()) {
 			return Collections.emptyList();
 		}
-		return new ArrayList<>(nodeSet);
+		int beginIndex = RedisKeys.SERVER_NODES.getKey().length();
+		List<ServerNode> list = new ArrayList<>();
+		for (String nodeKey : nodeKeySet) {
+			String nodeName = nodeKey.substring(beginIndex);
+			list.add(new ServerNode(nodeName, redisCache.get(nodeKey)));
+		}
+		return list;
 	}
 
 	@Override
