@@ -19,8 +19,6 @@ package net.dreamlu.iot.mqtt.broker;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Properties;
-
 /**
  * mica mqtt broker
  *

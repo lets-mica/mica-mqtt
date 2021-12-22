@@ -55,9 +55,9 @@ public class MqttClientTest {
 			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 
-		client.subQos0("/#", (topic, payload) -> {
-			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
-		});
+//		client.subQos0("/#", (topic, payload) -> {
+//			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
+//		});
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {

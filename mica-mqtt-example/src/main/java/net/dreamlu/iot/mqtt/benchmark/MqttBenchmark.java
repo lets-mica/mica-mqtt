@@ -33,7 +33,7 @@ public class MqttBenchmark {
 		// 1. 模拟 1w 连接，在开发机（i5-7500 4核4线程 win10 MqttServer 6G）1万连连接很轻松。
 		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
 		// 《修改Windows服务器最大的Tcp连接数》：https://www.jianshu.com/p/00136a97d2d8
-		int connCount = 2_0000;
+		int connCount = 1_0000;
 		int threadCount = 1000;
 		String ip = "127.0.0.1";
 		ExecutorService executor = Executors.newFixedThreadPool(threadCount);

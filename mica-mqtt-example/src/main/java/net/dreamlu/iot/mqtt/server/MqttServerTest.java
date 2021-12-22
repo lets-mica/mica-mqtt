@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +61,8 @@ public class MqttServerTest {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));
+				String message = "mica最牛皮 " + System.currentTimeMillis();
+				mqttServer.publishAll("/test/123", ByteBuffer.wrap(message.getBytes()), MqttQoS.AT_LEAST_ONCE);
 			}
 		}, 1000, 2000);
 	}

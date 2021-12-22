@@ -33,7 +33,7 @@ public final class MqttConnAckVariableHeader {
 	}
 
 	public MqttConnAckVariableHeader(MqttConnectReasonCode connectReturnCode, boolean sessionPresent,
-                                     MqttProperties properties) {
+									 MqttProperties properties) {
 		this.connectReturnCode = connectReturnCode;
 		this.sessionPresent = sessionPresent;
 		this.properties = MqttProperties.withEmptyDefaults(properties);

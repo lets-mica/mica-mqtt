@@ -37,7 +37,7 @@ public final class MqttClient {
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
 	private final ClientChannelContext context;
-	private final MqttClientStore clientStore;
+	private final IMqttClientSession clientSession;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public static MqttClientCreator create() {
@@ -47,12 +47,12 @@ public final class MqttClient {
 	MqttClient(TioClient tioClient,
 			   MqttClientCreator config,
 			   ClientChannelContext context,
-			   MqttClientStore clientStore,
+			   IMqttClientSession clientSession,
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.context = context;
-		this.clientStore = clientStore;
+		this.clientSession = clientSession;
 		this.executor = executor;
 	}
 
@@ -107,7 +107,7 @@ public final class MqttClient {
 		Boolean result = Tio.send(context, message);
 		logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} subscribing result:{}", topicFilter, mqttQoS, messageId, result);
 		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
-		clientStore.addPaddingSubscribe(messageId, pendingSubscription);
+		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 		return this;
 	}
 
@@ -127,7 +127,7 @@ public final class MqttClient {
 		Boolean result = Tio.send(context, message);
 		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilter, messageId, result);
 		// 解绑 subManage listener
-		clientStore.addPaddingUnSubscribe(messageId, pendingUnSubscription);
+		clientSession.addPaddingUnSubscribe(messageId, pendingUnSubscription);
 		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 		return this;
 	}
@@ -190,7 +190,7 @@ public final class MqttClient {
 		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
-			clientStore.addPendingPublish(messageId, pendingPublish);
+			clientSession.addPendingPublish(messageId, pendingPublish);
 			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
 		}
 		return result;
@@ -235,7 +235,7 @@ public final class MqttClient {
 		boolean result = tioClient.stop();
 		logger.info("MqttClient stop result:{}", result);
 		this.executor.shutdown();
-		this.clientStore.clean();
+		this.clientSession.clean();
 		return result;
 	}
 

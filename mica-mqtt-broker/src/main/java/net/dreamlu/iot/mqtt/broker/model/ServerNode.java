@@ -19,7 +19,7 @@ package net.dreamlu.iot.mqtt.broker.model;
 import lombok.Data;
 
 /**
- *  mqtt 服务节点
+ * mqtt 服务节点
  *
  * @author L.cm
  */

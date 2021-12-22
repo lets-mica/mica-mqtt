@@ -23,11 +23,11 @@ import net.dreamlu.iot.mqtt.core.util.MultiValueMap;
 import java.util.*;
 
 /**
- * 客户端管理处理，包括 sub 和 pub
+ * 客户端 session 管理，包括 sub 和 pub
  *
  * @author L.cm
  */
-public final class MqttClientStore {
+public final class DefaultMqttClientSession implements IMqttClientSession {
 	/**
 	 * 订阅的数据承载
 	 */
@@ -37,23 +37,28 @@ public final class MqttClientStore {
 	private final Map<Integer, MqttPendingPublish> pendingPublishData = new LinkedHashMap<>();
 	private final Map<Integer, MqttPendingQos2Publish> pendingQos2PublishData = new LinkedHashMap<>();
 
-	protected void addPaddingSubscribe(int messageId, MqttPendingSubscription pendingSubscription) {
+	@Override
+	public void addPaddingSubscribe(int messageId, MqttPendingSubscription pendingSubscription) {
 		pendingSubscriptions.put(messageId, pendingSubscription);
 	}
 
-	protected MqttPendingSubscription getPaddingSubscribe(int messageId) {
+	@Override
+	public MqttPendingSubscription getPaddingSubscribe(int messageId) {
 		return pendingSubscriptions.get(messageId);
 	}
 
-	protected MqttPendingSubscription removePaddingSubscribe(int messageId) {
+	@Override
+	public MqttPendingSubscription removePaddingSubscribe(int messageId) {
 		return pendingSubscriptions.remove(messageId);
 	}
 
-	protected void addSubscription(MqttClientSubscription subscription) {
+	@Override
+	public void addSubscription(MqttClientSubscription subscription) {
 		subscriptions.add(subscription.getTopicFilter(), subscription);
 	}
 
-	protected List<MqttClientSubscription> getAndCleanSubscription() {
+	@Override
+	public List<MqttClientSubscription> getAndCleanSubscription() {
 		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
 		for (List<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
 			subscriptionList.addAll(mqttSubscriptions);
@@ -63,7 +68,8 @@ public final class MqttClientStore {
 		return data;
 	}
 
-	protected List<MqttClientSubscription> getMatchedSubscription(String topicName) {
+	@Override
+	public List<MqttClientSubscription> getMatchedSubscription(String topicName) {
 		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
 		for (List<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
 			for (MqttClientSubscription subscription : mqttSubscriptions) {
@@ -75,46 +81,57 @@ public final class MqttClientStore {
 		return Collections.unmodifiableList(subscriptionList);
 	}
 
-	protected void removeSubscriptions(String topicFilter) {
+	@Override
+	public void removeSubscriptions(String topicFilter) {
 		subscriptions.remove(topicFilter);
 	}
 
-	protected void addPaddingUnSubscribe(int messageId, MqttPendingUnSubscription pendingUnSubscription) {
+	@Override
+	public void addPaddingUnSubscribe(int messageId, MqttPendingUnSubscription pendingUnSubscription) {
 		pendingUnSubscriptions.put(messageId, pendingUnSubscription);
 	}
 
-	protected MqttPendingUnSubscription getPaddingUnSubscribe(int messageId) {
+	@Override
+	public MqttPendingUnSubscription getPaddingUnSubscribe(int messageId) {
 		return pendingUnSubscriptions.get(messageId);
 	}
 
-	protected MqttPendingUnSubscription removePaddingUnSubscribe(int messageId) {
+	@Override
+	public MqttPendingUnSubscription removePaddingUnSubscribe(int messageId) {
 		return pendingUnSubscriptions.remove(messageId);
 	}
 
-	protected void addPendingPublish(int messageId, MqttPendingPublish pendingPublish) {
+	@Override
+	public void addPendingPublish(int messageId, MqttPendingPublish pendingPublish) {
 		pendingPublishData.put(messageId, pendingPublish);
 	}
 
-	protected MqttPendingPublish getPendingPublish(int messageId) {
+	@Override
+	public MqttPendingPublish getPendingPublish(int messageId) {
 		return pendingPublishData.get(messageId);
 	}
 
-	protected MqttPendingPublish removePendingPublish(int messageId) {
+	@Override
+	public MqttPendingPublish removePendingPublish(int messageId) {
 		return pendingPublishData.remove(messageId);
 	}
 
-	protected void addPendingQos2Publish(int messageId, MqttPendingQos2Publish pendingQos2Publish) {
+	@Override
+	public void addPendingQos2Publish(int messageId, MqttPendingQos2Publish pendingQos2Publish) {
 		pendingQos2PublishData.put(messageId, pendingQos2Publish);
 	}
 
-	protected MqttPendingQos2Publish getPendingQos2Publish(int messageId) {
+	@Override
+	public MqttPendingQos2Publish getPendingQos2Publish(int messageId) {
 		return pendingQos2PublishData.get(messageId);
 	}
 
-	protected MqttPendingQos2Publish removePendingQos2Publish(int messageId) {
+	@Override
+	public MqttPendingQos2Publish removePendingQos2Publish(int messageId) {
 		return pendingQos2PublishData.remove(messageId);
 	}
 
+	@Override
 	public void clean() {
 		subscriptions.clear();
 		pendingSubscriptions.clear();

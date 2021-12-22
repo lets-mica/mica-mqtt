@@ -28,7 +28,7 @@ public interface IMqttConnectStatusListener {
 	/**
 	 * 设备上线（连接成功）
 	 *
-	 * @param context ChannelContext
+	 * @param context  ChannelContext
 	 * @param clientId clientId
 	 */
 	void online(ChannelContext context, String clientId);
@@ -36,7 +36,7 @@ public interface IMqttConnectStatusListener {
 	/**
 	 * 设备离线
 	 *
-	 * @param context ChannelContext
+	 * @param context  ChannelContext
 	 * @param clientId clientId
 	 */
 	void offline(ChannelContext context, String clientId);

@@ -37,10 +37,12 @@ import java.util.Objects;
  */
 public class MqttClientAioListener extends DefaultClientAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
+	//	private final DefaultMqttClientSession clientStore;
 	private final MqttConnectMessage connectMessage;
 	private final IMqttClientConnectListener connectListener;
 
 	public MqttClientAioListener(MqttClientCreator clientCreator) {
+//		this.clientStore = clientCreator.getClientId();
 		this.connectMessage = getConnectMessage(Objects.requireNonNull(clientCreator));
 		this.connectListener = clientCreator.getConnectListener();
 	}
@@ -104,10 +106,13 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 
 	@Override
 	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+		// 1. 清理客户端 session
+//		this.clientStore.clean();
 		// 先判断是否配置监听
 		if (connectListener == null) {
 			return;
 		}
+		// 2. 触发客户断开连接事件
 		try {
 			connectListener.onDisconnect(channelContext, throwable, remark, isRemove);
 		} catch (Throwable e) {

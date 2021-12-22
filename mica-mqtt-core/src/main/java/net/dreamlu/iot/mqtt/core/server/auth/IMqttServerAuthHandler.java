@@ -29,7 +29,7 @@ public interface IMqttServerAuthHandler {
 	/**
 	 * 认证
 	 *
-	 * @param context ChannelContext
+	 * @param context  ChannelContext
 	 * @param uniqueId mqtt 内唯一id，默认和 clientId 相同
 	 * @param clientId 客户端 ID
 	 * @param userName 用户名

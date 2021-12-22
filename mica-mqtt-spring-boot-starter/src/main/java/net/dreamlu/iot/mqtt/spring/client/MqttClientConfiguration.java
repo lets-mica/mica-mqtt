@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.spring.client;
 
 import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
+import net.dreamlu.iot.mqtt.core.client.IMqttClientSession;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
 import org.springframework.beans.factory.ObjectProvider;
@@ -44,6 +45,7 @@ public class MqttClientConfiguration {
 
 	@Bean
 	public MqttClientCreator mqttClientCreator(MqttClientProperties properties,
+											   ObjectProvider<IMqttClientSession> clientSessionObjectProvider,
 											   ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
 											   ObjectProvider<MqttClientCustomizer> customizers) {
 		MqttClientCreator clientCreator = MqttClient.create()
@@ -79,6 +81,8 @@ public class MqttClientConfiguration {
 				}
 			});
 		}
+		// 客户端 session
+		clientSessionObjectProvider.ifAvailable(clientCreator::clientSession);
 		// 配置客户端链接监听器
 		clientConnectListenerObjectProvider.ifAvailable(clientCreator::connectListener);
 		// 自定义处理
