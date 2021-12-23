@@ -70,13 +70,12 @@ final class MqttClientSubscription implements Serializable {
 		MqttClientSubscription that = (MqttClientSubscription) o;
 		return Objects.equals(topicFilter, that.topicFilter) &&
 			mqttQoS == that.mqttQoS &&
-			Objects.equals(topicRegex, that.topicRegex) &&
 			Objects.equals(listener, that.listener);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(topicFilter, mqttQoS, topicRegex, listener);
+		return Objects.hash(topicFilter, mqttQoS, listener);
 	}
 
 	@Override

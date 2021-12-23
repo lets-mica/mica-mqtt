@@ -31,7 +31,7 @@ public enum RedisKeys {
 	/**
 	 * mqtt 服务端节点
 	 */
-	SERVER_NODES("mqtt:server:nodes"),
+	SERVER_NODES("mqtt:server:nodes:"),
 	/**
 	 * mqtt <-> redis pug/sub 集群内消息交互
 	 */

@@ -16,7 +16,9 @@
 
 package net.dreamlu.iot.mqtt.broker.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * mqtt 服务节点
@@ -24,6 +26,8 @@ import lombok.Data;
  * @author L.cm
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class ServerNode {
 
 	/**
