@@ -1,6 +1,13 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.2 - 2021-12-26
+- :sparkles: mica-mqtt server 添加发布权限接口，无权限直接断开连接，避免高级别 qos 重试浪费资源。
+- :sparkles: mica-mqtt-broker 优化节点信息存储
+- :sparkles: mqtt client 抽象 IMqttClientSession 接口。
+- :bug: 修复重构 AbstractMqttMessageDispatcher 保持跟 mica-mqtt-broker 逻辑一致 gitee #I4MA6A 感谢 `@胡萝博`
+- :arrow_up: mica-mqtt-example 升级 log4j2 到 2.17.0
+
 ### v1.2.1 - 2021-12-11
 - :sparkles: mica-mqtt 优化 topic 匹配。
 - :sparkles: mica-mqtt client disconnect 不再自动重连 gitee #I4L0WK 感谢 `@willianfu`。
