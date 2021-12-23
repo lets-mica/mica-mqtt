@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.spring.server;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerPublishPermission;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
@@ -56,6 +57,7 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttServerAuthHandler> authHandlerObjectProvider,
 											   ObjectProvider<IMqttServerUniqueIdService> uniqueIdServiceObjectProvider,
 											   ObjectProvider<IMqttServerSubscribeValidator> subscribeValidatorObjectProvider,
+											   ObjectProvider<IMqttServerPublishPermission> publishPermissionObjectProvider,
 											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
 											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
@@ -102,6 +104,8 @@ public class MqttServerConfiguration {
 		uniqueIdServiceObjectProvider.ifAvailable(serverCreator::uniqueIdService);
 		// 订阅校验
 		subscribeValidatorObjectProvider.ifAvailable(serverCreator::subscribeValidator);
+		// 订阅权限校验
+		publishPermissionObjectProvider.ifAvailable(serverCreator::publishPermission);
 		// 消息转发
 		messageDispatcherObjectProvider.ifAvailable(serverCreator::messageDispatcher);
 		// 消息存储

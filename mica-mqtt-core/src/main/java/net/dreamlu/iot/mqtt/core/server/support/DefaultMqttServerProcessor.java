@@ -23,6 +23,7 @@ import net.dreamlu.iot.mqtt.core.server.MqttConst;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerPublishPermission;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
@@ -52,6 +53,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttServerProcessor.class);
 	/**
+	 * 默认的超时时间
+	 */
+	private static final long DEFAULT_HEARTBEAT_TIMEOUT = 120_000L;
+	/**
 	 * 2 倍客户端 keepAlive 时间
 	 */
 	private static final long KEEP_ALIVE_UNIT = 2000L;
@@ -61,6 +66,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttServerAuthHandler authHandler;
 	private final IMqttServerUniqueIdService uniqueIdService;
 	private final IMqttServerSubscribeValidator subscribeValidator;
+	private final IMqttServerPublishPermission publishPermission;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final IMqttMessageListener messageListener;
@@ -68,12 +74,13 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
-		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? 120_000L : serverCreator.getHeartbeatTimeout();
+		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? DEFAULT_HEARTBEAT_TIMEOUT : serverCreator.getHeartbeatTimeout();
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.authHandler = serverCreator.getAuthHandler();
 		this.uniqueIdService = serverCreator.getUniqueIdService();
 		this.subscribeValidator = serverCreator.getSubscribeValidator();
+		this.publishPermission = serverCreator.getPublishPermission();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 		this.messageListener = serverCreator.getMessageListener();
@@ -191,6 +198,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		MqttQoS mqttQoS = fixedHeader.qosLevel();
 		MqttPublishVariableHeader variableHeader = message.variableHeader();
 		String topicName = variableHeader.topicName();
+		// 1. 判断是否有发布权限
+		if (publishPermission != null && !publishPermission.hasPermission(context, clientId, topicName, mqttQoS)) {
+			return;
+		}
+		// 2. 处理发布逻辑
 		int packetId = variableHeader.packetId();
 		logger.debug("Publish - clientId:{} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
 		switch (mqttQoS) {

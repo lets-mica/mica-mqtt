@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.core.server;
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerPublishPermission;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
@@ -100,6 +101,10 @@ public class MqttServerCreator {
 	 * 订阅校验器
 	 */
 	private IMqttServerSubscribeValidator subscribeValidator;
+	/**
+	 * 发布权限校验
+	 */
+	private IMqttServerPublishPermission publishPermission;
 	/**
 	 * 消息处理器
 	 */
@@ -274,6 +279,15 @@ public class MqttServerCreator {
 
 	public MqttServerCreator subscribeValidator(IMqttServerSubscribeValidator subscribeValidator) {
 		this.subscribeValidator = subscribeValidator;
+		return this;
+	}
+
+	public IMqttServerPublishPermission getPublishPermission() {
+		return publishPermission;
+	}
+
+	public MqttServerCreator publishPermission(IMqttServerPublishPermission publishPermission) {
+		this.publishPermission = publishPermission;
 		return this;
 	}
 
