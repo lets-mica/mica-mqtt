@@ -25,56 +25,35 @@ import java.util.*;
  * @param <V> value 泛型
  * @author L.cm
  */
-public class MultiValueMap<K, V> implements Map<K, List<V>> {
-	private final Map<K, List<V>> targetMap;
+public class MultiValueMap<K, V> implements Map<K, Set<V>> {
+	private final Map<K, Set<V>> targetMap;
 
 	public MultiValueMap() {
 		this(new LinkedHashMap<>());
 	}
 
-	public MultiValueMap(Map<K, List<V>> targetMap) {
+	public MultiValueMap(Map<K, Set<V>> targetMap) {
 		this.targetMap = Objects.requireNonNull(targetMap);
 	}
 
-	public V getFirst(K key) {
-		List<V> values = this.targetMap.get(key);
-		return (values != null && !values.isEmpty() ? values.get(0) : null);
-	}
-
 	public void add(K key, V value) {
-		List<V> values = this.targetMap.computeIfAbsent(key, k -> new LinkedList<>());
+		Set<V> values = this.targetMap.computeIfAbsent(key, k -> new LinkedHashSet<>());
 		values.add(value);
 	}
 
-	public void addAll(K key, List<? extends V> values) {
-		List<V> currentValues = this.targetMap.computeIfAbsent(key, k -> new LinkedList<>());
+	public void addAll(K key, Set<? extends V> values) {
+		Set<V> currentValues = this.targetMap.computeIfAbsent(key, k -> new LinkedHashSet<>());
 		currentValues.addAll(values);
 	}
 
-	public void addAll(MultiValueMap<K, V> values) {
-		for (Entry<K, List<V>> entry : values.entrySet()) {
-			addAll(entry.getKey(), entry.getValue());
-		}
-	}
-
 	public void set(K key, V value) {
-		List<V> values = new LinkedList<>();
+		Set<V> values = new LinkedHashSet<>();
 		values.add(value);
 		this.targetMap.put(key, values);
 	}
 
 	public void setAll(Map<K, V> values) {
 		values.forEach(this::set);
-	}
-
-	public Map<K, V> toSingleValueMap() {
-		Map<K, V> singleValueMap = new LinkedHashMap<>(this.targetMap.size());
-		this.targetMap.forEach((key, values) -> {
-			if (values != null && !values.isEmpty()) {
-				singleValueMap.put(key, values.get(0));
-			}
-		});
-		return singleValueMap;
 	}
 
 	@Override
@@ -98,22 +77,22 @@ public class MultiValueMap<K, V> implements Map<K, List<V>> {
 	}
 
 	@Override
-	public List<V> get(Object o) {
+	public Set<V> get(Object o) {
 		return this.targetMap.get(o);
 	}
 
 	@Override
-	public List<V> put(K k, List<V> vs) {
+	public Set<V> put(K k, Set<V> vs) {
 		return this.targetMap.put(k, vs);
 	}
 
 	@Override
-	public List<V> remove(Object o) {
+	public Set<V> remove(Object o) {
 		return this.targetMap.remove(o);
 	}
 
 	@Override
-	public void putAll(Map<? extends K, ? extends List<V>> map) {
+	public void putAll(Map<? extends K, ? extends Set<V>> map) {
 		this.targetMap.putAll(map);
 	}
 
@@ -128,12 +107,12 @@ public class MultiValueMap<K, V> implements Map<K, List<V>> {
 	}
 
 	@Override
-	public Collection<List<V>> values() {
+	public Collection<Set<V>> values() {
 		return this.targetMap.values();
 	}
 
 	@Override
-	public Set<Entry<K, List<V>>> entrySet() {
+	public Set<Entry<K, Set<V>>> entrySet() {
 		return this.targetMap.entrySet();
 	}
 

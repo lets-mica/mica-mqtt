@@ -98,16 +98,22 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, IMqttClientMessageListener listener) {
-		int messageId = MqttClientMessageId.getId();
-		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-			.addSubscription(mqttQoS, topicFilter)
-			.messageId(messageId)
-			.build();
-		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, listener, message);
-		Boolean result = Tio.send(context, message);
-		logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} subscribing result:{}", topicFilter, mqttQoS, messageId, result);
-		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
-		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
+		// 先判断是否已经订阅过，重复订阅
+		boolean subscribed = clientSession.isSubscribed(topicFilter, mqttQoS, listener);
+		if (subscribed) {
+			logger.error("MQTT Topic:{} mqttQoS:{} listener:{} duplicate subscription.", topicFilter, mqttQoS, listener);
+		} else {
+			int messageId = MqttClientMessageId.getId();
+			MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+				.addSubscription(mqttQoS, topicFilter)
+				.messageId(messageId)
+				.build();
+			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, listener, message);
+			Boolean result = Tio.send(context, message);
+			logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} subscribing result:{}", topicFilter, mqttQoS, messageId, result);
+			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
+			clientSession.addPaddingSubscribe(messageId, pendingSubscription);
+		}
 		return this;
 	}
 

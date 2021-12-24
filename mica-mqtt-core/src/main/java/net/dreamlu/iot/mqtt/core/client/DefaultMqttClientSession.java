@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.util.MultiValueMap;
@@ -58,9 +59,18 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 	}
 
 	@Override
+	public boolean isSubscribed(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener) {
+		Set<MqttClientSubscription> subscriptionSet = this.subscriptions.get(topicFilter);
+		if (subscriptionSet == null || subscriptionSet.isEmpty()) {
+			return false;
+		}
+		return subscriptionSet.contains(new MqttClientSubscription(mqttQoS, topicFilter, listener));
+	}
+
+	@Override
 	public List<MqttClientSubscription> getAndCleanSubscription() {
 		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
-		for (List<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
+		for (Set<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
 			subscriptionList.addAll(mqttSubscriptions);
 		}
 		List<MqttClientSubscription> data = Collections.unmodifiableList(subscriptionList);
@@ -71,7 +81,7 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 	@Override
 	public List<MqttClientSubscription> getMatchedSubscription(String topicName) {
 		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
-		for (List<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
+		for (Set<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
 			for (MqttClientSubscription subscription : mqttSubscriptions) {
 				if (subscription.matches(topicName)) {
 					subscriptionList.add(subscription);

@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 
@@ -58,6 +59,16 @@ public interface IMqttClientSession {
 	 * @param subscription MqttClientSubscription
 	 */
 	void addSubscription(MqttClientSubscription subscription);
+
+	/**
+	 * 判断是否已经订阅过
+	 *
+	 * @param topicFilter topicFilter
+	 * @param mqttQoS     MqttQoS
+	 * @param listener    IMqttClientMessageListener
+	 * @return 是否已经订阅过
+	 */
+	boolean isSubscribed(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener);
 
 	/**
 	 * 获取并清除订阅
