@@ -20,6 +20,8 @@ import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.util.MultiValueMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -29,6 +31,7 @@ import java.util.*;
  * @author L.cm
  */
 public final class DefaultMqttClientSession implements IMqttClientSession {
+	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientSession.class);
 	/**
 	 * 订阅的数据承载
 	 */
@@ -68,6 +71,7 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 		for (MqttClientSubscription subscription : subscriptionSet) {
 			// 1. 已经存在订阅
 			if (clientSubscription.equals(subscription)) {
+				logger.error("MQTT Topic:{} mqttQoS:{} listener:{} duplicate subscription.", topicFilter, mqttQoS, listener);
 				return true;
 			}
 			MqttQoS subQos = subscription.getMqttQoS();
@@ -77,6 +81,9 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 				// 3. 监听器不相同则直接添加
 				if (subListener != listener) {
 					subscriptions.add(topicFilter, clientSubscription);
+					logger.warn("MQTT Topic:{} mqttQoS:{} listener:{} has a higher level qos, added directly.", topicFilter, mqttQoS, listener);
+				} else {
+					logger.error("MQTT Topic:{} mqttQoS:{} listener:{} has a higher level qos, duplicate subscription.", topicFilter, mqttQoS, listener);
 				}
 				return true;
 			}
