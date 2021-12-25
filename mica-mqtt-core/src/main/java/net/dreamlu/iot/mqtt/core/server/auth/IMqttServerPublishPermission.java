@@ -33,8 +33,9 @@ public interface IMqttServerPublishPermission {
 	 * @param clientId 客户端 id
 	 * @param topic    topic
 	 * @param qoS      MqttQoS
+	 * @param isRetain 是否保留消息
 	 * @return 否有发布权限
 	 */
-	boolean hasPermission(ChannelContext context, String clientId, String topic, MqttQoS qoS);
+	boolean hasPermission(ChannelContext context, String clientId, String topic, MqttQoS qoS, boolean isRetain);
 
 }

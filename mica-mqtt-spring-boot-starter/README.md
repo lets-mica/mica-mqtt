@@ -63,7 +63,8 @@ mqtt:
 | ---------------------------   | -------------- | ------------------------- |
 | IMqttServerUniqueIdService    | 否             | 用于 clientId 不唯一时，自定义实现唯一标识，后续接口使用它替代 clientId |
 | IMqttServerAuthHandler        | 是             | 用于服务端认证               |
-| IMqttServerSubscribeValidator | 是             | 1.1.3 新增，用于服务端订阅校验 |
+| IMqttServerSubscribeValidator | 否（建议实现）   | 1.1.3 新增，用于对客户端订阅校验 |
+| IMqttServerPublishPermission  | 否（建议实现）   | 1.2.2 新增，用于对客户端发布权限校验 |
 | IMqttMessageListener          | 是             | 消息监听                    |
 | IMqttConnectStatusListener    | 是             | 连接状态监听                 |
 | IMqttSessionManager           | 否             | session 管理               |
