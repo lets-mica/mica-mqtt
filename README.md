@@ -14,6 +14,7 @@
 - 物联网（边缘端消息通信）
 - 群组类 IM
 - 消息推送
+- 简单易用的 mqtt 客户端
 
 ## 优势
 - 平凡却不单调，简单却不失精彩。
@@ -53,7 +54,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-spring-boot-starter</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
 </dependency>
 ```
 
@@ -64,7 +65,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-core</artifactId>
-  <version>1.2.1</version>
+  <version>1.2.2</version>
 </dependency>
 ```
 
