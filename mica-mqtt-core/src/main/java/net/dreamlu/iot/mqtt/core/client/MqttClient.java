@@ -25,6 +25,7 @@ import org.tio.client.TioClient;
 import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -98,6 +99,8 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, IMqttClientMessageListener listener) {
+		Objects.requireNonNull(topicFilter, "MQTT subscribe topicFilter is null.");
+		Objects.requireNonNull(listener, "MQTT subscribe listener is null.");
 		// 先判断是否已经订阅过，重复订阅，直接跳出
 		boolean subscribed = clientSession.isSubscribed(topicFilter, mqttQoS, listener);
 		if (!subscribed) {

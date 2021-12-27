@@ -16,6 +16,8 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
+
 import java.nio.ByteBuffer;
 
 /**
@@ -25,6 +27,16 @@ import java.nio.ByteBuffer;
  */
 @FunctionalInterface
 public interface IMqttClientMessageListener {
+
+	/**
+	 * 订阅成功之后的事件
+	 *
+	 * @param topicFilter topicFilter
+	 * @param mqttQoS     MqttQoS
+	 */
+	default void onSubscribed(String topicFilter, MqttQoS mqttQoS) {
+
+	}
 
 	/**
 	 * 监听到消息

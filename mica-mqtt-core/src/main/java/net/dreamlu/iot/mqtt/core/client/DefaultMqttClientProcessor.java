@@ -144,7 +144,13 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 		paddingSubscribe.onSubAckReceived();
 		clientSession.removePaddingSubscribe(messageId);
-		clientSession.addSubscription(paddingSubscribe.toSubscription());
+		MqttClientSubscription subscription = paddingSubscribe.toSubscription();
+		clientSession.addSubscription(subscription);
+		try {
+			subscription.getListener().onSubscribed(topicFilter, subscription.getMqttQoS());
+		} catch (Throwable e) {
+			logger.error("MQTT Topic:{} subscribed onSubscribed event error.", topicFilter);
+		}
 	}
 
 	@Override
