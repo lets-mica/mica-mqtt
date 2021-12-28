@@ -546,9 +546,10 @@ public final class MqttMessageBuilders {
 	public static final class SubAckBuilder {
 		private int packetId;
 		private MqttProperties properties;
-		private final List<MqttQoS> grantedQosList = new ArrayList<>();
+		private final List<MqttQoS> grantedQosList;
 
 		SubAckBuilder() {
+			grantedQosList = new ArrayList<>();
 		}
 
 		public SubAckBuilder packetId(int packetId) {

@@ -28,6 +28,7 @@ import org.tio.core.Tio;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * 默认的 mqtt 消息处理器
@@ -84,21 +85,25 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	}
 
 	private void reSendSubscription(ChannelContext context) {
-		List<MqttClientSubscription> subscriptionList = clientSession.getAndCleanSubscription();
-		for (MqttClientSubscription subscription : subscriptionList) {
-			int messageId = MqttClientMessageId.getId();
-			MqttQoS mqttQoS = subscription.getMqttQoS();
-			String topicFilter = subscription.getTopicFilter();
-			MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-				.addSubscription(mqttQoS, topicFilter)
-				.messageId(messageId)
-				.build();
-			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, subscription.getListener(), message);
-			Boolean result = Tio.send(context, message);
-			logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} resubscribing result:{}", topicFilter, mqttQoS, messageId, result);
-			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
-			clientSession.addPaddingSubscribe(messageId, pendingSubscription);
+		List<MqttClientSubscription> reSubscriptionList = clientSession.getAndCleanSubscription();
+		// 1. 判断是否为空
+		if (reSubscriptionList.isEmpty()) {
+			return;
 		}
+		// 2. 批量重新订阅
+		List<MqttTopicSubscription> topicSubscriptionList = reSubscriptionList.stream()
+			.map(MqttClientSubscription::toTopicSubscription)
+			.collect(Collectors.toList());
+		int messageId = MqttClientMessageId.getId();
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+			.addSubscriptions(topicSubscriptionList)
+			.messageId(messageId)
+			.build();
+		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(reSubscriptionList, message);
+		Boolean result = Tio.send(context, message);
+		logger.info("MQTT subscriptionList:{} messageId:{} resubscribing result:{}", reSubscriptionList, messageId, result);
+		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
+		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 	}
 
 	private void publishConnectEvent(ChannelContext context) {
@@ -121,35 +126,39 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (paddingSubscribe == null) {
 			return;
 		}
-		String topicFilter = paddingSubscribe.getTopicFilter();
+		List<MqttClientSubscription> subscriptionList = paddingSubscribe.getSubscriptionList();
 		MqttSubAckPayload subAckPayload = message.payload();
 		List<Integer> reasonCodes = subAckPayload.reasonCodes();
 		// reasonCodes 为空
 		if (reasonCodes.isEmpty()) {
-			logger.error("MqttClient topicFilter:{} subscribe failed reasonCode is empty messageId:{}", topicFilter, messageId);
+			logger.error("MqttClient subscriptionList:{} subscribe failed reasonCode is empty messageId:{}", subscriptionList, messageId);
 			paddingSubscribe.onSubAckReceived();
 			clientSession.removePaddingSubscribe(messageId);
 			return;
 		}
 		// reasonCodes 范围
-		Integer qos = reasonCodes.get(0);
-		if (qos == null || qos < 0 || qos > 2) {
-			logger.error("MqttClient topicFilter:{} subscribe failed reasonCodes:{} messageId:{}", topicFilter, reasonCodes, messageId);
-			paddingSubscribe.onSubAckReceived();
-			clientSession.removePaddingSubscribe(messageId);
-			return;
+		for (MqttClientSubscription subscription : subscriptionList) {
+			String topicFilter = subscription.getTopicFilter();
+			Integer qos = reasonCodes.get(0);
+			if (qos == null || qos < 0 || qos > 2) {
+				logger.error("MqttClient topicFilter:{} subscribe failed reasonCodes:{} messageId:{}", topicFilter, reasonCodes, messageId);
+				paddingSubscribe.onSubAckReceived();
+				clientSession.removePaddingSubscribe(messageId);
+				return;
+			}
 		}
 		if (logger.isInfoEnabled()) {
-			logger.info("MQTT Topic:{} successfully subscribed messageId:{}", topicFilter, messageId);
+			logger.info("MQTT subscriptionList:{} successfully subscribed messageId:{}", subscriptionList, messageId);
 		}
 		paddingSubscribe.onSubAckReceived();
 		clientSession.removePaddingSubscribe(messageId);
-		MqttClientSubscription subscription = paddingSubscribe.toSubscription();
-		clientSession.addSubscription(subscription);
+		clientSession.addSubscriptionList(subscriptionList);
 		try {
-			subscription.getListener().onSubscribed(topicFilter, subscription.getMqttQoS());
+			subscriptionList.forEach(clientSubscription -> {
+				clientSubscription.getListener().onSubscribed(clientSubscription.getTopicFilter(), clientSubscription.getMqttQoS());
+			});
 		} catch (Throwable e) {
-			logger.error("MQTT Topic:{} subscribed onSubscribed event error.", topicFilter);
+			logger.error("MQTT SubscriptionList:{} subscribed onSubscribed event error.", subscriptionList);
 		}
 	}
 

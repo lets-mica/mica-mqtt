@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
 import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
 
 import java.io.Serializable;
@@ -28,7 +29,7 @@ import java.util.regex.Pattern;
  *
  * @author L.cm
  */
-final class MqttClientSubscription implements Serializable {
+public final class MqttClientSubscription implements Serializable {
 	private final String topicFilter;
 	private final MqttQoS mqttQoS;
 	private final Pattern topicRegex;
@@ -37,10 +38,10 @@ final class MqttClientSubscription implements Serializable {
 	public MqttClientSubscription(MqttQoS mqttQoS,
 								  String topicFilter,
 								  IMqttClientMessageListener listener) {
-		this.mqttQoS = mqttQoS;
-		this.topicFilter = topicFilter;
+		this.mqttQoS = Objects.requireNonNull(mqttQoS, "MQTT subscribe mqttQoS is null.");
+		this.topicFilter = Objects.requireNonNull(topicFilter, "MQTT subscribe topicFilter is null.");
 		this.topicRegex = MqttTopicUtil.getTopicPattern(topicFilter);
-		this.listener = listener;
+		this.listener = Objects.requireNonNull(listener, "MQTT subscribe listener is null.");
 	}
 
 	public MqttQoS getMqttQoS() {
@@ -57,6 +58,10 @@ final class MqttClientSubscription implements Serializable {
 
 	public boolean matches(String topic) {
 		return this.topicRegex.matcher(topic).matches();
+	}
+
+	public MqttTopicSubscription toTopicSubscription() {
+		return new MqttTopicSubscription(topicFilter, mqttQoS);
 	}
 
 	@Override
@@ -80,11 +85,10 @@ final class MqttClientSubscription implements Serializable {
 
 	@Override
 	public String toString() {
-		return "MqttSubscription{" +
+		return "MqttClientSubscription{" +
 			"topicFilter='" + topicFilter + '\'' +
 			", mqttQoS=" + mqttQoS +
 			", topicRegex=" + topicRegex +
-			", listener=" + listener +
 			'}';
 	}
 

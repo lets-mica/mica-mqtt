@@ -25,10 +25,9 @@ import org.tio.client.TioClient;
 import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.stream.Collectors;
 
 /**
  * mqtt 客户端
@@ -101,23 +100,59 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, IMqttClientMessageListener listener) {
-		Objects.requireNonNull(topicFilter, "MQTT subscribe topicFilter is null.");
-		Objects.requireNonNull(listener, "MQTT subscribe listener is null.");
-		// 先判断是否已经订阅过，重复订阅，直接跳出
-		boolean subscribed = clientSession.isSubscribed(topicFilter, mqttQoS, listener);
-		if (!subscribed) {
-			// 没有订阅过
-			int messageId = MqttClientMessageId.getId();
-			MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-				.addSubscription(mqttQoS, topicFilter)
-				.messageId(messageId)
-				.build();
-			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(mqttQoS, topicFilter, listener, message);
-			Boolean result = Tio.send(context, message);
-			logger.info("MQTT Topic:{} mqttQoS:{} messageId:{} subscribing result:{}", topicFilter, mqttQoS, messageId, result);
-			pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
-			clientSession.addPaddingSubscribe(messageId, pendingSubscription);
+		return subscribe(Collections.singletonList(new MqttClientSubscription(mqttQoS, topicFilter, listener)));
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param topicFilters topicFilter 数组
+	 * @param mqttQoS      MqttQoS
+	 * @param listener     MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String[] topicFilters, MqttQoS mqttQoS, IMqttClientMessageListener listener) {
+		Objects.requireNonNull(topicFilters, "MQTT subscribe topicFilters is null.");
+		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
+		for (String topicFilter : topicFilters) {
+			subscriptionList.add(new MqttClientSubscription(mqttQoS, topicFilter, listener));
 		}
+		return subscribe(subscriptionList);
+	}
+
+	/**
+	 * 批量订阅
+	 *
+	 * @param subscriptionList 订阅集合
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(List<MqttClientSubscription> subscriptionList) {
+		// 1. 先判断是否已经订阅过，重复订阅，直接跳出
+		List<MqttClientSubscription> needSubscriptionList = new ArrayList<>();
+		for (MqttClientSubscription subscription : subscriptionList) {
+			boolean subscribed = clientSession.isSubscribed(subscription);
+			if (!subscribed) {
+				needSubscriptionList.add(subscription);
+			}
+		}
+		// 2. 已经订阅的跳出
+		if (needSubscriptionList.isEmpty()) {
+			return this;
+		}
+		List<MqttTopicSubscription> topicSubscriptionList = needSubscriptionList.stream()
+			.map(MqttClientSubscription::toTopicSubscription)
+			.collect(Collectors.toList());
+		// 3. 没有订阅过
+		int messageId = MqttClientMessageId.getId();
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+			.addSubscriptions(topicSubscriptionList)
+			.messageId(messageId)
+			.build();
+		Boolean result = Tio.send(context, message);
+		logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
+		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
+		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
+		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 		return this;
 	}
 

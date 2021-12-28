@@ -42,6 +42,7 @@ import org.tio.utils.hutool.StrUtil;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -312,9 +313,12 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
 		if (subscribeValidator != null && !subscribeValidator.isValid(context, clientId, topicSubscriptions)) {
 			logger.error("Subscribe - clientId:{} topicFilters:{} verification failed messageId:{}", clientId, topicSubscriptions, messageId);
+			// 错误时，也是返回列表
+			MqttQoS[] grantedQos = new MqttQoS[topicSubscriptions.size()];
+			Arrays.fill(grantedQos, MqttQoS.FAILURE);
 			// 3. 返回 ack
 			MqttMessage subAckMessage = MqttMessageBuilders.subAck()
-				.addGrantedQos(MqttQoS.FAILURE)
+				.addGrantedQoses(grantedQos)
 				.packetId(messageId)
 				.build();
 			Tio.send(context, subAckMessage);

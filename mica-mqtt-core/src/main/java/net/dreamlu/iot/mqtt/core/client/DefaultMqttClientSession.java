@@ -57,28 +57,34 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 	}
 
 	@Override
-	public void addSubscription(MqttClientSubscription subscription) {
-		subscriptions.add(subscription.getTopicFilter(), subscription);
+	public void addSubscriptionList(List<MqttClientSubscription> subscriptionList) {
+		for (MqttClientSubscription subscription : subscriptionList) {
+			subscriptions.add(subscription.getTopicFilter(), subscription);
+		}
 	}
 
 	@Override
-	public boolean isSubscribed(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener) {
+	public boolean isSubscribed(MqttClientSubscription clientSubscription) {
+		// 1. 判断是否已经存在订阅关系
+		String topicFilter = clientSubscription.getTopicFilter();
 		Set<MqttClientSubscription> subscriptionSet = this.subscriptions.get(topicFilter);
 		if (subscriptionSet == null || subscriptionSet.isEmpty()) {
 			return false;
 		}
-		MqttClientSubscription clientSubscription = new MqttClientSubscription(mqttQoS, topicFilter, listener);
+		// 2. 存在时的逻辑
+		MqttQoS mqttQoS = clientSubscription.getMqttQoS();
+		IMqttClientMessageListener listener = clientSubscription.getListener();
 		for (MqttClientSubscription subscription : subscriptionSet) {
-			// 1. 已经存在订阅
+			// 3. 已经存在订阅
 			if (clientSubscription.equals(subscription)) {
 				logger.error("MQTT Topic:{} mqttQoS:{} listener:{} duplicate subscription.", topicFilter, mqttQoS, listener);
 				return true;
 			}
 			MqttQoS subQos = subscription.getMqttQoS();
 			IMqttClientMessageListener subListener = subscription.getListener();
-			// 2. 如果已经存在更高或同级别 qos
+			// 4. 如果已经存在更高或同级别 qos
 			if (subQos.value() >= mqttQoS.value()) {
-				// 3. 监听器不相同则直接添加
+				// 5. 监听器不相同则直接添加
 				if (subListener != listener) {
 					subscriptions.add(topicFilter, clientSubscription);
 					logger.warn("MQTT Topic:{} mqttQoS:{} listener:{} has a higher level qos, added directly.", topicFilter, mqttQoS, listener);
