@@ -25,6 +25,8 @@ import org.tio.client.TioClient;
 import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -122,18 +124,28 @@ public final class MqttClient {
 	/**
 	 * 取消订阅
 	 *
-	 * @param topicFilter topicFilter
+	 * @param topicFilters topicFilter 集合
 	 * @return MqttClient
 	 */
-	public MqttClient unSubscribe(String topicFilter) {
+	public MqttClient unSubscribe(String... topicFilters) {
+		return unSubscribe(Arrays.asList(topicFilters));
+	}
+
+	/**
+	 * 取消订阅
+	 *
+	 * @param topicFilters topicFilter 集合
+	 * @return MqttClient
+	 */
+	public MqttClient unSubscribe(List<String> topicFilters) {
 		int messageId = MqttClientMessageId.getId();
 		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
-			.addTopicFilter(topicFilter)
+			.addTopicFilters(topicFilters)
 			.messageId(messageId)
 			.build();
-		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilter, message);
+		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilters, message);
 		Boolean result = Tio.send(context, message);
-		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilter, messageId, result);
+		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilters, messageId, result);
 		// 解绑 subManage listener
 		clientSession.addPaddingUnSubscribe(messageId, pendingUnSubscription);
 		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(context, msg));

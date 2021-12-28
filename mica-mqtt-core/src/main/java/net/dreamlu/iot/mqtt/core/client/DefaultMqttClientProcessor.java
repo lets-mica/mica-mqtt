@@ -197,11 +197,11 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			return;
 		}
 		if (logger.isInfoEnabled()) {
-			logger.info("MQTT Topic:{} successfully unSubscribed  messageId:{}", pendingUnSubscription.getTopic(), messageId);
+			logger.info("MQTT Topic:{} successfully unSubscribed  messageId:{}", pendingUnSubscription.getTopics(), messageId);
 		}
 		pendingUnSubscription.onUnSubAckReceived();
 		clientSession.removePaddingUnSubscribe(messageId);
-		clientSession.removeSubscriptions(pendingUnSubscription.getTopic());
+		clientSession.removeSubscriptions(pendingUnSubscription.getTopics());
 	}
 
 	@Override

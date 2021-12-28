@@ -88,9 +88,9 @@ public interface IMqttClientSession {
 	/**
 	 * 删除订阅过程消息
 	 *
-	 * @param topicFilter topicFilter
+	 * @param topicFilters topicFilter 集合
 	 */
-	void removeSubscriptions(String topicFilter);
+	void removeSubscriptions(List<String> topicFilters);
 
 	/**
 	 * 添加取消订阅过程消息

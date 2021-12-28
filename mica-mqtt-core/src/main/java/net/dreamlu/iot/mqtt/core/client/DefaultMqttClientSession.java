@@ -116,8 +116,8 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 	}
 
 	@Override
-	public void removeSubscriptions(String topicFilter) {
-		subscriptions.remove(topicFilter);
+	public void removeSubscriptions(List<String> topicFilters) {
+		topicFilters.forEach(subscriptions::remove);
 	}
 
 	@Override

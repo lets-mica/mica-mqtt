@@ -21,6 +21,7 @@ import net.dreamlu.iot.mqtt.codec.MqttProperties.MqttPropertyType;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -200,22 +201,29 @@ public final class MqttMessageBuilders {
 
 	public static final class SubscribeBuilder {
 
-		private List<MqttTopicSubscription> subscriptions;
+		private final List<MqttTopicSubscription> subscriptions;
 		private int messageId;
 		private MqttProperties properties;
 
 		SubscribeBuilder() {
+			subscriptions = new ArrayList<>(5);
 		}
 
-		public SubscribeBuilder addSubscription(MqttQoS qos, String topic) {
-			ensureSubscriptionsExist();
-			subscriptions.add(new MqttTopicSubscription(topic, qos));
+		public SubscribeBuilder addSubscription(MqttTopicSubscription subscription) {
+			subscriptions.add(subscription);
 			return this;
 		}
 
+		public SubscribeBuilder addSubscription(MqttQoS qos, String topic) {
+			return addSubscription(new MqttTopicSubscription(topic, qos));
+		}
+
 		public SubscribeBuilder addSubscription(String topic, MqttSubscriptionOption option) {
-			ensureSubscriptionsExist();
-			subscriptions.add(new MqttTopicSubscription(topic, option));
+			return addSubscription(new MqttTopicSubscription(topic, option));
+		}
+
+		public SubscribeBuilder addSubscriptions(Collection<MqttTopicSubscription> subscriptionColl) {
+			subscriptions.addAll(subscriptionColl);
 			return this;
 		}
 
@@ -237,28 +245,24 @@ public final class MqttMessageBuilders {
 			MqttSubscribePayload mqttSubscribePayload = new MqttSubscribePayload(subscriptions);
 			return new MqttSubscribeMessage(mqttFixedHeader, mqttVariableHeader, mqttSubscribePayload);
 		}
-
-		private void ensureSubscriptionsExist() {
-			if (subscriptions == null) {
-				subscriptions = new ArrayList<>(5);
-			}
-		}
 	}
 
 	public static final class UnsubscribeBuilder {
-
-		private List<String> topicFilters;
+		private final List<String> topicFilters;
 		private int messageId;
 		private MqttProperties properties;
 
 		UnsubscribeBuilder() {
+			topicFilters = new ArrayList<>(5);
 		}
 
 		public UnsubscribeBuilder addTopicFilter(String topic) {
-			if (topicFilters == null) {
-				topicFilters = new ArrayList<>(5);
-			}
 			topicFilters.add(topic);
+			return this;
+		}
+
+		public UnsubscribeBuilder addTopicFilters(Collection<String> topicColl) {
+			topicFilters.addAll(topicColl);
 			return this;
 		}
 
