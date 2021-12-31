@@ -69,7 +69,7 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 					throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String and ByteBuffer.");
 				}
 				// 4. 订阅
-				mqttClient.subscribe(subscribe.qos(), subscribe.value(), (topic, payload) ->
+				mqttClient.subscribe(subscribe.value(), subscribe.qos(), (topic, payload) ->
 					ReflectionUtils.invokeMethod(method, bean, topic, payload)
 				);
 			}

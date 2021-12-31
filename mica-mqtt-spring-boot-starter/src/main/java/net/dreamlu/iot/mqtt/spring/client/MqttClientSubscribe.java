@@ -35,7 +35,7 @@ public @interface MqttClientSubscribe {
 	 *
 	 * @return topic filter
 	 */
-	String value();
+	String[] value();
 
 	/**
 	 * 订阅的 qos

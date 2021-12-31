@@ -2,6 +2,7 @@
 
 ## 发行版本
 ### v1.2.3 - 2022-01-03
+- :sparkles: mica-mqtt-spring-boot-starter `@MqttClientSubscribe` value 改为数组，支持同时订阅多 topic。
 - :sparkles: mica-mqtt-core 缓存 TopicFilter Pattern。
 - :sparkles: mica-mqtt-core 优化客户端和服务端订阅逻辑 `IMqttServerSubscribeValidator` 接口调整。
 - :sparkles: mica-mqtt client 添加批量订阅。
