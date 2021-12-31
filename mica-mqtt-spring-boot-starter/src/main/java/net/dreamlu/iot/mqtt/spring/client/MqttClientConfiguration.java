@@ -61,7 +61,8 @@ public class MqttClientConfiguration {
 			.keepAliveSecs(properties.getKeepAliveSecs())
 			.reconnect(properties.isReconnect())
 			.reInterval(properties.getReInterval())
-			.setRetryCount(properties.getRetryCount())
+			.retryCount(properties.getRetryCount())
+			.reSubscribeBatchSize(properties.getReSubscribeBatchSize())
 			.version(properties.getVersion())
 			.cleanSession(properties.isCleanSession())
 			.bufferAllocator(properties.getBufferAllocator());

@@ -99,6 +99,10 @@ public class MqttClientProperties {
 	 */
 	private int retryCount = 0;
 	/**
+	 * 重连，重新订阅一个批次大小，默认：20
+	 */
+	private int reSubscribeBatchSize = 20;
+	/**
 	 * mqtt 协议，默认：MQTT_3_1_1
 	 */
 	private MqttVersion version = MqttVersion.MQTT_3_1_1;

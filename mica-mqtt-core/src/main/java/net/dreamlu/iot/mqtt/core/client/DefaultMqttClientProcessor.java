@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.core.client;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
+import net.dreamlu.iot.mqtt.core.util.CollUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -38,12 +39,14 @@ import java.util.stream.Collectors;
  */
 public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
+	private final int reSubscribeBatchSize;
 	private final IMqttClientSession clientSession;
 	private final IMqttClientConnectListener connectListener;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator,
 									  ScheduledThreadPoolExecutor executor) {
+		this.reSubscribeBatchSize = mqttClientCreator.getReSubscribeBatchSize();
 		this.clientSession = mqttClientCreator.getClientSession();
 		this.connectListener = mqttClientCreator.getConnectListener();
 		this.executor = executor;
@@ -91,6 +94,37 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (reSubscriptionList.isEmpty()) {
 			return;
 		}
+		// 2. 订阅的数量
+		int subscribedSize = reSubscriptionList.size();
+		if (subscribedSize <= reSubscribeBatchSize) {
+			reSendSubscription(context, reSubscriptionList);
+		} else {
+			List<List<MqttClientSubscription>> partitionList = CollUtil.partition(reSubscriptionList, reSubscribeBatchSize);
+			for (List<MqttClientSubscription> partition : partitionList) {
+				reSendSubscription(context, partition);
+			}
+		}
+	}
+
+	private void publishConnectEvent(ChannelContext context) {
+		// 先判断是否配置监听
+		if (connectListener == null) {
+			return;
+		}
+		try {
+			connectListener.onConnected(context, context.isReconnect);
+		} catch (Throwable e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 批量重新发布
+	 *
+	 * @param context            ChannelContext
+	 * @param reSubscriptionList reSubscriptionList
+	 */
+	private void reSendSubscription(ChannelContext context, List<MqttClientSubscription> reSubscriptionList) {
 		// 2. 批量重新订阅
 		List<MqttTopicSubscription> topicSubscriptionList = reSubscriptionList.stream()
 			.map(MqttClientSubscription::toTopicSubscription)
@@ -105,18 +139,6 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		logger.info("MQTT subscriptionList:{} messageId:{} resubscribing result:{}", reSubscriptionList, messageId, result);
 		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
 		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
-	}
-
-	private void publishConnectEvent(ChannelContext context) {
-		// 先判断是否配置监听
-		if (connectListener == null) {
-			return;
-		}
-		try {
-			connectListener.onConnected(context, context.isReconnect);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
 	}
 
 	@Override

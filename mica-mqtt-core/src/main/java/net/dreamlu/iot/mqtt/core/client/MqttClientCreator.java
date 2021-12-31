@@ -91,6 +91,10 @@ public final class MqttClientCreator {
 	 */
 	private int retryCount = 0;
 	/**
+	 * 重连，重新订阅一个批次大小，默认：20
+	 */
+	private int reSubscribeBatchSize = 20;
+	/**
 	 * 客户端 id，默认：随机生成
 	 */
 	private String clientId;
@@ -187,6 +191,10 @@ public final class MqttClientCreator {
 		return reInterval;
 	}
 
+	public int getReSubscribeBatchSize() {
+		return reSubscribeBatchSize;
+	}
+
 	public String getClientId() {
 		return clientId;
 	}
@@ -281,13 +289,18 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClientCreator setRetryCount(int retryCount) {
+	public MqttClientCreator retryCount(int retryCount) {
 		this.retryCount = retryCount;
 		return this;
 	}
 
 	public MqttClientCreator reInterval(long reInterval) {
 		this.reInterval = reInterval;
+		return this;
+	}
+
+	public MqttClientCreator reSubscribeBatchSize(int reSubscribeBatchSize) {
+		this.reSubscribeBatchSize = reSubscribeBatchSize;
 		return this;
 	}
 
