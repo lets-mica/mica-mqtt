@@ -303,4 +303,13 @@ public final class MqttClient {
 		return context;
 	}
 
+	/**
+	 * 判断客户端跟服务端是否断开连接
+	 *
+	 * @return 是否断连
+	 */
+	public boolean isDisconnect() {
+		return context.isClosed;
+	}
+
 }
