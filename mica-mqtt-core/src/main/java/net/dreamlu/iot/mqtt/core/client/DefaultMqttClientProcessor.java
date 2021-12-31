@@ -88,6 +88,28 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 	}
 
+	/**
+	 * 发布连接成功事件
+	 *
+	 * @param context ChannelContext
+	 */
+	private void publishConnectEvent(ChannelContext context) {
+		// 先判断是否配置监听
+		if (connectListener == null) {
+			return;
+		}
+		try {
+			connectListener.onConnected(context, context.isReconnect);
+		} catch (Throwable e) {
+			logger.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * 批量重新订阅
+	 *
+	 * @param context ChannelContext
+	 */
 	private void reSendSubscription(ChannelContext context) {
 		List<MqttClientSubscription> reSubscriptionList = clientSession.getAndCleanSubscription();
 		// 1. 判断是否为空
@@ -106,20 +128,8 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 	}
 
-	private void publishConnectEvent(ChannelContext context) {
-		// 先判断是否配置监听
-		if (connectListener == null) {
-			return;
-		}
-		try {
-			connectListener.onConnected(context, context.isReconnect);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
-	}
-
 	/**
-	 * 批量重新发布
+	 * 批量重新订阅
 	 *
 	 * @param context            ChannelContext
 	 * @param reSubscriptionList reSubscriptionList
@@ -170,7 +180,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				subscribedList.add(subscription);
 			}
 		}
-		logger.info("MQTT subscriptionList:{} successfully subscribed messageId:{}", subscribedList, messageId);
+		logger.info("MQTT subscriptionList:{} subscribed successfully messageId:{}", subscribedList, messageId);
 		paddingSubscribe.onSubAckReceived();
 		clientSession.removePaddingSubscribe(messageId);
 		clientSession.addSubscriptionList(subscribedList);
