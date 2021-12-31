@@ -308,7 +308,7 @@ public final class MqttClient {
 	 *
 	 * @return 是否断连
 	 */
-	public boolean isDisconnect() {
+	public boolean isDisconnected() {
 		return context.isClosed;
 	}
 
