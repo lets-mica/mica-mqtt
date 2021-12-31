@@ -1,6 +1,16 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.3 - 2022-01-03
+- :sparkles: mica-mqtt-core 缓存 TopicFilter Pattern。
+- :sparkles: mica-mqtt-core 优化客户端和服务端订阅逻辑 `IMqttServerSubscribeValidator` 接口调整。
+- :sparkles: mica-mqtt client 添加批量订阅。
+- :sparkles: mica-mqtt client 添加批量取消订阅。
+- :sparkles: mica-mqtt client 添加客户端是否断开连接。
+- :sparkles: mica-mqtt client 客户端断开重新订阅时支持配置批次大小。
+- :bookmark: mica-mqtt client 订阅 `IMqttClientMessageListener` 添加 `onSubscribed` 默认方法。
+- :arrow_up: mica-mqtt-example 升级 log4j2 到 2.17.1
+
 ### v1.2.2 - 2021-12-26
 - :sparkles: mica-mqtt server 添加发布权限接口，无权限直接断开连接，避免高级别 qos 重试浪费资源。
 - :sparkles: mica-mqtt-broker 优化节点信息存储
