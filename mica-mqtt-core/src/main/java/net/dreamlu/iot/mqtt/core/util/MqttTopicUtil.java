@@ -18,6 +18,8 @@ package net.dreamlu.iot.mqtt.core.util;
 
 import net.dreamlu.iot.mqtt.codec.MqttCodecUtil;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 /**
@@ -26,6 +28,7 @@ import java.util.regex.Pattern;
  * @author L.cm
  */
 public final class MqttTopicUtil {
+	private static final Map<String, Pattern> TOPIC_FILTER_PATTERN_CACHE = new ConcurrentHashMap<>(32);
 
 	/**
 	 * 判断 topicFilter topicName 是否匹配
@@ -49,6 +52,16 @@ public final class MqttTopicUtil {
 	 * @return Pattern
 	 */
 	public static Pattern getTopicPattern(String topicFilter) {
+		return TOPIC_FILTER_PATTERN_CACHE.computeIfAbsent(topicFilter, MqttTopicUtil::getTopicFilterPattern);
+	}
+
+	/**
+	 * mqtt topicFilter 转正则
+	 *
+	 * @param topicFilter topicFilter
+	 * @return Pattern
+	 */
+	public static Pattern getTopicFilterPattern(String topicFilter) {
 		// mqtt 分享主题 $share/{ShareName}/{filter}
 		String topicRegex = topicFilter.startsWith("$") ? "\\" + topicFilter : topicFilter;
 		return Pattern.compile(topicRegex
