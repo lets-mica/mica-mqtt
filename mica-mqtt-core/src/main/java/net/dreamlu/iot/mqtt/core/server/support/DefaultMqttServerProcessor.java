@@ -42,7 +42,6 @@ import org.tio.utils.hutool.StrUtil;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
@@ -310,39 +309,33 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		String clientId = context.getBsId();
 		int messageId = message.variableHeader().messageId();
 		// 1. 校验订阅的 topicFilter
-		List<MqttTopicSubscription> topicSubscriptions = message.payload().topicSubscriptions();
-		if (subscribeValidator != null && !subscribeValidator.isValid(context, clientId, topicSubscriptions)) {
-			logger.error("Subscribe - clientId:{} topicFilters:{} verification failed messageId:{}", clientId, topicSubscriptions, messageId);
-			// 错误时，也是返回列表
-			MqttQoS[] grantedQos = new MqttQoS[topicSubscriptions.size()];
-			Arrays.fill(grantedQos, MqttQoS.FAILURE);
-			// 3. 返回 ack
-			MqttMessage subAckMessage = MqttMessageBuilders.subAck()
-				.addGrantedQoses(grantedQos)
-				.packetId(messageId)
-				.build();
-			Tio.send(context, subAckMessage);
-			return;
-		}
-		// 2. 存储 clientId 订阅的 topic
-		List<MqttQoS> mqttQosList = new ArrayList<>();
-		List<String> topicList = new ArrayList<>();
-		for (MqttTopicSubscription subscription : topicSubscriptions) {
-			String topicName = subscription.topicName();
+		List<MqttTopicSubscription> topicSubscriptionList = message.payload().topicSubscriptions();
+		List<MqttQoS> grantedQosList = new ArrayList<>();
+		// 校验订阅
+		List<String> subscribedTopicList = new ArrayList<>();
+		boolean enableSubscribeValidator = subscribeValidator != null;
+		for (MqttTopicSubscription subscription : topicSubscriptionList) {
+			String topicFilter = subscription.topicName();
 			MqttQoS mqttQoS = subscription.qualityOfService();
-			mqttQosList.add(mqttQoS);
-			topicList.add(topicName);
-			sessionManager.addSubscribe(topicName, clientId, mqttQoS.value());
+			// 校验是否可以订阅
+			if (enableSubscribeValidator && !subscribeValidator.isValid(context, clientId, topicFilter, mqttQoS)) {
+				grantedQosList.add(MqttQoS.FAILURE);
+				logger.error("Subscribe - clientId:{} topicFilter:{} mqttQoS:{} valid failed messageId:{}", clientId, topicFilter, mqttQoS, messageId);
+			} else {
+				grantedQosList.add(mqttQoS);
+				subscribedTopicList.add(topicFilter);
+				sessionManager.addSubscribe(topicFilter, clientId, mqttQoS.value());
+				logger.info("Subscribe - clientId:{} topicFilter:{} mqttQoS:{} messageId:{}", clientId, topicFilter, mqttQoS, messageId);
+			}
 		}
-		logger.info("Subscribe - clientId:{} TopicFilters:{} mqttQoS:{} messageId:{}", clientId, topicList, mqttQosList, messageId);
 		// 3. 返回 ack
 		MqttMessage subAckMessage = MqttMessageBuilders.subAck()
-			.addGrantedQosList(mqttQosList)
+			.addGrantedQosList(grantedQosList)
 			.packetId(messageId)
 			.build();
 		Tio.send(context, subAckMessage);
 		// 4. 发送保留消息
-		for (String topic : topicList) {
+		for (String topic : subscribedTopicList) {
 			List<Message> retainMessageList = messageStore.getRetainMessage(topic);
 			if (retainMessageList != null && !retainMessageList.isEmpty()) {
 				for (Message retainMessage : retainMessageList) {

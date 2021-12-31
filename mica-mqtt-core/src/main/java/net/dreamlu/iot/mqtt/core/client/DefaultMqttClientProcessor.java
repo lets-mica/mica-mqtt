@@ -26,6 +26,7 @@ import org.tio.core.Node;
 import org.tio.core.Tio;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.stream.Collectors;
@@ -128,37 +129,35 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 		List<MqttClientSubscription> subscriptionList = paddingSubscribe.getSubscriptionList();
 		MqttSubAckPayload subAckPayload = message.payload();
-		List<Integer> reasonCodes = subAckPayload.reasonCodes();
+		List<Integer> reasonCodeList = subAckPayload.reasonCodes();
 		// reasonCodes 为空
-		if (reasonCodes.isEmpty()) {
-			logger.error("MqttClient subscriptionList:{} subscribe failed reasonCode is empty messageId:{}", subscriptionList, messageId);
-			paddingSubscribe.onSubAckReceived();
-			clientSession.removePaddingSubscribe(messageId);
+		if (reasonCodeList.isEmpty()) {
+			logger.error("MqttClient subscriptionList:{} subscribe failed reasonCodes is empty messageId:{}", subscriptionList, messageId);
 			return;
 		}
-		// reasonCodes 范围
-		for (MqttClientSubscription subscription : subscriptionList) {
+		// 找出订阅成功的数据
+		List<MqttClientSubscription> subscribedList = new ArrayList<>();
+		for (int i = 0; i < subscriptionList.size(); i++) {
+			MqttClientSubscription subscription = subscriptionList.get(i);
 			String topicFilter = subscription.getTopicFilter();
-			Integer qos = reasonCodes.get(0);
-			if (qos == null || qos < 0 || qos > 2) {
-				logger.error("MqttClient topicFilter:{} subscribe failed reasonCodes:{} messageId:{}", topicFilter, reasonCodes, messageId);
-				paddingSubscribe.onSubAckReceived();
-				clientSession.removePaddingSubscribe(messageId);
-				return;
+			Integer reasonCode = reasonCodeList.get(i);
+			// reasonCodes 范围
+			if (reasonCode == null || reasonCode < 0 || reasonCode > 2) {
+				logger.error("MqttClient topicFilter:{} subscribe failed reasonCodes:{} messageId:{}", topicFilter, reasonCode, messageId);
+			} else {
+				subscribedList.add(subscription);
 			}
 		}
-		if (logger.isInfoEnabled()) {
-			logger.info("MQTT subscriptionList:{} successfully subscribed messageId:{}", subscriptionList, messageId);
-		}
+		logger.info("MQTT subscriptionList:{} successfully subscribed messageId:{}", subscribedList, messageId);
 		paddingSubscribe.onSubAckReceived();
 		clientSession.removePaddingSubscribe(messageId);
-		clientSession.addSubscriptionList(subscriptionList);
+		clientSession.addSubscriptionList(subscribedList);
 		try {
-			subscriptionList.forEach(clientSubscription -> {
+			subscribedList.forEach(clientSubscription -> {
 				clientSubscription.getListener().onSubscribed(clientSubscription.getTopicFilter(), clientSubscription.getMqttQoS());
 			});
 		} catch (Throwable e) {
-			logger.error("MQTT SubscriptionList:{} subscribed onSubscribed event error.", subscriptionList);
+			logger.error("MQTT SubscriptionList:{} subscribed onSubscribed event error.", subscribedList);
 		}
 	}
 

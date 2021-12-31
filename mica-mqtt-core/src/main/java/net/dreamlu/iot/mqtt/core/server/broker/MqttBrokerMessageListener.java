@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.core.server.broker;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 
 import java.util.Objects;
@@ -29,6 +31,7 @@ import java.util.Objects;
  * @author L.cm
  */
 public class MqttBrokerMessageListener implements IMqttMessageListener {
+	private static final Logger logger = LoggerFactory.getLogger(MqttBrokerMessageListener.class);
 	private final IMqttMessageDispatcher dispatcher;
 
 	public MqttBrokerMessageListener(IMqttMessageDispatcher dispatcher) {
@@ -37,6 +40,7 @@ public class MqttBrokerMessageListener implements IMqttMessageListener {
 
 	@Override
 	public void onMessage(ChannelContext context, String clientId, Message message) {
+		logger.debug("Mqtt dispatcher send clientId:{} message:{}", clientId, message);
 		dispatcher.send(message);
 	}
 
