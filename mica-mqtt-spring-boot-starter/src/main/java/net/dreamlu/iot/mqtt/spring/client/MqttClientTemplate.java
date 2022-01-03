@@ -22,12 +22,14 @@ import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import net.dreamlu.iot.mqtt.core.client.MqttClientSubscription;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 
 /**
  * mqtt client 模板
@@ -86,13 +88,45 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	}
 
 	/**
+	 * 订阅
+	 *
+	 * @param topicFilters topicFilter 数组
+	 * @param mqttQoS      MqttQoS
+	 * @param listener     MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String[] topicFilters, MqttQoS mqttQoS, IMqttClientMessageListener listener) {
+		return client.subscribe(topicFilters, mqttQoS, listener);
+	}
+
+	/**
+	 * 批量订阅
+	 *
+	 * @param subscriptionList 订阅集合
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(List<MqttClientSubscription> subscriptionList) {
+		return client.subscribe(subscriptionList);
+	}
+
+	/**
 	 * 取消订阅
 	 *
 	 * @param topicFilter topicFilter
 	 * @return MqttClient
 	 */
-	public MqttClient unSubscribe(String topicFilter) {
+	public MqttClient unSubscribe(String... topicFilter) {
 		return client.unSubscribe(topicFilter);
+	}
+
+	/**
+	 * 取消订阅
+	 *
+	 * @param topicFilters topicFilter 集合
+	 * @return MqttClient
+	 */
+	public MqttClient unSubscribe(List<String> topicFilters) {
+		return client.unSubscribe(topicFilters);
 	}
 
 	/**
