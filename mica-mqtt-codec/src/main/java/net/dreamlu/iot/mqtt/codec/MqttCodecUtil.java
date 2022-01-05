@@ -29,7 +29,7 @@ import static net.dreamlu.iot.mqtt.codec.MqttConstant.MIN_CLIENT_ID_LENGTH;
 public final class MqttCodecUtil {
 	public static final char TOPIC_WILDCARDS_ONE = '+';
 	public static final char TOPIC_WILDCARDS_MORE = '#';
-	private static final String MQTT_VERSION_KEY = "MICA_MQTT_CODEC_VERSION";
+	private static final String MQTT_VERSION_KEY = "MQTT_V";
 
 	/**
 	 * mqtt 版本
