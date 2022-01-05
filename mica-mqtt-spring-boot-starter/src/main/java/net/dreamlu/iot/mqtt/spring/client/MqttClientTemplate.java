@@ -203,6 +203,15 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	}
 
 	/**
+	 * 判断客户端跟服务端是否断开连接
+	 *
+	 * @return 是否断连
+	 */
+	public boolean isDisconnected() {
+		return client.isDisconnected();
+	}
+
+	/**
 	 * 获取 MqttClient
 	 *
 	 * @return MqttClient
