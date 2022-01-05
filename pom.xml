@@ -20,8 +20,8 @@
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- tio version -->
         <tio.version>3.7.5.v20211028-RELEASE</tio.version>
-        <spring.boot.version>2.5.7</spring.boot.version>
-        <mica.version>2.5.7</mica.version>
+        <spring.boot.version>2.6.2</spring.boot.version>
+        <mica.version>2.6.0</mica.version>
         <fastjson.version>1.2.78</fastjson.version>
     </properties>
 
