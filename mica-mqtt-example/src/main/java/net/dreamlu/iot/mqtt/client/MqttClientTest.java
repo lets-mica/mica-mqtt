@@ -17,7 +17,7 @@
 package net.dreamlu.iot.mqtt.client;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
-import net.dreamlu.iot.mqtt.codec.MqttVersion;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,9 +46,15 @@ public class MqttClientTest {
 //			.readBufferSize(1024 * 10)
 //			最大包体长度,如果包体过大需要设置此参数
 //			.maxBytesInMessage(1024 * 10)
-			.version(MqttVersion.MQTT_5)
+//			.version(MqttVersion.MQTT_5)
 //			连接监听
 			.connectListener(new MqttClientConnectListener())
+			.willMessage(builder -> {
+				builder.topic("/test/offline")
+					.messageText("down")
+					.retain(false)
+					.qos(MqttQoS.AT_MOST_ONCE);    // 遗嘱消息
+			})
 			.connect();
 
 		client.subQos0("/test/#", (topic, payload) -> {
