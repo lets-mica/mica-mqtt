@@ -160,7 +160,6 @@ public final class MqttEncoder {
 		buf.putShort((short) clientIdentifierBytes.length);
 		buf.put(clientIdentifierBytes, 0, clientIdentifierBytes.length);
 		if (variableHeader.isWillFlag()) {
-			buf.putShort((short) willPropertiesBytes.length);
 			buf.put(willPropertiesBytes, 0, willPropertiesBytes.length);
 			buf.putShort((short) willTopicBytes.length);
 			buf.put(willTopicBytes, 0, willTopicBytes.length);
