@@ -5,9 +5,6 @@ spring:
     name: mica-mqtt-broker
   profiles:
     active: dev
-  mvc:
-    pathmatch:
-      matching-strategy: ant_path_matcher
 # actuator management
 management:
   info:
