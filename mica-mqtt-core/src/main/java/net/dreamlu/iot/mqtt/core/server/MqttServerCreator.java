@@ -458,7 +458,13 @@ public class MqttServerCreator {
 		// 6. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
 		// 7. 配置 mqtt http/websocket server
-		MqttWebServer webServer = MqttWebServer.config(this, tioConfig);
+		MqttWebServer webServer;
+		if (httpEnable || websocketEnable) {
+			webServer = MqttWebServer.config(this, tioConfig);
+		} else {
+			webServer = null;
+		}
+		// MqttServer
 		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, executor);
 		// 8. 如果是默认的消息转发器，设置 mqttServer
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
