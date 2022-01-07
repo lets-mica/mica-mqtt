@@ -32,6 +32,8 @@ import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.support.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -52,6 +54,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * @author L.cm
  */
 public class MqttServerCreator {
+	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
 
 	/**
 	 * 名称
@@ -459,7 +462,8 @@ public class MqttServerCreator {
 		tioServer.setCheckLastVersion(false);
 		// 7. 配置 mqtt http/websocket server
 		MqttWebServer webServer;
-		if (httpEnable || websocketEnable) {
+		logger.info("Mica mqtt http api enable:{} websocket enable:{}", this.httpEnable, this.websocketEnable);
+		if (this.httpEnable || this.websocketEnable) {
 			webServer = MqttWebServer.config(this, tioConfig);
 		} else {
 			webServer = null;

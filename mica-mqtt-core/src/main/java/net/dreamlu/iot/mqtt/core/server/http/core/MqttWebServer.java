@@ -200,8 +200,6 @@ import net.dreamlu.iot.mqtt.core.server.http.api.auth.BasicAuthFilter;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.http.websocket.MqttWsMsgHandler;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.tio.core.intf.AioHandler;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.HttpUuid;
@@ -225,7 +223,6 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @author L.cm
  */
 public class MqttWebServer {
-	private static final Logger logger = LoggerFactory.getLogger(MqttWebServer.class);
 	private static final String TIO_SYSTEM_TIMER_PERIOD = "tio.system.timer.period";
 	private final ServerAioListener serverAioListener;
 	private final HttpRequestHandler httpRequestHandler;
@@ -303,37 +300,30 @@ public class MqttWebServer {
 	 * @return MqttWebServer
 	 */
 	public static MqttWebServer config(MqttServerCreator serverCreator, ServerTioConfig mqttServerConfig) {
-		// 1. 判断是否开启
-		boolean httpEnable = serverCreator.isHttpEnable();
-		boolean websocketEnable = serverCreator.isWebsocketEnable();
-		logger.info("Mica mqtt http api enable:{} websocket enable:{}", httpEnable, websocketEnable);
-		if (!httpEnable && !websocketEnable) {
-			return null;
-		}
-		// 2. 如果开启 mqtt http api
-		if (httpEnable) {
-			// 2.1 http 特有的配置
+		// 1. 判断是否开启 http
+		if (serverCreator.isHttpEnable()) {
+			// 1.1 http 特有的配置
 			String systemTimerPeriod = System.getProperty(TIO_SYSTEM_TIMER_PERIOD);
 			if (StrUtil.isBlank(systemTimerPeriod)) {
 				System.setProperty(TIO_SYSTEM_TIMER_PERIOD, "50");
 			}
-			// 2.2 http 路由配置
+			// 1.2 http 路由配置
 			MqttHttpApi httpApi = new MqttHttpApi(serverCreator.getMessageDispatcher());
 			httpApi.register();
-			// 2.3 认证配置
+			// 1.3 认证配置
 			String username = serverCreator.getHttpBasicUsername();
 			String password = serverCreator.getHttpBasicPassword();
 			if (Objects.nonNull(username) && Objects.nonNull(password)) {
 				MqttHttpRoutes.addFilter(new BasicAuthFilter(username, password));
 			}
 		}
-		// 3. 初始化处理器
+		// 2. 初始化处理器
 		AioHandler mqttAioHandler = mqttServerConfig.getAioHandler();
 		ServerAioListener mqttAioListener = (ServerAioListener) mqttServerConfig.getAioListener();
 		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(serverCreator, mqttAioHandler);
 		MqttWebServer httpServerStarter = new MqttWebServer(serverCreator, mqttAioListener, mqttWsMsgHandler);
 		ServerTioConfig httpIioConfig = httpServerStarter.getServerTioConfig();
-		// 4. tcp + websocket mqtt 共享公共配置
+		// 3. tcp + websocket mqtt 共享公共配置
 		httpIioConfig.share(mqttServerConfig);
 		httpIioConfig.groupStat = mqttServerConfig.groupStat;
 		return httpServerStarter;
