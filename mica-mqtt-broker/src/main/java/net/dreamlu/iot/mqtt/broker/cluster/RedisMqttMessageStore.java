@@ -22,7 +22,7 @@ import net.dreamlu.iot.mqtt.broker.util.RedisUtil;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
-import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
 
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class RedisMqttMessageStore implements IMqttMessageStore {
 	@Override
 	public List<Message> getRetainMessage(String topicFilter) {
 		List<Message> retainMessageList = new ArrayList<>();
-		Pattern topicPattern = MqttTopicUtil.getTopicPattern(topicFilter);
+		Pattern topicPattern = TopicUtil.getTopicPattern(topicFilter);
 		RedisKeys redisKey = RedisKeys.MESSAGE_STORE_RETAIN;
 		String redisKeyPrefix = redisKey.getKey();
 		String redisKeyPattern = redisKeyPrefix.concat(RedisUtil.getTopicPattern(topicFilter));

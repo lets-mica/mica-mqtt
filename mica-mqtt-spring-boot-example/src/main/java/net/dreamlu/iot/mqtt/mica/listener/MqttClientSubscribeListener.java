@@ -9,6 +9,11 @@ import org.springframework.stereotype.Service;
 
 import java.nio.ByteBuffer;
 
+/**
+ * 客户端消息监听
+ *
+ * @author L.cm
+ */
 @Service
 public class MqttClientSubscribeListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientSubscribeListener.class);

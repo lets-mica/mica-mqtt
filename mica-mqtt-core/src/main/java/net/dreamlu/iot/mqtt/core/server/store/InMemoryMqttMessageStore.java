@@ -18,7 +18,7 @@ package net.dreamlu.iot.mqtt.core.server.store;
 
 
 import net.dreamlu.iot.mqtt.core.server.model.Message;
-import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +72,7 @@ public class InMemoryMqttMessageStore implements IMqttMessageStore {
 
 	@Override
 	public List<Message> getRetainMessage(String topicFilter) {
-		Pattern topicPattern = MqttTopicUtil.getTopicPattern(topicFilter);
+		Pattern topicPattern = TopicUtil.getTopicPattern(topicFilter);
 		List<Message> retainMessageList = new ArrayList<>();
 		retainStore.forEach((topic, message) -> {
 			if (topicPattern.matcher(topic).matches()) {

@@ -18,7 +18,7 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
-import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -40,7 +40,7 @@ public final class MqttClientSubscription implements Serializable {
 								  IMqttClientMessageListener listener) {
 		this.mqttQoS = Objects.requireNonNull(mqttQoS, "MQTT subscribe mqttQoS is null.");
 		this.topicFilter = Objects.requireNonNull(topicFilter, "MQTT subscribe topicFilter is null.");
-		this.topicRegex = MqttTopicUtil.getTopicPattern(topicFilter);
+		this.topicRegex = TopicUtil.getTopicPattern(topicFilter);
 		this.listener = Objects.requireNonNull(listener, "MQTT subscribe listener is null.");
 	}
 

@@ -27,7 +27,7 @@ import java.util.regex.Pattern;
  *
  * @author L.cm
  */
-public final class MqttTopicUtil {
+public final class TopicUtil {
 	private static final Map<String, Pattern> TOPIC_FILTER_PATTERN_CACHE = new ConcurrentHashMap<>(32);
 
 	/**
@@ -52,7 +52,7 @@ public final class MqttTopicUtil {
 	 * @return Pattern
 	 */
 	public static Pattern getTopicPattern(String topicFilter) {
-		return TOPIC_FILTER_PATTERN_CACHE.computeIfAbsent(topicFilter, MqttTopicUtil::getTopicFilterPattern);
+		return TOPIC_FILTER_PATTERN_CACHE.computeIfAbsent(topicFilter, TopicUtil::getTopicFilterPattern);
 	}
 
 	/**
@@ -69,6 +69,18 @@ public final class MqttTopicUtil {
 			.replace("#", ".+")
 			.concat("$")
 		);
+	}
+
+	/**
+	 * 获取处理完成之后的 topic
+	 *
+	 * @param topicTemplate topic 模板
+	 * @return 获取处理完成之后的 topic
+	 */
+	public static String getTopicFilter(String topicTemplate) {
+		// 替换 ${name} 为 + 替换 #{name} 为 #
+		return topicTemplate.replaceAll("\\$\\{[\\s\\w.]+}", "+")
+			.replaceAll("#\\{[\\s\\w.]+}", "#");
 	}
 
 }

@@ -139,7 +139,7 @@ public final class MqttWillMessage {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(topic, message, retain, qos);
+		return Objects.hash(topic, Arrays.hashCode(message), retain, qos);
 	}
 
 	@Override

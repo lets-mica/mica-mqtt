@@ -19,7 +19,7 @@ package net.dreamlu.iot.mqtt.core.server.session;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
-import net.dreamlu.iot.mqtt.core.util.MqttTopicUtil;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -86,7 +86,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		Integer qosValue = null;
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
-			if (MqttTopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
+			if (TopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
 				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					Integer mqttQoS = data.get(clientId);
@@ -109,7 +109,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		Map<String, Integer> subscribeMap = new HashMap<>(32);
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
-			if (MqttTopicUtil.match(topicFilter, topicName)) {
+			if (TopicUtil.match(topicFilter, topicName)) {
 				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					data.forEach((clientId, qos) -> {
