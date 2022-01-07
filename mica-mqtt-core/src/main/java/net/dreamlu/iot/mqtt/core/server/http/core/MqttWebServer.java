@@ -276,6 +276,7 @@ public class MqttWebServer {
 		httpConfig.setBindIp(serverCreator.getIp());
 		httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
 		httpConfig.setCheckHost(false);
+		httpConfig.setMonitorFileChange(false);
 		this.httpConfig = httpConfig;
 		this.httpConfig.setHttpRequestHandler(this.httpRequestHandler);
 		this.mqttWebServerAioHandler = new MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
