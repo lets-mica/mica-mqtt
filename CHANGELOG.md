@@ -6,6 +6,7 @@
 - :fire: mica-mqtt-core http websocket 都不开启时，可以排除 tio-websocket-server 依赖。
 - :sparkles: mica-mqtt-core MqttTopicUtil 改名为 TopicUtil。
 - :sparkles: mica-mqtt-spring-boot-starter `@MqttClientSubscribe` 支持 IMqttClientMessageListener bean。
+- :sparkles: mica-mqtt-spring-boot-starter `@MqttClientSubscribe` 支持自定义 MqttClientTemplate Bean。
 - :sparkles: mica-mqtt-spring-boot-starter 完善。
 - :sparkles: mica-mqtt-codec 缩短 mqtt 版本 key。
 - :bug: mica-mqtt-codec 修复 will message。
