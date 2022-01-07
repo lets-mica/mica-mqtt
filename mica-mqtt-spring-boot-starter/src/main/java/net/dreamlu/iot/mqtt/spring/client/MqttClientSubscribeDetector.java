@@ -19,9 +19,9 @@ package net.dreamlu.iot.mqtt.spring.client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
-import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.util.ClassUtils;
@@ -29,7 +29,6 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
-import java.util.Objects;
 
 /**
  * MqttClient 订阅监听器
@@ -39,21 +38,20 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 public class MqttClientSubscribeDetector implements BeanPostProcessor {
-	private final MqttClientTemplate clientTemplate;
+	private final ApplicationContext applicationContext;
 
 	@Override
 	public Object postProcessAfterInitialization(@NonNull Object bean, String beanName) throws BeansException {
-		MqttClient mqttClient = clientTemplate.getMqttClient();
-		Objects.requireNonNull(mqttClient, "MqttClient is null.");
 		Class<?> userClass = ClassUtils.getUserClass(bean);
-		// 1. 查找类
+		// 1. 查找类上的 MqttClientSubscribe 注解
 		if (bean instanceof IMqttClientMessageListener) {
 			MqttClientSubscribe subscribe = AnnotationUtils.findAnnotation(userClass, MqttClientSubscribe.class);
 			if (subscribe != null) {
+				MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
 				clientTemplate.subscribe(subscribe.value(), subscribe.qos(), (IMqttClientMessageListener) bean);
 			}
 		} else {
-			// 2. 查找方法
+			// 2. 查找方法上的 MqttClientSubscribe 注解
 			ReflectionUtils.doWithMethods(userClass, method -> {
 				MqttClientSubscribe subscribe = AnnotationUtils.findAnnotation(method, MqttClientSubscribe.class);
 				if (subscribe != null) {
@@ -78,13 +76,18 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 						throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String and ByteBuffer.");
 					}
 					// 4. 订阅
-					mqttClient.subscribe(subscribe.value(), subscribe.qos(), (topic, payload) ->
+					MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
+					clientTemplate.subscribe(subscribe.value(), subscribe.qos(), (topic, payload) ->
 						ReflectionUtils.invokeMethod(method, bean, topic, payload)
 					);
 				}
 			}, ReflectionUtils.USER_DECLARED_METHODS);
 		}
 		return bean;
+	}
+
+	private static MqttClientTemplate getMqttClientTemplate(ApplicationContext applicationContext, String beanName) {
+		return applicationContext.getBean(beanName, MqttClientTemplate.class);
 	}
 
 }

@@ -39,6 +39,7 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class MqttClientTemplate implements InitializingBean, DisposableBean, Ordered {
+	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
 	private final MqttClientCreator mqttClientCreator;
 	private MqttClient client;
 

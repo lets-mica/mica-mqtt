@@ -44,4 +44,11 @@ public @interface MqttClientSubscribe {
 	 */
 	MqttQoS qos() default MqttQoS.AT_MOST_ONCE;
 
+	/**
+	 * 客户端 bean 名称
+	 *
+	 * @return bean name
+	 */
+	String clientTemplateBean() default MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN;
+
 }

@@ -23,6 +23,7 @@ import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -91,14 +92,14 @@ public class MqttClientConfiguration {
 		return clientCreator;
 	}
 
-	@Bean
+	@Bean(MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN)
 	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator) {
 		return new MqttClientTemplate(mqttClientCreator);
 	}
 
 	@Bean
-	public MqttClientSubscribeDetector mqttClientSubscribeDetector(MqttClientTemplate clientTemplate) {
-		return new MqttClientSubscribeDetector(clientTemplate);
+	public MqttClientSubscribeDetector mqttClientSubscribeDetector(ApplicationContext applicationContext) {
+		return new MqttClientSubscribeDetector(applicationContext);
 	}
 
 }
