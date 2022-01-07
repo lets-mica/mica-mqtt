@@ -1,6 +1,15 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.4 - 2022-01-09
+- :fire: mica-mqtt-core 排除一些不需要的依赖。
+- :fire: mica-mqtt-core http websocket 都不开启时，可以排除 tio-websocket-server 依赖。
+- :sparkles: mica-mqtt-core MqttTopicUtil 改名为 TopicUtil。
+- :sparkles: mica-mqtt-spring-boot-starter `@MqttClientSubscribe` 支持 IMqttClientMessageListener bean。
+- :sparkles: mica-mqtt-spring-boot-starter 完善。
+- :sparkles: mica-mqtt-codec 缩短 mqtt 版本 key。
+- :bug: mica-mqtt-codec 修复 will message。
+
 ### v1.2.3 - 2022-01-03
 - :sparkles: mica-mqtt-spring-boot-starter `@MqttClientSubscribe` value 改为数组，支持同时订阅多 topic。
 - :sparkles: mica-mqtt-core 缓存 TopicFilter Pattern。
