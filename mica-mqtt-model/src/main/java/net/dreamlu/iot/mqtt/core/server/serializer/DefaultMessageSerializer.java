@@ -56,8 +56,8 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		if (message == null) {
 			return EMPTY_BYTES;
 		}
-		// 4 + 2 + 4 * 5 + 1 + 4 + 4 + 8 + 8
-		int protocolLength = 51;
+		// 2 + 2 + 2 * 5 + 1 + 4 + 1 + 8 + 8
+		int protocolLength = 36;
 		String fromClientId = message.getFromClientId();
 		// 消息来源 客户端 id
 		byte[] fromClientIdBytes = null;
@@ -118,7 +118,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		ByteBuffer buffer = ByteBuffer.allocate(protocolLength);
 		// 事件触发所在节点
 		if (nodeBytes != null) {
-			buffer.putInt(nodeBytes.length);
+			buffer.putShort((short) nodeBytes.length);
 			buffer.put(nodeBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
@@ -132,35 +132,35 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		}
 		// 消息来源 客户端 id
 		if (fromClientIdBytes != null) {
-			buffer.putInt(fromClientIdBytes.length);
+			buffer.putShort((short)fromClientIdBytes.length);
 			buffer.put(fromClientIdBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// 消息来源 用户名
 		if (fromUsernameBytes != null) {
-			buffer.putInt(fromUsernameBytes.length);
+			buffer.putShort((short)fromUsernameBytes.length);
 			buffer.put(fromUsernameBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// 消息目的 Client ID，主要是在遗嘱消息用
 		if (clientIdBytes != null) {
-			buffer.putInt(clientIdBytes.length);
+			buffer.putShort((short)clientIdBytes.length);
 			buffer.put(clientIdBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// 消息来源 用户名
 		if (usernameBytes != null) {
-			buffer.putInt(usernameBytes.length);
+			buffer.putShort((short)usernameBytes.length);
 			buffer.put(usernameBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
 		// topic
 		if (topicBytes != null) {
-			buffer.putInt(topicBytes.length);
+			buffer.putShort((short)topicBytes.length);
 			buffer.put(topicBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
@@ -185,7 +185,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		}
 		// 客户端的 IPAddress
 		if (peerHostBytes != null) {
-			buffer.putInt(peerHostBytes.length);
+			buffer.put((byte) peerHostBytes.length);
 			buffer.put(peerHostBytes);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
@@ -211,7 +211,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		Message message = new Message();
 		ByteBuffer buffer = ByteBuffer.wrap(data);
 		// 事件触发所在节点
-		int nodeLength = buffer.getInt();
+		short nodeLength = buffer.getShort();
 		if (nodeLength > 0) {
 			byte[] nodeBytes = new byte[nodeLength];
 			buffer.get(nodeBytes);
@@ -223,35 +223,35 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			message.setId(messageId);
 		}
 		// 消息来源 客户端 id
-		int fromClientIdLen = buffer.getInt();
+		short fromClientIdLen = buffer.getShort();
 		if (fromClientIdLen > 0) {
 			byte[] fromClientIdBytes = new byte[fromClientIdLen];
 			buffer.get(fromClientIdBytes);
 			message.setFromClientId(new String(fromClientIdBytes, StandardCharsets.UTF_8));
 		}
 		// 消息来源 用户名
-		int fromUsernameLen = buffer.getInt();
+		short fromUsernameLen = buffer.getShort();
 		if (fromUsernameLen > 0) {
 			byte[] fromUsernameBytes = new byte[fromUsernameLen];
 			buffer.get(fromUsernameBytes);
 			message.setFromUsername(new String(fromUsernameBytes, StandardCharsets.UTF_8));
 		}
 		// 消息目的 Client ID，主要是在遗嘱消息用
-		int clientIdLen = buffer.getInt();
+		short clientIdLen = buffer.getShort();
 		if (clientIdLen > 0) {
 			byte[] clientIdBytes = new byte[clientIdLen];
 			buffer.get(clientIdBytes);
 			message.setClientId(new String(clientIdBytes, StandardCharsets.UTF_8));
 		}
 		// 消息目的用户名，主要是在遗嘱消息用
-		int usernameLen = buffer.getInt();
+		short usernameLen = buffer.getShort();
 		if (usernameLen > 0) {
 			byte[] usernameBytes = new byte[usernameLen];
 			buffer.get(usernameBytes);
 			message.setUsername(new String(usernameBytes, StandardCharsets.UTF_8));
 		}
 		// topic
-		int topicLength = buffer.getInt();
+		short topicLength = buffer.getShort();
 		if (topicLength > 0) {
 			byte[] topicBytes = new byte[topicLength];
 			buffer.get(topicBytes);
@@ -279,7 +279,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			message.setPayload(ByteBuffer.wrap(payloadBytes));
 		}
 		// 客户端的 peerHost IPAddress
-		int peerHostLen = buffer.getInt();
+		byte peerHostLen = buffer.get();
 		if (peerHostLen > 0) {
 			byte[] peerHostBytes = new byte[peerHostLen];
 			buffer.get(peerHostBytes);
