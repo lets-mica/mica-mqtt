@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.core.server;
 
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.http.core.MqttHttpHelper;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
@@ -26,11 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.DefaultAioListener;
 import org.tio.core.Tio;
-import org.tio.core.TioConfig;
 import org.tio.core.intf.Packet;
-import org.tio.http.common.HttpConst;
-import org.tio.http.common.HttpRequest;
-import org.tio.http.common.HttpResponse;
 import org.tio.utils.hutool.StrUtil;
 
 /**
@@ -125,35 +122,10 @@ public class MqttServerAioListener extends DefaultAioListener {
 
 	@Override
 	public void onAfterSent(ChannelContext context, Packet packet, boolean isSentSuccess) {
-		if (!(packet instanceof HttpResponse)) {
-			return;
-		}
-		// 1. 短链接数据解绑
-		TioConfig tioConfig = context.getTioConfig();
-		tioConfig.groups.unbind(context);
-		tioConfig.bsIds.unbind(context);
-		tioConfig.ids.unbind(context);
-		tioConfig.clientNodes.remove(context);
-		tioConfig.tokens.unbind(context);
-		// 2. 关闭
-		HttpResponse httpResponse = (HttpResponse) packet;
-		HttpRequest request = httpResponse.getHttpRequest();
-		if (request != null) {
-			if (request.httpConfig.compatible1_0) {
-				if (HttpConst.HttpVersion.V1_0.equals(request.requestLine.version)) {
-					if (!HttpConst.RequestHeaderValue.Connection.keep_alive.equals(request.getConnection())) {
-						Tio.remove(context, "http 请求头Connection!=keep-alive：" + request.getRequestLine());
-					}
-				} else {
-					if (HttpConst.RequestHeaderValue.Connection.close.equals(request.getConnection())) {
-						Tio.remove(context, "http 请求头Connection=close：" + request.getRequestLine());
-					}
-				}
-			} else {
-				if (HttpConst.RequestHeaderValue.Connection.close.equals(request.getConnection())) {
-					Tio.remove(context, "http 请求头Connection=close：" + request.getRequestLine());
-				}
-			}
+		// 1. http 请求处理
+		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
+		if (isHttpRequest) {
+			MqttHttpHelper.close(context, packet);
 		}
 	}
 
