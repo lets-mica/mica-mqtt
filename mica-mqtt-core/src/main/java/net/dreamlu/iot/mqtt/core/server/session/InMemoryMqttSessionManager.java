@@ -74,6 +74,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public Integer searchSubscribe(String topicName, String clientId) {
+		// 服务端发布时查找是否有订阅，只要证明有订阅即可
 		// 1. 如果订阅的就是普通的 topic
 		ConcurrentMap<String, Integer> subscribeData = subscribeStore.get(topicName);
 		if (subscribeData != null && !subscribeData.isEmpty()) {
