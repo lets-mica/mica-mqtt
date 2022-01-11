@@ -17,6 +17,8 @@
 package net.dreamlu.iot.mqtt.core.server.auth;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 
 /**
@@ -25,6 +27,25 @@ import org.tio.core.ChannelContext;
  * @author L.cm
  */
 public interface IMqttServerSubscribeValidator {
+	Logger logger = LoggerFactory.getLogger(IMqttServerSubscribeValidator.class);
+
+	/**
+	 * 校验订阅的 topicFilter
+	 *
+	 * @param context     ChannelContext
+	 * @param clientId    clientId
+	 * @param topicFilter topicFilter
+	 * @param qoS         MqttQoS
+	 * @return 是否有权限
+	 */
+	default boolean verifyTopicFilter(ChannelContext context, String clientId, String topicFilter, MqttQoS qoS) {
+		try {
+			return isValid(context, clientId, topicFilter, qoS);
+		} catch (Throwable e) {
+			logger.error("Mqtt subscribe validator error", e);
+			return false;
+		}
+	}
 
 	/**
 	 * 是否可以订阅

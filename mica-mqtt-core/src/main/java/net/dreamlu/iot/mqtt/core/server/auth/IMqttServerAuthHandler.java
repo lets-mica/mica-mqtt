@@ -16,6 +16,8 @@
 
 package net.dreamlu.iot.mqtt.core.server.auth;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 
 /**
@@ -25,6 +27,26 @@ import org.tio.core.ChannelContext;
  */
 @FunctionalInterface
 public interface IMqttServerAuthHandler {
+	Logger logger = LoggerFactory.getLogger(IMqttServerAuthHandler.class);
+
+	/**
+	 * 认证
+	 *
+	 * @param context  ChannelContext
+	 * @param uniqueId mqtt 内唯一id，默认和 clientId 相同
+	 * @param clientId 客户端 ID
+	 * @param userName 用户名
+	 * @param password 密码
+	 * @return 是否认证成功
+	 */
+	default boolean verifyAuthenticate(ChannelContext context, String uniqueId, String clientId, String userName, String password) {
+		try {
+			return authenticate(context, uniqueId, clientId, userName, password);
+		} catch (Throwable e) {
+			logger.error("Mqtt authenticate validator error", e);
+			return false;
+		}
+	}
 
 	/**
 	 * 认证

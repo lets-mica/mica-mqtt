@@ -103,7 +103,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			return;
 		}
 		// 3. 认证
-		if (!authHandler.authenticate(context, uniqueId, clientId, userName, password)) {
+		if (!authHandler.verifyAuthenticate(context, uniqueId, clientId, userName, password)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}
@@ -157,10 +157,16 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setNode(nodeName);
 			messageStore.addWillMessage(uniqueId, willMessage);
 		}
-		// 9. 返回 ack
+		// 9. 在线状态
+		try {
+			connectStatusListener.online(context, uniqueId);
+		} catch (Throwable e) {
+			logger.error("mqtt connectStatusListener", e);
+			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_SERVER_UNAVAILABLE);
+			return;
+		}
+		// 10. 返回 ack
 		connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_ACCEPTED);
-		// 10. 在线状态
-		connectStatusListener.online(context, uniqueId);
 	}
 
 	private static void connAckByReturnCode(String clientId, String uniqueId, ChannelContext context, MqttConnectReasonCode returnCode) {
@@ -199,7 +205,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		MqttPublishVariableHeader variableHeader = message.variableHeader();
 		String topicName = variableHeader.topicName();
 		// 1. 判断是否有发布权限，没有权限则断开 mqtt 连接 mqtt 5.x qos1、qos2 可以响应 reasonCode
-		if (publishPermission != null && !publishPermission.hasPermission(context, clientId, topicName, mqttQoS, fixedHeader.isRetain())) {
+		if (publishPermission != null && !publishPermission.verifyPermission(context, clientId, topicName, mqttQoS, fixedHeader.isRetain())) {
 			Tio.remove(context, "Mqtt clientId:" + clientId + " publish topic: " + topicName + " no permission.");
 			return;
 		}
@@ -318,7 +324,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			String topicFilter = subscription.topicName();
 			MqttQoS mqttQoS = subscription.qualityOfService();
 			// 校验是否可以订阅
-			if (enableSubscribeValidator && !subscribeValidator.isValid(context, clientId, topicFilter, mqttQoS)) {
+			if (enableSubscribeValidator && !subscribeValidator.verifyTopicFilter(context, clientId, topicFilter, mqttQoS)) {
 				grantedQosList.add(MqttQoS.FAILURE);
 				logger.error("Subscribe - clientId:{} topicFilter:{} mqttQoS:{} valid failed messageId:{}", clientId, topicFilter, mqttQoS, messageId);
 			} else {

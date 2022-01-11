@@ -17,6 +17,8 @@
 package net.dreamlu.iot.mqtt.core.server.auth;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 
 /**
@@ -25,6 +27,26 @@ import org.tio.core.ChannelContext;
  * @author L.cm
  */
 public interface IMqttServerPublishPermission {
+	Logger logger = LoggerFactory.getLogger(IMqttServerPublishPermission.class);
+
+	/**
+	 * 否有发布权限
+	 *
+	 * @param context  ChannelContext
+	 * @param clientId 客户端 id
+	 * @param topic    topic
+	 * @param qoS      MqttQoS
+	 * @param isRetain 是否保留消息
+	 * @return 否有发布权限
+	 */
+	default boolean verifyPermission(ChannelContext context, String clientId, String topic, MqttQoS qoS, boolean isRetain) {
+		try {
+			return hasPermission(context, clientId, topic, qoS, isRetain);
+		} catch (Throwable e) {
+			logger.error("Mqtt publish permission validator error", e);
+			return false;
+		}
+	}
 
 	/**
 	 * 否有发布权限
