@@ -160,6 +160,14 @@ public class MqttServerCreator {
 	 * 节点名称，用于处理集群
 	 */
 	private String nodeName;
+	/**
+	 * 是否用队列发送
+	 */
+	public boolean useQueueSend = true;
+	/**
+	 * 是否用队列解码（系统初始化时确定该值，中途不要变更此值，否则在切换的时候可能导致消息丢失）
+	 */
+	public boolean useQueueDecode = false;
 
 	public String getName() {
 		return name;
@@ -407,6 +415,24 @@ public class MqttServerCreator {
 
 	public MqttServerCreator nodeName(String nodeName) {
 		this.nodeName = nodeName;
+		return this;
+	}
+
+	public boolean isUseQueueSend() {
+		return useQueueSend;
+	}
+
+	public MqttServerCreator useQueueSend(boolean useQueueSend) {
+		this.useQueueSend = useQueueSend;
+		return this;
+	}
+
+	public boolean isUseQueueDecode() {
+		return useQueueDecode;
+	}
+
+	public MqttServerCreator useQueueDecode(boolean useQueueDecode) {
+		this.useQueueDecode = useQueueDecode;
 		return this;
 	}
 

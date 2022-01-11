@@ -209,6 +209,7 @@ import org.tio.utils.hutool.StrUtil;
 import org.tio.websocket.common.*;
 import org.tio.websocket.common.util.BASE64Util;
 import org.tio.websocket.common.util.SHA1Util;
+import org.tio.websocket.server.WsServerAioHandler;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.UnsupportedEncodingException;
@@ -222,7 +223,7 @@ import java.util.*;
  * @author L.cm
  */
 public class MqttWebServerAioHandler implements ServerAioHandler {
-	private static Logger log = LoggerFactory.getLogger(org.tio.websocket.server.WsServerAioHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(WsServerAioHandler.class);
 	/**
 	 * value: List<WsRequest>
 	 */
