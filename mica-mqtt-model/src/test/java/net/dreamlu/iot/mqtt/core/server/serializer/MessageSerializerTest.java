@@ -30,7 +30,61 @@ import java.nio.ByteBuffer;
  */
 public class MessageSerializerTest {
 
-	private static Message getMessage() {
+	@Test
+	public void testConnect() {
+		Message message = new Message();
+		message.setMessageType(MessageType.CONNECT);
+		message.setNode("node");
+		message.setClientId("123");
+		message.setUsername("userName");
+		message.setPeerHost("127.0.0.1:1883");
+		message.setTimestamp(System.currentTimeMillis());
+
+		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
+		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
+		System.out.println(message);
+		System.out.println(message1);
+		Assert.assertEquals(message, message1);
+	}
+
+	@Test
+	public void testSubscribe() {
+		Message message = new Message();
+		message.setMessageType(MessageType.SUBSCRIBE);
+		message.setNode("node");
+		message.setClientId("123");
+		message.setTopic("/abc/123/#");
+		message.setQos(2);
+		message.setPeerHost("127.0.0.1:1883");
+		message.setTimestamp(System.currentTimeMillis());
+
+		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
+		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
+		System.out.println(message);
+		System.out.println(message1);
+		Assert.assertEquals(message, message1);
+	}
+
+	@Test
+	public void testUnsubscribe() {
+		Message message = new Message();
+		message.setMessageType(MessageType.UNSUBSCRIBE);
+		message.setNode("node");
+		message.setClientId("123");
+		message.setTopic("/abc/123/#");
+		message.setPeerHost("127.0.0.1:1883");
+		message.setTimestamp(System.currentTimeMillis());
+
+		message.setMessageType(MessageType.UNSUBSCRIBE);
+		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
+		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
+		System.out.println(message);
+		System.out.println(message1);
+		Assert.assertEquals(message, message1);
+	}
+
+	@Test
+	public void testUpStream() {
 		Message message = new Message();
 		message.setId(0xffff);
 		message.setFromClientId("123");
@@ -47,12 +101,42 @@ public class MessageSerializerTest {
 		message.setPeerHost("127.0.0.1:1883");
 		message.setTimestamp(System.currentTimeMillis());
 		message.setPublishReceivedAt(System.currentTimeMillis());
-		return message;
+
+		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
+		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
+		System.out.println(message);
+		System.out.println(message1);
+		Assert.assertEquals(message, message1);
+	}
+
+	@Test
+	public void testDownStream() {
+		Message message = new Message();
+		message.setId(0xffff);
+		message.setClientId("123");
+		message.setUsername("userName");
+		message.setNode("node");
+		message.setMessageType(MessageType.DOWN_STREAM);
+		message.setTopic("/mica/mqtt/123");
+		message.setQos(1);
+		message.setRetain(true);
+		message.setDup(true);
+		message.setPayload(ByteBuffer.wrap(new byte[]{1, 2, 3}));
+		message.setPeerHost("127.0.0.1:1883");
+		message.setTimestamp(System.currentTimeMillis());
+		message.setPublishReceivedAt(System.currentTimeMillis());
+
+		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
+		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
+		System.out.println(message);
+		System.out.println(message1);
+		Assert.assertEquals(message, message1);
 	}
 
 	@Test
 	public void testDefaultMessageSerializer() {
-		Message message = getMessage();
+		Message message = new Message();
+		message.setMessageType(MessageType.CONNECT);
 		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
 		System.out.println(message);
@@ -62,7 +146,23 @@ public class MessageSerializerTest {
 
 	@Test
 	public void testFastJsonMessageSerializer() {
-		Message message = getMessage();
+		Message message = new Message();
+		message.setId(0xffff);
+		message.setFromClientId("123");
+		message.setFromUsername("name");
+		message.setClientId("123");
+		message.setUsername("userName");
+		message.setNode("node");
+		message.setMessageType(MessageType.UP_STREAM);
+		message.setTopic("/mica/mqtt/123");
+		message.setQos(1);
+		message.setRetain(true);
+		message.setDup(true);
+		message.setPayload(ByteBuffer.wrap(new byte[]{1, 2, 3}));
+		message.setPeerHost("127.0.0.1:1883");
+		message.setTimestamp(System.currentTimeMillis());
+		message.setPublishReceivedAt(System.currentTimeMillis());
+
 		FastJsonMessageSerializer serializer = new FastJsonMessageSerializer();
 		byte[] data = serializer.serialize(message);
 		Message message1 = serializer.deserialize(data);
