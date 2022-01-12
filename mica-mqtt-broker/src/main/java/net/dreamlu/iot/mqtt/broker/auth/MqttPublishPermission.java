@@ -41,6 +41,7 @@ public class MqttPublishPermission implements IMqttServerPublishPermission {
 	 * @param isRetain 是否保留消息
 	 * @return 否有发布权限
 	 */
+	@Override
 	public boolean hasPermission(ChannelContext context, String clientId, String topic, MqttQoS qoS, boolean isRetain) {
 		log.info("Mqtt client publish permission check clientId:{} topic:{}.", clientId, topic);
 		// 可自定义业务，判断客户端是否有发布的权限。

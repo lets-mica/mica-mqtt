@@ -204,9 +204,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		MqttQoS mqttQoS = fixedHeader.qosLevel();
 		MqttPublishVariableHeader variableHeader = message.variableHeader();
 		String topicName = variableHeader.topicName();
-		// 1. 判断是否有发布权限，没有权限则断开 mqtt 连接 mqtt 5.x qos1、qos2 可以响应 reasonCode
+		// 1. 权限判断，在 MQTT v3.1 和 v3.1.1 协议中，发布操作被拒绝后服务器无任何报文错误返回，这是协议设计的一个缺陷。但在 MQTT v5.0 协议上已经支持应答一个相应的错误报文。
 		if (publishPermission != null && !publishPermission.verifyPermission(context, clientId, topicName, mqttQoS, fixedHeader.isRetain())) {
-			Tio.remove(context, "Mqtt clientId:" + clientId + " publish topic: " + topicName + " no permission.");
+			logger.error("Mqtt clientId:{} topic:{} no publish permission.", clientId, topicName);
 			return;
 		}
 		// 2. 处理发布逻辑
