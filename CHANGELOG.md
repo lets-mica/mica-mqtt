@@ -1,6 +1,15 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.5 - 2022-01-23
+- :sparkles: mica mqtt server 调整发布权限规则。
+- :sparkles: mica mqtt server 自定义接口的异常处理。
+- :sparkles: mica mqtt server 放开 tio 队列配置。
+- :sparkles: mica mqtt client publish 添加一批 byte[] payload 参数方法。
+- :sparkles: mica-mqtt-model DefaultMessageSerializer 重构，**不兼容**。
+- :memo: 添加日志，避免遗忘。
+- :bug: http websocket 都不开启并排除 tio-websocket-server 依赖时 gitee  #I4Q3CP
+
 ### v1.2.4 - 2022-01-09
 - :fire: mica-mqtt-core 排除一些不需要的依赖。
 - :fire: mica-mqtt-core http websocket 都不开启时，可以排除 tio-websocket-server 依赖。
