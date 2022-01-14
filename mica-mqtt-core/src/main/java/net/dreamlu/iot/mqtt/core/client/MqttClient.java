@@ -202,11 +202,34 @@ public final class MqttClient {
 	 * 发布消息
 	 *
 	 * @param topic   topic
+	 * @param payload 消息内容
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, byte[] payload) {
+		return publish(topic, payload, MqttQoS.AT_MOST_ONCE);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
 	 * @param payload 消息体
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
+		return publish(topic, payload, qos, false);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息内容
+	 * @param qos     MqttQoS
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, byte[] payload, MqttQoS qos) {
 		return publish(topic, payload, qos, false);
 	}
 
@@ -226,6 +249,31 @@ public final class MqttClient {
 	 * 发布消息
 	 *
 	 * @param topic   topic
+	 * @param payload 消息内容
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, byte[] payload, boolean retain) {
+		return publish(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, byte[] payload, MqttQoS qos, boolean retain) {
+		return publish(topic, payload == null ? null : ByteBuffer.wrap(payload), qos, retain);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
 	 * @param payload 消息体
 	 * @param qos     MqttQoS
 	 * @param retain  是否在服务器上保留消息
@@ -234,6 +282,9 @@ public final class MqttClient {
 	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? MqttClientMessageId.getId() : -1;
+		if (payload == null) {
+			payload = ByteBuffer.allocate(0);
+		}
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)
