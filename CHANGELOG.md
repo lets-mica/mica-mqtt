@@ -1,7 +1,7 @@
 # 变更记录
 
 ## 发行版本
-### v1.2.5 - 2022-01-23
+### v1.2.5 - 2022-01-16
 - :sparkles: mica mqtt server 调整发布权限规则。
 - :sparkles: mica mqtt server 自定义接口的异常处理。
 - :sparkles: mica mqtt server 放开 tio 队列配置。
