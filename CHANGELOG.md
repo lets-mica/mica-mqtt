@@ -1,6 +1,9 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.6 - 2022-01-19
+- :sparkles: mica-mqtt-client 支持 `$share`、`$queue` 共享订阅
+
 ### v1.2.5 - 2022-01-16
 - :sparkles: mica mqtt server 调整发布权限规则。
 - :sparkles: mica mqtt server 自定义接口的异常处理。
