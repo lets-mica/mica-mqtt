@@ -55,14 +55,8 @@ public enum TopicFilterType {
 	SHARE {
 		@Override
 		public boolean match(String topicFilter, String topicName) {
-			String shareTopicFilter = topicFilter.substring(TopicFilterType.SHARE_GROUP_PREFIX.length());
-			String[] group = shareTopicFilter.split("/");
-			String groupName = group[0];
-			String shareTopicPrefix = TopicFilterType.SHARE_GROUP_PREFIX + groupName + '/';
-			int prefixLen = shareTopicPrefix.length();
-			if (topicName.startsWith("/")) {
-				prefixLen = prefixLen - 1;
-			}
+			// 去除前缀 $share/<group-name>/
+			int prefixLen = TopicFilterType.findShareTopicIndex(topicFilter, topicName.startsWith("/"));
 			return TopicUtil.match(topicFilter.substring(prefixLen), topicName);
 		}
 	};
@@ -96,6 +90,18 @@ public enum TopicFilterType {
 		} else {
 			return TopicFilterType.NONE;
 		}
+	}
+
+	private static int findShareTopicIndex(String topicFilter, boolean startDelimiter) {
+		int prefixLength = TopicFilterType.SHARE_GROUP_PREFIX.length();
+		int topicFilterLength = topicFilter.length();
+		for (int i = prefixLength; i < topicFilterLength; i++) {
+			char ch = topicFilter.charAt(i);
+			if ('/' == ch) {
+				return startDelimiter ? i : i + 1;
+			}
+		}
+		throw new IllegalArgumentException("Share subscription topicFilter: " + topicFilter + " not conform to the $share/<group-name>/xxx");
 	}
 
 }
