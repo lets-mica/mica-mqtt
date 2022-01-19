@@ -18,11 +18,10 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
-import net.dreamlu.iot.mqtt.core.util.TopicUtil;
+import net.dreamlu.iot.mqtt.core.common.TopicFilterType;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.regex.Pattern;
 
 /**
  * 发送订阅，未 ack 前的数据承载
@@ -32,7 +31,7 @@ import java.util.regex.Pattern;
 public final class MqttClientSubscription implements Serializable {
 	private final String topicFilter;
 	private final MqttQoS mqttQoS;
-	private final Pattern topicRegex;
+	private final TopicFilterType type;
 	private final IMqttClientMessageListener listener;
 
 	public MqttClientSubscription(MqttQoS mqttQoS,
@@ -40,7 +39,7 @@ public final class MqttClientSubscription implements Serializable {
 								  IMqttClientMessageListener listener) {
 		this.mqttQoS = Objects.requireNonNull(mqttQoS, "MQTT subscribe mqttQoS is null.");
 		this.topicFilter = Objects.requireNonNull(topicFilter, "MQTT subscribe topicFilter is null.");
-		this.topicRegex = TopicUtil.getTopicPattern(topicFilter);
+		this.type = TopicFilterType.getType(topicFilter);
 		this.listener = Objects.requireNonNull(listener, "MQTT subscribe listener is null.");
 	}
 
@@ -57,7 +56,7 @@ public final class MqttClientSubscription implements Serializable {
 	}
 
 	public boolean matches(String topic) {
-		return this.topicRegex.matcher(topic).matches();
+		return this.type.match(this.topicFilter, topic);
 	}
 
 	public MqttTopicSubscription toTopicSubscription() {
@@ -88,7 +87,6 @@ public final class MqttClientSubscription implements Serializable {
 		return "MqttClientSubscription{" +
 			"topicFilter='" + topicFilter + '\'' +
 			", mqttQoS=" + mqttQoS +
-			", topicRegex=" + topicRegex +
 			'}';
 	}
 
