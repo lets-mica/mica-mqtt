@@ -318,16 +318,20 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	 */
 	private void invokeListenerForPublish(String topicName, MqttPublishMessage message) {
 		List<MqttClientSubscription> subscriptionList = clientSession.getMatchedSubscription(topicName);
-		final ByteBuffer payload = message.payload();
-		subscriptionList.forEach(subscription -> {
-			IMqttClientMessageListener listener = subscription.getListener();
-			payload.rewind();
-			try {
-				listener.onMessage(topicName, payload);
-			} catch (Throwable e) {
-				logger.error(e.getMessage(), e);
-			}
-		});
+		if (subscriptionList.isEmpty()) {
+			logger.warn("Mqtt message to accept topic:{} subscriptionList is empty.", topicName);
+		} else {
+			final ByteBuffer payload = message.payload();
+			subscriptionList.forEach(subscription -> {
+				IMqttClientMessageListener listener = subscription.getListener();
+				payload.rewind();
+				try {
+					listener.onMessage(topicName, payload);
+				} catch (Throwable e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
+		}
 	}
 
 }
