@@ -51,7 +51,7 @@ public enum TopicFilterType {
 	},
 
 	/**
-	 * $share/<group-name>/ 为前缀的共享订阅是带群组的共享订阅
+	 * $share/{group-name}/ 为前缀的共享订阅是带群组的共享订阅
 	 */
 	SHARE {
 		@Override
