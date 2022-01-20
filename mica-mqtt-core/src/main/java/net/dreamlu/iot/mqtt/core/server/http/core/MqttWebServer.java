@@ -278,6 +278,7 @@ public class MqttWebServer {
 		this.httpConfig.setHttpRequestHandler(this.httpRequestHandler);
 		this.mqttWebServerAioHandler = new MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
 		this.serverTioConfig = new ServerTioConfig(this.httpConfig.getName(), mqttWebServerAioHandler, this.serverAioListener, tioExecutor, groupExecutor);
+		this.serverTioConfig.setSslConfig(serverCreator.getSslConfig());
 		this.serverTioConfig.setHeartbeatTimeout(0);
 		this.serverTioConfig.setReadBufferSize(1024 * 30);
 		this.serverTioConfig.setTioUuid(new HttpUuid());
