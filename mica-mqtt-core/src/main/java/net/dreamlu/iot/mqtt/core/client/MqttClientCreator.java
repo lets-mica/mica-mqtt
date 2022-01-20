@@ -142,6 +142,10 @@ public final class MqttClientCreator {
 	 * 客户端 session
 	 */
 	private IMqttClientSession clientSession;
+	/**
+	 * messageId 生成器
+	 */
+	private IMqttClientMessageIdGenerator messageIdGenerator;
 
 	public String getName() {
 		return name;
@@ -237,6 +241,10 @@ public final class MqttClientCreator {
 
 	public IMqttClientSession getClientSession() {
 		return clientSession;
+	}
+
+	public IMqttClientMessageIdGenerator getMessageIdGenerator() {
+		return messageIdGenerator;
 	}
 
 	public MqttClientCreator name(String name) {
@@ -365,6 +373,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator messageIdGenerator(IMqttClientMessageIdGenerator messageIdGenerator) {
+		this.messageIdGenerator = messageIdGenerator;
+		return this;
+	}
+
 	public MqttClient connect() {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
@@ -376,30 +389,34 @@ public final class MqttClientCreator {
 		if (this.clientSession == null) {
 			this.clientSession = new DefaultMqttClientSession();
 		}
+		// 3. 消息id 生成器
+		if (this.messageIdGenerator == null) {
+			this.messageIdGenerator = new DefaultMqttClientMessageIdGenerator();
+		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, executor);
-		// 3. 初始化 mqtt 处理器
+		// 4. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this, processor);
 		ClientAioListener clientAioListener = new MqttClientAioListener(this);
-		// 4. 重连配置
+		// 5. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
 			reconnConf = new ReconnConf(this.reInterval, this.retryCount);
 		}
-		// 5. tioConfig
+		// 6. tioConfig
 		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
 		tioConfig.setName(this.name);
-		// 6. 心跳超时时间
+		// 7. 心跳超时时间
 		tioConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
-		// 7. mqtt 消息最大长度
+		// 8. mqtt 消息最大长度
 		tioConfig.setReadBufferSize(this.readBufferSize);
-		// 8. tioClient
+		// 9. ssl 证书设置
+		tioConfig.setSslConfig(this.sslConfig);
+		// 10. tioClient
 		try {
-			// 9. ssl 证书设置
-			tioConfig.setSslConfig(this.sslConfig);
 			TioClient tioClient = new TioClient(tioConfig);
 			ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
-			return new MqttClient(tioClient, this, context, this.clientSession, executor);
+			return new MqttClient(tioClient, this, context, executor);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
 		}

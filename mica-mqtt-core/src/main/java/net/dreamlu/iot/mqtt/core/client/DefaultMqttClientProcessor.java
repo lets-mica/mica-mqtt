@@ -42,6 +42,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private final int reSubscribeBatchSize;
 	private final IMqttClientSession clientSession;
 	private final IMqttClientConnectListener connectListener;
+	private final IMqttClientMessageIdGenerator messageIdGenerator;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator,
@@ -49,6 +50,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		this.reSubscribeBatchSize = mqttClientCreator.getReSubscribeBatchSize();
 		this.clientSession = mqttClientCreator.getClientSession();
 		this.connectListener = mqttClientCreator.getConnectListener();
+		this.messageIdGenerator = mqttClientCreator.getMessageIdGenerator();
 		this.executor = executor;
 	}
 
@@ -139,7 +141,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		List<MqttTopicSubscription> topicSubscriptionList = reSubscriptionList.stream()
 			.map(MqttClientSubscription::toTopicSubscription)
 			.collect(Collectors.toList());
-		int messageId = MqttClientMessageId.getId();
+		int messageId = messageIdGenerator.getId();
 		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
 			.addSubscriptions(topicSubscriptionList)
 			.messageId(messageId)

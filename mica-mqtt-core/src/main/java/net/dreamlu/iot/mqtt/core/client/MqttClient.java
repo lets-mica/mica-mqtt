@@ -41,6 +41,7 @@ public final class MqttClient {
 	private final ClientChannelContext context;
 	private final IMqttClientSession clientSession;
 	private final ScheduledThreadPoolExecutor executor;
+	private final IMqttClientMessageIdGenerator messageIdGenerator;
 
 	public static MqttClientCreator create() {
 		return new MqttClientCreator();
@@ -49,13 +50,13 @@ public final class MqttClient {
 	MqttClient(TioClient tioClient,
 			   MqttClientCreator config,
 			   ClientChannelContext context,
-			   IMqttClientSession clientSession,
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.context = context;
-		this.clientSession = clientSession;
 		this.executor = executor;
+		this.clientSession = config.getClientSession();
+		this.messageIdGenerator = config.getMessageIdGenerator();
 	}
 
 	/**
@@ -143,7 +144,7 @@ public final class MqttClient {
 			.map(MqttClientSubscription::toTopicSubscription)
 			.collect(Collectors.toList());
 		// 3. 没有订阅过
-		int messageId = MqttClientMessageId.getId();
+		int messageId = messageIdGenerator.getId();
 		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
 			.addSubscriptions(topicSubscriptionList)
 			.messageId(messageId)
@@ -173,7 +174,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient unSubscribe(List<String> topicFilters) {
-		int messageId = MqttClientMessageId.getId();
+		int messageId = messageIdGenerator.getId();
 		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
 			.addTopicFilters(topicFilters)
 			.messageId(messageId)
@@ -281,7 +282,7 @@ public final class MqttClient {
 	 */
 	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
-		int messageId = isHighLevelQoS ? MqttClientMessageId.getId() : -1;
+		int messageId = isHighLevelQoS ? messageIdGenerator.getId() : -1;
 		if (payload == null) {
 			payload = ByteBuffer.allocate(0);
 		}
