@@ -40,6 +40,7 @@ import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
 import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
+import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
@@ -460,7 +461,7 @@ public class MqttServerCreator {
 		if (this.connectStatusListener == null) {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttServer"));
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(Threads.CORE_POOL_SIZE, DefaultThreadFactory.getInstance("MqttServer"));
 		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, executor);
 		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);

@@ -189,13 +189,17 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		paddingSubscribe.onSubAckReceived();
 		clientSession.removePaddingSubscribe(messageId);
 		clientSession.addSubscriptionList(subscribedList);
-		try {
-			subscribedList.forEach(clientSubscription -> {
-				clientSubscription.getListener().onSubscribed(clientSubscription.getTopicFilter(), clientSubscription.getMqttQoS());
-			});
-		} catch (Throwable e) {
-			logger.error("MQTT SubscriptionList:{} subscribed onSubscribed event error.", subscribedList);
-		}
+		// 触发已经监听的事件
+		subscribedList.forEach(clientSubscription -> {
+			IMqttClientMessageListener subscriptionListener = clientSubscription.getListener();
+			try {
+				executor.execute(() ->
+					subscriptionListener.onSubscribed(clientSubscription.getTopicFilter(), clientSubscription.getMqttQoS())
+				);
+			} catch (Throwable e) {
+				logger.error("MQTT SubscriptionList:{} subscribed onSubscribed event error.", subscribedList);
+			}
+		});
 	}
 
 	@Override
