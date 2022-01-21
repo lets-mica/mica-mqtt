@@ -393,11 +393,11 @@ public final class MqttClientCreator {
 		if (this.messageIdGenerator == null) {
 			this.messageIdGenerator = new DefaultMqttClientMessageIdGenerator();
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, DefaultThreadFactory.getInstance("MqttClient"));
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttClient"));
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, executor);
 		// 4. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this, processor);
-		ClientAioListener clientAioListener = new MqttClientAioListener(this);
+		ClientAioListener clientAioListener = new MqttClientAioListener(this, executor);
 		// 5. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {

@@ -465,7 +465,7 @@ public class MqttServerCreator {
 		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		ServerAioListener listener = new MqttServerAioListener(this);
+		ServerAioListener listener = new MqttServerAioListener(this, executor);
 		// 3. t-io 配置
 		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
 		// 4. 设置 t-io 心跳 timeout

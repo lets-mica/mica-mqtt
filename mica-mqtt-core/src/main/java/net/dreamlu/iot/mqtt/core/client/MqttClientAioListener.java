@@ -29,6 +29,7 @@ import org.tio.utils.hutool.StrUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 客户端监听器
@@ -39,10 +40,12 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
 	private final MqttConnectMessage connectMessage;
 	private final IMqttClientConnectListener connectListener;
+	private final ScheduledThreadPoolExecutor executor;
 
-	public MqttClientAioListener(MqttClientCreator clientCreator) {
+	public MqttClientAioListener(MqttClientCreator clientCreator, ScheduledThreadPoolExecutor executor) {
 		this.connectMessage = getConnectMessage(Objects.requireNonNull(clientCreator));
 		this.connectListener = clientCreator.getConnectListener();
+		this.executor = executor;
 	}
 
 	/**
@@ -109,11 +112,13 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 			return;
 		}
 		// 2. 触发客户断开连接事件
-		try {
-			connectListener.onDisconnect(channelContext, throwable, remark, isRemove);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
+		executor.submit(() -> {
+			try {
+				connectListener.onDisconnect(channelContext, throwable, remark, isRemove);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
+		});
 	}
 
 }

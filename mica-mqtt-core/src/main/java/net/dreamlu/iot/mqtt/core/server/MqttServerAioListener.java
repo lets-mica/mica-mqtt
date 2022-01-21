@@ -30,6 +30,8 @@ import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
 import org.tio.utils.hutool.StrUtil;
 
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+
 /**
  * mqtt 服务监听
  *
@@ -41,12 +43,14 @@ public class MqttServerAioListener extends DefaultAioListener {
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
+	private final ScheduledThreadPoolExecutor executor;
 
-	public MqttServerAioListener(MqttServerCreator serverCreator) {
+	public MqttServerAioListener(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
+		this.executor = executor;
 	}
 
 	@Override
@@ -113,11 +117,13 @@ public class MqttServerAioListener extends DefaultAioListener {
 	}
 
 	private void notify(ChannelContext context, String clientId) {
-		try {
-			connectStatusListener.offline(context, clientId);
-		} catch (Throwable throwable) {
-			logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
-		}
+		executor.execute(() -> {
+			try {
+				connectStatusListener.offline(context, clientId);
+			} catch (Throwable throwable) {
+				logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
+			}
+		});
 	}
 
 	@Override

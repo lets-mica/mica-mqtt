@@ -157,16 +157,16 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setNode(nodeName);
 			messageStore.addWillMessage(uniqueId, willMessage);
 		}
-		// 9. 在线状态
-		try {
-			connectStatusListener.online(context, uniqueId);
-		} catch (Throwable e) {
-			logger.error("mqtt connectStatusListener", e);
-			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_SERVER_UNAVAILABLE);
-			return;
-		}
-		// 10. 返回 ack
+		// 9. 返回 ack
 		connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_ACCEPTED);
+		// 10. 在线状态
+		executor.execute(() -> {
+			try {
+				connectStatusListener.online(context, uniqueId);
+			} catch (Throwable e) {
+				logger.error("Mqtt server uniqueId:{} clientId:{} online notify error.", uniqueId, clientId, e);
+			}
+		});
 	}
 
 	private static void connAckByReturnCode(String clientId, String uniqueId, ChannelContext context, MqttConnectReasonCode returnCode) {

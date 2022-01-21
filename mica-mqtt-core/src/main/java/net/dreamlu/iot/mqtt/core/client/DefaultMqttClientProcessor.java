@@ -100,11 +100,14 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (connectListener == null) {
 			return;
 		}
-		try {
-			connectListener.onConnected(context, context.isReconnect);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
+		// 触发客户端连接事件
+		executor.submit(() -> {
+			try {
+				connectListener.onConnected(context, context.isReconnect);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
+		});
 	}
 
 	/**
@@ -149,7 +152,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(reSubscriptionList, message);
 		Boolean result = Tio.send(context, message);
 		logger.info("MQTT subscriptionList:{} messageId:{} resubscribing result:{}", reSubscriptionList, messageId, result);
-		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
+		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, msg));
 		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 	}
 
@@ -276,7 +279,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		Tio.send(context, pubRelMessage);
 
 		pendingPublish.setPubRelMessage(pubRelMessage);
-		pendingPublish.startPubRelRetransmissionTimer(executor, msg -> Tio.send(context, msg));
+		pendingPublish.startPubRelRetransmissionTimer(executor, (msg) -> Tio.send(context, msg));
 	}
 
 	@Override
