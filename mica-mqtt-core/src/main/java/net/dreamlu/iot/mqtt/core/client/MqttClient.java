@@ -21,8 +21,11 @@ import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
+import org.tio.client.ClientTioConfig;
 import org.tio.client.TioClient;
+import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
+import org.tio.utils.lock.SetWithLock;
 
 import java.nio.ByteBuffer;
 import java.util.*;
@@ -38,10 +41,11 @@ public final class MqttClient {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
-	private final ClientChannelContext context;
+	private final ClientTioConfig clientTioConfig;
 	private final IMqttClientSession clientSession;
 	private final ScheduledThreadPoolExecutor executor;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
+	private volatile ClientChannelContext context;
 
 	public static MqttClientCreator create() {
 		return new MqttClientCreator();
@@ -49,11 +53,10 @@ public final class MqttClient {
 
 	MqttClient(TioClient tioClient,
 			   MqttClientCreator config,
-			   ClientChannelContext context,
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioClient = tioClient;
 		this.config = config;
-		this.context = context;
+		this.clientTioConfig = tioClient.getClientTioConfig();
 		this.executor = executor;
 		this.clientSession = config.getClientSession();
 		this.messageIdGenerator = config.getMessageIdGenerator();
@@ -149,10 +152,10 @@ public final class MqttClient {
 			.addSubscriptions(topicSubscriptionList)
 			.messageId(messageId)
 			.build();
-		Boolean result = Tio.send(context, message);
+		Boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
-		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, message));
+		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(getContext(), message));
 		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 		return this;
 	}
@@ -180,11 +183,11 @@ public final class MqttClient {
 			.messageId(messageId)
 			.build();
 		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilters, message);
-		Boolean result = Tio.send(context, message);
+		Boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilters, messageId, result);
 		// 解绑 subManage listener
 		clientSession.addPaddingUnSubscribe(messageId, pendingUnSubscription);
-		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(context, msg));
+		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(getContext(), msg));
 		return this;
 	}
 
@@ -293,12 +296,12 @@ public final class MqttClient {
 			.retained(retain)
 			.messageId(messageId)
 			.build();
-		boolean result = Tio.send(context, message);
+		boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, retain, result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			clientSession.addPendingPublish(messageId, pendingPublish);
-			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
+			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(getContext(), msg));
 		}
 		return result;
 	}
@@ -307,12 +310,16 @@ public final class MqttClient {
 	 * 重连
 	 */
 	public void reconnect() {
+		ClientChannelContext channelContext = getContext();
+		if (channelContext == null) {
+			return;
+		}
 		try {
 			// 判断是否 removed
-			if (context.isRemoved) {
-				context.setRemoved(false);
+			if (channelContext.isRemoved) {
+				channelContext.setRemoved(false);
 			}
-			tioClient.reconnect(context, config.getTimeout());
+			tioClient.reconnect(channelContext, config.getTimeout());
 		} catch (Exception e) {
 			logger.error("mqtt client reconnect error", e);
 		}
@@ -324,9 +331,13 @@ public final class MqttClient {
 	 * @return 是否成功
 	 */
 	public boolean disconnect() {
-		boolean result = Tio.bSend(context, MqttMessage.DISCONNECT);
+		ClientChannelContext channelContext = getContext();
+		if (channelContext == null) {
+			return false;
+		}
+		boolean result = Tio.bSend(channelContext, MqttMessage.DISCONNECT);
 		if (result) {
-			Tio.close(context, null, "MqttClient disconnect.", true);
+			Tio.close(channelContext, null, "MqttClient disconnect.", true);
 		}
 		return result;
 	}
@@ -347,12 +358,48 @@ public final class MqttClient {
 	}
 
 	/**
+	 * 获取 TioClient
+	 *
+	 * @return TioClient
+	 */
+	public TioClient getTioClient() {
+		return tioClient;
+	}
+
+	/**
+	 * 获取配置
+	 *
+	 * @return MqttClientCreator
+	 */
+	public MqttClientCreator getClientCreator() {
+		return config;
+	}
+
+	/**
+	 * 获取 ClientTioConfig
+	 *
+	 * @return ClientTioConfig
+	 */
+	public ClientTioConfig getClientTioConfig() {
+		return clientTioConfig;
+	}
+
+	/**
 	 * 获取 ClientChannelContext
 	 *
 	 * @return ClientChannelContext
 	 */
 	public ClientChannelContext getContext() {
-		return context;
+		if (context != null) {
+			return context;
+		}
+		SetWithLock<ChannelContext> connectedSet = Tio.getConnecteds(clientTioConfig);
+		Set<ChannelContext> contextSet = connectedSet.getObj();
+		if (contextSet == null || contextSet.isEmpty()) {
+			return null;
+		}
+		this.context = (ClientChannelContext) contextSet.iterator().next();
+		return this.context;
 	}
 
 	/**
@@ -361,7 +408,8 @@ public final class MqttClient {
 	 * @return 是否已经连接成功
 	 */
 	public boolean isConnected() {
-		return context != null && !context.isClosed;
+		ClientChannelContext channelContext = getContext();
+		return channelContext != null && !channelContext.isClosed;
 	}
 
 	/**

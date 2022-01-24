@@ -20,7 +20,6 @@ import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
-import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
@@ -416,8 +415,8 @@ public final class MqttClientCreator {
 		// 10. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
-			ClientChannelContext context = tioClient.connect(new Node(this.ip, this.port), this.timeout);
-			return new MqttClient(tioClient, this, context, executor);
+			tioClient.asynConnect(new Node(this.ip, this.port), this.timeout);
+			return new MqttClient(tioClient, this, executor);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
 		}
