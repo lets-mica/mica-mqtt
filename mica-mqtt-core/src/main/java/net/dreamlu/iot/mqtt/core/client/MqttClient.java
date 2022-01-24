@@ -356,12 +356,21 @@ public final class MqttClient {
 	}
 
 	/**
+	 * 判断客户端跟服务端是否连接
+	 *
+	 * @return 是否已经连接成功
+	 */
+	public boolean isConnected() {
+		return context != null && !context.isClosed;
+	}
+
+	/**
 	 * 判断客户端跟服务端是否断开连接
 	 *
 	 * @return 是否断连
 	 */
 	public boolean isDisconnected() {
-		return context.isClosed;
+		return !isConnected();
 	}
 
 }
