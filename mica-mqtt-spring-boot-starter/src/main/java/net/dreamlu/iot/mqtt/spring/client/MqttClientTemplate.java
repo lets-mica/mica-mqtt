@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.spring.client;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
@@ -27,6 +26,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
+import org.tio.client.ClientTioConfig;
+import org.tio.client.TioClient;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -36,7 +37,6 @@ import java.util.List;
  *
  * @author wsq（冷月宫主）
  */
-@Slf4j
 @RequiredArgsConstructor
 public class MqttClientTemplate implements InitializingBean, DisposableBean, Ordered {
 	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
@@ -195,12 +195,48 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	}
 
 	/**
+	 * 获取 TioClient
+	 *
+	 * @return TioClient
+	 */
+	public TioClient getTioClient() {
+		return client.getTioClient();
+	}
+
+	/**
+	 * 获取配置
+	 *
+	 * @return MqttClientCreator
+	 */
+	public MqttClientCreator getClientCreator() {
+		return client.getClientCreator();
+	}
+
+	/**
+	 * 获取 ClientTioConfig
+	 *
+	 * @return ClientTioConfig
+	 */
+	public ClientTioConfig getClientTioConfig() {
+		return client.getClientTioConfig();
+	}
+
+	/**
 	 * 获取 ClientChannelContext
 	 *
 	 * @return ClientChannelContext
 	 */
 	public ClientChannelContext getContext() {
 		return client.getContext();
+	}
+
+	/**
+	 * 判断客户端跟服务端是否连接
+	 *
+	 * @return 是否已经连接成功
+	 */
+	public boolean isConnected() {
+		return client.isConnected();
 	}
 
 	/**
@@ -224,7 +260,6 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	@Override
 	public void afterPropertiesSet() {
 		client = mqttClientCreator.connect();
-		log.info("Mica mqtt client connect to {}:{} successful.", mqttClientCreator.getIp(), mqttClientCreator.getPort());
 	}
 
 	@Override
