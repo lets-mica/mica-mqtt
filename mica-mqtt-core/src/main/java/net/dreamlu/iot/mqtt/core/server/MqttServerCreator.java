@@ -164,11 +164,11 @@ public class MqttServerCreator {
 	/**
 	 * 是否用队列发送
 	 */
-	public boolean useQueueSend = true;
+	private boolean useQueueSend = true;
 	/**
 	 * 是否用队列解码（系统初始化时确定该值，中途不要变更此值，否则在切换的时候可能导致消息丢失）
 	 */
-	public boolean useQueueDecode = false;
+	private boolean useQueueDecode = false;
 
 	public String getName() {
 		return name;
@@ -461,7 +461,7 @@ public class MqttServerCreator {
 		if (this.connectStatusListener == null) {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(Threads.CORE_POOL_SIZE, DefaultThreadFactory.getInstance("MqttServer"));
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(Threads.MAX_POOL_SIZE_FOR_TIO, DefaultThreadFactory.getInstance("MqttServer"));
 		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, executor);
 		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
@@ -469,7 +469,11 @@ public class MqttServerCreator {
 		ServerAioListener listener = new MqttServerAioListener(this, executor);
 		// 3. t-io 配置
 		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
-		// 4. 设置 t-io 心跳 timeout
+		tioConfig.setUseQueueDecode(this.useQueueDecode);
+		tioConfig.setUseQueueSend(this.useQueueSend);
+		// 4. mqtt 消息最大长度
+		tioConfig.setReadBufferSize(this.readBufferSize);
+		// 5. 设置 t-io 心跳 timeout
 		if (this.heartbeatTimeout != null) {
 			tioConfig.setHeartbeatTimeout(this.heartbeatTimeout);
 		}
@@ -482,8 +486,6 @@ public class MqttServerCreator {
 		if (this.debug) {
 			tioConfig.debug = true;
 		}
-		// 5. mqtt 消息最大长度
-		tioConfig.setReadBufferSize(this.readBufferSize);
 		TioServer tioServer = new TioServer(tioConfig);
 		// 6. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
