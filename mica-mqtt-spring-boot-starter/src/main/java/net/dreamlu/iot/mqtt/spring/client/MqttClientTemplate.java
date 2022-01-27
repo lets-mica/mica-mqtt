@@ -51,7 +51,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 * @return MqttClient
 	 */
 	public MqttClient subQos0(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(MqttQoS.AT_MOST_ONCE, topicFilter, listener);
+		return client.subscribe(topicFilter, MqttQoS.AT_MOST_ONCE, listener);
 	}
 
 	/**
@@ -62,7 +62,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 * @return MqttClient
 	 */
 	public MqttClient subQos1(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(MqttQoS.AT_LEAST_ONCE, topicFilter, listener);
+		return client.subscribe(topicFilter, MqttQoS.AT_LEAST_ONCE, listener);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 * @return MqttClient
 	 */
 	public MqttClient subQos2(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(MqttQoS.EXACTLY_ONCE, topicFilter, listener);
+		return client.subscribe(topicFilter, MqttQoS.EXACTLY_ONCE, listener);
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(mqttQoS, topicFilter, listener);
+		return client.subscribe(topicFilter, mqttQoS, listener);
 	}
 
 	/**
