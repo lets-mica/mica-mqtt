@@ -27,7 +27,6 @@ import org.tio.client.intf.ClientAioHandler;
 import org.tio.client.intf.ClientAioListener;
 import org.tio.core.Node;
 import org.tio.core.ssl.SslConfig;
-import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
 
@@ -393,7 +392,7 @@ public final class MqttClientCreator {
 		if (this.messageIdGenerator == null) {
 			this.messageIdGenerator = new DefaultMqttClientMessageIdGenerator();
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(Threads.CORE_POOL_SIZE, DefaultThreadFactory.getInstance("MqttClient"));
+		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttClient"));
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, executor);
 		// 4. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this, processor);
