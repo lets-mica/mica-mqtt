@@ -30,6 +30,7 @@ import org.tio.utils.lock.SetWithLock;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -70,7 +71,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos0(String topicFilter, IMqttClientMessageListener listener) {
-		return subscribe(MqttQoS.AT_MOST_ONCE, topicFilter, listener);
+		return subscribe(topicFilter, MqttQoS.AT_MOST_ONCE, listener);
 	}
 
 	/**
@@ -81,7 +82,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos1(String topicFilter, IMqttClientMessageListener listener) {
-		return subscribe(MqttQoS.AT_LEAST_ONCE, topicFilter, listener);
+		return subscribe(topicFilter, MqttQoS.AT_LEAST_ONCE, listener);
 	}
 
 	/**
@@ -92,7 +93,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos2(String topicFilter, IMqttClientMessageListener listener) {
-		return subscribe(MqttQoS.EXACTLY_ONCE, topicFilter, listener);
+		return subscribe(topicFilter, MqttQoS.EXACTLY_ONCE, listener);
 	}
 
 	/**
@@ -104,7 +105,31 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, IMqttClientMessageListener listener) {
-		return subscribe(Collections.singletonList(new MqttClientSubscription(mqttQoS, topicFilter, listener)));
+		return subscribe(topicFilter, mqttQoS, listener, null);
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param mqttQoS     MqttQoS
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener) {
+		return subscribe(topicFilter, mqttQoS, listener, null);
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param mqttQoS     MqttQoS
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener, MqttProperties properties) {
+		return subscribe(Collections.singletonList(new MqttClientSubscription(mqttQoS, topicFilter, listener)), properties);
 	}
 
 	/**
@@ -116,12 +141,24 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(String[] topicFilters, MqttQoS mqttQoS, IMqttClientMessageListener listener) {
+		return subscribe(topicFilters, mqttQoS, listener, null);
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param topicFilters topicFilter 数组
+	 * @param mqttQoS      MqttQoS
+	 * @param listener     MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String[] topicFilters, MqttQoS mqttQoS, IMqttClientMessageListener listener, MqttProperties properties) {
 		Objects.requireNonNull(topicFilters, "MQTT subscribe topicFilters is null.");
 		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
 		for (String topicFilter : topicFilters) {
 			subscriptionList.add(new MqttClientSubscription(mqttQoS, topicFilter, listener));
 		}
-		return subscribe(subscriptionList);
+		return subscribe(subscriptionList, properties);
 	}
 
 	/**
@@ -131,6 +168,16 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(List<MqttClientSubscription> subscriptionList) {
+		return subscribe(subscriptionList, null);
+	}
+
+	/**
+	 * 批量订阅
+	 *
+	 * @param subscriptionList 订阅集合
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(List<MqttClientSubscription> subscriptionList, MqttProperties properties) {
 		// 1. 先判断是否已经订阅过，重复订阅，直接跳出
 		List<MqttClientSubscription> needSubscriptionList = new ArrayList<>();
 		for (MqttClientSubscription subscription : subscriptionList) {
@@ -151,6 +198,7 @@ public final class MqttClient {
 		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
 			.addSubscriptions(topicSubscriptionList)
 			.messageId(messageId)
+			.properties(properties)
 			.build();
 		Boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
@@ -284,20 +332,46 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		return publish(topic, payload, qos, (publishBuilder) -> publishBuilder.retained(retain));
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic      topic
+	 * @param payload    消息体
+	 * @param qos        MqttQoS
+	 * @param retain     是否在服务器上保留消息
+	 * @param properties MqttProperties
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain, MqttProperties properties) {
+		return publish(topic, payload, qos, (publishBuilder) -> publishBuilder.retained(retain).properties(properties));
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? messageIdGenerator.getId() : -1;
 		if (payload == null) {
 			payload = ByteBuffer.allocate(0);
 		}
-		MqttPublishMessage message = MqttMessageBuilders.publish()
+		MqttMessageBuilders.PublishBuilder publishBuilder = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)
-			.qos(qos)
-			.retained(retain)
 			.messageId(messageId)
-			.build();
+			.qos(qos);
+		builder.accept(publishBuilder);
+		MqttPublishMessage message = publishBuilder.build();
 		boolean result = Tio.send(getContext(), message);
-		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, retain, result);
+		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, publishBuilder.isRetained(), result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			clientSession.addPendingPublish(messageId, pendingPublish);

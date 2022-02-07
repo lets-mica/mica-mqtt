@@ -72,6 +72,10 @@ public final class MqttMessageBuilders {
 			return this;
 		}
 
+		public boolean isRetained() {
+			return retained;
+		}
+
 		public MqttPublishMessage build() {
 			MqttFixedHeader mqttFixedHeader = new MqttFixedHeader(MqttMessageType.PUBLISH, false, qos, retained, 0);
 			MqttPublishVariableHeader mqttVariableHeader =
