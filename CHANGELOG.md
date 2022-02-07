@@ -1,6 +1,15 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.7 - 2022-02-13
+- :sparkles: mica-mqtt-spring-boot-starter 完善。
+- :sparkles: mica-mqtt client 考虑一开始就没有连接上服务端的情况。
+- :sparkles: mica-mqtt client 添加 isConnected 方法
+- :sparkles: mica-mqtt client、server connectListener 改为异步
+- :sparkles: websocket ssl 配置
+- :sparkles: 尝试新版 graalvm
+- :bug: 修复多个 mica mqtt client 消息id生成器隔离。
+
 ### v1.2.6 - 2022-01-19
 - :sparkles: mica-mqtt-client 支持 `$share`、`$queue` 共享订阅
 
