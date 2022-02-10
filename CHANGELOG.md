@@ -6,6 +6,7 @@
 - :sparkles: mica-mqtt client 考虑一开始就没有连接上服务端的情况。
 - :sparkles: mica-mqtt client 添加 isConnected 方法
 - :sparkles: mica-mqtt client、server connectListener 改为异步
+- :sparkles: mica-mqtt server ChannelContext 添加用户名，使用 (String) context.get(MqttConst.USER_NAME_KEY) 获取。
 - :sparkles: websocket ssl 配置
 - :sparkles: 尝试新版 graalvm
 - :bug: 修复多个 mica mqtt client 消息id生成器隔离。

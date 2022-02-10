@@ -86,8 +86,9 @@ public class MqttServerAioListener extends DefaultAioListener {
 		}
 		// 6. 会话清理
 		cleanSession(clientId);
-		// 7. 解绑 clientId
+		// 7. 解绑 clientId、username
 		Tio.unbindBsId(context);
+		context.remove(MqttConst.USER_NAME_KEY);
 		// 8. 下线事件
 		notify(context, clientId);
 	}

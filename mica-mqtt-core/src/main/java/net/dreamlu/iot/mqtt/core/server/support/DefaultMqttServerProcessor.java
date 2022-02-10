@@ -117,8 +117,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		}
 		// 4.5 广播上线消息，避免一个 uniqueId 多个集群服务器中连接。
 		sendConnected(context, uniqueId);
-		// 5. 绑定 uniqueId
+		// 5. 绑定 uniqueId、保存 username
 		Tio.bindBsId(context, uniqueId);
+		context.set(MqttConst.USER_NAME_KEY, userName);
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
 		// 6. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
