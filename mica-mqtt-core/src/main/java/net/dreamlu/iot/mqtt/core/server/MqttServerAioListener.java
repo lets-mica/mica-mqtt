@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.DefaultAioListener;
-import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
 import org.tio.utils.hutool.StrUtil;
 
@@ -86,10 +85,8 @@ public class MqttServerAioListener extends DefaultAioListener {
 		}
 		// 6. 会话清理
 		cleanSession(clientId);
-		// 7. 解绑 clientId、username
-		Tio.unbindBsId(context);
-		context.remove(MqttConst.USER_NAME_KEY);
-		// 8. 下线事件
+		context.remove(MqttConst.DIS_CONNECTED);
+		// 7. 下线事件
 		notify(context, clientId);
 	}
 
