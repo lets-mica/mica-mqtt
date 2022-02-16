@@ -363,12 +363,14 @@ public final class MqttClient {
 		if (payload == null) {
 			payload = ByteBuffer.allocate(0);
 		}
-		MqttMessageBuilders.PublishBuilder publishBuilder = MqttMessageBuilders.publish()
-			.topicName(topic)
+		MqttMessageBuilders.PublishBuilder publishBuilder = MqttMessageBuilders.publish();
+		// 自定义配置
+		builder.accept(publishBuilder);
+		// 内置
+		publishBuilder.topicName(topic)
 			.payload(payload)
 			.messageId(messageId)
 			.qos(qos);
-		builder.accept(publishBuilder);
 		MqttPublishMessage message = publishBuilder.build();
 		boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, publishBuilder.isRetained(), result);
