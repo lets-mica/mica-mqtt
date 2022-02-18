@@ -176,7 +176,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			.sessionPresent(false)
 			.build();
 		Tio.send(context, message);
-		logger.info("Connect ack send - clientId: {} uniqueId:{} returnCode:{}", clientId, uniqueId, returnCode);
+		if (MqttConnectReasonCode.CONNECTION_ACCEPTED == returnCode) {
+			logger.info("Connect ack send - clientId: {} uniqueId:{} returnCode:{}", clientId, uniqueId, returnCode);
+		} else {
+			logger.error("Connect error - clientId: {} uniqueId:{} returnCode:{}", clientId, uniqueId, returnCode);
+		}
 	}
 
 	private void sendConnected(ChannelContext context, String uniqueId) {
