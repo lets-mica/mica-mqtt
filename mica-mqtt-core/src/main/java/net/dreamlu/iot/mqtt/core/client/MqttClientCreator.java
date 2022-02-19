@@ -145,6 +145,10 @@ public final class MqttClientCreator {
 	 * messageId 生成器
 	 */
 	private IMqttClientMessageIdGenerator messageIdGenerator;
+	/**
+	 * 是否开启监控，默认：false 不开启，节省内存
+	 */
+	private boolean statEnable = false;
 
 	public String getName() {
 		return name;
@@ -244,6 +248,10 @@ public final class MqttClientCreator {
 
 	public IMqttClientMessageIdGenerator getMessageIdGenerator() {
 		return messageIdGenerator;
+	}
+
+	public boolean isStatEnable() {
+		return statEnable;
 	}
 
 	public MqttClientCreator name(String name) {
@@ -377,6 +385,15 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator statEnable() {
+		return statEnable(true);
+	}
+
+	public MqttClientCreator statEnable(boolean enable) {
+		this.statEnable = enable;
+		return this;
+	}
+
 	public MqttClient connect() {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
@@ -411,7 +428,9 @@ public final class MqttClientCreator {
 		tioConfig.setReadBufferSize(this.readBufferSize);
 		// 9. ssl 证书设置
 		tioConfig.setSslConfig(this.sslConfig);
-		// 10. tioClient
+		// 10. 是否开启监控
+		tioConfig.statOn = this.statEnable;
+		// 11. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
 			tioClient.asynConnect(new Node(this.ip, this.port), this.timeout);

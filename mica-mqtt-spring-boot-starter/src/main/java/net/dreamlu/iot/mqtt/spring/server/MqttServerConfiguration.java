@@ -77,7 +77,8 @@ public class MqttServerConfiguration {
 			.webPort(properties.getWebPort())
 			.websocketEnable(properties.isWebsocketEnable())
 			.httpEnable(properties.isHttpEnable())
-			.nodeName(properties.getNodeName());
+			.nodeName(properties.getNodeName())
+			.statEnable(properties.isStatEnable());
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}

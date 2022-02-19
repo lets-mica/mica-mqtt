@@ -1,6 +1,12 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.8 - 2022-02-20
+- :sparkles: mica-mqtt server 优化连接 connect 日志。
+- :sparkles: mica-mqtt server 代码优化。
+- :sparkles: mica-mqtt server 添加 statEnable 配置，默认关闭，开启 Prometheus 监控，需要设置为 true。
+- :sparkles: mica-mqtt client 添加 statEnable 配置，默认关闭。
+
 ### v1.2.7 - 2022-02-13
 - :sparkles: mica-mqtt-spring-boot-starter 完善。
 - :sparkles: mica-mqtt client 考虑一开始就没有连接上服务端的情况。

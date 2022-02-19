@@ -122,6 +122,10 @@ public class MqttClientProperties {
 	 * 遗嘱消息
 	 */
 	private WillMessage willMessage;
+	/**
+	 * 是否开启监控，默认：false 不开启，节省内存
+	 */
+	private boolean statEnable = false;
 
 	@Getter
 	@Setter

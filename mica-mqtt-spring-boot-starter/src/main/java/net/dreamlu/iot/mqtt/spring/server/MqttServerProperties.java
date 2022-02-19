@@ -100,6 +100,10 @@ public class MqttServerProperties {
 	 * 节点名称，用于处理集群
 	 */
 	private String nodeName;
+	/**
+	 * 是否开启监控，默认：false 不开启，节省内存
+	 */
+	private boolean statEnable = false;
 
 	@Getter
 	@Setter

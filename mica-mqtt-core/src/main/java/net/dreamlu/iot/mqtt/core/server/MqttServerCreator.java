@@ -169,6 +169,10 @@ public class MqttServerCreator {
 	 * 是否用队列解码（系统初始化时确定该值，中途不要变更此值，否则在切换的时候可能导致消息丢失）
 	 */
 	private boolean useQueueDecode = false;
+	/**
+	 * 是否开启监控，默认：false 不开启，节省内存
+	 */
+	private boolean statEnable = false;
 
 	public String getName() {
 		return name;
@@ -437,6 +441,19 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public boolean isStatEnable() {
+		return statEnable;
+	}
+
+	public MqttServerCreator statEnable() {
+		return statEnable(true);
+	}
+
+	public MqttServerCreator statEnable(boolean enable) {
+		this.statEnable = enable;
+		return this;
+	}
+
 	public MqttServer build() {
 		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		// 默认的节点名称，用于集群
@@ -473,7 +490,9 @@ public class MqttServerCreator {
 		tioConfig.setUseQueueSend(this.useQueueSend);
 		// 4. mqtt 消息最大长度
 		tioConfig.setReadBufferSize(this.readBufferSize);
-		// 5. 设置 t-io 心跳 timeout
+		// 5. 是否开启监控
+		tioConfig.statOn = this.statEnable;
+		// 6. 设置 t-io 心跳 timeout
 		if (this.heartbeatTimeout != null) {
 			tioConfig.setHeartbeatTimeout(this.heartbeatTimeout);
 		}
@@ -487,9 +506,9 @@ public class MqttServerCreator {
 			tioConfig.debug = true;
 		}
 		TioServer tioServer = new TioServer(tioConfig);
-		// 6. 不校验版本号，社区版设置无效
+		// 7. 不校验版本号，社区版设置无效
 		tioServer.setCheckLastVersion(false);
-		// 7. 配置 mqtt http/websocket server
+		// 9 配置 mqtt http/websocket server
 		MqttWebServer webServer;
 		logger.info("Mica mqtt http api enable:{} websocket enable:{}", this.httpEnable, this.websocketEnable);
 		if (this.httpEnable || this.websocketEnable) {
@@ -499,7 +518,7 @@ public class MqttServerCreator {
 		}
 		// MqttServer
 		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, executor);
-		// 8. 如果是默认的消息转发器，设置 mqttServer
+		// 9. 如果是默认的消息转发器，设置 mqttServer
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
 			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);
 		}

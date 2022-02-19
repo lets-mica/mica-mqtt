@@ -14,25 +14,26 @@
 
 ### 2.1 配置项
 
-| 配置项 | 默认值 | 说明 |
-| ----- | ------ | ------ |
-| mqtt.server.enabled | true | 是否启用，默认：true |
-| mqtt.server.name | Mica-Mqtt-Server | 名称 |
-| mqtt.server.port | 1883 | 端口 |
-| mqtt.server.ip | 0.0.0.0 | 服务端 ip 默认为空，0.0.0.0，建议不要设置 |
-| mqtt.server.buffer-allocator | 堆内存 | 堆内存和堆外内存 |
-| mqtt.server.heartbeat-timeout | 1000 * 120 | 心跳超时时间(单位: 毫秒 默认: 1000 * 120) |
-| mqtt.server.read-buffer-size | 8092 | 一次读取接收数据的 buffer size，超过这个长度的消息会多次读取，默认：8092 |
-| mqtt.server.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
-| mqtt.server.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
-| mqtt.server.debug | false | debug，如果开启 prometheus 指标收集建议关闭 |
-| mqtt.server.web-port | 8083 | http、websocket 端口，默认：8083 |
-| mqtt.server.websocket-enable | true | 开启 websocket 服务，默认：true |
-| mqtt.server.http-enable | false | 开启 http 服务，默认：true |
-| mqtt.server.http-basic-auth.enable | false | 是否启用，默认：关闭 |
-| mqtt.server.http-basic-auth.password |  | http Basic 认证密码 |
-| mqtt.server.http-basic-auth.username |  | http Basic 认证账号 |
-| mqtt.server.node-name | pid@ip:port | 集群节点名 |
+| 配置项 | 默认值       | 说明                                           |
+| ----- |-----------|----------------------------------------------|
+| mqtt.server.enabled | true      | 是否启用，默认：true                                 |
+| mqtt.server.name | Mica-Mqtt-Server | 名称                                           |
+| mqtt.server.port | 1883      | 端口                                           |
+| mqtt.server.ip | 0.0.0.0   | 服务端 ip 默认为空，0.0.0.0，建议不要设置                   |
+| mqtt.server.buffer-allocator | 堆内存       | 堆内存和堆外内存                                     |
+| mqtt.server.heartbeat-timeout | 1000 * 120 | 心跳超时时间(单位: 毫秒 默认: 1000 * 120)                |
+| mqtt.server.read-buffer-size | 8092      | 一次读取接收数据的 buffer size，超过这个长度的消息会多次读取，默认：8092 |
+| mqtt.server.max-bytes-in-message | 8092      | 消息解析最大 bytes 长度，默认：8092                      |
+| mqtt.server.max-client-id-length | 23        | mqtt 3.1 会校验此参数，其它协议版本不会                     |
+| mqtt.server.debug | false     | debug，如果开启 prometheus 指标收集建议关闭               |
+| mqtt.server.web-port | 8083      | http、websocket 端口，默认：8083                    |
+| mqtt.server.websocket-enable | true      | 开启 websocket 服务，默认：true                      |
+| mqtt.server.http-enable | false     | 开启 http 服务，默认：true                           |
+| mqtt.server.http-basic-auth.enable | false     | 是否启用，默认：关闭                                   |
+| mqtt.server.http-basic-auth.password |           | http Basic 认证密码                              |
+| mqtt.server.http-basic-auth.username |           | http Basic 认证账号                              |
+| mqtt.server.node-name | pid@ip:port | 集群节点名                                        |
+| mqtt.server.stat-enable | false     | 是否开启监控，默认：关闭，注意如果开启 Prometheus 监控，需要设置为 true |
 
 ### 2.2 配置项示例
 
@@ -183,10 +184,11 @@ public class ServerService {
 | mqtt.client.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.client.reconnect | true | 自动重连 |
 | mqtt.client.re-interval | 5000 | 重连重试时间，单位毫秒 |
-| mqtt.client.retry-count | 0 | 连续重连次数，当连续重连这么多次都失败时，不再重连。0和负数则一直重连  |
+| mqtt.client.retry-count | 0 | 连续重连次数，当连续重连这么多次都失败时，不再重连。0和负数则一直重连 |
 | mqtt.client.timeout | 5 | 连接超时时间，单位秒，t-io 配置，可为 null |
 | mqtt.client.keep-alive-secs | 60 | Keep Alive (s) 心跳维持时间 |
 | mqtt.client.version | MQTT_3_1_1 | mqtt 协议，默认：MQTT_3_1_1 |
+| mqtt.client.stat-enable | false     | 是否开启监控，默认：关闭 |
 
 ### 3.2 配置项示例
 ```yaml
