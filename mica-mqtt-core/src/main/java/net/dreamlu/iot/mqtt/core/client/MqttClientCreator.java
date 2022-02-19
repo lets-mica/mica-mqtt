@@ -20,6 +20,7 @@ import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
+import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
@@ -29,8 +30,10 @@ import org.tio.core.Node;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -149,6 +152,14 @@ public final class MqttClientCreator {
 	 * 是否开启监控，默认：false 不开启，节省内存
 	 */
 	private boolean statEnable = false;
+	/**
+	 * tioExecutor
+	 */
+	private SynThreadPoolExecutor tioExecutor;
+	/**
+	 * groupExecutor
+	 */
+	private ThreadPoolExecutor groupExecutor;
 
 	public String getName() {
 		return name;
@@ -252,6 +263,14 @@ public final class MqttClientCreator {
 
 	public boolean isStatEnable() {
 		return statEnable;
+	}
+
+	public SynThreadPoolExecutor getTioExecutor() {
+		return tioExecutor;
+	}
+
+	public ThreadPoolExecutor getGroupExecutor() {
+		return groupExecutor;
 	}
 
 	public MqttClientCreator name(String name) {
@@ -394,6 +413,16 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator tioExecutor(SynThreadPoolExecutor tioExecutor) {
+		this.tioExecutor = tioExecutor;
+		return this;
+	}
+
+	public MqttClientCreator groupExecutor(ThreadPoolExecutor groupExecutor) {
+		this.groupExecutor = groupExecutor;
+		return this;
+	}
+
 	public MqttClient connect() {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
@@ -409,6 +438,14 @@ public final class MqttClientCreator {
 		if (this.messageIdGenerator == null) {
 			this.messageIdGenerator = new DefaultMqttClientMessageIdGenerator();
 		}
+		// tioExecutor
+		if (this.tioExecutor == null) {
+			this.tioExecutor = ThreadUtil.getTioExecutor(2);
+		}
+		// groupExecutor
+		if (this.groupExecutor == null) {
+			this.groupExecutor = ThreadUtil.getGroupExecutor(1);
+		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttClient"));
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, executor);
 		// 4. 初始化 mqtt 处理器
@@ -420,7 +457,7 @@ public final class MqttClientCreator {
 			reconnConf = new ReconnConf(this.reInterval, this.retryCount);
 		}
 		// 6. tioConfig
-		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf);
+		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf, tioExecutor, groupExecutor);
 		tioConfig.setName(this.name);
 		// 7. 心跳超时时间
 		tioConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
