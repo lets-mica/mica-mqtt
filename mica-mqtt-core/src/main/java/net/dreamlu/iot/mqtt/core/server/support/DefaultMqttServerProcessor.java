@@ -177,7 +177,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			.build();
 		Tio.send(context, message);
 		if (MqttConnectReasonCode.CONNECTION_ACCEPTED == returnCode) {
-			logger.info("Connect ack send - clientId: {} uniqueId:{} returnCode:{}", clientId, uniqueId, returnCode);
+			logger.info("Connect successful, clientId: {} uniqueId:{}", clientId, uniqueId);
 		} else {
 			logger.error("Connect error - clientId: {} uniqueId:{} returnCode:{}", clientId, uniqueId, returnCode);
 		}
