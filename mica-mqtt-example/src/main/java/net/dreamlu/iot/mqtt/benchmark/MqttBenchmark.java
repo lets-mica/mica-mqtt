@@ -17,10 +17,13 @@
 package net.dreamlu.iot.mqtt.benchmark;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
+import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
+import org.tio.utils.Threads;
 
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * mqtt 压力测试
@@ -37,19 +40,22 @@ public class MqttBenchmark {
 		int threadCount = 1000;
 		String ip = "127.0.0.1";
 		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+		ThreadPoolExecutor groupExecutor = ThreadUtil.getGroupExecutor(connCount);
 		for (int i = 0; i < connCount; i++) {
 			int num = i;
-			executor.submit(() -> newClient(ip, num));
+			executor.submit(() -> newClient(ip, num, groupExecutor));
 		}
 	}
 
-	private static void newClient(String ip, int i) {
+	private static void newClient(String ip, int i, ThreadPoolExecutor groupExecutor) {
 		MqttClient.create()
 			.ip(ip)
 			.clientId(UUID.randomUUID().toString() + '-' + i)
 			.username("admin")
 			.password("123456")
 			.readBufferSize(512)
+			.tioExecutor(Threads.getTioExecutor())
+			.groupExecutor(groupExecutor)
 			.connect();
 	}
 
