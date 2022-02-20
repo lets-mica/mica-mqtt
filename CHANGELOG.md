@@ -6,6 +6,7 @@
 - :sparkles: mica-mqtt server 代码优化。
 - :sparkles: mica-mqtt server 添加 statEnable 配置，默认关闭，开启 Prometheus 监控，需要设置为 true。
 - :sparkles: mica-mqtt client 添加 statEnable 配置，默认关闭。
+- :sparkles: mica-mqtt client 优化默认线程池。
 
 ### v1.2.7 - 2022-02-13
 - :sparkles: mica-mqtt-spring-boot-starter 完善。
