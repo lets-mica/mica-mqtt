@@ -50,6 +50,8 @@ public class MqttServerTest {
 			.messageListener((context, clientId, message) -> {
 				logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
 			})
+			// 客户端连接状态监听
+			.connectStatusListener(new MqttConnectStatusListener())
 			// 开启 http
 			.httpEnable(true)
 			// http basic 认证，自定义认证，实现 HttpFilter， 注册到 MqttHttpRoutes 即可

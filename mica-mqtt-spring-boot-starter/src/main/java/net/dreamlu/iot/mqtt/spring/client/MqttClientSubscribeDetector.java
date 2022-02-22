@@ -29,6 +29,7 @@ import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Modifier;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 /**
  * MqttClient 订阅监听器
@@ -48,7 +49,8 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 			MqttClientSubscribe subscribe = AnnotationUtils.findAnnotation(userClass, MqttClientSubscribe.class);
 			if (subscribe != null) {
 				MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
-				clientTemplate.subscribe(subscribe.value(), subscribe.qos(), (IMqttClientMessageListener) bean);
+				String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
+				clientTemplate.subscribe(topicFilters, subscribe.qos(), (IMqttClientMessageListener) bean);
 			}
 		} else {
 			// 2. 查找方法上的 MqttClientSubscribe 注解
@@ -77,7 +79,8 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 					}
 					// 4. 订阅
 					MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
-					clientTemplate.subscribe(subscribe.value(), subscribe.qos(), (topic, payload) ->
+					String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
+					clientTemplate.subscribe(topicFilters, subscribe.qos(), (topic, payload) ->
 						ReflectionUtils.invokeMethod(method, bean, topic, payload)
 					);
 				}
@@ -88,6 +91,10 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 
 	private static MqttClientTemplate getMqttClientTemplate(ApplicationContext applicationContext, String beanName) {
 		return applicationContext.getBean(beanName, MqttClientTemplate.class);
+	}
+
+	private static String[] getTopicFilters(ApplicationContext applicationContext, String[] values) {
+		return Arrays.stream(values).map(applicationContext.getEnvironment()::resolvePlaceholders).toArray(String[]::new);
 	}
 
 }
