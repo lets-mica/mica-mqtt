@@ -15,7 +15,7 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 @Service
-@MqttClientSubscribe("/test/#")
+@MqttClientSubscribe("${topic1}")
 public class MqttClientMessageListener implements IMqttClientMessageListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientMessageListener.class);
 

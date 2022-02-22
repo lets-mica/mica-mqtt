@@ -18,7 +18,7 @@ import java.nio.ByteBuffer;
 public class MqttClientSubscribeListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientSubscribeListener.class);
 
-	@MqttClientSubscribe("/test/#")
+	@MqttClientSubscribe("/test1/#")
 	public void subQos0(String topic, ByteBuffer payload) {
 		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
 	}
