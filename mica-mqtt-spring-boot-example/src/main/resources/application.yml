@@ -1,10 +1,6 @@
-server:
-  port: 30012
 spring:
   application:
     name: mica-mqtt-broker
-  profiles:
-    active: dev
 # actuator management
 management:
   info:

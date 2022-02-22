@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica.auth;
+package net.dreamlu.iot.mqtt.server.auth;
 
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;

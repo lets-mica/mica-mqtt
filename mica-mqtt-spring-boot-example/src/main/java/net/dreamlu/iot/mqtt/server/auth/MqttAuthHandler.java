@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica.auth;
+package net.dreamlu.iot.mqtt.server.auth;
 
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import org.springframework.context.annotation.Configuration;

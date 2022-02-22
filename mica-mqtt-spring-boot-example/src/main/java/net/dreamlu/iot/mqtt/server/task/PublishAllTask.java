@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica.task;
+package net.dreamlu.iot.mqtt.server.task;
 
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.springframework.beans.factory.annotation.Autowired;

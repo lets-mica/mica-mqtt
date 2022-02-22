@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica.auth;
+package net.dreamlu.iot.mqtt.server.auth;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;

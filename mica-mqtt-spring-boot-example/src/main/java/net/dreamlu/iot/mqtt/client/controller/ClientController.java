@@ -1,7 +1,7 @@
-package net.dreamlu.iot.mqtt.mica.controller;
+package net.dreamlu.iot.mqtt.client.controller;
 
 import io.swagger.annotations.Api;
-import net.dreamlu.iot.mqtt.mica.service.ClientService;
+import net.dreamlu.iot.mqtt.client.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

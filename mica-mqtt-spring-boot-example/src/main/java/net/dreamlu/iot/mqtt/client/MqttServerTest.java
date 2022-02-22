@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.mica;
+package net.dreamlu.iot.mqtt.client;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
@@ -44,6 +44,7 @@ public class MqttServerTest {
 			// 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
 			.readBufferSize(512)
 			// 关闭 websocket，避免和 spring boot 启动的冲突
+			.httpEnable(false)
 			.websocketEnable(false)
 			.messageListener((context, clientId, message) -> {
 				logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));

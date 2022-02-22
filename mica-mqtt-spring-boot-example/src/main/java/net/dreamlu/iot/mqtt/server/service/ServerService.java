@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica.service;
+package net.dreamlu.iot.mqtt.server.service;
 
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import org.slf4j.Logger;

@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica;
+package net.dreamlu.iot.mqtt.client;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -11,13 +11,14 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @EnableCaching
-public class MicaMqttApplication {
+public class MqttClientApplication {
 
 	/**
-	 * 启动同目录下的 MqttClientTest、MqttServerTest 进行测试
+	 * 启动同目录下的 MqttServerTest 进行测试
 	 */
 	public static void main(String[] args) {
-		SpringApplication.run(MicaMqttApplication.class, args);
+		System.setProperty("spring.profiles.active", "client");
+		SpringApplication.run(MqttClientApplication.class, args);
 	}
 
 }

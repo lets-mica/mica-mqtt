@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica.service;
+package net.dreamlu.iot.mqtt.client.service;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;

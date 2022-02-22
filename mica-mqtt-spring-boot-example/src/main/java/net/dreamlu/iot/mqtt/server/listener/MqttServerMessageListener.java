@@ -1,4 +1,4 @@
-package net.dreamlu.iot.mqtt.mica.listener;
+package net.dreamlu.iot.mqtt.server.listener;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
