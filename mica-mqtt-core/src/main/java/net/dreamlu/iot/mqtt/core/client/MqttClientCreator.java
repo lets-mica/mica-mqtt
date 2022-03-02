@@ -444,7 +444,7 @@ public final class MqttClientCreator {
 		}
 		// groupExecutor
 		if (this.groupExecutor == null) {
-			this.groupExecutor = ThreadUtil.getGroupExecutor(1);
+			this.groupExecutor = ThreadUtil.getGroupExecutor(2);
 		}
 		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttClient"));
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, executor);
