@@ -248,7 +248,7 @@ public final class MqttServer {
 		// 查找订阅该 topic 的客户端
 		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {
-			logger.warn("Mqtt Topic:{} publishAll but subscribe client list is empty.", topic);
+			logger.debug("Mqtt Topic:{} publishAll but subscribe client list is empty.", topic);
 			return false;
 		}
 		// 下行 payload 为空时，构造一个空结构体
