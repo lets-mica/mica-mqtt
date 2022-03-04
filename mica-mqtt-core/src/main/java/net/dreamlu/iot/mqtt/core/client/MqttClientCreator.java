@@ -160,6 +160,10 @@ public final class MqttClientCreator {
 	 * groupExecutor
 	 */
 	private ThreadPoolExecutor groupExecutor;
+	/**
+	 * scheduledExecutor
+	 */
+	private ScheduledThreadPoolExecutor scheduledExecutor;
 
 	public String getName() {
 		return name;
@@ -271,6 +275,10 @@ public final class MqttClientCreator {
 
 	public ThreadPoolExecutor getGroupExecutor() {
 		return groupExecutor;
+	}
+
+	public ScheduledThreadPoolExecutor getScheduledExecutor() {
+		return scheduledExecutor;
 	}
 
 	public MqttClientCreator name(String name) {
@@ -423,6 +431,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator scheduledExecutor(ScheduledThreadPoolExecutor scheduledExecutor) {
+		this.scheduledExecutor = scheduledExecutor;
+		return this;
+	}
+
 	public MqttClient connect() {
 		// 1. 生成 默认的 clientId
 		String clientId = getClientId();
@@ -446,11 +459,14 @@ public final class MqttClientCreator {
 		if (this.groupExecutor == null) {
 			this.groupExecutor = ThreadUtil.getGroupExecutor(2);
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttClient"));
-		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, executor);
+		// scheduledExecutor
+		if (this.scheduledExecutor == null) {
+			this.scheduledExecutor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttClient"));
+		}
+		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this, this.scheduledExecutor);
 		// 4. 初始化 mqtt 处理器
 		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this, processor);
-		ClientAioListener clientAioListener = new MqttClientAioListener(this, executor);
+		ClientAioListener clientAioListener = new MqttClientAioListener(this, this.scheduledExecutor);
 		// 5. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
@@ -471,7 +487,7 @@ public final class MqttClientCreator {
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
 			tioClient.asynConnect(new Node(this.ip, this.port), this.timeout);
-			return new MqttClient(tioClient, this, executor);
+			return new MqttClient(tioClient, this, this.scheduledExecutor);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
 		}
