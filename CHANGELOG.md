@@ -1,6 +1,12 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.9 - 2022-03-06
+- :sparkles: mqttServer#publishAll() 日志级别调整 gitee #I4W4IS
+- :sparkles: @MqttClientSubscribe 支持 springboot 配置 gitee #I4UOR3
+- :sparkles: mica-mqtt client 代码优化
+- :sparkles: mica-mqtt-spring-boot-example 拆分
+
 ### v1.2.8 - 2022-02-20
 - :sparkles: mica-mqtt server 优化连接 connect 日志。
 - :sparkles: mica-mqtt server 代码优化。
