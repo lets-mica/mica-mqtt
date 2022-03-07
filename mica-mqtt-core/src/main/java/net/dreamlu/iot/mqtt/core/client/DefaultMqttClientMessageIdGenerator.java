@@ -30,6 +30,7 @@ public final class DefaultMqttClientMessageIdGenerator implements IMqttClientMes
 		this.value = new AtomicInteger(1);
 	}
 
+	@Override
 	public int getId() {
 		this.value.compareAndSet(0xffff, 1);
 		return this.value.getAndIncrement();

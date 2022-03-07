@@ -45,13 +45,12 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
 	private final ScheduledThreadPoolExecutor executor;
 
-	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator,
-									  ScheduledThreadPoolExecutor executor) {
+	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator) {
 		this.reSubscribeBatchSize = mqttClientCreator.getReSubscribeBatchSize();
 		this.clientSession = mqttClientCreator.getClientSession();
 		this.connectListener = mqttClientCreator.getConnectListener();
 		this.messageIdGenerator = mqttClientCreator.getMessageIdGenerator();
-		this.executor = executor;
+		this.executor = mqttClientCreator.getScheduledExecutor();
 	}
 
 	@Override

@@ -28,8 +28,7 @@ import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Objects;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * mqtt 客户端监听器
@@ -38,14 +37,39 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class MqttClientAioListener extends DefaultClientAioListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
-	private final MqttConnectMessage connectMessage;
+	private final MqttClientCreator clientCreator;
 	private final IMqttClientConnectListener connectListener;
-	private final ScheduledThreadPoolExecutor executor;
+	private final ThreadPoolExecutor executor;
 
-	public MqttClientAioListener(MqttClientCreator clientCreator, ScheduledThreadPoolExecutor executor) {
-		this.connectMessage = getConnectMessage(Objects.requireNonNull(clientCreator));
+	public MqttClientAioListener(MqttClientCreator clientCreator) {
+		this.clientCreator = clientCreator;
 		this.connectListener = clientCreator.getConnectListener();
-		this.executor = executor;
+		this.executor = clientCreator.getScheduledExecutor();
+	}
+
+	@Override
+	public void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) {
+		if (isConnected) {
+			// 重连时，发送 mqtt 连接消息
+			Boolean result = Tio.send(context, getConnectMessage(this.clientCreator));
+			logger.info("MqttClient reconnect send connect result:{}", result);
+		}
+	}
+
+	@Override
+	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+		// 先判断是否配置监听
+		if (connectListener == null) {
+			return;
+		}
+		// 2. 触发客户断开连接事件
+		executor.submit(() -> {
+			try {
+				connectListener.onDisconnect(channelContext, throwable, remark, isRemove);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
+		});
 	}
 
 	/**
@@ -94,31 +118,6 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 			}
 		}
 		return builder.build();
-	}
-
-	@Override
-	public void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) {
-		if (isConnected) {
-			// 重连时，发送 mqtt 连接消息
-			Boolean result = Tio.send(context, this.connectMessage);
-			logger.info("MqttClient reconnect send connect result:{}", result);
-		}
-	}
-
-	@Override
-	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
-		// 先判断是否配置监听
-		if (connectListener == null) {
-			return;
-		}
-		// 2. 触发客户断开连接事件
-		executor.submit(() -> {
-			try {
-				connectListener.onDisconnect(channelContext, throwable, remark, isRemove);
-			} catch (Throwable e) {
-				logger.error(e.getMessage(), e);
-			}
-		});
 	}
 
 }
