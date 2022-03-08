@@ -70,6 +70,7 @@ public class MqttServerConfiguration {
 			.ip(properties.getIp())
 			.port(properties.getPort())
 			.heartbeatTimeout(properties.getHeartbeatTimeout())
+			.keepaliveBackoff(properties.getKeepaliveBackoff())
 			.readBufferSize(properties.getReadBufferSize())
 			.maxBytesInMessage(properties.getMaxBytesInMessage())
 			.bufferAllocator(properties.getBufferAllocator())

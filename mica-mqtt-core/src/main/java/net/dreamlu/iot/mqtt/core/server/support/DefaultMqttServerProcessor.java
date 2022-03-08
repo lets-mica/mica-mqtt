@@ -60,6 +60,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	 * 2 倍客户端 keepAlive 时间
 	 */
 	private static final long KEEP_ALIVE_UNIT = 2000L;
+	private final MqttServerCreator serverCreator;
 	private final long heartbeatTimeout;
 	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;
@@ -70,10 +71,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final IMqttMessageListener messageListener;
-	private final String nodeName;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
+		this.serverCreator = serverCreator;
 		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? DEFAULT_HEARTBEAT_TIMEOUT : serverCreator.getHeartbeatTimeout();
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
@@ -84,7 +85,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 		this.messageListener = serverCreator.getMessageListener();
-		this.nodeName = serverCreator.getNodeName();
 		this.executor = executor;
 	}
 
@@ -119,13 +119,17 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		sendConnected(context, uniqueId);
 		// 5. 绑定 uniqueId、保存 username
 		Tio.bindBsId(context, uniqueId);
-		context.set(MqttConst.USER_NAME_KEY, userName);
-		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
+		if (StrUtil.isNotBlank(userName)) {
+			context.set(MqttConst.USER_NAME_KEY, userName);
+		}
 		// 6. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
+		float keepaliveBackoff = serverCreator.getKeepaliveBackoff();
+		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
-		// 2倍客户端 keepAlive 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
-		if (keepAliveSeconds > 0 && heartbeatTimeout != keepAliveSeconds * KEEP_ALIVE_UNIT) {
-			context.setHeartbeatTimeout(keepAliveSeconds * KEEP_ALIVE_UNIT);
+		// keepalive * keepaliveBackoff * 2 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
+		long keepAliveTimeout = (long) (keepAliveSeconds * keepaliveBackoff * KEEP_ALIVE_UNIT);
+		if (keepAliveSeconds > 0 && heartbeatTimeout < keepAliveTimeout) {
+			context.setHeartbeatTimeout(keepAliveTimeout);
 		}
 		// 7. session 处理，先默认全部连接关闭时清除，mqtt5 为 CleanStart，
 		// 按照 mqtt 协议的规则是下一次连接时清除，emq 是添加了全局 session 超时，关闭时激活 session 有效期倒计时
@@ -155,7 +159,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			Node clientNode = context.getClientNode();
 			// 客户端 ip:端口
 			willMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
-			willMessage.setNode(nodeName);
+			willMessage.setNode(serverCreator.getNodeName());
 			messageStore.addWillMessage(uniqueId, willMessage);
 		}
 		// 9. 返回 ack
@@ -187,7 +191,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Message message = new Message();
 		message.setClientId(uniqueId);
 		message.setMessageType(MessageType.CONNECT);
-		message.setNode(nodeName);
+		message.setNode(serverCreator.getNodeName());
 		message.setTimestamp(System.currentTimeMillis());
 		Node clientNode = context.getClientNode();
 		message.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
@@ -418,7 +422,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				Node clientNode = context.getClientNode();
 				// 客户端 ip:端口
 				retainMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
-				retainMessage.setNode(nodeName);
+				retainMessage.setNode(serverCreator.getNodeName());
 				this.messageStore.addRetainMessage(topicName, retainMessage);
 			}
 		}
@@ -442,7 +446,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Node clientNode = context.getClientNode();
 		// 客户端 ip:端口
 		message.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
-		message.setNode(nodeName);
+		message.setNode(serverCreator.getNodeName());
 		// 3. 消息发布
 		try {
 			messageListener.onMessage(context, clientId, message);

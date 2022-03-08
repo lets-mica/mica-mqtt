@@ -373,7 +373,7 @@ public final class MqttClient {
 			.qos(qos);
 		MqttPublishMessage message = publishBuilder.build();
 		boolean result = Tio.send(getContext(), message);
-		logger.info("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, publishBuilder.isRetained(), result);
+		logger.debug("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, publishBuilder.isRetained(), result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			clientSession.addPendingPublish(messageId, pendingPublish);

@@ -74,6 +74,12 @@ public class MqttServerCreator {
 	 */
 	private Long heartbeatTimeout;
 	/**
+	 * MQTT 客户端 keepalive 系数，连接超时缺省为连接设置的 keepalive * keepaliveBackoff * 2，默认：0.75
+	 * <p>
+	 * 如果读者想对该值做一些调整，可以在此进行配置。比如设置为 0.75，则变为 keepalive * 1.5。但是该值不得小于 0.5，否则将小于 keepalive 设定的时间。
+	 */
+	private float keepaliveBackoff = 0.75F;
+	/**
 	 * 接收数据的 buffer size，默认：8092
 	 */
 	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
@@ -207,6 +213,18 @@ public class MqttServerCreator {
 
 	public MqttServerCreator heartbeatTimeout(Long heartbeatTimeout) {
 		this.heartbeatTimeout = heartbeatTimeout;
+		return this;
+	}
+
+	public float getKeepaliveBackoff() {
+		return keepaliveBackoff;
+	}
+
+	public MqttServerCreator keepaliveBackoff(float keepaliveBackoff) {
+		if (keepaliveBackoff <= 0.5) {
+			throw new IllegalArgumentException("keepalive backoff must greater than 0.5");
+		}
+		this.keepaliveBackoff = keepaliveBackoff;
 		return this;
 	}
 

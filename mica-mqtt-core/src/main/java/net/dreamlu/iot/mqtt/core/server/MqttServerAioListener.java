@@ -98,7 +98,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 				return;
 			}
 			boolean result = messageDispatcher.send(willMessage);
-			logger.info("Mqtt server clientId:{} send willMessage result:{}.", clientId, result);
+			logger.debug("Mqtt server clientId:{} send willMessage result:{}.", clientId, result);
 			// 4. 清理遗嘱消息
 			messageStore.clearWillMessage(clientId);
 		} catch (Throwable throwable) {
