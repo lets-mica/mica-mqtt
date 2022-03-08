@@ -126,6 +126,7 @@ public final class MqttClient {
 	 * @param mqttQoS     MqttQoS
 	 * @param topicFilter topicFilter
 	 * @param listener    MqttMessageListener
+	 * @param properties  MqttProperties
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener, MqttProperties properties) {
@@ -150,6 +151,7 @@ public final class MqttClient {
 	 * @param topicFilters topicFilter 数组
 	 * @param mqttQoS      MqttQoS
 	 * @param listener     MqttMessageListener
+	 * @param properties   MqttProperties
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(String[] topicFilters, MqttQoS mqttQoS, IMqttClientMessageListener listener, MqttProperties properties) {
@@ -175,6 +177,7 @@ public final class MqttClient {
 	 * 批量订阅
 	 *
 	 * @param subscriptionList 订阅集合
+	 * @param properties       MqttProperties
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(List<MqttClientSubscription> subscriptionList, MqttProperties properties) {
@@ -355,6 +358,7 @@ public final class MqttClient {
 	 * @param topic   topic
 	 * @param payload 消息体
 	 * @param qos     MqttQoS
+	 * @param builder PublishBuilder
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
