@@ -128,7 +128,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
 		// keepalive * keepaliveBackoff * 2 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
 		long keepAliveTimeout = (long) (keepAliveSeconds * keepaliveBackoff * KEEP_ALIVE_UNIT);
-		if (keepAliveSeconds > 0 && heartbeatTimeout < keepAliveTimeout) {
+		if (keepAliveSeconds > 0 && heartbeatTimeout != keepAliveTimeout) {
 			context.setHeartbeatTimeout(keepAliveTimeout);
 		}
 		// 7. session 处理，先默认全部连接关闭时清除，mqtt5 为 CleanStart，
