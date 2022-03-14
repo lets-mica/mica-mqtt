@@ -1,6 +1,12 @@
 # 变更记录
 
 ## 发行版本
+### v1.2.10 - 2022-03-20
+- :sparkles: mica-mqtt server 添加 MQTT 客户端 keepalive 系数 `keepalive-backoff`。
+- :sparkles: mica-mqtt client、server 调整发布的日志级别为 debug。
+- :sparkles: mica-mqtt client 优化 javadoc。
+- :sparkles: mica-mqtt client 重连时，支持重新设置新的鉴权密码。
+
 ### v1.2.9 - 2022-03-06
 - :sparkles: mqttServer#publishAll() 日志级别调整 gitee #I4W4IS
 - :sparkles: @MqttClientSubscribe 支持 springboot 配置 gitee #I4UOR3
