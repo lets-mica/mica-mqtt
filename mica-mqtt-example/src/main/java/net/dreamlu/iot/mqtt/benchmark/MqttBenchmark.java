@@ -16,13 +16,17 @@
 
 package net.dreamlu.iot.mqtt.benchmark;
 
+import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
+import org.tio.core.Tio;
 import org.tio.utils.Threads;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -36,33 +40,46 @@ public class MqttBenchmark {
 	public static void main(String[] args) {
 		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
 		// 《修改Windows服务器最大的Tcp连接数》：https://www.jianshu.com/p/00136a97d2d8
-		int connCount = 6_0000;
-		int threadCount = 100;
+		int connCount = 5_0000;
 		String ip = "127.0.0.1";
-		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-		ThreadPoolExecutor groupExecutor = ThreadUtil.getGroupExecutor(connCount);
+		final List<MqttClient> clientList = new CopyOnWriteArrayList<>();
+		SynThreadPoolExecutor tioExecutor = Threads.getTioExecutor();
+		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
 		ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(10, DefaultThreadFactory.getInstance("MqttClient"));
 		for (int i = 0; i < connCount; i++) {
 			int num = i;
-			executor.submit(() -> newClient(ip, num, groupExecutor, scheduledExecutor));
-			// 避免太快，导致 jvm 崩溃
-			ThreadUtil.sleep(1);
+			groupExecutor.submit(() -> newClient(ip, num, clientList, tioExecutor, groupExecutor, scheduledExecutor));
 		}
+		// 自定义心跳
+		new Thread(() -> {
+			while (true) {
+				ThreadUtil.sleep(60 * 1000);
+				for (MqttClient client : clientList) {
+					if (client.isConnected()) {
+						Tio.send(client.getContext(), MqttMessage.PINGREQ);
+					} else {
+						client.reconnect();
+					}
+				}
+			}
+		}, "timer-heartbeat").start();
 	}
 
-	private static void newClient(String ip, int i, ThreadPoolExecutor groupExecutor,
-								  ScheduledThreadPoolExecutor scheduledExecutor) {
-		MqttClient.create()
+	private static void newClient(String ip, int i, final List<MqttClient> clientList, SynThreadPoolExecutor tioExecutor,
+								  ThreadPoolExecutor groupExecutor, ScheduledThreadPoolExecutor scheduledExecutor) {
+		MqttClient client = MqttClient.create()
 			.ip(ip)
-			.clientId("Bench_" + i)
+			.clientId(UUID.randomUUID().toString() + i)
 			.readBufferSize(128)
 			// 取消 t-io 的心跳线程
 			.keepAliveSecs(0)
-			.tioExecutor(Threads.getTioExecutor())
+			// 取消自动重连
+			.reconnect(false)
+			.tioExecutor(tioExecutor)
 			.groupExecutor(groupExecutor)
 			.scheduledExecutor(scheduledExecutor)
 			.connect();
+		clientList.add(client);
 	}
-
 
 }
