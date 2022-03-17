@@ -43,6 +43,10 @@ import java.util.function.Consumer;
  * @author L.cm
  */
 public final class MqttClientCreator {
+	/**
+	 * 默认的心跳超时
+	 */
+	public static final int DEFAULT_KEEP_ALIVE_SECS = 60;
 
 	/**
 	 * 名称
@@ -75,7 +79,7 @@ public final class MqttClientCreator {
 	/**
 	 * Keep Alive (s)
 	 */
-	private int keepAliveSecs = 60;
+	private int keepAliveSecs = DEFAULT_KEEP_ALIVE_SECS;
 	/**
 	 * SSL配置
 	 */

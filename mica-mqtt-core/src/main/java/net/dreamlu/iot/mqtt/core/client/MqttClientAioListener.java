@@ -81,13 +81,15 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	private static MqttConnectMessage getConnectMessage(MqttClientCreator mqttClientCreator) {
 		MqttWillMessage willMessage = mqttClientCreator.getWillMessage();
 		MqttVersion version = mqttClientCreator.getVersion();
+		int keepAliveSecs = mqttClientCreator.getKeepAliveSecs();
 		// 1. 建立连接后发送 mqtt 连接的消息
 		MqttMessageBuilders.ConnectBuilder builder = MqttMessageBuilders.connect()
 			.clientId(mqttClientCreator.getClientId())
 			.username(mqttClientCreator.getUsername())
-			.keepAlive(mqttClientCreator.getKeepAliveSecs())
 			.cleanSession(mqttClientCreator.isCleanSession())
 			.protocolVersion(version)
+			// 心跳
+			.keepAlive(keepAliveSecs > 0 ? keepAliveSecs : MqttClientCreator.DEFAULT_KEEP_ALIVE_SECS)
 			.willFlag(willMessage != null);
 		// 2. 密码
 		String password = mqttClientCreator.getPassword();
