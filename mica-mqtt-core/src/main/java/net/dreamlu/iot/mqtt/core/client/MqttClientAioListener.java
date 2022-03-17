@@ -22,7 +22,7 @@ import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.client.DefaultClientAioListener;
+import org.tio.client.DefaultTioClientListener;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
@@ -35,7 +35,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  *
  * @author L.cm
  */
-public class MqttClientAioListener extends DefaultClientAioListener {
+public class MqttClientAioListener extends DefaultTioClientListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientAioListener.class);
 	private final MqttClientCreator clientCreator;
 	private final IMqttClientConnectListener connectListener;

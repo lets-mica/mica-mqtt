@@ -200,13 +200,13 @@ import net.dreamlu.iot.mqtt.core.server.http.api.auth.BasicAuthFilter;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.http.websocket.MqttWsMsgHandler;
-import org.tio.core.intf.AioHandler;
+import org.tio.core.intf.TioHandler;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.HttpUuid;
 import org.tio.http.common.handler.HttpRequestHandler;
-import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
-import org.tio.server.intf.ServerAioListener;
+import org.tio.server.TioServerConfig;
+import org.tio.server.intf.TioServerListener;
 import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
@@ -224,18 +224,18 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class MqttWebServer {
 	private static final String TIO_SYSTEM_TIMER_PERIOD = "tio.system.timer.period";
-	private final ServerAioListener serverAioListener;
+	private final TioServerListener serverAioListener;
 	private final HttpRequestHandler httpRequestHandler;
 	private HttpConfig httpConfig = null;
-	private ServerTioConfig serverTioConfig = null;
+	private TioServerConfig serverTioConfig = null;
 	private MqttWebServerAioHandler mqttWebServerAioHandler = null;
 	private TioServer tioServer = null;
 
-	public MqttWebServer(MqttServerCreator serverCreator, ServerAioListener serverAioListener, IWsMsgHandler wsMsgHandler) {
+	public MqttWebServer(MqttServerCreator serverCreator, TioServerListener serverAioListener, IWsMsgHandler wsMsgHandler) {
 		this(serverCreator, serverAioListener, new MqttHttpRequestHandler(), wsMsgHandler, null, null);
 	}
 
-	public MqttWebServer(MqttServerCreator serverCreator, ServerAioListener serverAioListener, HttpRequestHandler requestHandler, IWsMsgHandler wsMsgHandler, SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
+	public MqttWebServer(MqttServerCreator serverCreator, TioServerListener serverAioListener, HttpRequestHandler requestHandler, IWsMsgHandler wsMsgHandler, SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
 		if (tioExecutor == null) {
 			tioExecutor = Threads.getTioExecutor();
 		}
@@ -259,7 +259,7 @@ public class MqttWebServer {
 		return mqttWebServerAioHandler;
 	}
 
-	public ServerTioConfig getServerTioConfig() {
+	public TioServerConfig getServerTioConfig() {
 		return serverTioConfig;
 	}
 
@@ -277,7 +277,7 @@ public class MqttWebServer {
 		this.httpConfig = httpConfig;
 		this.httpConfig.setHttpRequestHandler(this.httpRequestHandler);
 		this.mqttWebServerAioHandler = new MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
-		this.serverTioConfig = new ServerTioConfig(this.httpConfig.getName(), mqttWebServerAioHandler, this.serverAioListener, tioExecutor, groupExecutor);
+		this.serverTioConfig = new TioServerConfig(this.httpConfig.getName(), mqttWebServerAioHandler, this.serverAioListener, tioExecutor, groupExecutor);
 		this.serverTioConfig.setSslConfig(serverCreator.getSslConfig());
 		this.serverTioConfig.setHeartbeatTimeout(0);
 		this.serverTioConfig.setReadBufferSize(1024 * 30);
@@ -300,7 +300,7 @@ public class MqttWebServer {
 	 * @param mqttServerConfig ServerTioConfig
 	 * @return MqttWebServer
 	 */
-	public static MqttWebServer config(MqttServerCreator serverCreator, ServerTioConfig mqttServerConfig) {
+	public static MqttWebServer config(MqttServerCreator serverCreator, TioServerConfig mqttServerConfig) {
 		// 1. 判断是否开启 http
 		if (serverCreator.isHttpEnable()) {
 			// 1.1 http 特有的配置
@@ -319,11 +319,11 @@ public class MqttWebServer {
 			}
 		}
 		// 2. 初始化处理器
-		AioHandler mqttAioHandler = mqttServerConfig.getAioHandler();
-		ServerAioListener mqttAioListener = (ServerAioListener) mqttServerConfig.getAioListener();
+		TioHandler mqttAioHandler = mqttServerConfig.getTioHandler();
+		TioServerListener mqttAioListener = (TioServerListener) mqttServerConfig.getTioListener();
 		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(serverCreator, mqttAioHandler);
 		MqttWebServer httpServerStarter = new MqttWebServer(serverCreator, mqttAioListener, mqttWsMsgHandler);
-		ServerTioConfig httpIioConfig = httpServerStarter.getServerTioConfig();
+		TioServerConfig httpIioConfig = httpServerStarter.getServerTioConfig();
 		// 3. tcp + websocket mqtt 共享公共配置
 		httpIioConfig.share(mqttServerConfig);
 		httpIioConfig.groupStat = mqttServerConfig.groupStat;

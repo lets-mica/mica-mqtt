@@ -17,7 +17,7 @@
 package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
-import org.tio.client.intf.ClientAioHandler;
+import org.tio.client.intf.TioClientHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.TioConfig;
 import org.tio.core.exception.TioDecodeException;
@@ -30,7 +30,7 @@ import java.nio.ByteBuffer;
  *
  * @author L.cm
  */
-public class MqttClientAioHandler implements ClientAioHandler {
+public class MqttClientAioHandler implements TioClientHandler {
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
 	private final ByteBufferAllocator allocator;

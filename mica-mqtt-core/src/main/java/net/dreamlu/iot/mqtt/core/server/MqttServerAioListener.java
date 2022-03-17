@@ -25,8 +25,8 @@ import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
-import org.tio.core.DefaultAioListener;
 import org.tio.core.intf.Packet;
+import org.tio.server.DefaultTioServerListener;
 import org.tio.utils.hutool.StrUtil;
 
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -36,7 +36,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  *
  * @author L.cm
  */
-public class MqttServerAioListener extends DefaultAioListener {
+public class MqttServerAioListener extends DefaultTioServerListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServerAioListener.class);
 	private final IMqttMessageStore messageStore;
 	private final IMqttSessionManager sessionManager;

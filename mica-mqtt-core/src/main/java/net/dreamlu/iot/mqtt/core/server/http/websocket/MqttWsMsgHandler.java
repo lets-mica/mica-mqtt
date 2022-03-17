@@ -23,8 +23,8 @@ import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
-import org.tio.core.intf.AioHandler;
 import org.tio.core.intf.Packet;
+import org.tio.core.intf.TioHandler;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.websocket.common.WsRequest;
@@ -51,15 +51,15 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 * websocket 握手端点
 	 */
 	private final String[] supportedSubProtocols;
-	private final AioHandler mqttServerAioHandler;
+	private final TioHandler mqttServerAioHandler;
 
-	public MqttWsMsgHandler(MqttServerCreator serverCreator, AioHandler aioHandler) {
+	public MqttWsMsgHandler(MqttServerCreator serverCreator, TioHandler aioHandler) {
 		this(serverCreator, new String[]{"mqtt", "mqttv3.1", "mqttv3.1.1"}, aioHandler);
 	}
 
 	public MqttWsMsgHandler(MqttServerCreator serverCreator,
 							String[] supportedSubProtocols,
-							AioHandler aioHandler) {
+							TioHandler aioHandler) {
 		this.serverCreator = serverCreator;
 		this.supportedSubProtocols = supportedSubProtocols;
 		this.mqttServerAioHandler = aioHandler;

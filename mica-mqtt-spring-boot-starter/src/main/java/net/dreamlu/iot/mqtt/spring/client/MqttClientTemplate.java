@@ -26,8 +26,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
-import org.tio.client.ClientTioConfig;
 import org.tio.client.TioClient;
+import org.tio.client.TioClientConfig;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -217,7 +217,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 *
 	 * @return ClientTioConfig
 	 */
-	public ClientTioConfig getClientTioConfig() {
+	public TioClientConfig getClientTioConfig() {
 		return client.getClientTioConfig();
 	}
 

@@ -26,7 +26,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.tio.core.Tio;
 import org.tio.server.ServerGroupStat;
-import org.tio.server.ServerTioConfig;
+import org.tio.server.TioServerConfig;
 
 import java.util.Collections;
 
@@ -68,11 +68,11 @@ public class MqttServerMetrics implements ApplicationListener<ApplicationStarted
 		ConfigurableApplicationContext applicationContext = event.getApplicationContext();
 		MqttServer mqttServer = applicationContext.getBean(MqttServer.class);
 		MeterRegistry registry = applicationContext.getBean(MeterRegistry.class);
-		ServerTioConfig serverConfig = mqttServer.getServerConfig();
+		TioServerConfig serverConfig = mqttServer.getServerConfig();
 		bindTo(registry, serverConfig);
 	}
 
-	private void bindTo(MeterRegistry meterRegistry, ServerTioConfig serverConfig) {
+	private void bindTo(MeterRegistry meterRegistry, TioServerConfig serverConfig) {
 		// 连接统计
 		Gauge.builder(MQTT_CONNECTIONS_ACCEPTED, serverConfig, (config) -> ((ServerGroupStat) config.getGroupStat()).getAccepted().get())
 			.description("Mqtt server connections accepted")

@@ -27,8 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
-import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
+import org.tio.server.TioServerConfig;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -86,8 +86,8 @@ public final class MqttServer {
 	 *
 	 * @return the serverTioConfig
 	 */
-	public ServerTioConfig getServerConfig() {
-		return this.tioServer.getServerTioConfig();
+	public TioServerConfig getServerConfig() {
+		return this.tioServer.getTioServerConfig();
 	}
 
 	/**

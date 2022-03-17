@@ -204,12 +204,11 @@ import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.http.common.*;
 import org.tio.http.common.handler.HttpRequestHandler;
-import org.tio.server.intf.ServerAioHandler;
+import org.tio.server.intf.TioServerHandler;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.websocket.common.*;
 import org.tio.websocket.common.util.BASE64Util;
 import org.tio.websocket.common.util.SHA1Util;
-import org.tio.websocket.server.WsServerAioHandler;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.UnsupportedEncodingException;
@@ -222,8 +221,8 @@ import java.util.*;
  * @author tanyaowu
  * @author L.cm
  */
-public class MqttWebServerAioHandler implements ServerAioHandler {
-	private static final Logger log = LoggerFactory.getLogger(WsServerAioHandler.class);
+public class MqttWebServerAioHandler implements TioServerHandler {
+	private static final Logger log = LoggerFactory.getLogger(MqttWebServerAioHandler.class);
 	/**
 	 * value: List<WsRequest>
 	 */

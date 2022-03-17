@@ -21,8 +21,8 @@ import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
-import org.tio.client.ClientTioConfig;
 import org.tio.client.TioClient;
+import org.tio.client.TioClientConfig;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.utils.lock.SetWithLock;
@@ -42,7 +42,7 @@ public final class MqttClient {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
-	private final ClientTioConfig clientTioConfig;
+	private final TioClientConfig clientTioConfig;
 	private final IMqttClientSession clientSession;
 	private final ScheduledThreadPoolExecutor executor;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
@@ -57,7 +57,7 @@ public final class MqttClient {
 			   ScheduledThreadPoolExecutor executor) {
 		this.tioClient = tioClient;
 		this.config = config;
-		this.clientTioConfig = tioClient.getClientTioConfig();
+		this.clientTioConfig = tioClient.getTioClientConfig();
 		this.executor = executor;
 		this.clientSession = config.getClientSession();
 		this.messageIdGenerator = config.getMessageIdGenerator();
@@ -460,7 +460,7 @@ public final class MqttClient {
 	 *
 	 * @return ClientTioConfig
 	 */
-	public ClientTioConfig getClientTioConfig() {
+	public TioClientConfig getClientTioConfig() {
 		return clientTioConfig;
 	}
 

@@ -21,11 +21,11 @@ import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
-import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
-import org.tio.client.intf.ClientAioHandler;
-import org.tio.client.intf.ClientAioListener;
+import org.tio.client.TioClientConfig;
+import org.tio.client.intf.TioClientHandler;
+import org.tio.client.intf.TioClientListener;
 import org.tio.core.Node;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
@@ -469,15 +469,15 @@ public final class MqttClientCreator {
 		}
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this);
 		// 4. 初始化 mqtt 处理器
-		ClientAioHandler clientAioHandler = new MqttClientAioHandler(this, processor);
-		ClientAioListener clientAioListener = new MqttClientAioListener(this);
+		TioClientHandler clientAioHandler = new MqttClientAioHandler(this, processor);
+		TioClientListener clientAioListener = new MqttClientAioListener(this);
 		// 5. 重连配置
 		ReconnConf reconnConf = null;
 		if (this.reconnect) {
 			reconnConf = new ReconnConf(this.reInterval, this.retryCount);
 		}
 		// 6. tioConfig
-		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf, tioExecutor, groupExecutor);
+		TioClientConfig tioConfig = new TioClientConfig(clientAioHandler, clientAioListener, reconnConf, tioExecutor, groupExecutor);
 		tioConfig.setName(this.name);
 		// 7. 心跳超时时间
 		tioConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));

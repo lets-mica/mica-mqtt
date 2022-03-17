@@ -25,7 +25,7 @@ import org.tio.core.TioConfig;
 import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.server.AcceptCompletionHandler;
-import org.tio.server.intf.ServerAioHandler;
+import org.tio.server.intf.TioServerHandler;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.ByteBuffer;
@@ -33,7 +33,7 @@ import java.nio.ByteBuffer;
 /**
  * @author L.cm
  */
-public class MqttServerAioHandler implements ServerAioHandler {
+public class MqttServerAioHandler implements TioServerHandler {
 	private static final Logger log = LoggerFactory.getLogger(AcceptCompletionHandler.class);
 	private final MqttDecoder mqttDecoder;
 	private final MqttEncoder mqttEncoder;
