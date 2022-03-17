@@ -36,7 +36,7 @@ import java.util.concurrent.ThreadPoolExecutor;
  * @author L.cm
  */
 public class MqttClientAioListener extends DefaultClientAioListener {
-	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
+	private static final Logger logger = LoggerFactory.getLogger(MqttClientAioListener.class);
 	private final MqttClientCreator clientCreator;
 	private final IMqttClientConnectListener connectListener;
 	private final ThreadPoolExecutor executor;
