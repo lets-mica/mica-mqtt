@@ -19,10 +19,11 @@ package net.dreamlu.iot.mqtt.benchmark;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import org.tio.utils.Threads;
+import org.tio.utils.thread.pool.DefaultThreadFactory;
 
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -33,30 +34,35 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class MqttBenchmark {
 
 	public static void main(String[] args) {
-		// 1. 模拟 1w 连接，在开发机（i5-7500 4核4线程 win10 MqttServer 6G）1万连连接很轻松。
 		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
 		// 《修改Windows服务器最大的Tcp连接数》：https://www.jianshu.com/p/00136a97d2d8
-		int connCount = 1_0000;
-		int threadCount = 1000;
+		int connCount = 6_0000;
+		int threadCount = 100;
 		String ip = "127.0.0.1";
 		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
 		ThreadPoolExecutor groupExecutor = ThreadUtil.getGroupExecutor(connCount);
+		ScheduledThreadPoolExecutor scheduledExecutor = new ScheduledThreadPoolExecutor(10, DefaultThreadFactory.getInstance("MqttClient"));
 		for (int i = 0; i < connCount; i++) {
 			int num = i;
-			executor.submit(() -> newClient(ip, num, groupExecutor));
+			executor.submit(() -> newClient(ip, num, groupExecutor, scheduledExecutor));
+			// 避免太快，导致 jvm 崩溃
+			ThreadUtil.sleep(1);
 		}
 	}
 
-	private static void newClient(String ip, int i, ThreadPoolExecutor groupExecutor) {
+	private static void newClient(String ip, int i, ThreadPoolExecutor groupExecutor,
+								  ScheduledThreadPoolExecutor scheduledExecutor) {
 		MqttClient.create()
 			.ip(ip)
-			.clientId(UUID.randomUUID().toString() + '-' + i)
-			.username("admin")
-			.password("123456")
-			.readBufferSize(512)
+			.clientId("Bench_" + i)
+			.readBufferSize(128)
+			// 取消 t-io 的心跳线程
+			.keepAliveSecs(0)
 			.tioExecutor(Threads.getTioExecutor())
 			.groupExecutor(groupExecutor)
+			.scheduledExecutor(scheduledExecutor)
 			.connect();
 	}
+
 
 }

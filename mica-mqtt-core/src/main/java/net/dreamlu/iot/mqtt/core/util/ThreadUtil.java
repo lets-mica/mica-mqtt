@@ -33,6 +33,24 @@ import java.util.concurrent.TimeUnit;
 public final class ThreadUtil {
 
 	/**
+	 * 挂起当前线程
+	 *
+	 * @param millis 挂起的毫秒数
+	 * @return 被中断返回false，否则true
+	 */
+	public static boolean sleep(long millis) {
+		if (millis > 0) {
+			try {
+				Thread.sleep(millis);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * 获取 tio group 线程池
 	 *
 	 * @param groupPoolSize group 线程大小
