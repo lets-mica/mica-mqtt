@@ -40,7 +40,7 @@ public class MqttBenchmark {
 	public static void main(String[] args) {
 		// 注意： windows 上需要修改最大的 Tcp 连接数，不然超不过 2W。
 		// 《修改Windows服务器最大的Tcp连接数》：https://www.jianshu.com/p/00136a97d2d8
-		int connCount = 1000;
+		int connCount = 5_0000;
 		String ip = "127.0.0.1";
 		final List<MqttClient> clientList = new CopyOnWriteArrayList<>();
 		SynThreadPoolExecutor tioExecutor = Threads.getTioExecutor();
@@ -49,8 +49,6 @@ public class MqttBenchmark {
 		for (int i = 0; i < connCount; i++) {
 			int num = i;
 			groupExecutor.submit(() -> newClient(ip, num, clientList, tioExecutor, groupExecutor, scheduledExecutor));
-			// 避免太快，导致 jvm 崩溃
-			ThreadUtil.sleep(1);
 		}
 		// 自定义心跳
 		new Thread(() -> {
@@ -83,6 +81,5 @@ public class MqttBenchmark {
 			.connect();
 		clientList.add(client);
 	}
-
 
 }
