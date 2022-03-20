@@ -38,12 +38,12 @@ public class RedisMqttConnectStatusListener implements IMqttConnectStatusListene
 	private MqttServerCreator serverCreator;
 
 	@Override
-	public void online(ChannelContext context, String clientId) {
+	public void online(ChannelContext context, String clientId, String username) {
 		redisCache.sAdd(getRedisKey(), clientId);
 	}
 
 	@Override
-	public void offline(ChannelContext context, String clientId) {
+	public void offline(ChannelContext context, String clientId, String username) {
 		redisCache.sRem(getRedisKey(), clientId);
 	}
 

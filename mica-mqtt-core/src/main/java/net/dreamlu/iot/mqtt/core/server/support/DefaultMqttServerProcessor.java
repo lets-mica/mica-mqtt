@@ -167,7 +167,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 10. 在线状态
 		executor.execute(() -> {
 			try {
-				connectStatusListener.online(context, uniqueId);
+				connectStatusListener.online(context, uniqueId, userName);
 			} catch (Throwable e) {
 				logger.error("Mqtt server uniqueId:{} clientId:{} online notify error.", uniqueId, clientId, e);
 			}

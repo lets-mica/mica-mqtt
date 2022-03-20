@@ -87,7 +87,8 @@ public class MqttServerAioListener extends DefaultAioListener {
 		cleanSession(clientId);
 		context.remove(MqttConst.DIS_CONNECTED);
 		// 7. 下线事件
-		notify(context, clientId);
+		String username = (String) context.get(MqttConst.USER_NAME_KEY);
+		notify(context, clientId, username);
 	}
 
 	private void sendWillMessage(String clientId) {
@@ -114,10 +115,10 @@ public class MqttServerAioListener extends DefaultAioListener {
 		}
 	}
 
-	private void notify(ChannelContext context, String clientId) {
+	private void notify(ChannelContext context, String clientId, String username) {
 		executor.execute(() -> {
 			try {
-				connectStatusListener.offline(context, clientId);
+				connectStatusListener.offline(context, clientId, username);
 			} catch (Throwable throwable) {
 				logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
 			}

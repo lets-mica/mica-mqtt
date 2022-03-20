@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.server.listener;
 
-import net.dreamlu.iot.mqtt.core.server.MqttConst;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.server.MqttClientTest;
 import org.slf4j.Logger;
@@ -34,14 +33,12 @@ public class MqttConnectStatusListener implements IMqttConnectStatusListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientTest.class);
 
 	@Override
-	public void online(ChannelContext context, String clientId) {
-		String username = (String) context.get(MqttConst.USER_NAME_KEY);
+	public void online(ChannelContext context, String clientId, String username) {
 		logger.info("Mqtt clientId:{} username:{} online...", clientId, username);
 	}
 
 	@Override
-	public void offline(ChannelContext context, String clientId) {
-		String username = (String) context.get(MqttConst.USER_NAME_KEY);
+	public void offline(ChannelContext context, String clientId, String username) {
 		logger.info("Mqtt clientId:{} username:{} offline...", clientId, username);
 	}
 

@@ -30,12 +30,12 @@ public class DefaultMqttConnectStatusListener implements IMqttConnectStatusListe
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttConnectStatusListener.class);
 
 	@Override
-	public void online(ChannelContext context, String clientId) {
-		logger.info("Mqtt clientId:{} online.", clientId);
+	public void online(ChannelContext context, String clientId, String username) {
+		logger.info("Mqtt clientId:{} username:{} online.", clientId, username);
 	}
 
 	@Override
-	public void offline(ChannelContext context, String clientId) {
-		logger.info("Mqtt clientId:{} offline.", clientId);
+	public void offline(ChannelContext context, String clientId, String username) {
+		logger.info("Mqtt clientId:{} username:{} offline.", clientId, username);
 	}
 }
