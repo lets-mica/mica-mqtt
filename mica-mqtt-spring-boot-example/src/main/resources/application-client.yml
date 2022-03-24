@@ -1,8 +1,6 @@
 server:
   port: 30012
 mqtt:
-  server:
-    enabled: false              # 是否开启服务端，默认：true
   client:
     enabled: true               # 是否开启客户端，默认：false 使用到的场景有限，非必要请不要启用
     ip: 127.0.0.1               # 连接的服务端 ip ，默认：127.0.0.1

@@ -46,8 +46,7 @@ import java.util.Objects;
 @ConditionalOnProperty(
 	prefix = MqttServerProperties.PREFIX,
 	name = "enabled",
-	havingValue = "true",
-	matchIfMissing = true
+	havingValue = "true"
 )
 @EnableConfigurationProperties(MqttServerProperties.class)
 public class MqttServerConfiguration {

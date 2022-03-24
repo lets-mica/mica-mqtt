@@ -33,8 +33,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(
 	prefix = MqttServerProperties.PREFIX,
 	name = "enabled",
-	havingValue = "true",
-	matchIfMissing = true
+	havingValue = "true"
 )
 @ConditionalOnClass(MeterBinder.class)
 @AutoConfigureAfter(MqttServerConfiguration.class)
