@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.server;
 
-import net.dreamlu.iot.mqtt.client.MqttClientTest;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +27,7 @@ import org.tio.core.ChannelContext;
  * @author L.cm
  */
 public class MqttConnectStatusListener implements IMqttConnectStatusListener {
-	private static final Logger logger = LoggerFactory.getLogger(MqttClientTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MqttConnectStatusListener.class);
 
 	@Override
 	public void online(ChannelContext context, String clientId, String username) {

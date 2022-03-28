@@ -17,9 +17,11 @@
 package net.dreamlu.iot.mqtt.client.listener;
 
 import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
-import net.dreamlu.iot.mqtt.server.MqttClientTest;
+import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.tio.core.ChannelContext;
 
@@ -30,7 +32,10 @@ import org.tio.core.ChannelContext;
  */
 @Service
 public class MqttClientConnectListener implements IMqttClientConnectListener {
-	private static final Logger logger = LoggerFactory.getLogger(MqttClientTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MqttClientConnectListener.class);
+
+	@Autowired
+	private ApplicationContext applicationContext;
 
 	@Override
 	public void onConnected(ChannelContext context, boolean isReconnect) {
@@ -44,6 +49,12 @@ public class MqttClientConnectListener implements IMqttClientConnectListener {
 	@Override
 	public void onDisconnect(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
 		logger.error("mqtt 链接断开 remark:{} isRemove:{}", remark, isRemove, throwable);
+		// 在断线时更新 clientId、username、password
+		MqttClientCreator mqttClientCreator = applicationContext.getBean(MqttClientCreator.class);
+		mqttClientCreator
+			.clientId("newClient" + System.currentTimeMillis())
+			.username("newUserName")
+			.password("newPassword");
 	}
 
 }
