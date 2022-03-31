@@ -441,9 +441,8 @@ public final class MqttClientCreator {
 	}
 
 	public MqttClient connect() {
-		// 1. 生成 默认的 clientId
-		String clientId = getClientId();
-		if (StrUtil.isBlank(clientId)) {
+		// 1. clientId 为空，生成默认的 clientId
+		if (StrUtil.isBlank(this.clientId)) {
 			// 默认为：MICA-MQTT- 前缀和 36进制的纳秒数
 			this.clientId("MICA-MQTT-" + Long.toString(System.nanoTime(), 36));
 		}

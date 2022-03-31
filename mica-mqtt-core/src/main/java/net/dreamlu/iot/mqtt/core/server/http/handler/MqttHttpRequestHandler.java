@@ -57,7 +57,9 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 		if (handler.getMethod() != method) {
 			return Result.fail(new HttpResponse(request), ResultCode.E104);
 		}
-		logger.info("mqtt http api {} path:{}", method.name(), requestLine.getPathAndQuery());
+		if (logger.isInfoEnabled()) {
+			logger.info("mqtt http api {} path:{}", method.name(), requestLine.getPathAndQuery());
+		}
 		try {
 			return handler.getHandler().apply(request);
 		} catch (Exception e) {
@@ -67,7 +69,9 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 
 	@Override
 	public HttpResponse resp404(HttpRequest request, RequestLine requestLine) {
-		logger.error("mqtt http {} path:{} 404", requestLine.getMethod().name(), requestLine.getPathAndQuery());
+		if (logger.isErrorEnabled()) {
+			logger.error("mqtt http {} path:{} 404", requestLine.getMethod().name(), requestLine.getPathAndQuery());
+		}
 		HttpResponse response = new HttpResponse(request);
 		response.setStatus(HttpResponseStatus.C404);
 		return response;
@@ -75,7 +79,9 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 
 	@Override
 	public HttpResponse resp500(HttpRequest request, RequestLine requestLine, Throwable throwable) {
-		logger.error("mqtt http {} path:{} error", requestLine.getMethod().name(), requestLine.getPathAndQuery(), throwable);
+		if (logger.isErrorEnabled()) {
+			logger.error("mqtt http {} path:{} error", requestLine.getMethod().name(), requestLine.getPathAndQuery(), throwable);
+		}
 		HttpResponse response = new HttpResponse(request);
 		return Result.fail(response, ResultCode.E105);
 	}
@@ -87,7 +93,7 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 
 	@Override
 	public void clearStaticResCache() {
-
+		// ignore
 	}
 
 }

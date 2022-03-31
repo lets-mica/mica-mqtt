@@ -55,7 +55,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * @author L.cm
  */
 public class MqttServerCreator {
-	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(MqttServerCreator.class);
 
 	/**
 	 * 名称

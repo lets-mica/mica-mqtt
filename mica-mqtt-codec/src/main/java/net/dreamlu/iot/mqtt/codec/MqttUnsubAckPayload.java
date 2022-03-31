@@ -40,19 +40,13 @@ public final class MqttUnsubAckPayload {
 		}
 	}
 
-	public MqttUnsubAckPayload(short... unsubscribeReasonCodes) {
-		Objects.requireNonNull(unsubscribeReasonCodes, "unsubscribeReasonCodes is null.");
-		List<Short> list = new ArrayList<>(unsubscribeReasonCodes.length);
-		for (Short v : unsubscribeReasonCodes) {
-			list.add(v);
-		}
-		this.unsubscribeReasonCodes = Collections.unmodifiableList(list);
+	public MqttUnsubAckPayload() {
+		this.unsubscribeReasonCodes = Collections.emptyList();
 	}
 
 	public MqttUnsubAckPayload(Iterable<Short> unsubscribeReasonCodes) {
 		Objects.requireNonNull(unsubscribeReasonCodes, "unsubscribeReasonCodes is null.");
-
-		List<Short> list = new ArrayList<Short>();
+		List<Short> list = new ArrayList<>();
 		for (Short v : unsubscribeReasonCodes) {
 			Objects.requireNonNull(v, "unsubscribeReasonCode is null.");
 			list.add(v);

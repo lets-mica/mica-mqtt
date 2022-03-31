@@ -45,7 +45,7 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	 * @param message Message
 	 * @return 是否成功
 	 */
-	abstract public boolean sendAll(Message message);
+	public abstract boolean sendAll(Message message);
 
 	@Override
 	public boolean send(Message message) {

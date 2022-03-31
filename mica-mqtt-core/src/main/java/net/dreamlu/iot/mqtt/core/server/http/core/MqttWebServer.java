@@ -269,12 +269,11 @@ public class MqttWebServer {
 
 	private void init(MqttServerCreator serverCreator, IWsMsgHandler wsMsgHandler,
 					  SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
-		HttpConfig httpConfig = new HttpConfig(serverCreator.getWebPort(), false);
-		httpConfig.setBindIp(serverCreator.getIp());
-		httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
-		httpConfig.setCheckHost(false);
-		httpConfig.setMonitorFileChange(false);
-		this.httpConfig = httpConfig;
+		this.httpConfig = new HttpConfig(serverCreator.getWebPort(), false);
+		this.httpConfig.setBindIp(serverCreator.getIp());
+		this.httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
+		this.httpConfig.setCheckHost(false);
+		this.httpConfig.setMonitorFileChange(false);
 		this.httpConfig.setHttpRequestHandler(this.httpRequestHandler);
 		this.mqttWebServerAioHandler = new MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
 		this.serverTioConfig = new ServerTioConfig(this.httpConfig.getName(), mqttWebServerAioHandler, this.serverAioListener, tioExecutor, groupExecutor);

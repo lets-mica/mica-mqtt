@@ -209,7 +209,6 @@ import org.tio.utils.hutool.StrUtil;
 import org.tio.websocket.common.*;
 import org.tio.websocket.common.util.BASE64Util;
 import org.tio.websocket.common.util.SHA1Util;
-import org.tio.websocket.server.WsServerAioHandler;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.UnsupportedEncodingException;
@@ -223,7 +222,7 @@ import java.util.*;
  * @author L.cm
  */
 public class MqttWebServerAioHandler implements ServerAioHandler {
-	private static final Logger log = LoggerFactory.getLogger(WsServerAioHandler.class);
+	private static final Logger log = LoggerFactory.getLogger(MqttWebServerAioHandler.class);
 	/**
 	 * value: List<WsRequest>
 	 */
@@ -407,7 +406,7 @@ public class MqttWebServerAioHandler implements ServerAioHandler {
 				Tio.send(channelContext, httpResponse);
 			} else {
 				if (log.isInfoEnabled()) {
-					log.info("{}, {}, handler return null, request line: {}", channelContext.tioConfig.getName(), channelContext, request.getRequestLine().toString());
+					log.info("{}, {}, handler return null, request line: {}", channelContext.tioConfig.getName(), channelContext, request.getRequestLine());
 				}
 				request.close("handler return null");
 			}
