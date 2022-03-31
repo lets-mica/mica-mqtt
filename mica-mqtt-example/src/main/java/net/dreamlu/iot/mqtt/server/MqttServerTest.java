@@ -56,7 +56,12 @@ public class MqttServerTest {
 			.httpEnable(true)
 			// http basic 认证，自定义认证，实现 HttpFilter， 注册到 MqttHttpRoutes 即可
 			.httpBasicAuth("mica", "mica")
-			.debug() // 开启 debug 信息日志
+			// 开启 websocket
+			.websocketEnable(true)
+			// 开始 stat 监控
+			.statEnable()
+			// 开启 debug 信息日志
+			.debug()
 			.start();
 
 		Timer timer = new Timer();
