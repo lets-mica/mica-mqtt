@@ -50,15 +50,27 @@
 
 ## 依赖
 ### Spring boot 项目
+**客户端：**
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
-  <artifactId>mica-mqtt-spring-boot-starter</artifactId>
+  <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
   <version>1.2.10</version>
 </dependency>
 ```
 
-**配置详见**：[mica-mqtt-spring-boot-starter 使用文档](mica-mqtt-spring-boot-starter/README.md)
+**配置详见**：[mica-mqtt-client-spring-boot-starter 使用文档](starter/mica-mqtt-client-spring-boot-starter/README.md)
+
+**服务端：**
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
+  <version>1.2.10</version>
+</dependency>
+```
+
+**配置详见**：[mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 
 ### 非 Spring boot 项目
 ```xml
@@ -72,7 +84,8 @@
 **配置详见**：[mica-mqtt 使用文档](mica-mqtt-core/README.md)
 
 ## 文档
-- [mica-mqtt-spring-boot-starter 使用文档](mica-mqtt-spring-boot-starter/README.md)
+- [mica-mqtt-client-spring-boot-starter 使用文档](starter/mica-mqtt-client-spring-boot-starter/README.md)
+- [mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 - [mica-mqtt 使用文档](mica-mqtt-core/README.md)
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 发行版本](CHANGELOG.md)
@@ -84,7 +97,7 @@
 
 ### 1. 启动 Server 端
 
-运行 `mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/server/MqttServerTest.java` 的 `main` 方法
+运行  `example/mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/server/MqttServerTest.java` 的 `main` 方法
 
 控制台打印如下内容：
 
@@ -141,7 +154,7 @@ Mica-Mqtt-Server
 
 ### 2. 启动 Client 端
 
-运行 `mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/client/MqttClientTest.java` 的 `main` 方法
+运行 `example/mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/client/MqttClientTest.java` 的 `main` 方法
 
 控制台打印如下内容，表示客户端连接成功：
 ```text
@@ -188,7 +201,7 @@ Mica-Mqtt-Server
 
 ### 3. Client 接入 Aliyun MQTT 服务（示例）
 
-详见 `mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/aliyun/MqttClientTest.java`
+详见 `example/mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/aliyun/MqttClientTest.java`
 
 ## 参考vs借鉴
 - [netty codec mqtt](https://github.com/netty/netty/tree/4.1/codec-mqtt)

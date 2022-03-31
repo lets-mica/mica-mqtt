@@ -15,12 +15,7 @@
         <dependency>
             <groupId>org.t-io</groupId>
             <artifactId>tio-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.alibaba</groupId>
-                    <artifactId>fastjson</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

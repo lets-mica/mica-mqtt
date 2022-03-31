@@ -26,6 +26,10 @@
         </dependency>
         <dependency>
             <groupId>org.t-io</groupId>
+            <artifactId>tio-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.t-io</groupId>
             <artifactId>tio-websocket-server</artifactId>
         </dependency>
     </dependencies>

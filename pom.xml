@@ -29,10 +29,12 @@
         <module>mica-mqtt-codec</module>
         <module>mica-mqtt-model</module>
         <module>mica-mqtt-core</module>
-        <module>mica-mqtt-spring-boot-starter</module>
-        <module>mica-mqtt-example</module>
-        <module>mica-mqtt-spring-boot-example</module>
         <module>mica-mqtt-broker</module>
+        <module>starter/mica-mqtt-client-spring-boot-starter</module>
+        <module>starter/mica-mqtt-server-spring-boot-starter</module>
+        <module>example/mica-mqtt-example</module>
+        <module>example/mica-mqtt-client-spring-boot-example</module>
+        <module>example/mica-mqtt-server-spring-boot-example</module>
     </modules>
 
     <dependencyManagement>
@@ -41,6 +43,12 @@
                 <groupId>org.t-io</groupId>
                 <artifactId>tio-core</artifactId>
                 <version>${tio.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>com.alibaba</groupId>
+                        <artifactId>fastjson</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.t-io</groupId>
@@ -83,7 +91,12 @@
             </dependency>
             <dependency>
                 <groupId>net.dreamlu</groupId>
-                <artifactId>mica-mqtt-spring-boot-starter</artifactId>
+                <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

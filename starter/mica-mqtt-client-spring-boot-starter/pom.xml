@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
+    <name>${project.artifactId}</name>
+
+    <parent>
+        <artifactId>mica-mqtt</artifactId>
+        <groupId>net.dreamlu</groupId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <properties>
+        <micrometer-core.version>1.8.1</micrometer-core.version>
+        <lombok.version>1.18.22</lombok.version>
+        <mica.auto.version>2.2.2</mica.auto.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-mqtt-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.t-io</groupId>
+                    <artifactId>tio-websocket-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.dreamlu</groupId>
+                    <artifactId>mica-mqtt-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>fastjson</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${spring.boot.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- mica-auto 自动生成 spring.factories、spring-devtools.properties 配置  -->
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-auto</artifactId>
+            <version>${mica.auto.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+</project>
