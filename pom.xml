@@ -20,9 +20,9 @@
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- tio version -->
         <tio.version>3.7.5.v20211028-RELEASE</tio.version>
-        <spring.boot.version>2.5.8</spring.boot.version>
+        <spring.boot.version>2.5.12</spring.boot.version>
         <mica.version>2.5.8</mica.version>
-        <fastjson.version>1.2.78</fastjson.version>
+        <fastjson.version>1.2.80</fastjson.version>
     </properties>
 
     <modules>
@@ -60,6 +60,11 @@
                         <artifactId>commons-io</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.dreamlu</groupId>
