@@ -16,7 +16,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 8
-          server-id: ossrh
+          server-id: oss
           server-username: MAVEN_USERNAME
           server-password: MAVEN_PASSWORD
           gpg-passphrase: MAVEN_GPG_PASSWORD
