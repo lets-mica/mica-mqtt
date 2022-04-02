@@ -22,7 +22,10 @@
         <tio.version>3.7.5.v20211028-RELEASE</tio.version>
         <spring.boot.version>2.6.6</spring.boot.version>
         <mica.version>2.6.6</mica.version>
+        <mica.auto.version>2.2.2</mica.auto.version>
         <fastjson.version>1.2.80</fastjson.version>
+        <micrometer-core.version>1.8.1</micrometer-core.version>
+        <lombok.version>1.18.22</lombok.version>
     </properties>
 
     <modules>
