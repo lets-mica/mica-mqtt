@@ -21,6 +21,13 @@ jobs:
           server-password: MAVEN_PASSWORD
           gpg-passphrase: MAVEN_GPG_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+      - name: Cache local Maven repository
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
       - name: Publish to the Maven Central Repository
         run: |
           chmod +x ./deploy.sh
