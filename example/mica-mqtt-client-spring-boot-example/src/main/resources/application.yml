@@ -3,6 +3,11 @@ spring:
     name: mica-mqtt-client
   profiles:
     active: client
+springdoc:
+  swagger-ui:
+    urls:
+      - name: swagger
+        url: /v3/api-docs
 logging:
   level:
     root: info

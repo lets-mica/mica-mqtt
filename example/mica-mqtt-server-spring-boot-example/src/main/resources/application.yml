@@ -3,6 +3,11 @@ spring:
     name: mica-mqtt-server
   profiles:
     active: server
+springdoc:
+  swagger-ui:
+    urls:
+      - name: swagger
+        url: /v3/api-docs
 # actuator management
 management:
   info:

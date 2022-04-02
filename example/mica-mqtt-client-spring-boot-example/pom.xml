@@ -37,7 +37,7 @@
         </dependency>
         <dependency>
             <groupId>net.dreamlu</groupId>
-            <artifactId>mica-swagger</artifactId>
+            <artifactId>mica-openapi</artifactId>
         </dependency>
     </dependencies>
 

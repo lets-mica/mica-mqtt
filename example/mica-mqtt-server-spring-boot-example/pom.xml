@@ -35,7 +35,7 @@
         </dependency>
         <dependency>
             <groupId>net.dreamlu</groupId>
-            <artifactId>mica-swagger</artifactId>
+            <artifactId>mica-openapi</artifactId>
         </dependency>
         <!-- 开启 prometheus 指标收集，详见： http://localhost:30012/actuator/prometheus -->
         <dependency>

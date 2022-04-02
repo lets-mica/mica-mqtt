@@ -34,10 +34,10 @@
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-logging</artifactId>
         </dependency>
-        <!-- mica-swagger 在 spring boot 2.6.1 目前有兼容问题 -->
+        <!-- mica-opeanapi -->
         <dependency>
             <groupId>net.dreamlu</groupId>
-            <artifactId>mica-swagger</artifactId>
+            <artifactId>mica-openapi</artifactId>
         </dependency>
         <dependency>
             <groupId>net.dreamlu</groupId>
