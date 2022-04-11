@@ -27,9 +27,12 @@ import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
+import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.http.common.Method;
+import org.tio.server.ServerTioConfig;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.ByteBuffer;
@@ -43,9 +46,12 @@ import java.util.function.Function;
  * @author L.cm
  */
 public class MqttHttpApi {
+	private final ServerTioConfig mqttServerConfig;
 	private final IMqttMessageDispatcher messageDispatcher;
 
-	public MqttHttpApi(IMqttMessageDispatcher messageDispatcher) {
+	public MqttHttpApi(ServerTioConfig mqttServerConfig,
+					   IMqttMessageDispatcher messageDispatcher) {
+		this.mqttServerConfig = mqttServerConfig;
 		this.messageDispatcher = messageDispatcher;
 	}
 
@@ -249,6 +255,27 @@ public class MqttHttpApi {
 		return Result.ok(response);
 	}
 
+	/**
+	 * 踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
+	 * <p>
+	 * POST /api/v4/clients/delete
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse deleteClients(HttpRequest request) {
+		String clientId = request.getParam("clientId");
+		HttpResponse response = new HttpResponse();
+		if (StrUtil.isBlank(clientId)) {
+			return Result.fail(response, ResultCode.E101);
+		}
+		ChannelContext channelContext = Tio.getByBsId(mqttServerConfig, clientId);
+		if (channelContext != null) {
+			Tio.remove(channelContext, "Mqtt server http api delete clients:" + clientId);
+		}
+		return Result.ok(response);
+	}
+
 	private void sendSubOrUnSubscribe(BaseForm form) {
 		Message message = new Message();
 		message.setFromClientId(form.getClientId());
@@ -309,6 +336,7 @@ public class MqttHttpApi {
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/subscribe/batch", this::subscribeBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe", this::unsubscribe);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe/batch", this::unsubscribeBatch);
+		MqttHttpRoutes.register(Method.POST, "/api/v4/clients/delete", this::deleteClients);
 		// @formatter:on
 	}
 
