@@ -20,6 +20,8 @@ import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.util.TopicUtil;
+import net.dreamlu.iot.mqtt.core.util.collection.IntObjectHashMap;
+import net.dreamlu.iot.mqtt.core.util.collection.IntObjectMap;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -43,11 +45,11 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * qos1 消息过程存储 clientId: {msgId: Object}
 	 */
-	private final ConcurrentMap<String, Map<Integer, MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, IntObjectMap<MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
 	/**
 	 * qos2 消息过程存储 clientId: {msgId: Object}
 	 */
-	private final ConcurrentMap<String, Map<Integer, MqttPendingQos2Publish>> pendingQos2PublishStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, IntObjectMap<MqttPendingQos2Publish>> pendingQos2PublishStore = new ConcurrentHashMap<>();
 
 	@Override
 	public void addSubscribe(String topicFilter, String clientId, int mqttQoS) {
@@ -129,7 +131,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void addPendingPublish(String clientId, int messageId, MqttPendingPublish pendingPublish) {
-		Map<Integer, MqttPendingPublish> data = pendingPublishStore.computeIfAbsent(clientId, (key) -> new ConcurrentHashMap<>(16));
+		Map<Integer, MqttPendingPublish> data = pendingPublishStore.computeIfAbsent(clientId, (key) -> new IntObjectHashMap<>(16));
 		data.put(messageId, pendingPublish);
 	}
 
@@ -152,7 +154,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void addPendingQos2Publish(String clientId, int messageId, MqttPendingQos2Publish pendingQos2Publish) {
-		Map<Integer, MqttPendingQos2Publish> data = pendingQos2PublishStore.computeIfAbsent(clientId, (key) -> new ConcurrentHashMap<>());
+		Map<Integer, MqttPendingQos2Publish> data = pendingQos2PublishStore.computeIfAbsent(clientId, (key) -> new IntObjectHashMap<>());
 		data.put(messageId, pendingQos2Publish);
 	}
 

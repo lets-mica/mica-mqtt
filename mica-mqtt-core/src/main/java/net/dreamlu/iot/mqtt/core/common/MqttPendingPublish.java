@@ -5,6 +5,7 @@ import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 
 import java.nio.ByteBuffer;
+import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
@@ -63,6 +64,23 @@ public final class MqttPendingPublish {
 
 	public void onPubCompReceived() {
 		this.pubRelRetryProcessor.stop();
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		MqttPendingPublish that = (MqttPendingPublish) o;
+		return Objects.equals(payload, that.payload) && Objects.equals(message, that.message) && qos == that.qos;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(payload, message, qos);
 	}
 
 }

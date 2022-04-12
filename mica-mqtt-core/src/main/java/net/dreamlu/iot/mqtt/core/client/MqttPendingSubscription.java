@@ -6,6 +6,7 @@ import net.dreamlu.iot.mqtt.codec.MqttSubscribeMessage;
 import net.dreamlu.iot.mqtt.core.common.RetryProcessor;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
@@ -35,4 +36,20 @@ final class MqttPendingSubscription {
 		this.retryProcessor.stop();
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		MqttPendingSubscription that = (MqttPendingSubscription) o;
+		return Objects.equals(subscriptionList, that.subscriptionList);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(subscriptionList);
+	}
 }
