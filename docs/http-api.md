@@ -30,7 +30,7 @@
 | 104         | 请求方法错误               |
 | 105         | 未知错误                   |
 
-## 
+
 
 ## 消息发布
 
@@ -207,3 +207,32 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubs
 
 {"code":0}
 ```
+
+## 踢除指定客户端
+
+### DELETE /api/v4/clients/{clientid}
+
+踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
+
+**Query Parameters:**
+
+| Name     | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| clientId | String | True     | ClientID    |
+
+**Success Response Body (JSON):**
+
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| code | Integer | 0           |
+
+**Examples:**
+
+踢除指定客户端
+
+```bash
+$ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients/delete?clientId=123"
+
+{"code":0}
+```
+
