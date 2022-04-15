@@ -27,12 +27,9 @@ import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
-import org.tio.core.ChannelContext;
-import org.tio.core.Tio;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.http.common.Method;
-import org.tio.server.ServerTioConfig;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.ByteBuffer;
@@ -46,12 +43,9 @@ import java.util.function.Function;
  * @author L.cm
  */
 public class MqttHttpApi {
-	private final ServerTioConfig mqttServerConfig;
 	private final IMqttMessageDispatcher messageDispatcher;
 
-	public MqttHttpApi(ServerTioConfig mqttServerConfig,
-					   IMqttMessageDispatcher messageDispatcher) {
-		this.mqttServerConfig = mqttServerConfig;
+	public MqttHttpApi(IMqttMessageDispatcher messageDispatcher) {
 		this.messageDispatcher = messageDispatcher;
 	}
 
@@ -258,7 +252,7 @@ public class MqttHttpApi {
 	/**
 	 * 踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
 	 * <p>
-	 * POST /api/v4/clients/delete
+	 * POST /api/v1/clients/delete
 	 *
 	 * @param request HttpRequest
 	 * @return HttpResponse
@@ -269,10 +263,10 @@ public class MqttHttpApi {
 		if (StrUtil.isBlank(clientId)) {
 			return Result.fail(response, ResultCode.E101);
 		}
-		ChannelContext channelContext = Tio.getByBsId(mqttServerConfig, clientId);
-		if (channelContext != null) {
-			Tio.remove(channelContext, "Mqtt server http api delete clients:" + clientId);
-		}
+		Message message = new Message();
+		message.setClientId(clientId);
+		message.setMessageType(MessageType.DISCONNECT);
+		messageDispatcher.send(message);
 		return Result.ok(response);
 	}
 

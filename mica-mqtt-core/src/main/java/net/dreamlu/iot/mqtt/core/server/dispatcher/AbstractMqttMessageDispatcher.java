@@ -21,6 +21,8 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
+import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
 import java.util.Objects;
@@ -60,6 +62,12 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 			sendToClient(message.getTopic(), message);
 		} else if (MessageType.DOWN_STREAM == messageType) {
 			sendToClient(message.getTopic(), message);
+		} else if (MessageType.DISCONNECT == messageType) {
+			String clientId = message.getClientId();
+			ChannelContext context = mqttServer.getChannelContext(clientId);
+			if (context != null) {
+				Tio.remove(context, "Mqtt server delete clients:" + clientId);
+			}
 		}
 		return sendAll(message);
 	}

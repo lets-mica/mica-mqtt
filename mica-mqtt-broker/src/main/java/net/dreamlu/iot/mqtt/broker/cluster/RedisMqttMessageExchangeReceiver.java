@@ -104,6 +104,12 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 		} else if (MessageType.DOWN_STREAM == messageType) {
 			// http rest api 下行消息也会转发到此
 			sendToClient(topic, message);
+		} else if (MessageType.DISCONNECT == messageType) {
+			String clientId = message.getClientId();
+			ChannelContext context = mqttServer.getChannelContext(clientId);
+			if (context != null) {
+				Tio.remove(context, "Mqtt server delete clients:" + clientId);
+			}
 		}
 	}
 

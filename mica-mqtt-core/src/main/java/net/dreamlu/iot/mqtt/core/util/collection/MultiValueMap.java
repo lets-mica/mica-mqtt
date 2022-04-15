@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.util;
+package net.dreamlu.iot.mqtt.core.util.collection;
 
 import java.util.*;
 
