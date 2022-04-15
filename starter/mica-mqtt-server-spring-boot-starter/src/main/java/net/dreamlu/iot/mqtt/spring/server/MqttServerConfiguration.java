@@ -24,6 +24,7 @@ import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.springframework.beans.factory.ObjectProvider;
@@ -58,6 +59,7 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
 											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
+											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
 											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
 											   ObjectProvider<IpStatListener> ipStatListenerObjectProvider,
 											   ObjectProvider<MqttServerCustomizer> customizers) {
@@ -91,6 +93,8 @@ public class MqttServerConfiguration {
 		if (StrUtil.isNotBlank(keyStorePath) && StrUtil.isNotBlank(trustStorePath) && StrUtil.isNotBlank(password)) {
 			serverCreator.useSsl(keyStorePath, trustStorePath, password);
 		}
+		// 自定义消息监听
+		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
 		// 认证处理器
 		authHandlerObjectProvider.ifAvailable(serverCreator::authHandler);
 		// mqtt 内唯一id

@@ -62,29 +62,29 @@ mqtt:
 ### 2.3 可实现接口（注册成 Spring Bean 即可）
 
 | 接口                           | 是否必须       | 说明                        |
-| ---------------------------   | -------------- | ------------------------- |
-| IMqttServerUniqueIdService    | 否             | 用于 clientId 不唯一时，自定义实现唯一标识，后续接口使用它替代 clientId |
-| IMqttServerAuthHandler        | 是             | 用于服务端认证               |
-| IMqttServerSubscribeValidator | 否（建议实现）   | 1.1.3 新增，用于对客户端订阅校验 |
-| IMqttServerPublishPermission  | 否（建议实现）   | 1.2.2 新增，用于对客户端发布权限校验 |
-| IMqttConnectStatusListener    | 是             | 连接状态监听                 |
-| IMqttSessionManager           | 否             | session 管理               |
-| IMqttMessageStore             | 集群是，单机否   | 遗嘱和保留消息存储            |
-| AbstractMqttMessageDispatcher | 集群是，单机否   | 消息转发，（遗嘱、保留消息转发） |
-| IpStatListener                | 否             | t-io ip 状态监听            |
+| ---------------------------   |------------| ------------------------- |
+| IMqttServerUniqueIdService    | 否          | 用于 clientId 不唯一时，自定义实现唯一标识，后续接口使用它替代 clientId |
+| IMqttServerAuthHandler        | 是          | 用于服务端认证               |
+| IMqttServerSubscribeValidator | 否（建议实现）    | 1.1.3 新增，用于对客户端订阅校验 |
+| IMqttServerPublishPermission  | 否（建议实现）    | 1.2.2 新增，用于对客户端发布权限校验 |
+| IMqttMessageListener          | 否（1.3.x为否） | 消息监听                    |
+| IMqttConnectStatusListener    | 是          | 连接状态监听                 |
+| IMqttSessionManager           | 否          | session 管理               |
+| IMqttMessageStore             | 集群是，单机否    | 遗嘱和保留消息存储            |
+| AbstractMqttMessageDispatcher | 集群是，单机否    | 消息转发，（遗嘱、保留消息转发） |
+| IpStatListener                | 否          | t-io ip 状态监听            |
 
-### 2.4 AbstractMqttMessageDispatcher (用于监听客户端上传的消息) 使用示例
+### 2.4 IMqttMessageListener (用于监听客户端上传的消息) 使用示例
 
 ```java
 @Service
-public class MqttServerMessageListener extends AbstractMqttMessageDispatcher {
+public class MqttServerMessageListener implements IMqttMessageListener {
     private static final Logger logger = LoggerFactory.getLogger(MqttServerMessageListener.class);
 
     @Override
-    public void sendAll(Message message) {
-        logger.info("message:{}", message);
+    public void onMessage(ChannelContext context, String clientId, Message message) {
+        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
     }
-
 }
 ```
 

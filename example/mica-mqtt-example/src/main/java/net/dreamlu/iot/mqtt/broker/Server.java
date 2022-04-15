@@ -35,8 +35,6 @@ public class Server {
 	public static void main(String[] args) {
 		// 启动服务，mica-mqtt 1.3.x 已经默认为 broker 模式
 		MqttServer.create()
-			.ip("0.0.0.0")
-			.port(1883)
 			.debug()
 			.start();
 	}

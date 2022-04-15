@@ -84,6 +84,10 @@ MqttServer mqttServer = MqttServer.create()
     .maxBytesInMessage(1024 * 100)
     // 自定义认证
     .authHandler((clientId, userName, password) -> true)
+    // 消息监听
+    .messageListener((context, clientId, message) -> {
+        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
+    })
     // 堆内存和堆外内存选择，默认：堆内存
     .bufferAllocator(ByteBufferAllocator.HEAP)
     // 心跳超时时间，默认：120s

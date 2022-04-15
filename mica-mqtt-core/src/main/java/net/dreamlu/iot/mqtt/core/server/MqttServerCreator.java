@@ -26,6 +26,7 @@ import net.dreamlu.iot.mqtt.core.server.broker.DefaultMqttBrokerDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
@@ -129,6 +130,10 @@ public class MqttServerCreator {
 	 * session 管理
 	 */
 	private IMqttSessionManager sessionManager;
+	/**
+	 * 消息监听
+	 */
+	private IMqttMessageListener messageListener;
 	/**
 	 * 连接状态监听
 	 */
@@ -347,6 +352,15 @@ public class MqttServerCreator {
 
 	public MqttServerCreator sessionManager(IMqttSessionManager sessionManager) {
 		this.sessionManager = sessionManager;
+		return this;
+	}
+
+	public IMqttMessageListener getMessageListener() {
+		return messageListener;
+	}
+
+	public MqttServerCreator messageListener(IMqttMessageListener messageListener) {
+		this.messageListener = messageListener;
 		return this;
 	}
 
