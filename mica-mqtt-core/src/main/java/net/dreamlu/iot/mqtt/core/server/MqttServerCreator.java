@@ -38,6 +38,7 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerUniqueIdServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.ServerTioConfig;
@@ -51,6 +52,7 @@ import org.tio.utils.thread.pool.DefaultThreadFactory;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Consumer;
 
 /**
  * mqtt 服务端参数构造
@@ -182,6 +184,10 @@ public class MqttServerCreator {
 	 * 是否开启监控，默认：false 不开启，节省内存
 	 */
 	private boolean statEnable = false;
+	/**
+	 * TioConfig 自定义配置
+	 */
+	private Consumer<TioConfig> tioConfigCustomize;
 
 	public String getName() {
 		return name;
@@ -475,6 +481,11 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public MqttServerCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
+		this.tioConfigCustomize = tioConfigCustomize;
+		return this;
+	}
+
 	public MqttServer build() {
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
@@ -524,6 +535,10 @@ public class MqttServerCreator {
 		}
 		if (this.debug) {
 			tioConfig.debug = true;
+		}
+		// 自定义处理
+		if (this.tioConfigCustomize != null) {
+			this.tioConfigCustomize.accept(tioConfig);
 		}
 		TioServer tioServer = new TioServer(tioConfig);
 		// 7. 不校验版本号，社区版设置无效

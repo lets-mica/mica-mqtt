@@ -27,6 +27,7 @@ import org.tio.client.TioClient;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.client.intf.ClientAioListener;
 import org.tio.core.Node;
+import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
@@ -47,7 +48,6 @@ public final class MqttClientCreator {
 	 * 默认的心跳超时
 	 */
 	public static final int DEFAULT_KEEP_ALIVE_SECS = 60;
-
 	/**
 	 * 名称
 	 */
@@ -168,6 +168,10 @@ public final class MqttClientCreator {
 	 * scheduledExecutor
 	 */
 	private ScheduledThreadPoolExecutor scheduledExecutor;
+	/**
+	 * TioConfig 自定义配置
+	 */
+	private Consumer<TioConfig> tioConfigCustomize;
 
 	public String getName() {
 		return name;
@@ -440,6 +444,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
+		this.tioConfigCustomize = tioConfigCustomize;
+		return this;
+	}
+
 	public MqttClient connect() {
 		// 1. clientId 为空，生成默认的 clientId
 		if (StrUtil.isBlank(this.clientId)) {
@@ -486,7 +495,11 @@ public final class MqttClientCreator {
 		tioConfig.setSslConfig(this.sslConfig);
 		// 10. 是否开启监控
 		tioConfig.statOn = this.statEnable;
-		// 11. tioClient
+		// 11. 自定义处理
+		if (this.tioConfigCustomize != null) {
+			this.tioConfigCustomize.accept(tioConfig);
+		}
+		// 12. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
 			tioClient.asynConnect(new Node(this.ip, this.port), this.timeout);
