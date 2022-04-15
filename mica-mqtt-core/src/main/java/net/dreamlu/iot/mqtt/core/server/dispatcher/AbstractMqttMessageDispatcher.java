@@ -45,7 +45,6 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 	 * 转发所有消息
 	 *
 	 * @param message Message
-	 * @return 是否成功
 	 */
 	public abstract void sendAll(Message message);
 
