@@ -336,7 +336,7 @@ public class MqttHttpApi {
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/subscribe/batch", this::subscribeBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe", this::unsubscribe);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe/batch", this::unsubscribeBatch);
-		MqttHttpRoutes.register(Method.POST, "/api/v4/clients/delete", this::deleteClients);
+		MqttHttpRoutes.register(Method.POST, "/api/v1/clients/delete", this::deleteClients);
 		// @formatter:on
 	}
 

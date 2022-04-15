@@ -94,7 +94,7 @@ Authorization: Basic {{username}} {{password}}
 ]
 
 ### mqtt delete clients
-POST /api/v4/clients/delete
+POST /api/v1/clients/delete
 Content-Type: application/x-www-form-urlencoded
 Authorization: Basic {{username}} {{password}}
 

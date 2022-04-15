@@ -92,3 +92,10 @@ Authorization: Basic {{username}} {{password}}
         "clientId":"example"
     }
 ]
+
+### mqtt delete clients
+POST /api/v1/clients/delete
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic {{username}} {{password}}
+
+clientId=123

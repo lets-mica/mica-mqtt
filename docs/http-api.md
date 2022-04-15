@@ -210,7 +210,7 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubs
 
 ## 踢除指定客户端
 
-### DELETE /api/v4/clients/{clientid}
+### POST /api/v1/clients/delete
 
 踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
 
