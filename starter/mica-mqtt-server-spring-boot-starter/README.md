@@ -67,24 +67,24 @@ mqtt:
 | IMqttServerAuthHandler        | 是             | 用于服务端认证               |
 | IMqttServerSubscribeValidator | 否（建议实现）   | 1.1.3 新增，用于对客户端订阅校验 |
 | IMqttServerPublishPermission  | 否（建议实现）   | 1.2.2 新增，用于对客户端发布权限校验 |
-| IMqttMessageListener          | 是             | 消息监听                    |
 | IMqttConnectStatusListener    | 是             | 连接状态监听                 |
 | IMqttSessionManager           | 否             | session 管理               |
 | IMqttMessageStore             | 集群是，单机否   | 遗嘱和保留消息存储            |
 | AbstractMqttMessageDispatcher | 集群是，单机否   | 消息转发，（遗嘱、保留消息转发） |
 | IpStatListener                | 否             | t-io ip 状态监听            |
 
-### 2.4 IMqttMessageListener (用于监听客户端上传的消息) 使用示例
+### 2.4 AbstractMqttMessageDispatcher (用于监听客户端上传的消息) 使用示例
 
 ```java
 @Service
-public class MqttServerMessageListener implements IMqttMessageListener {
+public class MqttServerMessageListener extends AbstractMqttMessageDispatcher {
     private static final Logger logger = LoggerFactory.getLogger(MqttServerMessageListener.class);
 
     @Override
-    public void onMessage(ChannelContext context, String clientId, Message message) {
-        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
+    public void sendAll(Message message) {
+        logger.info("message:{}", message);
     }
+
 }
 ```
 
@@ -136,7 +136,6 @@ public class ServerService {
 ### 2.7 基于 mq 消息广播集群处理
 
 - 实现 `IMqttConnectStatusListener` 处理设备状态存储。
-- 实现 `IMqttMessageListener` 将消息转发到 mq，业务按需处理 mq 消息。
 - 实现 `IMqttMessageStore` 存储遗嘱和保留消息。
 - 实现 `AbstractMqttMessageDispatcher` 将消息发往 mq，mq 再广播回 mqtt 集群，mqtt 将消息发送到设备。
 - 业务消息发送到 mq，mq 广播到 mqtt 集群，mqtt 将消息发送到设备。

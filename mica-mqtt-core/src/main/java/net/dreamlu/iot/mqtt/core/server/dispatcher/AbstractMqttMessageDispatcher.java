@@ -73,13 +73,6 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 		return true;
 	}
 
-	@Override
-	public boolean send(String clientId, Message message) {
-		Objects.requireNonNull(mqttServer, "MqttServer require not Null.");
-		message.setClientId(clientId);
-		return send(message);
-	}
-
 	/**
 	 * 发送消息到客户端
 	 *

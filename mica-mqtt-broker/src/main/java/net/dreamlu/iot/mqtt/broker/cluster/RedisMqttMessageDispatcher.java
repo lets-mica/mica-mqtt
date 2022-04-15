@@ -62,9 +62,4 @@ public class RedisMqttMessageDispatcher implements IMqttMessageDispatcher {
 		return true;
 	}
 
-	@Override
-	public boolean send(String clientId, Message message) {
-		message.setClientId(clientId);
-		return send(message);
-	}
 }

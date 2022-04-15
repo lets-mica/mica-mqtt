@@ -18,14 +18,6 @@
 - 而每当有订阅者建立订阅时，服务端就会查找是否存在匹配该订阅的保留消息，如果保留消息存在，就会立即转发给订阅者。
 - 借助保留消息，新的订阅者能够立即获取最近的状态。
 
-### mica-mqtt 多个客户端直接交互
-
-- A APP 端订阅 `/a/door/open`，
-- B web 网页端 mqtt.js 订阅 `/a/door/open`，
-- Mqtt 服务端实现 `IMqttMessageListener`，将消息转交给 `AbstractMqttMessageDispatcher`（自定义实现）处理。
-- C 发布 `/a/door/open`
-- 结果：A 和 B 将收到 C 发布的消息，并完成相应的效果展示。
-
 ## 客户端使用
 ```java
 // 初始化 mqtt 客户端
@@ -92,10 +84,6 @@ MqttServer mqttServer = MqttServer.create()
     .maxBytesInMessage(1024 * 100)
     // 自定义认证
     .authHandler((clientId, userName, password) -> true)
-    // 消息监听
-    .messageListener((context, clientId, message) -> {
-        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
-    })
     // 堆内存和堆外内存选择，默认：堆内存
     .bufferAllocator(ByteBufferAllocator.HEAP)
     // 心跳超时时间，默认：120s
