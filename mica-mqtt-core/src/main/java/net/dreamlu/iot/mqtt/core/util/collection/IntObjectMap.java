@@ -33,16 +33,19 @@ public interface IntObjectMap<V> extends Map<Integer, V> {
 	interface PrimitiveEntry<V> {
 		/**
 		 * Gets the key for this entry.
+		 * @return keu
 		 */
 		int key();
 
 		/**
 		 * Gets the value for this entry.
+		 * @return V
 		 */
 		V value();
 
 		/**
 		 * Sets the value for this entry.
+		 * @param value value
 		 */
 		void setValue(V value);
 	}
@@ -76,11 +79,16 @@ public interface IntObjectMap<V> extends Map<Integer, V> {
 	 * Gets an iterable to traverse over the primitive entries contained in this map. As an optimization,
 	 * the {@link PrimitiveEntry}s returned by the {@link Iterator} may change as the {@link Iterator}
 	 * progresses. The caller should not rely on {@link PrimitiveEntry} key/value stability.
+	 *
+	 * @return entries
 	 */
 	Iterable<PrimitiveEntry<V>> entries();
 
 	/**
 	 * Indicates whether or not this map contains a value for the specified key.
+	 *
+	 * @param key key
+	 * @return is has key
 	 */
 	boolean containsKey(int key);
 }

@@ -512,6 +512,9 @@ public class IntObjectHashMap<V> implements IntObjectMap<V> {
 	/**
 	 * Helper method called by {@link #toString()} in order to convert a single map key into a string.
 	 * This is protected to allow subclasses to override the appearance of a given key.
+	 *
+	 * @param key key
+	 * @return key String
 	 */
 	protected String keyToString(int key) {
 		return Integer.toString(key);
