@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.server.support;
+package net.dreamlu.iot.mqtt.core.server.broker;
 
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
@@ -24,11 +24,11 @@ import net.dreamlu.iot.mqtt.core.server.model.Message;
  *
  * @author L.cm
  */
-public class DefaultMqttMessageDispatcher extends AbstractMqttMessageDispatcher {
+public class DefaultMqttBrokerDispatcher extends AbstractMqttMessageDispatcher {
 
 	@Override
-	public boolean sendAll(Message message) {
-		return true;
+	public void sendAll(Message message) {
+		
 	}
 
 }

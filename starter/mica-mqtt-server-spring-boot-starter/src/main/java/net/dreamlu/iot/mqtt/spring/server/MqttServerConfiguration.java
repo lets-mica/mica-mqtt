@@ -24,7 +24,6 @@ import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
-import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.springframework.beans.factory.ObjectProvider;
@@ -34,8 +33,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.tio.core.stat.IpStatListener;
 import org.tio.utils.hutool.StrUtil;
-
-import java.util.Objects;
 
 /**
  * mqtt server 配置
@@ -61,7 +58,6 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
 											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
-											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
 											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
 											   ObjectProvider<IpStatListener> ipStatListenerObjectProvider,
 											   ObjectProvider<MqttServerCustomizer> customizers) {
@@ -95,11 +91,6 @@ public class MqttServerConfiguration {
 		if (StrUtil.isNotBlank(keyStorePath) && StrUtil.isNotBlank(trustStorePath) && StrUtil.isNotBlank(password)) {
 			serverCreator.useSsl(keyStorePath, trustStorePath, password);
 		}
-		// bean 初始化
-		IMqttMessageListener messageListener = messageListenerObjectProvider.getIfAvailable();
-		// 消息监听器不能为 null
-		Objects.requireNonNull(messageListener, "Mqtt server IMqttMessageListener Bean not found.");
-		serverCreator.messageListener(messageListener);
 		// 认证处理器
 		authHandlerObjectProvider.ifAvailable(serverCreator::authHandler);
 		// mqtt 内唯一id

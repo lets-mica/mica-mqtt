@@ -17,10 +17,6 @@
 package net.dreamlu.iot.mqtt.broker;
 
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import net.dreamlu.iot.mqtt.core.server.broker.MqttBrokerMessageListener;
-import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
-import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
-import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttMessageDispatcher;
 
 /**
  * 服务端，单纯的做消息转发
@@ -37,17 +33,10 @@ public class Server {
 	 * 结果：A 和 B 将收到 C 发布的消息，并完成相应的效果展示。
 	 */
 	public static void main(String[] args) {
-		// 1. 消息转发处理器，可用来实现集群
-		IMqttMessageDispatcher messageDispatcher = new DefaultMqttMessageDispatcher();
-		// 2. mqtt broker 消息转发处理
-		IMqttMessageListener messageListener = new MqttBrokerMessageListener(messageDispatcher);
-		// 3. 启动服务
+		// 启动服务，mica-mqtt 1.3.x 已经默认为 broker 模式
 		MqttServer.create()
 			.ip("0.0.0.0")
 			.port(1883)
-			.readBufferSize(512)
-			.messageDispatcher(messageDispatcher)
-			.messageListener(messageListener)
 			.debug()
 			.start();
 	}

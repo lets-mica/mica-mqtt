@@ -29,7 +29,6 @@ import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
-import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
@@ -70,7 +69,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttServerPublishPermission publishPermission;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
-	private final IMqttMessageListener messageListener;
 	private final ScheduledThreadPoolExecutor executor;
 
 	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
@@ -84,7 +82,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.publishPermission = serverCreator.getPublishPermission();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
-		this.messageListener = serverCreator.getMessageListener();
 		this.executor = executor;
 	}
 
@@ -449,7 +446,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		message.setNode(serverCreator.getNodeName());
 		// 3. 消息发布
 		try {
-			messageListener.onMessage(context, clientId, message);
+			messageDispatcher.send(message);
 		} catch (Throwable e) {
 			logger.error(e.getMessage(), e);
 		}

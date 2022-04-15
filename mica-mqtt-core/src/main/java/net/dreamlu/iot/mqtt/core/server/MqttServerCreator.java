@@ -22,16 +22,19 @@ import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerPublishPermission;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
+import net.dreamlu.iot.mqtt.core.server.broker.DefaultMqttBrokerDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
-import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
-import net.dreamlu.iot.mqtt.core.server.support.*;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerUniqueIdServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ssl.SslConfig;
@@ -46,7 +49,6 @@ import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
-import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
@@ -127,10 +129,6 @@ public class MqttServerCreator {
 	 * session 管理
 	 */
 	private IMqttSessionManager sessionManager;
-	/**
-	 * 消息监听
-	 */
-	private IMqttMessageListener messageListener;
 	/**
 	 * 连接状态监听
 	 */
@@ -352,15 +350,6 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public IMqttMessageListener getMessageListener() {
-		return messageListener;
-	}
-
-	public MqttServerCreator messageListener(IMqttMessageListener messageListener) {
-		this.messageListener = messageListener;
-		return this;
-	}
-
 	public IMqttConnectStatusListener getConnectStatusListener() {
 		return connectStatusListener;
 	}
@@ -473,7 +462,6 @@ public class MqttServerCreator {
 	}
 
 	public MqttServer build() {
-		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
 			this.nodeName = ManagementFactory.getRuntimeMXBean().getName() + ':' + port;
@@ -485,7 +473,7 @@ public class MqttServerCreator {
 			this.uniqueIdService = new DefaultMqttServerUniqueIdServiceImpl();
 		}
 		if (this.messageDispatcher == null) {
-			this.messageDispatcher = new DefaultMqttMessageDispatcher();
+			this.messageDispatcher = new DefaultMqttBrokerDispatcher();
 		}
 		if (this.sessionManager == null) {
 			this.sessionManager = new InMemoryMqttSessionManager();
