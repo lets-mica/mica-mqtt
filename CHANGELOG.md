@@ -5,12 +5,13 @@
 - :sparkles: mica-mqtt mqtt-server 简化，默认多设备可以直接互相订阅和处理消息。
 - :sparkles: mica-mqtt server、client 添加 `tioConfigCustomize` 方法，方便更大程度的自定义 TioConfig。
 - :sparkles: 拆分 mica-mqtt-client-spring-boot-starter 和 mica-mqtt-server-spring-boot-starter gitee #I4OTC5
-- :sparkles: mica-mqtt-spring-boot-example client 添加重连动态更新 clientId、username、password 示例。
+- :sparkles: mica-mqtt-client-spring-boot-example 添加重连动态更新 clientId、username、password 示例。
 - :sparkles: mica-mqtt server 添加根据踢出指定 clientId 的 http api 接口。
 - :sparkles: mica-mqtt server IMqttConnectStatusListener api 调整，添加用户名字段。
 - :sparkles: mica-mqtt server IMqttMessageListener 不再强制要求实现。
 - :sparkles: 使用 netty IntObjectHashMap 优化默认 session 存储。
 - :sparkles: 添加 github action，用于自动构建开发阶段的 SNAPSHOT 版本。
+- :sparkles: 示例项目拆分到 example 目录，mica-mqtt client、server starter 拆分到 starter 目录。
 - :arrow_up: 依赖升级.
 
 ### v1.2.10 - 2022-03-20
