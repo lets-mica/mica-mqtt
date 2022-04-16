@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.broker.cluster;
+package net.dreamlu.iot.mqtt.broker.listener;
 
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
