@@ -1,7 +1,7 @@
 # 变更记录
 
 ## 发行版本
-### v1.3.0 - 2022-04-23
+### v1.3.0 - 2022-04-17
 - :sparkles: mica-mqtt mqtt-server 简化，默认多设备可以直接互相订阅和处理消息。
 - :sparkles: mica-mqtt server、client 添加 `tioConfigCustomize` 方法，方便更大程度的自定义 TioConfig。
 - :sparkles: 拆分 mica-mqtt-client-spring-boot-starter 和 mica-mqtt-server-spring-boot-starter gitee #I4OTC5
