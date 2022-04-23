@@ -31,7 +31,16 @@ public final class MqttHttpRoutes {
 	private static final Map<String, HandlerInfo> ROUTS = new HashMap<>();
 
 	/**
-	 * 注册路由
+	 * 注册 filter 到 first
+	 *
+	 * @param filter HttpFilter
+	 */
+	public static void addFirstFilter(HttpFilter filter) {
+		FILTERS.addFirst(filter);
+	}
+
+	/**
+	 * 注册 filter
 	 *
 	 * @param filter HttpFilter
 	 */
@@ -40,7 +49,7 @@ public final class MqttHttpRoutes {
 	}
 
 	/**
-	 * 注册路由
+	 * 注册 filter
 	 *
 	 * @param index  index
 	 * @param filter HttpFilter
