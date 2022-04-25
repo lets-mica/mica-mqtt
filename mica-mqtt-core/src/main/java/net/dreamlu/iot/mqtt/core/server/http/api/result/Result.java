@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import org.tio.http.common.HeaderName;
 import org.tio.http.common.HeaderValue;
+import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 
 import java.nio.charset.Charset;
@@ -60,6 +61,17 @@ public final class Result {
 		json.put("code", resultCode.getResultCode());
 		json.put("data", data);
 		return result(response, resultCode, json);
+	}
+
+	/**
+	 * 响应失败
+	 *
+	 * @param request    HttpRequest
+	 * @param resultCode ResultCode
+	 * @return HttpResponse
+	 */
+	public static HttpResponse fail(HttpRequest request, ResultCode resultCode) {
+		return fail(new HttpResponse(request), resultCode);
 	}
 
 	/**

@@ -38,10 +38,9 @@ public interface HttpFilter {
 	/**
 	 * 响应
 	 *
-	 * @param request  HttpRequest
-	 * @param response HttpResponse
+	 * @param request HttpRequest
 	 * @return HttpResponse
 	 */
-	HttpResponse response(HttpRequest request, HttpResponse response);
+	HttpResponse response(HttpRequest request);
 
 }

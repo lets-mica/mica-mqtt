@@ -41,8 +41,7 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 		try {
 			for (HttpFilter filter : httpFilters) {
 				if (!filter.filter(request)) {
-					HttpResponse response = new HttpResponse(request);
-					return filter.response(request, response);
+					return filter.response(request);
 				}
 			}
 		} catch (Exception e) {

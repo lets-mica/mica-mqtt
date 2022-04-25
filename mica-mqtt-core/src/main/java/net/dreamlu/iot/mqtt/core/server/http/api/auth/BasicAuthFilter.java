@@ -59,7 +59,8 @@ public class BasicAuthFilter implements HttpFilter {
 	}
 
 	@Override
-	public HttpResponse response(HttpRequest request, HttpResponse response) {
+	public HttpResponse response(HttpRequest request) {
+		HttpResponse response = new HttpResponse(request);
 		response.addHeader(WWW_AUTHENTICATE, BASIC_REALM);
 		Result.fail(response, ResultCode.E103);
 		return response;
