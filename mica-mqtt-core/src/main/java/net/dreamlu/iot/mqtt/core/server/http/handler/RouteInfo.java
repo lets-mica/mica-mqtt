@@ -25,21 +25,13 @@ import java.util.Objects;
  *
  * @author L.cm
  */
-public class HandlerInfo {
+public class RouteInfo {
+	private final String path;
 	private final Method method;
-	private final HttpHandler handler;
 
-	public HandlerInfo(Method method, HttpHandler handler) {
+	public RouteInfo(String path, Method method) {
+		this.path = path;
 		this.method = method;
-		this.handler = handler;
-	}
-
-	public Method getMethod() {
-		return method;
-	}
-
-	public HttpHandler getHandler() {
-		return handler;
 	}
 
 	@Override
@@ -47,16 +39,23 @@ public class HandlerInfo {
 		if (this == o) {
 			return true;
 		}
-		if (!(o instanceof HandlerInfo)) {
+		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		HandlerInfo that = (HandlerInfo) o;
-		return method == that.method &&
-			Objects.equals(handler, that.handler);
+		RouteInfo that = (RouteInfo) o;
+		return Objects.equals(path, that.path) && method == that.method;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(method, handler);
+		return Objects.hash(path, method);
+	}
+
+	@Override
+	public String toString() {
+		return "HandlerInfo{" +
+			"path='" + path + '\'' +
+			", method=" + method +
+			'}';
 	}
 }

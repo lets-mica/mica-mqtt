@@ -28,7 +28,7 @@ import java.util.*;
  */
 public final class MqttHttpRoutes {
 	private static final LinkedList<HttpFilter> FILTERS = new LinkedList<>();
-	private static final Map<String, HandlerInfo> ROUTS = new HashMap<>();
+	private static final Map<RouteInfo, HttpHandler> ROUTS = new HashMap<>();
 
 	/**
 	 * 注册 filter 到 first
@@ -75,17 +75,7 @@ public final class MqttHttpRoutes {
 	 * @param handler HttpHandler
 	 */
 	public static void register(Method method, String path, HttpHandler handler) {
-		ROUTS.put(path, new HandlerInfo(method, handler));
-	}
-
-	/**
-	 * 读取路由
-	 *
-	 * @param path 路径
-	 * @return HandlerInfo
-	 */
-	public static HandlerInfo getHandler(String path) {
-		return ROUTS.get(path);
+		ROUTS.put(new RouteInfo(path, method), handler);
 	}
 
 	/**
@@ -94,8 +84,10 @@ public final class MqttHttpRoutes {
 	 * @param requestLine RequestLine
 	 * @return HttpHandler
 	 */
-	public static HandlerInfo getHandler(RequestLine requestLine) {
-		return getHandler(requestLine.getPath());
+	public static HttpHandler getHandler(RequestLine requestLine) {
+		String path = requestLine.getPath();
+		Method method = requestLine.getMethod();
+		return ROUTS.get(new RouteInfo(path, method));
 	}
 
 }
