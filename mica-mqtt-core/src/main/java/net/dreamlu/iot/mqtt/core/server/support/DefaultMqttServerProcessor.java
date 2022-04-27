@@ -30,6 +30,7 @@ import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
@@ -70,6 +71,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttServerPublishPermission publishPermission;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
+	private final IMqttSessionListener sessionListener;
 	private final IMqttMessageListener messageListener;
 	private final ScheduledThreadPoolExecutor executor;
 
@@ -84,6 +86,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.publishPermission = serverCreator.getPublishPermission();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
+		this.sessionListener = serverCreator.getSessionListener();
 		this.messageListener = serverCreator.getMessageListener();
 		this.executor = executor;
 	}
@@ -341,6 +344,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				subscribedTopicList.add(topicFilter);
 				sessionManager.addSubscribe(topicFilter, clientId, mqttQoS.value());
 				logger.info("Subscribe - clientId:{} topicFilter:{} mqttQoS:{} messageId:{}", clientId, topicFilter, mqttQoS, messageId);
+				publishSubscribedEvent(context, clientId, topicFilter, mqttQoS);
 			}
 		}
 		// 3. 返回 ack
@@ -360,6 +364,26 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		}
 	}
 
+	/**
+	 * 发送订阅事件
+	 * @param context ChannelContext
+	 * @param clientId clientId
+	 * @param topicFilter topicFilter
+	 * @param mqttQoS MqttQoS
+	 */
+	private void publishSubscribedEvent(ChannelContext context, String clientId, String topicFilter, MqttQoS mqttQoS) {
+		if (sessionListener == null) {
+			return;
+		}
+		executor.execute(() -> {
+			try {
+				sessionListener.onSubscribed(context, clientId, topicFilter, mqttQoS);
+			} catch (Throwable e) {
+				logger.error("Mqtt server clientId:{} topicFilter:{} onUnsubscribed error.", clientId, topicFilter, e);
+			}
+		});
+	}
+
 	@Override
 	public void processUnSubscribe(ChannelContext context, MqttUnsubscribeMessage message) {
 		String clientId = context.getBsId();
@@ -367,12 +391,32 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		List<String> topicFilterList = message.payload().topics();
 		for (String topicFilter : topicFilterList) {
 			sessionManager.removeSubscribe(topicFilter, clientId);
+			publishUnsubscribedEvent(context, clientId, topicFilter);
 		}
 		logger.info("UnSubscribe - clientId:{} Topic:{} messageId:{}", clientId, topicFilterList, messageId);
 		MqttMessage unSubMessage = MqttMessageBuilders.unsubAck()
 			.packetId(messageId)
 			.build();
 		Tio.send(context, unSubMessage);
+	}
+
+	/**
+	 * 发送取消订阅事件
+	 * @param context ChannelContext
+	 * @param clientId clientId
+	 * @param topicFilter topicFilter
+	 */
+	private void publishUnsubscribedEvent(ChannelContext context, String clientId, String topicFilter) {
+		if (sessionListener == null) {
+			return;
+		}
+		executor.execute(() -> {
+			try {
+				sessionListener.onUnsubscribed(context, clientId, topicFilter);
+			} catch (Throwable e) {
+				logger.error("Mqtt server clientId:{} topicFilter:{} onUnsubscribed error.", clientId, topicFilter, e);
+			}
+		});
 	}
 
 	@Override

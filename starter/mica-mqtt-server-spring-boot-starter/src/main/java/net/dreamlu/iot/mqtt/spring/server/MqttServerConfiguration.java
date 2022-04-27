@@ -25,6 +25,7 @@ import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.springframework.beans.factory.ObjectProvider;
@@ -59,6 +60,7 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttMessageDispatcher> messageDispatcherObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
 											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
+											   ObjectProvider<IMqttSessionListener> sessionListenerObjectProvider,
 											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
 											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
 											   ObjectProvider<IpStatListener> ipStatListenerObjectProvider,
@@ -109,6 +111,8 @@ public class MqttServerConfiguration {
 		messageStoreObjectProvider.ifAvailable(serverCreator::messageStore);
 		// session 管理
 		sessionManagerObjectProvider.ifAvailable(serverCreator::sessionManager);
+		// session 监听
+		sessionListenerObjectProvider.ifAvailable(serverCreator::sessionListener);
 		// 状态监听
 		connectStatusListenerObjectProvider.ifAvailable(serverCreator::connectStatusListener);
 		// ip 状态监听
