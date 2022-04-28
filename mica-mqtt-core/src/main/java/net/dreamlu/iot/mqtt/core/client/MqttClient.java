@@ -24,6 +24,7 @@ import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.TioClient;
 import org.tio.core.ChannelContext;
+import org.tio.core.Node;
 import org.tio.core.Tio;
 import org.tio.utils.lock.SetWithLock;
 
@@ -384,6 +385,34 @@ public final class MqttClient {
 			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(getContext(), msg));
 		}
 		return result;
+	}
+
+	/**
+	 * 异步连接
+	 *
+	 * @return TioClient
+	 */
+	MqttClient connect() {
+		try {
+			this.tioClient.asynConnect(new Node(config.getIp(), config.getPort()), config.getTimeout());
+			return this;
+		} catch (Exception e) {
+			throw new IllegalStateException("Mica mqtt client async start fail.", e);
+		}
+	}
+
+	/**
+	 * 同步连接
+	 *
+	 * @return TioClient
+	 */
+	MqttClient connectSync() {
+		try {
+			this.tioClient.connect(new Node(config.getIp(), config.getPort()), config.getTimeout());
+			return this;
+		} catch (Exception e) {
+			throw new IllegalStateException("Mica mqtt client sync start fail.", e);
+		}
 	}
 
 	/**

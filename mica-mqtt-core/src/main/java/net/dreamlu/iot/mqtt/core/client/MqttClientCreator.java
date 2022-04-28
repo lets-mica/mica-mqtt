@@ -26,7 +26,6 @@ import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.client.intf.ClientAioListener;
-import org.tio.core.Node;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
@@ -449,7 +448,7 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClient connect() {
+	private MqttClient build() {
 		// 1. clientId 为空，生成默认的 clientId
 		if (StrUtil.isBlank(this.clientId)) {
 			// 默认为：MICA-MQTT- 前缀和 36进制的纳秒数
@@ -502,11 +501,28 @@ public final class MqttClientCreator {
 		// 12. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
-			tioClient.asynConnect(new Node(this.ip, this.port), this.timeout);
 			return new MqttClient(tioClient, this, this.scheduledExecutor);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
 		}
+	}
+
+	/**
+	 * 默认异步连接
+	 *
+	 * @return TioClient
+	 */
+	public MqttClient connect() {
+		return this.build().connect();
+	}
+
+	/**
+	 * 同步连接
+	 *
+	 * @return TioClient
+	 */
+	public MqttClient connectSync() {
+		return this.build().connectSync();
 	}
 
 }
