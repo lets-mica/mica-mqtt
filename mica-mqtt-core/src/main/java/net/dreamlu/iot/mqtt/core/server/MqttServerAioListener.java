@@ -64,6 +64,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 		// 1. http 请求跳过
 		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
 		if (isHttpRequest) {
+			context.remove(MqttConst.IS_HTTP);
 			return;
 		}
 		// 2. 业务 id
