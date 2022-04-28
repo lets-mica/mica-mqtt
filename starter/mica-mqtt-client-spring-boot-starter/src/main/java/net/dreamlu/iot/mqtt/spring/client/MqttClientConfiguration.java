@@ -48,7 +48,6 @@ public class MqttClientConfiguration {
 	@Bean
 	public MqttClientCreator mqttClientCreator(MqttClientProperties properties,
 											   ObjectProvider<IMqttClientSession> clientSessionObjectProvider,
-											   ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
 											   ObjectProvider<MqttClientCustomizer> customizers) {
 		MqttClientCreator clientCreator = MqttClient.create()
 			.name(properties.getName())
@@ -87,16 +86,15 @@ public class MqttClientConfiguration {
 		}
 		// 客户端 session
 		clientSessionObjectProvider.ifAvailable(clientCreator::clientSession);
-		// 配置客户端链接监听器
-		clientConnectListenerObjectProvider.ifAvailable(clientCreator::connectListener);
 		// 自定义处理
 		customizers.ifAvailable((customizer) -> customizer.customize(clientCreator));
 		return clientCreator;
 	}
 
 	@Bean(MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN)
-	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator) {
-		return new MqttClientTemplate(mqttClientCreator);
+	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator,
+												 ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider) {
+		return new MqttClientTemplate(mqttClientCreator, clientConnectListenerObjectProvider);
 	}
 
 	@Bean

@@ -18,12 +18,10 @@ package net.dreamlu.iot.mqtt.spring.client;
 
 import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
-import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
-import net.dreamlu.iot.mqtt.core.client.MqttClient;
-import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
-import net.dreamlu.iot.mqtt.core.client.MqttClientSubscription;
+import net.dreamlu.iot.mqtt.core.client.*;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientTioConfig;
@@ -41,6 +39,7 @@ import java.util.List;
 public class MqttClientTemplate implements InitializingBean, DisposableBean, Ordered {
 	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
 	private final MqttClientCreator mqttClientCreator;
+	private final ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider;
 	private MqttClient client;
 
 	/**
@@ -259,6 +258,8 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 
 	@Override
 	public void afterPropertiesSet() {
+		// 配置客户端链接监听器
+		clientConnectListenerObjectProvider.ifAvailable(mqttClientCreator::connectListener);
 		client = mqttClientCreator.connect();
 	}
 
