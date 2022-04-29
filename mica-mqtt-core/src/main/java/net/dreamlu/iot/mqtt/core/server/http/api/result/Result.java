@@ -70,6 +70,17 @@ public final class Result {
 	/**
 	 * 响应成功
 	 *
+	 * @param request HttpRequest
+	 * @param data    Object
+	 * @return HttpResponse
+	 */
+	public static HttpResponse ok(HttpRequest request, Object data) {
+		return ok(new HttpResponse(request), data);
+	}
+
+	/**
+	 * 响应成功
+	 *
 	 * @param response HttpResponse
 	 * @param data     Object
 	 * @return HttpResponse

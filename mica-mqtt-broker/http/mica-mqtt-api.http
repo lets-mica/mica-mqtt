@@ -99,3 +99,10 @@ Content-Type: application/x-www-form-urlencoded
 Authorization: Basic {{username}} {{password}}
 
 clientId=123
+
+### mqtt client subscriptions
+GET http://{{host}}/api/v1/client/subscriptions
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic {{username}} {{password}}
+
+clientId=123

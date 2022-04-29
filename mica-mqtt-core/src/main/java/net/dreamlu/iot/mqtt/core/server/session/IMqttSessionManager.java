@@ -64,6 +64,14 @@ public interface IMqttSessionManager {
 	List<Subscribe> searchSubscribe(String topicName);
 
 	/**
+	 * 获取设备订阅
+	 *
+	 * @param clientId clientId
+	 * @return 订阅列表
+	 */
+	List<Subscribe> getSubscriptions(String clientId);
+
+	/**
 	 * 添加发布过程存储
 	 *
 	 * @param clientId       clientId

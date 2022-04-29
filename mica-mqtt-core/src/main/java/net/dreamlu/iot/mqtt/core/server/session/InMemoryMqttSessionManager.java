@@ -130,6 +130,25 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	}
 
 	@Override
+	public List<Subscribe> getSubscriptions(String clientId) {
+		List<Subscribe> subscribeList = new ArrayList<>();
+		Set<Map.Entry<String, ConcurrentMap<String, Integer>>> entrySet = subscribeStore.entrySet();
+		for (Map.Entry<String, ConcurrentMap<String, Integer>> mapEntry : entrySet) {
+			ConcurrentMap<String, Integer> mapEntryValue = mapEntry.getValue();
+			if (mapEntryValue == null || mapEntryValue.isEmpty()) {
+				continue;
+			}
+			Integer qos = mapEntryValue.get(clientId);
+			if (qos == null) {
+				continue;
+			}
+			String topicFilter = mapEntry.getKey();
+			subscribeList.add(new Subscribe(topicFilter, clientId, qos));
+		}
+		return subscribeList;
+	}
+
+	@Override
 	public void addPendingPublish(String clientId, int messageId, MqttPendingPublish pendingPublish) {
 		Map<Integer, MqttPendingPublish> data = pendingPublishStore.computeIfAbsent(clientId, (key) -> new IntObjectHashMap<>(16));
 		data.put(messageId, pendingPublish);

@@ -20,12 +20,16 @@ import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
+import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
+import org.tio.core.Node;
 import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
@@ -46,6 +50,7 @@ public final class MqttServer {
 	private final MqttWebServer webServer;
 	private final MqttServerCreator serverCreator;
 	private final IMqttSessionManager sessionManager;
+	private final IMqttMessageStore messageStore;
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
@@ -56,6 +61,7 @@ public final class MqttServer {
 		this.webServer = webServer;
 		this.serverCreator = serverCreator;
 		this.sessionManager = serverCreator.getSessionManager();
+		this.messageStore = serverCreator.getMessageStore();
 		this.executor = executor;
 	}
 
@@ -183,6 +189,9 @@ public final class MqttServer {
 		} else {
 			payload.rewind();
 		}
+		if (retain) {
+			this.saveRetainMessage(topic, qos, payload);
+		}
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)
@@ -255,6 +264,9 @@ public final class MqttServer {
 		if (payload == null) {
 			payload = ByteBuffer.allocate(0);
 		}
+		if (retain) {
+			this.saveRetainMessage(topic, qos, payload);
+		}
 		for (Subscribe subscribe : subscribeList) {
 			String clientId = subscribe.getClientId();
 			ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
@@ -264,9 +276,29 @@ public final class MqttServer {
 			}
 			int subMqttQoS = subscribe.getMqttQoS();
 			MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
-			publish(context, clientId, topic, payload, mqttQoS, retain);
+			publish(context, clientId, topic, payload, mqttQoS, false);
 		}
 		return true;
+	}
+
+	/**
+	 * 存储保留消息
+	 *
+	 * @param topic   topic
+	 * @param mqttQoS MqttQoS
+	 * @param payload ByteBuffer
+	 */
+	private void saveRetainMessage(String topic, MqttQoS mqttQoS, ByteBuffer payload) {
+		Message retainMessage = new Message();
+		retainMessage.setTopic(topic);
+		retainMessage.setQos(mqttQoS.value());
+		retainMessage.setPayload(payload);
+		retainMessage.setMessageType(MessageType.DOWN_STREAM);
+		retainMessage.setRetain(true);
+		retainMessage.setDup(false);
+		retainMessage.setTimestamp(System.currentTimeMillis());
+		retainMessage.setNode(serverCreator.getNodeName());
+		this.messageStore.addRetainMessage(topic, retainMessage);
 	}
 
 	/**

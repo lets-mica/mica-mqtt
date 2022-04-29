@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server.http.api;
 
 import com.alibaba.fastjson.JSON;
+import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
@@ -26,6 +27,8 @@ import net.dreamlu.iot.mqtt.core.server.http.api.form.SubscribeForm;
 import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
@@ -44,9 +47,11 @@ import java.util.function.Function;
  */
 public class MqttHttpApi {
 	private final IMqttMessageDispatcher messageDispatcher;
+	private final IMqttSessionManager sessionManager;
 
-	public MqttHttpApi(IMqttMessageDispatcher messageDispatcher) {
-		this.messageDispatcher = messageDispatcher;
+	public MqttHttpApi(MqttServerCreator serverCreator) {
+		this.messageDispatcher = serverCreator.getMessageDispatcher();
+		this.sessionManager = serverCreator.getSessionManager();
 	}
 
 	/**
@@ -270,6 +275,21 @@ public class MqttHttpApi {
 		return Result.ok(response);
 	}
 
+	/**
+	 * 获取客户端订阅情况
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse getClientSubscriptions(HttpRequest request) {
+		String clientId = request.getParam("clientId");
+		if (StrUtil.isBlank(clientId)) {
+			return Result.fail(request, ResultCode.E101);
+		}
+		List<Subscribe> subscribeList = sessionManager.getSubscriptions(clientId);
+		return Result.ok(new HttpResponse(request), subscribeList);
+	}
+
 	private void sendSubOrUnSubscribe(BaseForm form) {
 		Message message = new Message();
 		message.setFromClientId(form.getClientId());
@@ -331,6 +351,7 @@ public class MqttHttpApi {
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe", this::unsubscribe);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe/batch", this::unsubscribeBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/clients/delete", this::deleteClients);
+		MqttHttpRoutes.register(Method.GET, "/api/v1/client/subscriptions", this::getClientSubscriptions);
 		// @formatter:on
 	}
 
