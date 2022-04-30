@@ -90,4 +90,13 @@ public final class MqttHttpRoutes {
 		return ROUTS.get(new RouteInfo(path, method));
 	}
 
+	/**
+	 * 读取所有路由
+	 *
+	 * @return 路由信息
+	 */
+	public static Map<RouteInfo, HttpHandler> getRouts() {
+		return Collections.unmodifiableMap(ROUTS);
+	}
+
 }
