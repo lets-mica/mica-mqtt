@@ -1,3 +1,8 @@
+### mqtt endpoints
+GET http://{{host}}/api/v1/endpoints
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
 ### mqtt publish
 POST http://{{host}}/api/v1/mqtt/publish
 Content-Type: application/json

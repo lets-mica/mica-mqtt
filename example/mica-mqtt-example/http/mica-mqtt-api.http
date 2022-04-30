@@ -1,3 +1,8 @@
+### mqtt endpoints
+GET http://{{host}}/api/v1/endpoints
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
 ### mqtt publish
 POST http://{{host}}/api/v1/mqtt/publish
 Content-Type: application/json
@@ -95,6 +100,13 @@ Authorization: Basic {{username}} {{password}}
 
 ### mqtt delete clients
 POST http://{{host}}/api/v1/clients/delete
+Content-Type: application/x-www-form-urlencoded
+Authorization: Basic {{username}} {{password}}
+
+clientId=123
+
+### mqtt client subscriptions
+GET http://{{host}}/api/v1/client/subscriptions
 Content-Type: application/x-www-form-urlencoded
 Authorization: Basic {{username}} {{password}}
 

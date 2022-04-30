@@ -55,6 +55,18 @@ public class MqttHttpApi {
 	}
 
 	/**
+	 * 获取 api 列表
+	 * <p>
+	 * GET /api/v1/endpoints
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse endpoints(HttpRequest request) {
+		return Result.ok(request, MqttHttpRoutes.getRouts().keySet());
+	}
+
+	/**
 	 * 消息发布
 	 * <p>
 	 * POST /api/v1/mqtt/publish
@@ -67,17 +79,16 @@ public class MqttHttpApi {
 		PublishForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, PublishForm.class)
 		);
-		HttpResponse response = new HttpResponse();
 		if (form == null) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, response);
+		HttpResponse validResponse = validForm(form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
 		sendPublish(form);
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -93,14 +104,13 @@ public class MqttHttpApi {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, PublishForm.class);
 		});
-		HttpResponse response = new HttpResponse();
 		if (formList == null || formList.isEmpty()) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (PublishForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, response);
+			HttpResponse validResponse = validForm(form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
@@ -109,7 +119,7 @@ public class MqttHttpApi {
 		for (PublishForm form : formList) {
 			sendPublish(form);
 		}
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	private void sendPublish(PublishForm form) {
@@ -140,22 +150,21 @@ public class MqttHttpApi {
 		SubscribeForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, SubscribeForm.class)
 		);
-		HttpResponse response = new HttpResponse();
 		if (form == null) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, response);
+		HttpResponse validResponse = validForm(form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
 		int qos = form.getQos();
 		if (qos < 0 || qos > 2) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 		sendSubOrUnSubscribe(form);
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -171,20 +180,19 @@ public class MqttHttpApi {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, SubscribeForm.class);
 		});
-		HttpResponse response = new HttpResponse();
 		if (formList == null || formList.isEmpty()) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (SubscribeForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, response);
+			HttpResponse validResponse = validForm(form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
 			int qos = form.getQos();
 			if (qos < 0 || qos > 2) {
-				return Result.fail(response, ResultCode.E101);
+				return Result.fail(request, ResultCode.E101);
 			}
 		}
 		// 批量处理
@@ -192,7 +200,7 @@ public class MqttHttpApi {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 			sendSubOrUnSubscribe(form);
 		}
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -207,18 +215,17 @@ public class MqttHttpApi {
 		BaseForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, BaseForm.class)
 		);
-		HttpResponse response = new HttpResponse();
 		if (form == null) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, response);
+		HttpResponse validResponse = validForm(form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
 		// 接口手动取消的订阅关系，可用来调试，不建议其他场景使用
 		sendSubOrUnSubscribe(form);
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -234,14 +241,13 @@ public class MqttHttpApi {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, BaseForm.class);
 		});
-		HttpResponse response = new HttpResponse();
 		if (formList == null || formList.isEmpty()) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (BaseForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, response);
+			HttpResponse validResponse = validForm(form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
@@ -251,7 +257,7 @@ public class MqttHttpApi {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 			sendSubOrUnSubscribe(form);
 		}
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -264,15 +270,14 @@ public class MqttHttpApi {
 	 */
 	public HttpResponse deleteClients(HttpRequest request) {
 		String clientId = request.getParam("clientId");
-		HttpResponse response = new HttpResponse();
 		if (StrUtil.isBlank(clientId)) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		Message message = new Message();
 		message.setClientId(clientId);
 		message.setMessageType(MessageType.DISCONNECT);
 		messageDispatcher.send(message);
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -322,19 +327,19 @@ public class MqttHttpApi {
 	/**
 	 * 校验表单
 	 *
-	 * @param form     BaseForm
-	 * @param response HttpResponse
+	 * @param form    BaseForm
+	 * @param request HttpRequest
 	 * @return 表单
 	 */
-	private static HttpResponse validForm(BaseForm form, HttpResponse response) {
+	private static HttpResponse validForm(BaseForm form, HttpRequest request) {
 		// 必须的参数
 		String clientId = form.getClientId();
 		if (StrUtil.isBlank(clientId)) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		String topic = form.getTopic();
 		if (StrUtil.isBlank(topic)) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		return null;
 	}
@@ -344,6 +349,7 @@ public class MqttHttpApi {
 	 */
 	public void register() {
 		// @formatter:off
+		MqttHttpRoutes.register(Method.GET, "/api/v1/endpoints", this::endpoints);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/publish", this::publish);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/publish/batch", this::publishBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/subscribe", this::subscribe);

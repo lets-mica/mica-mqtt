@@ -34,6 +34,14 @@ public class RouteInfo {
 		this.method = method;
 	}
 
+	public String getPath() {
+		return path;
+	}
+
+	public Method getMethod() {
+		return method;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
