@@ -30,7 +30,66 @@
 | 104         | 请求方法错误               |
 | 105         | 未知错误                   |
 
+## 获取所有 api 接口列表
 
+### GET /api/v1/endpoints
+
+**Success Response Body (JSON):**
+
+| Name | Type    | Description |
+| ---- |---------|-------------|
+| code | Integer | 1           |
+| data | Array   | 接口列表        |
+| method | String  | 方法名         |
+| path | String  | 路径          |
+
+**Examples:**
+
+```bash
+$ curl -i --basic -u mica:mica "http://localhost:8083/api/v1/endpoints"
+
+{
+  "code": 1,
+  "data": [
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/subscribe"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/unsubscribe/batch"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/client/subscriptions"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/clients/delete"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/endpoints"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/publish"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/publish/batch"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/subscribe/batch"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/unsubscribe"
+    }
+  ]
+}
+```
 
 ## 消息发布
 
