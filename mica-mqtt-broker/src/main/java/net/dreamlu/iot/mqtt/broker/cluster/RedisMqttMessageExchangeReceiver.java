@@ -23,7 +23,6 @@ import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.mica.core.utils.StringUtil;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisCallback;
@@ -47,11 +46,11 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 	private final String nodeName;
 	private final IMqttSessionManager sessionManager;
 
-	public RedisMqttMessageExchangeReceiver(MicaRedisCache redisCache,
+	public RedisMqttMessageExchangeReceiver(RedisTemplate<String, Object> redisTemplate,
 											IMessageSerializer messageSerializer,
 											String channel,
 											MqttServer mqttServer) {
-		this.redisTemplate = redisCache.getRedisTemplate();
+		this.redisTemplate = redisTemplate;
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.mqttServer = mqttServer;

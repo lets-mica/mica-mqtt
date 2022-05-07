@@ -393,8 +393,9 @@ public final class MqttClient {
 	 * @return TioClient
 	 */
 	MqttClient connect() {
+		Node node = new Node(config.getIp(), config.getPort());
 		try {
-			this.tioClient.asynConnect(new Node(config.getIp(), config.getPort()), config.getTimeout());
+			this.tioClient.asynConnect(node, config.getTimeout());
 			return this;
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client async start fail.", e);
@@ -407,8 +408,9 @@ public final class MqttClient {
 	 * @return TioClient
 	 */
 	MqttClient connectSync() {
+		Node node = new Node(config.getIp(), config.getPort());
 		try {
-			this.tioClient.connect(new Node(config.getIp(), config.getPort()), config.getTimeout());
+			this.tioClient.connect(node, config.getTimeout());
 			return this;
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client sync start fail.", e);

@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.broker.cluster;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -36,10 +35,10 @@ public class RedisMqttMessageDispatcher implements IMqttMessageDispatcher {
 	private final IMessageSerializer messageSerializer;
 	private final byte[] channelBytes;
 
-	public RedisMqttMessageDispatcher(MicaRedisCache redisCache,
+	public RedisMqttMessageDispatcher(RedisTemplate<String, Object> redisTemplate,
 									  IMessageSerializer messageSerializer,
 									  String channel) {
-		this.redisTemplate = redisCache.getRedisTemplate();
+		this.redisTemplate = redisTemplate;
 		this.messageSerializer = messageSerializer;
 		this.channelBytes = RedisSerializer.string().serialize(Objects.requireNonNull(channel, "Redis pub/sub channel is null."));
 	}
