@@ -117,6 +117,8 @@
 
 [![JetBrains](docs/img/jetbrains.png)](https://www.jetbrains.com/?from=mica-mqtt)
 
+感谢 `如梦技术 VIP` **小伙伴们**的鼎力支持，更多 **VIP** 信息详见：https://www.dreamlu.net/vip/index.html
+
 ## 微信公众号
 
 ![如梦技术](docs/img/dreamlu-weixin.jpg)
