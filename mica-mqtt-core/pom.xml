@@ -32,6 +32,11 @@
             <groupId>org.t-io</groupId>
             <artifactId>tio-websocket-server</artifactId>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>

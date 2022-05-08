@@ -16,19 +16,12 @@
 
 package net.dreamlu.iot.mqtt.core.util;
 
-import net.dreamlu.iot.mqtt.codec.MqttCodecUtil;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
-
 /**
  * Mqtt Topic 工具
  *
  * @author L.cm
  */
 public final class TopicUtil {
-	private static final Map<String, Pattern> TOPIC_FILTER_PATTERN_CACHE = new ConcurrentHashMap<>(32);
 
 	/**
 	 * 判断 topicFilter topicName 是否匹配
@@ -38,37 +31,57 @@ public final class TopicUtil {
 	 * @return 是否匹配
 	 */
 	public static boolean match(String topicFilter, String topicName) {
-		if (MqttCodecUtil.isTopicFilter(topicFilter)) {
-			return getTopicPattern(topicFilter).matcher(topicName).matches();
-		} else {
-			return topicFilter.equals(topicName);
+		char[] topicFilterChars = topicFilter.toCharArray();
+		char[] topicNameChars = topicName.toCharArray();
+		int topicFilterLength = topicFilterChars.length;
+		int topicNameLength = topicNameChars.length;
+		int topicFilterIdxEnd = topicFilterLength - 1;
+		char ch;
+		// 是否进入 + 号层级通配符
+		boolean inLayerWildcard = false;
+		for (int i = 0; i < topicFilterLength; i++) {
+			ch = topicFilterChars[i];
+			if (ch == '#') {
+				// 校验: # 通配符只能在最后一位
+				if (i < topicFilterIdxEnd) {
+					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
+				}
+				return true;
+			} else if (ch == '+') {
+				// 校验: 单独 + 是允许的，判断 + 号前一位是否为 /
+				if (i > 0 && topicFilterChars[i - 1] != '/') {
+					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
+				}
+				// 如果 + 是最后一位，判断 topicName 中是否还存在层级 /
+				if (i == topicFilterIdxEnd && topicNameLength > i) {
+					for (int j = i; j < topicNameLength; j++) {
+						if (topicNameChars[j] == '/') {
+							return false;
+						}
+					}
+				}
+				inLayerWildcard = true;
+				continue;
+			} else if (ch == '/') {
+				if (inLayerWildcard) {
+					inLayerWildcard = false;
+				}
+				// 预读下一位，如果是 #，并且 topicName 位数已经不足
+				int next = i + 1;
+				if ((topicFilterLength > next) && topicFilterChars[next] == '#' && topicNameLength < next) {
+					return true;
+				}
+			}
+			// topicName 长度不够了
+			if (topicNameLength < i) {
+				return false;
+			}
+			// 进入通配符
+			if (!inLayerWildcard && ch != topicNameChars[i]) {
+				return false;
+			}
 		}
-	}
-
-	/**
-	 * mqtt topicFilter 转正则
-	 *
-	 * @param topicFilter topicFilter
-	 * @return Pattern
-	 */
-	public static Pattern getTopicPattern(String topicFilter) {
-		return TOPIC_FILTER_PATTERN_CACHE.computeIfAbsent(topicFilter, TopicUtil::getTopicFilterPattern);
-	}
-
-	/**
-	 * mqtt topicFilter 转正则
-	 *
-	 * @param topicFilter topicFilter
-	 * @return Pattern
-	 */
-	public static Pattern getTopicFilterPattern(String topicFilter) {
-		// mqtt 分享主题 $share/{ShareName}/{filter}
-		String topicRegex = topicFilter.startsWith("$") ? "\\" + topicFilter : topicFilter;
-		return Pattern.compile(topicRegex
-			.replace("+", "[^/]+")
-			.replace("#", ".+")
-			.concat("$")
-		);
+		return true;
 	}
 
 	/**

@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.regex.Pattern;
 
 /**
  * message store
@@ -72,10 +71,9 @@ public class InMemoryMqttMessageStore implements IMqttMessageStore {
 
 	@Override
 	public List<Message> getRetainMessage(String topicFilter) {
-		Pattern topicPattern = TopicUtil.getTopicPattern(topicFilter);
 		List<Message> retainMessageList = new ArrayList<>();
 		retainStore.forEach((topic, message) -> {
-			if (topicPattern.matcher(topic).matches()) {
+			if (TopicUtil.match(topicFilter, topic)) {
 				retainMessageList.add(message);
 			}
 		});

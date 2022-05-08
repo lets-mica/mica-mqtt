@@ -89,7 +89,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		Integer qosValue = null;
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
-			if (TopicUtil.getTopicPattern(topicFilter).matcher(topicName).matches()) {
+			if (TopicUtil.match(topicFilter, topicName)) {
 				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					Integer mqttQoS = data.get(clientId);

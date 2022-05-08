@@ -27,7 +27,6 @@ import net.dreamlu.mica.redis.cache.MicaRedisCache;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * redis mqtt 遗嘱和保留消息存储
@@ -71,14 +70,13 @@ public class RedisMqttMessageStore implements IMqttMessageStore {
 	@Override
 	public List<Message> getRetainMessage(String topicFilter) {
 		List<Message> retainMessageList = new ArrayList<>();
-		Pattern topicPattern = TopicUtil.getTopicPattern(topicFilter);
 		RedisKeys redisKey = RedisKeys.MESSAGE_STORE_RETAIN;
 		String redisKeyPrefix = redisKey.getKey();
 		String redisKeyPattern = redisKeyPrefix.concat(RedisUtil.getTopicPattern(topicFilter));
 		int keyPrefixLength = redisKeyPrefix.length();
 		redisCache.scan(redisKeyPattern, (key) -> {
 			String keySuffix = key.substring(keyPrefixLength);
-			if (topicPattern.matcher(keySuffix).matches()) {
+			if (TopicUtil.match(topicFilter, keySuffix)) {
 				Message message = redisCache.get(key, messageSerializer::deserialize);
 				if (message != null) {
 					retainMessageList.add(message);
