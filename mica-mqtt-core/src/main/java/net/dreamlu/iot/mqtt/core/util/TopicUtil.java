@@ -36,6 +36,7 @@ public final class TopicUtil {
 		int topicFilterLength = topicFilterChars.length;
 		int topicNameLength = topicNameChars.length;
 		int topicFilterIdxEnd = topicFilterLength - 1;
+		int topicNameIdxEnd = topicNameLength - 1;
 		char ch;
 		// 是否进入 + 号层级通配符
 		boolean inLayerWildcard = false;
@@ -73,7 +74,7 @@ public final class TopicUtil {
 				}
 			}
 			// topicName 长度不够了
-			if (topicNameLength < i) {
+			if (topicNameIdxEnd < i) {
 				return false;
 			}
 			// 进入通配符
