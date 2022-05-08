@@ -5,14 +5,15 @@
 - :sparkles: mica-mqtt-broker 默认开启 http 和 basic auth。
 - :sparkles: mica-mqtt server 添加服务端共享订阅接口，方便开源之夏学生参与。
 - :sparkles: mica-mqtt server 添加 IMqttSessionListener。
-- :sparkles: mica-mqtt server 统一 http 响应模型、优化 http 判断。
+- :sparkles: mica-mqtt server publish 保留消息存储。
+- :sparkles: mica-mqtt server 统一 http 响应模型、优化 http 请求判断。
 - :sparkles: mica-mqtt server 优化 MqttHttpRoutes，添加获取所有路由的方法。
 - :sparkles: mica-mqtt server 完善 Result 和 http api。
 - :sparkles: mica-mqtt server http api 添加 endpoints 列表接口。
 - :sparkles: mica-mqtt client 添加同步连接 connectSync 方法。
-- :sparkles: mica-mqtt client 优化 bean 依赖。
-- :bug: 重构 topic 匹配规则，提升性能减少内存占用，修复 gitee #I56BTC
-- :arrow_up: 依赖升级
+- :sparkles: mica-mqtt client 优化 bean 依赖，减少循环依赖可能性。
+- :bug: 重构 mqtt topic 匹配规则，提升性能减少内存占用，修复 gitee #I56BTC
+- :arrow_up: spring boot、mica 版本升级
 
 ### v1.3.0 - 2022-04-17
 - :sparkles: mica-mqtt mqtt-server 简化，默认多设备可以直接互相订阅和处理消息。
