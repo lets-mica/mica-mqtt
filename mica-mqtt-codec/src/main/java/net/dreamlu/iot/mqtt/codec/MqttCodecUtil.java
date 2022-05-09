@@ -56,7 +56,13 @@ public final class MqttCodecUtil {
 	 * @return 是否 topic filter
 	 */
 	public static boolean isTopicFilter(String topicFilter) {
-		return topicFilter.indexOf(TOPIC_WILDCARDS_ONE) >= 0 || topicFilter.indexOf(TOPIC_WILDCARDS_MORE) >= 0;
+		char[] topicFilterChars = topicFilter.toCharArray();
+		for (char ch : topicFilterChars) {
+			if (TOPIC_WILDCARDS_ONE == ch || TOPIC_WILDCARDS_MORE == ch) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

@@ -34,6 +34,7 @@ import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -334,6 +335,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		boolean enableSubscribeValidator = subscribeValidator != null;
 		for (MqttTopicSubscription subscription : topicSubscriptionList) {
 			String topicFilter = subscription.topicName();
+			// 校验 topicFilter 是否合法
+			TopicUtil.validateTopicFilter(topicFilter);
 			MqttQoS mqttQoS = subscription.qualityOfService();
 			// 校验是否可以订阅
 			if (enableSubscribeValidator && !subscribeValidator.verifyTopicFilter(context, clientId, topicFilter, mqttQoS)) {

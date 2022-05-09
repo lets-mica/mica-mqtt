@@ -16,12 +16,72 @@
 
 package net.dreamlu.iot.mqtt.core.util;
 
+import net.dreamlu.iot.mqtt.codec.MqttCodecUtil;
+
+import java.util.List;
+
 /**
  * Mqtt Topic 工具
  *
  * @author L.cm
  */
 public final class TopicUtil {
+
+	/**
+	 * 校验 topicFilter
+	 *
+	 * @param topicFilterList topicFilter 集合
+	 */
+	public static void validateTopicFilter(List<String> topicFilterList) {
+		for (String topicFilter : topicFilterList) {
+			validateTopicFilter(topicFilter);
+		}
+	}
+
+	/**
+	 * 校验 topicFilter
+	 *
+	 * @param topicFilter topicFilter
+	 */
+	public static void validateTopicFilter(String topicFilter) {
+		if (topicFilter == null || topicFilter.isEmpty()) {
+			throw new IllegalArgumentException("TopicFilter is blank:" + topicFilter);
+		}
+		char[] topicFilterChars = topicFilter.toCharArray();
+		int topicFilterLength = topicFilterChars.length;
+		int topicFilterIdxEnd = topicFilterLength - 1;
+		char ch;
+		for (int i = 0; i < topicFilterLength; i++) {
+			ch = topicFilterChars[i];
+			if (Character.isWhitespace(ch)) {
+				throw new IllegalArgumentException("Mqtt subscribe topicFilter has white space:" + topicFilter);
+			} else if (ch == MqttCodecUtil.TOPIC_WILDCARDS_MORE) {
+				// 校验: # 通配符只能在最后一位
+				if (i < topicFilterIdxEnd) {
+					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
+				}
+			} else if (ch == MqttCodecUtil.TOPIC_WILDCARDS_ONE) {
+				// 校验: 单独 + 是允许的，判断 + 号前一位是否为 /
+				if (i > 0 && topicFilterChars[i - 1] != '/') {
+					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
+				}
+			}
+		}
+	}
+
+	/**
+	 * 校验 topicName
+	 *
+	 * @param topicName topicName
+	 */
+	public static void validateTopicName(String topicName) throws IllegalArgumentException {
+		if (topicName == null || topicName.isEmpty()) {
+			throw new IllegalArgumentException("Topic is blank:" + topicName);
+		}
+		if (MqttCodecUtil.isTopicFilter(topicName)) {
+			throw new IllegalArgumentException("Topic has wildcards char [+] or [#], topicName:" + topicName);
+		}
+	}
 
 	/**
 	 * 判断 topicFilter topicName 是否匹配
@@ -42,13 +102,13 @@ public final class TopicUtil {
 		boolean inLayerWildcard = false;
 		for (int i = 0; i < topicFilterLength; i++) {
 			ch = topicFilterChars[i];
-			if (ch == '#') {
+			if (ch == MqttCodecUtil.TOPIC_WILDCARDS_MORE) {
 				// 校验: # 通配符只能在最后一位
 				if (i < topicFilterIdxEnd) {
 					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
 				}
 				return true;
-			} else if (ch == '+') {
+			} else if (ch == MqttCodecUtil.TOPIC_WILDCARDS_ONE) {
 				// 校验: 单独 + 是允许的，判断 + 号前一位是否为 /
 				if (i > 0 && topicFilterChars[i - 1] != '/') {
 					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);

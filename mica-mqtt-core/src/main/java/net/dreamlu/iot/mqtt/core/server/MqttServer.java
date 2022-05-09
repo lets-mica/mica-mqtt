@@ -26,10 +26,10 @@ import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
-import org.tio.core.Node;
 import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
@@ -154,6 +154,9 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		// 校验 topic
+		TopicUtil.validateTopicName(topic);
+		// 获取 context
 		ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
 		if (context == null || context.isClosed) {
 			logger.warn("Mqtt Topic:{} publish to clientId:{} ChannelContext is null may be disconnected.", topic, clientId);
@@ -165,8 +168,7 @@ public final class MqttServer {
 			return false;
 		}
 		MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
-		publish(context, clientId, topic, payload, mqttQoS, retain);
-		return true;
+		return publish(context, clientId, topic, payload, mqttQoS, retain);
 	}
 
 	/**
@@ -180,7 +182,7 @@ public final class MqttServer {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	private boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
 		// 下行 payload 为空时，构造一个空结构体
@@ -254,6 +256,8 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		// 校验 topic
+		TopicUtil.validateTopicName(topic);
 		// 查找订阅该 topic 的客户端
 		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {
