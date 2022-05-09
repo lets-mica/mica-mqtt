@@ -1,6 +1,10 @@
 # 变更记录
 
 ## 发行版本
+### v1.3.2 - 2022-05-09
+- :sparkles: mica-mqtt topic 匹配完善。
+- :sparkles: mica-mqtt 订阅、发布时添加 topicFilter、topicName 校验。
+
 ### v1.3.1 - 2022-05-08
 - :sparkles: mica-mqtt-broker 默认开启 http 和 basic auth。
 - :sparkles: mica-mqtt server 添加服务端共享订阅接口，方便开源之夏学生参与。
