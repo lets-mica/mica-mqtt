@@ -30,6 +30,7 @@ import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.http.common.Method;
@@ -83,7 +84,7 @@ public class MqttHttpApi {
 			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, request);
+		HttpResponse validResponse = validForm(false, form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
@@ -110,7 +111,7 @@ public class MqttHttpApi {
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (PublishForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, request);
+			HttpResponse validResponse = validForm(false, form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
@@ -154,7 +155,7 @@ public class MqttHttpApi {
 			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, request);
+		HttpResponse validResponse = validForm(true, form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
@@ -186,7 +187,7 @@ public class MqttHttpApi {
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (SubscribeForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, request);
+			HttpResponse validResponse = validForm(true, form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
@@ -219,7 +220,7 @@ public class MqttHttpApi {
 			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, request);
+		HttpResponse validResponse = validForm(true, form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
@@ -247,7 +248,7 @@ public class MqttHttpApi {
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (BaseForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, request);
+			HttpResponse validResponse = validForm(true, form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
@@ -327,11 +328,12 @@ public class MqttHttpApi {
 	/**
 	 * 校验表单
 	 *
-	 * @param form    BaseForm
-	 * @param request HttpRequest
+	 * @param isTopicFilter isTopicFilter
+	 * @param form          BaseForm
+	 * @param request       HttpRequest
 	 * @return 表单
 	 */
-	private static HttpResponse validForm(BaseForm form, HttpRequest request) {
+	private static HttpResponse validForm(boolean isTopicFilter, BaseForm form, HttpRequest request) {
 		// 必须的参数
 		String clientId = form.getClientId();
 		if (StrUtil.isBlank(clientId)) {
@@ -340,6 +342,15 @@ public class MqttHttpApi {
 		String topic = form.getTopic();
 		if (StrUtil.isBlank(topic)) {
 			return Result.fail(request, ResultCode.E101);
+		}
+		try {
+			if (isTopicFilter) {
+				TopicUtil.validateTopicFilter(topic);
+			} else {
+				TopicUtil.validateTopicName(topic);
+			}
+		} catch (IllegalArgumentException exception) {
+			return Result.fail(request, ResultCode.E102);
 		}
 		return null;
 	}

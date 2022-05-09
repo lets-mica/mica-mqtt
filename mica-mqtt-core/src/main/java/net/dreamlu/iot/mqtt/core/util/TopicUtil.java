@@ -43,7 +43,7 @@ public final class TopicUtil {
 	 *
 	 * @param topicFilter topicFilter
 	 */
-	public static void validateTopicFilter(String topicFilter) {
+	public static void validateTopicFilter(String topicFilter) throws IllegalArgumentException {
 		if (topicFilter == null || topicFilter.isEmpty()) {
 			throw new IllegalArgumentException("TopicFilter is blank:" + topicFilter);
 		}
