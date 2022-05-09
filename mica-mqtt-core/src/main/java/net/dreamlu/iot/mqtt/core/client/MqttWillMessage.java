@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -84,7 +85,8 @@ public final class MqttWillMessage {
 		private MqttProperties willProperties;
 
 		public Builder topic(String topic) {
-			this.topic = Objects.requireNonNull(topic);
+			TopicUtil.validateTopicName(topic);
+			this.topic = topic;
 			return this;
 		}
 

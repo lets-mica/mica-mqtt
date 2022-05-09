@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.core.client;
 
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
@@ -185,6 +186,8 @@ public final class MqttClient {
 		// 1. 先判断是否已经订阅过，重复订阅，直接跳出
 		List<MqttClientSubscription> needSubscriptionList = new ArrayList<>();
 		for (MqttClientSubscription subscription : subscriptionList) {
+			// 校验 topicFilter
+			TopicUtil.validateTopicFilter(subscription.getTopicFilter());
 			boolean subscribed = clientSession.isSubscribed(subscription);
 			if (!subscribed) {
 				needSubscriptionList.add(subscription);
@@ -229,6 +232,8 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient unSubscribe(List<String> topicFilters) {
+		// 校验 topicFilter
+		TopicUtil.validateTopicFilter(topicFilters);
 		int messageId = messageIdGenerator.getId();
 		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
 			.addTopicFilters(topicFilters)
@@ -363,6 +368,9 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
+		// 校验 topic
+		TopicUtil.validateTopicName(topic);
+		// qos 判断
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? messageIdGenerator.getId() : -1;
 		if (payload == null) {
