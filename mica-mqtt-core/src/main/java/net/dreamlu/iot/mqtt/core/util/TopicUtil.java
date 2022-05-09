@@ -115,8 +115,10 @@ public final class TopicUtil {
 					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
 				}
 				// 如果 + 是最后一位，判断 topicName 中是否还存在层级 /
-				if (i == topicFilterIdxEnd && topicNameLength > i) {
-					for (int j = i; j < topicNameLength; j++) {
+				// topicName index
+				int topicNameIdx = i + wildcardCharLen;
+				if (i == topicFilterIdxEnd && topicNameLength > topicNameIdx) {
+					for (int j = topicNameIdx; j < topicNameLength; j++) {
 						if (topicNameChars[j] == '/') {
 							return false;
 						}
