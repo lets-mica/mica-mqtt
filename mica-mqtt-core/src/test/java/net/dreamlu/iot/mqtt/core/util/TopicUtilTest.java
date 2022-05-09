@@ -39,6 +39,12 @@ public class TopicUtilTest {
 
 		Assert.assertTrue(TopicUtil.match("/iot/test/+", "/iot/test/123"));
 		Assert.assertFalse(TopicUtil.match("/iot/test/+", "/iot/test/123/"));
+		Assert.assertTrue(TopicUtil.match("/iot/+/test", "/iot/abc/test"));
+		Assert.assertFalse(TopicUtil.match("/iot/+/test", "/iot/abc/test/"));
+		Assert.assertFalse(TopicUtil.match("/iot/+/test", "/iot/abc/test1"));
+		Assert.assertTrue(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test"));
+		Assert.assertFalse(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test1"));
+		Assert.assertFalse(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test/"));
 
 		Assert.assertTrue(TopicUtil.match("#", "/iot/test"));
 		Assert.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test"));

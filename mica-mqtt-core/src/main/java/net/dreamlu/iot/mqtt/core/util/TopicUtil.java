@@ -100,7 +100,8 @@ public final class TopicUtil {
 		char ch;
 		// 是否进入 + 号层级通配符
 		boolean inLayerWildcard = false;
-		for (int i = 0; i < topicFilterLength; i++) {
+		int wildcardCharLen = 0;
+		topicFilterLoop: for (int i = 0; i < topicFilterLength; i++) {
 			ch = topicFilterChars[i];
 			if (ch == MqttCodecUtil.TOPIC_WILDCARDS_MORE) {
 				// 校验: # 通配符只能在最后一位
@@ -120,9 +121,9 @@ public final class TopicUtil {
 							return false;
 						}
 					}
+					return true;
 				}
 				inLayerWildcard = true;
-				continue;
 			} else if (ch == '/') {
 				if (inLayerWildcard) {
 					inLayerWildcard = false;
@@ -138,11 +139,28 @@ public final class TopicUtil {
 				return false;
 			}
 			// 进入通配符
-			if (!inLayerWildcard && ch != topicNameChars[i]) {
+			if (inLayerWildcard) {
+				for (int j = i + wildcardCharLen; j < topicNameLength; j++) {
+					if (topicNameChars[j] == '/') {
+						wildcardCharLen--;
+						continue topicFilterLoop;
+					} else {
+						wildcardCharLen++;
+					}
+				}
+			}
+			// topicName index
+			int topicNameIdx = i + wildcardCharLen;
+			// topic 已经完成，topicName 还有数据
+			if (topicNameIdx > topicNameIdxEnd) {
+				return false;
+			}
+			if (ch != topicNameChars[topicNameIdx]) {
 				return false;
 			}
 		}
-		return true;
+		// 判断 topicName 是否还有数据
+		return topicFilterLength + wildcardCharLen + 1 > topicNameLength;
 	}
 
 	/**
