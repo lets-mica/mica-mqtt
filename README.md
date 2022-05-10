@@ -89,6 +89,7 @@
 - [mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 - [mica-mqtt 使用文档](mica-mqtt-core/README.md)
 - [mica-mqtt http api 文档详见](docs/http-api.md)
+- [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt 发行版本](CHANGELOG.md)
 - [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
