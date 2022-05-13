@@ -232,8 +232,12 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient unSubscribe(List<String> topicFilters) {
-		// 校验 topicFilter
+		// 1. 校验 topicFilter
 		TopicUtil.validateTopicFilter(topicFilters);
+		// 2. 优先取消本地订阅
+		clientSession.removePaddingSubscribes(topicFilters);
+		clientSession.removeSubscriptions(topicFilters);
+		// 3. 发送取消订阅到服务端
 		int messageId = messageIdGenerator.getId();
 		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
 			.addTopicFilters(topicFilters)
@@ -242,7 +246,7 @@ public final class MqttClient {
 		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilters, message);
 		Boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilters, messageId, result);
-		// 解绑 subManage listener
+		// 4. 启动取消订阅线程
 		clientSession.addPaddingUnSubscribe(messageId, pendingUnSubscription);
 		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(getContext(), msg));
 		return this;

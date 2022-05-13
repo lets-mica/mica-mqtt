@@ -25,10 +25,7 @@ import net.dreamlu.iot.mqtt.core.util.collection.MultiValueMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 客户端 session 管理，包括 sub 和 pub
@@ -54,6 +51,25 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 	@Override
 	public MqttPendingSubscription getPaddingSubscribe(int messageId) {
 		return pendingSubscriptions.get(messageId);
+	}
+
+	@Override
+	public void removePaddingSubscribes(List<String> topicFilters) {
+		Set<Integer> needToRemove = new HashSet<>();
+		pendingSubscriptions.forEach((messageId, pendingSubscription) -> {
+			List<MqttClientSubscription> subscriptionList = pendingSubscription.getSubscriptionList();
+			if (subscriptionList != null) {
+				subscriptionList.removeIf(subscription -> topicFilters.contains(subscription.getTopicFilter()));
+			}
+			// 如果已经被删到为空
+			if (subscriptionList == null || subscriptionList.isEmpty()) {
+				// 停止线程
+				pendingSubscription.onSubAckReceived();
+				needToRemove.add(messageId);
+			}
+		});
+		// 清除 messageId 的过程订阅
+		needToRemove.forEach(pendingSubscriptions::remove);
 	}
 
 	@Override

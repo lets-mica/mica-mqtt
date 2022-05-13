@@ -45,6 +45,13 @@ public interface IMqttClientSession {
 	MqttPendingSubscription getPaddingSubscribe(int messageId);
 
 	/**
+	 * 移除过程订阅
+	 *
+	 * @param topicFilters topicFilter 集合
+	 */
+	void removePaddingSubscribes(List<String> topicFilters);
+
+	/**
 	 * 删除过程订阅
 	 *
 	 * @param messageId messageId

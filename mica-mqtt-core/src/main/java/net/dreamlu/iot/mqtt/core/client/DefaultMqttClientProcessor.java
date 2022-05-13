@@ -244,12 +244,13 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (pendingUnSubscription == null) {
 			return;
 		}
+		List<String> unSubscriptionTopics = pendingUnSubscription.getTopics();
 		if (logger.isInfoEnabled()) {
-			logger.info("MQTT Topic:{} successfully unSubscribed  messageId:{}", pendingUnSubscription.getTopics(), messageId);
+			logger.info("MQTT Topic:{} successfully unSubscribed messageId:{}", unSubscriptionTopics, messageId);
 		}
 		pendingUnSubscription.onUnSubAckReceived();
 		clientSession.removePaddingUnSubscribe(messageId);
-		clientSession.removeSubscriptions(pendingUnSubscription.getTopics());
+		clientSession.removeSubscriptions(unSubscriptionTopics);
 	}
 
 	@Override
