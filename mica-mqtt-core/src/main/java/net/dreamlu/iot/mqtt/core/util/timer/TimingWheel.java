@@ -94,19 +94,21 @@ import java.util.concurrent.atomic.LongAdder;
  * <p>
  * This class is not thread-safe. There should not be any add calls while advanceClock is executing.
  * It is caller's responsibility to enforce it. Simultaneous add calls are thread-safe.
+ *
+ * @author kafka、guest、L.cm
  */
 public class TimingWheel {
 
 	/**
-	 * 每一格时间
+	 * 时间轮由多个时间格组成，每个时间格就是 tickMs，它代表当前时间轮的基本时间跨度。
 	 */
 	private final long tickMs;
 	/**
-	 * 格子数
+	 * 代表每一层时间轮的格数
 	 */
 	private final int wheelSize;
 	/**
-	 * 时间跨度
+	 * 当前时间轮的总体时间跨度，interval=tickMs × wheelSize
 	 */
 	private final long interval;
 	/**
@@ -118,7 +120,7 @@ public class TimingWheel {
 	 */
 	private final DelayQueue<TimerTaskList> queue;
 	/**
-	 * 当前时间
+	 * 表示时间轮当前所处的时间
 	 */
 	private long currentTime;
 	/**
@@ -136,7 +138,7 @@ public class TimingWheel {
 		this.taskCounter = taskCounter;
 		this.queue = queue;
 		this.interval = tickMs * wheelSize;
-		// currentTime为tickMs的整数倍 这里做取整操作
+		// currentTime为 tickMs 的整数倍 这里做取整操作
 		this.currentTime = startMs - (startMs % tickMs);
 		this.buckets = new TimerTaskList[wheelSize];
 		for (int i = 0; i < buckets.length; i++) {

@@ -20,7 +20,9 @@ package net.dreamlu.iot.mqtt.core.util.timer;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author kafka、guest
+ * Timer
+ *
+ * @author kafka、guest、L.cm
  */
 public interface Timer {
 
@@ -56,4 +58,5 @@ public interface Timer {
 	static Long getHiresClockMs() {
 		return TimeUnit.NANOSECONDS.toMillis(System.nanoTime());
 	}
+
 }

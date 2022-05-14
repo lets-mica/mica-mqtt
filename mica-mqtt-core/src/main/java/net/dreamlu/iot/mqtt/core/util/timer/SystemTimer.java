@@ -26,7 +26,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 /**
- * @author kafka、guest
+ * SystemTimer
+ *
+ * @author kafka、guest、L.cm
  */
 public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 	private static final Logger logger = LoggerFactory.getLogger(SystemTimer.class);
@@ -57,20 +59,23 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 	private final ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
 
 	public SystemTimer(String executeName) {
-		this(1L, Timer.getHiresClockMs(), 20, executeName);
+		this(1L, 20, executeName);
 	}
 
-	public SystemTimer(long tickMs, long startMs, int wheelSize, String executeName) {
+	public SystemTimer(long tickMs, int wheelSize, String executeName) {
+		this(tickMs, wheelSize, Timer.getHiresClockMs(), executeName);
+	}
+
+	public SystemTimer(long tickMs, int wheelSize, long startMs, String executeName) {
 		taskExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
 			new LinkedBlockingQueue<>(Integer.MAX_VALUE), r -> new Thread(r, "SystemTimerExecutor" + executeName));
 		timingWheel = new TimingWheel(tickMs, wheelSize, startMs, taskCounter, delayQueue);
 	}
 
 	/**
-	 * Add a new task to this executor. It will be executed after the task's delay
-	 * (beginning from the time of submission)
+	 * 添加一个任务，任务被包装为一个TimerTaskEntry
 	 *
-	 * @param timerTask the task to add
+	 * @param timerTask TimerTask
 	 */
 	@Override
 	public void add(TimerTask timerTask) {
@@ -91,29 +96,29 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 	 */
 	@Override
 	public boolean advanceClock(long timeoutMs) {
+		TimerTaskList bucket;
 		try {
-			TimerTaskList bucket = delayQueue.poll(timeoutMs, TimeUnit.MILLISECONDS);
-			if (bucket != null) {
-				writeLock.lock();
-				try {
-					while (bucket != null) {
-						// 推进时间
-						timingWheel.advanceClock(bucket.getExpiration());
-						// 执行过期任务（包含降级操作）
-						bucket.flush(this);
-						bucket = delayQueue.poll();
-					}
-				} finally {
-					writeLock.unlock();
-				}
-				return true;
-			} else {
-				return false;
-			}
+			bucket = delayQueue.poll(timeoutMs, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
+			return false;
 		}
-		return false;
+		if (bucket == null) {
+			return false;
+		}
+		writeLock.lock();
+		try {
+			while (bucket != null) {
+				// 推进时间
+				timingWheel.advanceClock(bucket.getExpiration());
+				// 执行过期任务（包含降级操作）
+				bucket.flush(this);
+				bucket = delayQueue.poll();
+			}
+		} finally {
+			writeLock.unlock();
+		}
+		return true;
 	}
 
 	/**
@@ -127,7 +132,7 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 	}
 
 	/**
-	 * ;     * Shutdown the timer service, leaving pending tasks unexpected
+	 * Shutdown the timer service, leaving pending tasks unexpected
 	 */
 	@Override
 	public void shutdown() {
@@ -155,4 +160,5 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 		addTimerTaskEntry(timerTaskEntry);
 		return null;
 	}
+
 }
