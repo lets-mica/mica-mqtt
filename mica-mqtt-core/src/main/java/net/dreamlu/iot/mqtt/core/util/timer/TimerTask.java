@@ -19,7 +19,9 @@ package net.dreamlu.iot.mqtt.core.util.timer;
 
 
 /**
- * @author kafka、guest
+ * TimerTask
+ *
+ * @author kafka、guest、L.cm
  */
 public abstract class TimerTask implements Runnable {
 

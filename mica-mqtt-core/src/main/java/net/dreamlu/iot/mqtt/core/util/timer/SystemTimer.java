@@ -58,6 +58,10 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 
 	private final ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
 
+	public SystemTimer() {
+		this("SystemTimer");
+	}
+
 	public SystemTimer(String executeName) {
 		this(1L, 20, executeName);
 	}
@@ -72,28 +76,17 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 		timingWheel = new TimingWheel(tickMs, wheelSize, startMs, taskCounter, delayQueue);
 	}
 
-	/**
-	 * 添加一个任务，任务被包装为一个TimerTaskEntry
-	 *
-	 * @param timerTask TimerTask
-	 */
 	@Override
 	public void add(TimerTask timerTask) {
 		readLock.lock();
 		try {
+			// 通过任务的延时加上当前时间得到延时的具体时刻，作为定时任务的过期时间
 			addTimerTaskEntry(new TimerTaskEntry(timerTask, timerTask.getDelayMs() + Timer.getHiresClockMs()));
 		} finally {
 			readLock.unlock();
 		}
 	}
 
-	/**
-	 * Advance the internal clock, executing any tasks whose expiration has been
-	 * reached within the duration of the passed timeout.
-	 *
-	 * @param timeoutMs timeoutMs
-	 * @return whether or not any tasks were executed
-	 */
 	@Override
 	public boolean advanceClock(long timeoutMs) {
 		TimerTaskList bucket;
@@ -121,28 +114,20 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 		return true;
 	}
 
-	/**
-	 * Get the number of tasks pending execution
-	 *
-	 * @return the number of tasks
-	 */
 	@Override
 	public long size() {
 		return taskCounter.sum();
 	}
 
-	/**
-	 * Shutdown the timer service, leaving pending tasks unexpected
-	 */
 	@Override
 	public void shutdown() {
 		taskExecutor.shutdown();
 	}
 
 	private void addTimerTaskEntry(TimerTaskEntry timerTaskEntry) {
-		// 添加失败任务直接执行
+		// 尝试将任务加入时间轮
 		if (!timingWheel.add(timerTaskEntry)) {
-			// Already expired or cancelled
+			// 任务过期则执行任务，仅当 任务已经过期 或者 任务主动取消 才会进入此分支
 			if (!timerTaskEntry.cancelled()) {
 				taskExecutor.submit(timerTaskEntry.getTimerTask());
 			}
