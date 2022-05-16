@@ -193,6 +193,14 @@ public class MqttServerCreator {
 	 * TioConfig 自定义配置
 	 */
 	private Consumer<TioConfig> tioConfigCustomize;
+	/**
+	 * qos 1~2 重试间隔
+	 */
+	private int messageRetryIntervalSecs;
+	/**
+	 * qos 1~2 重试次数
+	 */
+	private int messageRetryCount;
 
 	public String getName() {
 		return name;
@@ -497,6 +505,24 @@ public class MqttServerCreator {
 
 	public MqttServerCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
 		this.tioConfigCustomize = tioConfigCustomize;
+		return this;
+	}
+
+	public int getMessageRetryIntervalSecs() {
+		return messageRetryIntervalSecs;
+	}
+
+	public MqttServerCreator messageRetryIntervalSecs(int messageRetryIntervalSecs) {
+		this.messageRetryIntervalSecs = messageRetryIntervalSecs;
+		return this;
+	}
+
+	public int getMessageRetryCount() {
+		return messageRetryCount;
+	}
+
+	public MqttServerCreator messageRetryCount(int messageRetryCount) {
+		this.messageRetryCount = messageRetryCount;
 		return this;
 	}
 
