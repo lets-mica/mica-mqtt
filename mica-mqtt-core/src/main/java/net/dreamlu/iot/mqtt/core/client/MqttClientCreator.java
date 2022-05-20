@@ -27,6 +27,7 @@ import org.tio.client.TioClientConfig;
 import org.tio.client.intf.TioClientHandler;
 import org.tio.client.intf.TioClientListener;
 import org.tio.core.Node;
+import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.DefaultThreadFactory;
