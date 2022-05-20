@@ -93,6 +93,23 @@ public enum TopicFilterType {
 		}
 	}
 
+	/**
+	 * 读取共享订阅的分组名
+	 *
+	 * @return 共享订阅分组名
+	 */
+	public static String getShareGroupName(String topicFilter) {
+		int prefixLength = TopicFilterType.SHARE_GROUP_PREFIX.length();
+		int topicFilterLength = topicFilter.length();
+		for (int i = prefixLength; i < topicFilterLength; i++) {
+			char ch = topicFilter.charAt(i);
+			if ('/' == ch) {
+				return topicFilter.substring(prefixLength, i);
+			}
+		}
+		throw new IllegalArgumentException("Share subscription topicFilter: " + topicFilter + " not conform to the $share/<group-name>/xxx");
+	}
+
 	private static int findShareTopicIndex(String topicFilter, boolean startDelimiter) {
 		int prefixLength = TopicFilterType.SHARE_GROUP_PREFIX.length();
 		int topicFilterLength = topicFilter.length();

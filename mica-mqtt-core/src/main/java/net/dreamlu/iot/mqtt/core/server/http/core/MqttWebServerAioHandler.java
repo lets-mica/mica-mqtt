@@ -406,7 +406,7 @@ public class MqttWebServerAioHandler implements TioServerHandler {
 				Tio.send(channelContext, httpResponse);
 			} else {
 				if (log.isInfoEnabled()) {
-					log.info("{}, {}, handler return null, request line: {}", channelContext.tioConfig.getName(), channelContext, request.getRequestLine().toString());
+					log.info("{}, {}, handler return null, request line: {}", channelContext.tioConfig.getName(), channelContext, request.getRequestLine());
 				}
 				request.close("handler return null");
 			}

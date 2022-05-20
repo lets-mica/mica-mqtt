@@ -64,6 +64,7 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		// 1. http 请求跳过
 		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
 		if (isHttpRequest) {
+			context.remove(MqttConst.IS_HTTP);
 			return;
 		}
 		// 2. 业务 id
@@ -87,7 +88,8 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		cleanSession(clientId);
 		context.remove(MqttConst.DIS_CONNECTED);
 		// 7. 下线事件
-		notify(context, clientId);
+		String username = (String) context.get(MqttConst.USER_NAME_KEY);
+		notify(context, clientId, username);
 	}
 
 	private void sendWillMessage(String clientId) {
@@ -114,10 +116,10 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		}
 	}
 
-	private void notify(ChannelContext context, String clientId) {
+	private void notify(ChannelContext context, String clientId, String username) {
 		executor.execute(() -> {
 			try {
-				connectStatusListener.offline(context, clientId);
+				connectStatusListener.offline(context, clientId, username);
 			} catch (Throwable throwable) {
 				logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
 			}

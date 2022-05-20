@@ -48,7 +48,10 @@ public enum ResultCode {
 	 * 未知错误
 	 */
 	E105(HttpResponseStatus.C500, 105),
-
+	/**
+	 * 请求方法错误
+	 */
+	E404(HttpResponseStatus.C404, 404),
 	;
 
 	private final HttpResponseStatus statusCode;

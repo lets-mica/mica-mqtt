@@ -40,6 +40,9 @@ public interface IMqttMessageDispatcher {
 	 * @param message  消息
 	 * @return 是否成功
 	 */
-	boolean send(String clientId, Message message);
+	default boolean send(String clientId, Message message) {
+		message.setClientId(clientId);
+		return send(message);
+	}
 
 }

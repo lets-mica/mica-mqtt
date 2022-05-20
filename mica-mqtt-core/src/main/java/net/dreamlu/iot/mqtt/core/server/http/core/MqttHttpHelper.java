@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server.http.core;
 
-import net.dreamlu.iot.mqtt.core.server.MqttConst;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
@@ -40,7 +39,6 @@ public class MqttHttpHelper {
 	 */
 	public static void close(ChannelContext context, Packet packet) {
 		// 1. 短链接数据解绑
-		context.remove(MqttConst.IS_HTTP);
 		TioConfig tioConfig = context.getTioConfig();
 		tioConfig.groups.unbind(context);
 		tioConfig.bsIds.unbind(context);

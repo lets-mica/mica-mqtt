@@ -30,7 +30,66 @@
 | 104         | 请求方法错误               |
 | 105         | 未知错误                   |
 
-## 
+## 获取所有 api 接口列表
+
+### GET /api/v1/endpoints
+
+**Success Response Body (JSON):**
+
+| Name | Type    | Description |
+| ---- |---------|-------------|
+| code | Integer | 1           |
+| data | Array   | 接口列表        |
+| method | String  | 方法名         |
+| path | String  | 路径          |
+
+**Examples:**
+
+```bash
+$ curl -i --basic -u mica:mica "http://localhost:8083/api/v1/endpoints"
+
+{
+  "code": 1,
+  "data": [
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/subscribe"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/unsubscribe/batch"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/client/subscriptions"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/clients/delete"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/endpoints"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/publish"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/publish/batch"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/subscribe/batch"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/mqtt/unsubscribe"
+    }
+  ]
+}
+```
 
 ## 消息发布
 
@@ -60,7 +119,7 @@
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/publish" -d '{"topic":"a/b/c","payload":"Hello World","qos":1,"retain":false,"clientId":"example"}'
 
-{"code":0}
+{"code":1}
 ```
 
 ## 主题订阅
@@ -90,7 +149,7 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/publis
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/subscribe" -d '{"topic":"a/b/c","qos":1,"clientId":"example"}'
 
-{"code":0}
+{"code":1}
 ```
 
 ### POST /api/v1/mqtt/unsubscribe
@@ -117,7 +176,7 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/subscr
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubscribe" -d '{"topic":"a","clientId":"example"}'
 
-{"code":0}
+{"code":1}
 ```
 
 ## 消息批量发布
@@ -148,7 +207,7 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubs
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/publish/batch" -d '[{"topic":"a/b/c","payload":"Hello World","qos":1,"retain":false,"clientId":"example"},{"topic":"a/b/c","payload":"Hello World Again","qos":0,"retain":false,"clientId":"example"}]'
 
-{"code":0}
+{"code":1}
 ```
 
 ## 主题批量订阅
@@ -178,7 +237,7 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/publis
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/subscribe/batch" -d '[{"topic":"a","qos":1,"clientId":"example"},{"topic":"b","qos":1,"clientId":"example"},{"topic":"c","qos":1,"clientId":"example"}]'
 
-{"code":0}
+{"code":1}
 ```
 
 ### POST /api/v1/mqtt/unsubscribe/batch
@@ -205,5 +264,79 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/subscr
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubscribe/batch" -d '[{"topic":"a","clientId":"example"},{"topic":"b","clientId":"example"}]'
 
-{"code":0}
+{"code":1}
+```
+
+## 踢除指定客户端
+
+### POST /api/v1/clients/delete
+
+踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
+
+**Query Parameters:**
+
+| Name     | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| clientId | String | True     | ClientID    |
+
+**Success Response Body (JSON):**
+
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| code | Integer | 0           |
+
+**Examples:**
+
+踢除指定客户端
+
+```bash
+$ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients/delete?clientId=123"
+
+{"code":1}
+```
+
+## 获取客户端订阅情况
+
+### GET /api/v1/client/subscriptions
+
+获取指定客户端订阅详情。
+
+**Query Parameters:**
+
+| Name     | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| clientId | String | True     | ClientID    |
+
+**Success Response Body (JSON):**
+
+| Name | Type    | Description |
+| ---- |---------|-------------|
+| code | Integer | 0           |
+| data | Array   | []          |
+| topicFilter | String   |             |
+| clientId | String  |             |
+| mqttQoS | Integer | 0           |
+
+**Examples:**
+
+踢除指定客户端
+
+```bash
+$ curl -i --basic -u mica:mica "http://127.0.0.1:8083/api/v1/client/subscriptions?clientId=123"
+
+{
+  "code": 1,
+  "data": [
+    {
+      "clientId": "123",
+      "mqttQoS": 0,
+      "topicFilter": "#"
+    },
+    {
+      "clientId": "123",
+      "mqttQoS": 0,
+      "topicFilter": "testtopic/#"
+    }
+  ]
+}
 ```

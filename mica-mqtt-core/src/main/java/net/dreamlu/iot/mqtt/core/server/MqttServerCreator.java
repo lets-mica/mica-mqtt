@@ -22,18 +22,24 @@ import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerPublishPermission;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerSubscribeValidator;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerUniqueIdService;
+import net.dreamlu.iot.mqtt.core.server.broker.DefaultMqttBrokerDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.AbstractMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.store.InMemoryMqttMessageStore;
-import net.dreamlu.iot.mqtt.core.server.support.*;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerUniqueIdServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
 import org.tio.server.TioServer;
@@ -46,8 +52,8 @@ import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
-import java.util.Objects;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.function.Consumer;
 
 /**
  * mqtt 服务端参数构造
@@ -55,7 +61,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  * @author L.cm
  */
 public class MqttServerCreator {
-	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
+	private static final Logger logger = LoggerFactory.getLogger(MqttServerCreator.class);
 
 	/**
 	 * 名称
@@ -128,6 +134,10 @@ public class MqttServerCreator {
 	 */
 	private IMqttSessionManager sessionManager;
 	/**
+	 * session 监听
+	 */
+	private IMqttSessionListener sessionListener;
+	/**
 	 * 消息监听
 	 */
 	private IMqttMessageListener messageListener;
@@ -179,6 +189,10 @@ public class MqttServerCreator {
 	 * 是否开启监控，默认：false 不开启，节省内存
 	 */
 	private boolean statEnable = false;
+	/**
+	 * TioConfig 自定义配置
+	 */
+	private Consumer<TioConfig> tioConfigCustomize;
 
 	public String getName() {
 		return name;
@@ -352,6 +366,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public IMqttSessionListener getSessionListener() {
+		return sessionListener;
+	}
+
+	public MqttServerCreator sessionListener(IMqttSessionListener sessionListener) {
+		this.sessionListener = sessionListener;
+		return this;
+	}
+
 	public IMqttMessageListener getMessageListener() {
 		return messageListener;
 	}
@@ -472,8 +495,12 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public MqttServerCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
+		this.tioConfigCustomize = tioConfigCustomize;
+		return this;
+	}
+
 	public MqttServer build() {
-		Objects.requireNonNull(this.messageListener, "Mqtt Server message listener cannot be null.");
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
 			this.nodeName = ManagementFactory.getRuntimeMXBean().getName() + ':' + port;
@@ -485,7 +512,7 @@ public class MqttServerCreator {
 			this.uniqueIdService = new DefaultMqttServerUniqueIdServiceImpl();
 		}
 		if (this.messageDispatcher == null) {
-			this.messageDispatcher = new DefaultMqttMessageDispatcher();
+			this.messageDispatcher = new DefaultMqttBrokerDispatcher();
 		}
 		if (this.sessionManager == null) {
 			this.sessionManager = new InMemoryMqttSessionManager();
@@ -522,6 +549,10 @@ public class MqttServerCreator {
 		}
 		if (this.debug) {
 			tioConfig.debug = true;
+		}
+		// 自定义处理
+		if (this.tioConfigCustomize != null) {
+			this.tioConfigCustomize.accept(tioConfig);
 		}
 		TioServer tioServer = new TioServer(tioConfig);
 		// 7. 不校验版本号，社区版设置无效

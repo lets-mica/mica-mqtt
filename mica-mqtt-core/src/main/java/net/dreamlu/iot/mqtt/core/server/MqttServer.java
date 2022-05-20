@@ -20,9 +20,13 @@ import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
+import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
+import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
+import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -46,6 +50,7 @@ public final class MqttServer {
 	private final MqttWebServer webServer;
 	private final MqttServerCreator serverCreator;
 	private final IMqttSessionManager sessionManager;
+	private final IMqttMessageStore messageStore;
 	private final ScheduledThreadPoolExecutor executor;
 
 	MqttServer(TioServer tioServer,
@@ -56,6 +61,7 @@ public final class MqttServer {
 		this.webServer = webServer;
 		this.serverCreator = serverCreator;
 		this.sessionManager = serverCreator.getSessionManager();
+		this.messageStore = serverCreator.getMessageStore();
 		this.executor = executor;
 	}
 
@@ -148,6 +154,9 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		// 校验 topic
+		TopicUtil.validateTopicName(topic);
+		// 获取 context
 		ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
 		if (context == null || context.isClosed) {
 			logger.warn("Mqtt Topic:{} publish to clientId:{} ChannelContext is null may be disconnected.", topic, clientId);
@@ -159,8 +168,7 @@ public final class MqttServer {
 			return false;
 		}
 		MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
-		publish(context, clientId, topic, payload, mqttQoS, retain);
-		return true;
+		return publish(context, clientId, topic, payload, mqttQoS, retain);
 	}
 
 	/**
@@ -174,7 +182,7 @@ public final class MqttServer {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	private boolean publish(ChannelContext context, String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
 		// 下行 payload 为空时，构造一个空结构体
@@ -182,6 +190,9 @@ public final class MqttServer {
 			payload = ByteBuffer.allocate(0);
 		} else {
 			payload.rewind();
+		}
+		if (retain) {
+			this.saveRetainMessage(topic, qos, payload);
 		}
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
@@ -245,6 +256,8 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		// 校验 topic
+		TopicUtil.validateTopicName(topic);
 		// 查找订阅该 topic 的客户端
 		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {
@@ -255,6 +268,9 @@ public final class MqttServer {
 		if (payload == null) {
 			payload = ByteBuffer.allocate(0);
 		}
+		if (retain) {
+			this.saveRetainMessage(topic, qos, payload);
+		}
 		for (Subscribe subscribe : subscribeList) {
 			String clientId = subscribe.getClientId();
 			ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
@@ -264,9 +280,29 @@ public final class MqttServer {
 			}
 			int subMqttQoS = subscribe.getMqttQoS();
 			MqttQoS mqttQoS = qos.value() > subMqttQoS ? MqttQoS.valueOf(subMqttQoS) : qos;
-			publish(context, clientId, topic, payload, mqttQoS, retain);
+			publish(context, clientId, topic, payload, mqttQoS, false);
 		}
 		return true;
+	}
+
+	/**
+	 * 存储保留消息
+	 *
+	 * @param topic   topic
+	 * @param mqttQoS MqttQoS
+	 * @param payload ByteBuffer
+	 */
+	private void saveRetainMessage(String topic, MqttQoS mqttQoS, ByteBuffer payload) {
+		Message retainMessage = new Message();
+		retainMessage.setTopic(topic);
+		retainMessage.setQos(mqttQoS.value());
+		retainMessage.setPayload(payload);
+		retainMessage.setMessageType(MessageType.DOWN_STREAM);
+		retainMessage.setRetain(true);
+		retainMessage.setDup(false);
+		retainMessage.setTimestamp(System.currentTimeMillis());
+		retainMessage.setNode(serverCreator.getNodeName());
+		this.messageStore.addRetainMessage(topic, retainMessage);
 	}
 
 	/**

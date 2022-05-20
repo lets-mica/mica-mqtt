@@ -1,6 +1,37 @@
 # 变更记录
 
 ## 发行版本
+### v1.3.2 - 2022-05-09
+- :sparkles: mica-mqtt topic 匹配完善。
+- :sparkles: mica-mqtt 订阅、发布时添加 topicFilter、topicName 校验。
+
+### v1.3.1 - 2022-05-08
+- :sparkles: mica-mqtt-broker 默认开启 http 和 basic auth。
+- :sparkles: mica-mqtt server 添加服务端共享订阅接口，方便开源之夏学生参与。
+- :sparkles: mica-mqtt server 添加 IMqttSessionListener。
+- :sparkles: mica-mqtt server publish 保留消息存储。
+- :sparkles: mica-mqtt server 统一 http 响应模型、优化 http 请求判断。
+- :sparkles: mica-mqtt server 优化 MqttHttpRoutes，添加获取所有路由的方法。
+- :sparkles: mica-mqtt server 完善 Result 和 http api。
+- :sparkles: mica-mqtt server http api 添加 endpoints 列表接口。
+- :sparkles: mica-mqtt client 添加同步连接 connectSync 方法。
+- :sparkles: mica-mqtt client 优化 bean 依赖，减少循环依赖可能性。
+- :bug: 重构 mqtt topic 匹配规则，提升性能减少内存占用，修复 gitee #I56BTC
+- :arrow_up: spring boot、mica 版本升级
+
+### v1.3.0 - 2022-04-17
+- :sparkles: mica-mqtt mqtt-server 简化，默认多设备可以直接互相订阅和处理消息。
+- :sparkles: mica-mqtt server、client 添加 `tioConfigCustomize` 方法，方便更大程度的自定义 TioConfig。
+- :sparkles: 拆分 mica-mqtt-client-spring-boot-starter 和 mica-mqtt-server-spring-boot-starter gitee #I4OTC5
+- :sparkles: mica-mqtt-client-spring-boot-example 添加重连动态更新 clientId、username、password 示例。
+- :sparkles: mica-mqtt server 添加根据踢出指定 clientId 的 http api 接口。
+- :sparkles: mica-mqtt server IMqttConnectStatusListener api 调整，添加用户名字段。
+- :sparkles: mica-mqtt server IMqttMessageListener 不再强制要求实现。
+- :sparkles: 使用 netty IntObjectHashMap 优化默认 session 存储。
+- :sparkles: 添加 github action，用于自动构建开发阶段的 SNAPSHOT 版本。
+- :sparkles: 示例项目拆分到 example 目录，mica-mqtt client、server starter 拆分到 starter 目录。
+- :arrow_up: 依赖升级.
+
 ### v1.2.10 - 2022-03-20
 - :sparkles: mica-mqtt server 添加 MQTT 客户端 keepalive 系数 `keepalive-backoff`。
 - :sparkles: mica-mqtt client、server 调整发布的日志级别为 debug。

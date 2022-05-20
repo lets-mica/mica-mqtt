@@ -269,12 +269,11 @@ public class MqttWebServer {
 
 	private void init(MqttServerCreator serverCreator, IWsMsgHandler wsMsgHandler,
 					  SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
-		HttpConfig httpConfig = new HttpConfig(serverCreator.getWebPort(), false);
-		httpConfig.setBindIp(serverCreator.getIp());
-		httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
-		httpConfig.setCheckHost(false);
-		httpConfig.setMonitorFileChange(false);
-		this.httpConfig = httpConfig;
+		this.httpConfig = new HttpConfig(serverCreator.getWebPort(), false);
+		this.httpConfig.setBindIp(serverCreator.getIp());
+		this.httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
+		this.httpConfig.setCheckHost(false);
+		this.httpConfig.setMonitorFileChange(false);
 		this.httpConfig.setHttpRequestHandler(this.httpRequestHandler);
 		this.mqttWebServerAioHandler = new MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
 		this.serverTioConfig = new TioServerConfig(this.httpConfig.getName(), mqttWebServerAioHandler, this.serverAioListener, tioExecutor, groupExecutor);
@@ -309,7 +308,7 @@ public class MqttWebServer {
 				System.setProperty(TIO_SYSTEM_TIMER_PERIOD, "50");
 			}
 			// 1.2 http 路由配置
-			MqttHttpApi httpApi = new MqttHttpApi(serverCreator.getMessageDispatcher());
+			MqttHttpApi httpApi = new MqttHttpApi(serverCreator);
 			httpApi.register();
 			// 1.3 认证配置
 			String username = serverCreator.getHttpBasicUsername();

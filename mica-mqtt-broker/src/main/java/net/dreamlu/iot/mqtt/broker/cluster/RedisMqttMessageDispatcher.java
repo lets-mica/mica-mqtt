@@ -16,12 +16,9 @@
 
 package net.dreamlu.iot.mqtt.broker.cluster;
 
-import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
-import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.RedisSerializer;
@@ -34,37 +31,24 @@ import java.util.Objects;
  * @author L.cm
  */
 public class RedisMqttMessageDispatcher implements IMqttMessageDispatcher {
-	private final IMqttMessageService messageService;
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final IMessageSerializer messageSerializer;
 	private final byte[] channelBytes;
 
-	public RedisMqttMessageDispatcher(IMqttMessageService messageService,
-									  MicaRedisCache redisCache,
+	public RedisMqttMessageDispatcher(RedisTemplate<String, Object> redisTemplate,
 									  IMessageSerializer messageSerializer,
 									  String channel) {
-		this.messageService = messageService;
-		this.redisTemplate = redisCache.getRedisTemplate();
+		this.redisTemplate = redisTemplate;
 		this.messageSerializer = messageSerializer;
 		this.channelBytes = RedisSerializer.string().serialize(Objects.requireNonNull(channel, "Redis pub/sub channel is null."));
 	}
 
 	@Override
 	public boolean send(Message message) {
-		MessageType messageType = message.getMessageType();
-		// 上行消息先处理业务
-		if (MessageType.UP_STREAM == messageType) {
-			messageService.publishProcessing(message);
-		}
 		// 手动序列化和反序列化，避免 redis 序列化不一致问题
 		final byte[] messageBytes = messageSerializer.serialize(message);
 		redisTemplate.execute((RedisCallback<Long>) connection -> connection.publish(channelBytes, messageBytes));
 		return true;
 	}
 
-	@Override
-	public boolean send(String clientId, Message message) {
-		message.setClientId(clientId);
-		return send(message);
-	}
 }

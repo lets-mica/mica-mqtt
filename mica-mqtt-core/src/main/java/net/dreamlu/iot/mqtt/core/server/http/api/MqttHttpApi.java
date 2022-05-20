@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server.http.api;
 
 import com.alibaba.fastjson.JSON;
+import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
@@ -26,7 +27,10 @@ import net.dreamlu.iot.mqtt.core.server.http.api.form.SubscribeForm;
 import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
+import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.http.common.Method;
@@ -44,9 +48,23 @@ import java.util.function.Function;
  */
 public class MqttHttpApi {
 	private final IMqttMessageDispatcher messageDispatcher;
+	private final IMqttSessionManager sessionManager;
 
-	public MqttHttpApi(IMqttMessageDispatcher messageDispatcher) {
-		this.messageDispatcher = messageDispatcher;
+	public MqttHttpApi(MqttServerCreator serverCreator) {
+		this.messageDispatcher = serverCreator.getMessageDispatcher();
+		this.sessionManager = serverCreator.getSessionManager();
+	}
+
+	/**
+	 * 获取 api 列表
+	 * <p>
+	 * GET /api/v1/endpoints
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse endpoints(HttpRequest request) {
+		return Result.ok(request, MqttHttpRoutes.getRouts().keySet());
 	}
 
 	/**
@@ -62,17 +80,16 @@ public class MqttHttpApi {
 		PublishForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, PublishForm.class)
 		);
-		HttpResponse response = new HttpResponse();
 		if (form == null) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, response);
+		HttpResponse validResponse = validForm(false, form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
 		sendPublish(form);
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -88,14 +105,13 @@ public class MqttHttpApi {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, PublishForm.class);
 		});
-		HttpResponse response = new HttpResponse();
 		if (formList == null || formList.isEmpty()) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (PublishForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, response);
+			HttpResponse validResponse = validForm(false, form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
@@ -104,7 +120,7 @@ public class MqttHttpApi {
 		for (PublishForm form : formList) {
 			sendPublish(form);
 		}
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	private void sendPublish(PublishForm form) {
@@ -135,22 +151,21 @@ public class MqttHttpApi {
 		SubscribeForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, SubscribeForm.class)
 		);
-		HttpResponse response = new HttpResponse();
 		if (form == null) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, response);
+		HttpResponse validResponse = validForm(true, form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
 		int qos = form.getQos();
 		if (qos < 0 || qos > 2) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 		sendSubOrUnSubscribe(form);
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -166,20 +181,19 @@ public class MqttHttpApi {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, SubscribeForm.class);
 		});
-		HttpResponse response = new HttpResponse();
 		if (formList == null || formList.isEmpty()) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (SubscribeForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, response);
+			HttpResponse validResponse = validForm(true, form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
 			int qos = form.getQos();
 			if (qos < 0 || qos > 2) {
-				return Result.fail(response, ResultCode.E101);
+				return Result.fail(request, ResultCode.E101);
 			}
 		}
 		// 批量处理
@@ -187,7 +201,7 @@ public class MqttHttpApi {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 			sendSubOrUnSubscribe(form);
 		}
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -202,18 +216,17 @@ public class MqttHttpApi {
 		BaseForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, BaseForm.class)
 		);
-		HttpResponse response = new HttpResponse();
 		if (form == null) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 表单校验
-		HttpResponse validResponse = validForm(form, response);
+		HttpResponse validResponse = validForm(true, form, request);
 		if (validResponse != null) {
 			return validResponse;
 		}
 		// 接口手动取消的订阅关系，可用来调试，不建议其他场景使用
 		sendSubOrUnSubscribe(form);
-		return Result.ok(response);
+		return Result.ok(request);
 	}
 
 	/**
@@ -229,14 +242,13 @@ public class MqttHttpApi {
 			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
 			return JSON.parseArray(jsonBody, BaseForm.class);
 		});
-		HttpResponse response = new HttpResponse();
 		if (formList == null || formList.isEmpty()) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		// 参数校验，保证一个批次同时不成功，所以先校验
 		for (BaseForm form : formList) {
 			// 表单校验
-			HttpResponse validResponse = validForm(form, response);
+			HttpResponse validResponse = validForm(true, form, request);
 			if (validResponse != null) {
 				return validResponse;
 			}
@@ -246,7 +258,42 @@ public class MqttHttpApi {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 			sendSubOrUnSubscribe(form);
 		}
-		return Result.ok(response);
+		return Result.ok(request);
+	}
+
+	/**
+	 * 踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
+	 * <p>
+	 * POST /api/v1/clients/delete
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse deleteClients(HttpRequest request) {
+		String clientId = request.getParam("clientId");
+		if (StrUtil.isBlank(clientId)) {
+			return Result.fail(request, ResultCode.E101);
+		}
+		Message message = new Message();
+		message.setClientId(clientId);
+		message.setMessageType(MessageType.DISCONNECT);
+		messageDispatcher.send(message);
+		return Result.ok(request);
+	}
+
+	/**
+	 * 获取客户端订阅情况
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse getClientSubscriptions(HttpRequest request) {
+		String clientId = request.getParam("clientId");
+		if (StrUtil.isBlank(clientId)) {
+			return Result.fail(request, ResultCode.E101);
+		}
+		List<Subscribe> subscribeList = sessionManager.getSubscriptions(clientId);
+		return Result.ok(new HttpResponse(request), subscribeList);
 	}
 
 	private void sendSubOrUnSubscribe(BaseForm form) {
@@ -281,19 +328,29 @@ public class MqttHttpApi {
 	/**
 	 * 校验表单
 	 *
-	 * @param form     BaseForm
-	 * @param response HttpResponse
+	 * @param isTopicFilter isTopicFilter
+	 * @param form          BaseForm
+	 * @param request       HttpRequest
 	 * @return 表单
 	 */
-	private static HttpResponse validForm(BaseForm form, HttpResponse response) {
+	private static HttpResponse validForm(boolean isTopicFilter, BaseForm form, HttpRequest request) {
 		// 必须的参数
 		String clientId = form.getClientId();
 		if (StrUtil.isBlank(clientId)) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
 		}
 		String topic = form.getTopic();
 		if (StrUtil.isBlank(topic)) {
-			return Result.fail(response, ResultCode.E101);
+			return Result.fail(request, ResultCode.E101);
+		}
+		try {
+			if (isTopicFilter) {
+				TopicUtil.validateTopicFilter(topic);
+			} else {
+				TopicUtil.validateTopicName(topic);
+			}
+		} catch (IllegalArgumentException exception) {
+			return Result.fail(request, ResultCode.E102);
 		}
 		return null;
 	}
@@ -303,12 +360,15 @@ public class MqttHttpApi {
 	 */
 	public void register() {
 		// @formatter:off
+		MqttHttpRoutes.register(Method.GET, "/api/v1/endpoints", this::endpoints);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/publish", this::publish);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/publish/batch", this::publishBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/subscribe", this::subscribe);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/subscribe/batch", this::subscribeBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe", this::unsubscribe);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe/batch", this::unsubscribeBatch);
+		MqttHttpRoutes.register(Method.POST, "/api/v1/clients/delete", this::deleteClients);
+		MqttHttpRoutes.register(Method.GET, "/api/v1/client/subscriptions", this::getClientSubscriptions);
 		// @formatter:on
 	}
 

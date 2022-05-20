@@ -47,7 +47,6 @@ public final class MqttClientCreator {
 	 * 默认的心跳超时
 	 */
 	public static final int DEFAULT_KEEP_ALIVE_SECS = 60;
-
 	/**
 	 * 名称
 	 */
@@ -168,6 +167,10 @@ public final class MqttClientCreator {
 	 * scheduledExecutor
 	 */
 	private ScheduledThreadPoolExecutor scheduledExecutor;
+	/**
+	 * TioConfig 自定义配置
+	 */
+	private Consumer<TioConfig> tioConfigCustomize;
 
 	public String getName() {
 		return name;
@@ -440,10 +443,14 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClient connect() {
-		// 1. 生成 默认的 clientId
-		String clientId = getClientId();
-		if (StrUtil.isBlank(clientId)) {
+	public MqttClientCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
+		this.tioConfigCustomize = tioConfigCustomize;
+		return this;
+	}
+
+	private MqttClient build() {
+		// 1. clientId 为空，生成默认的 clientId
+		if (StrUtil.isBlank(this.clientId)) {
 			// 默认为：MICA-MQTT- 前缀和 36进制的纳秒数
 			this.clientId("MICA-MQTT-" + Long.toString(System.nanoTime(), 36));
 		}
@@ -487,7 +494,11 @@ public final class MqttClientCreator {
 		tioConfig.setSslConfig(this.sslConfig);
 		// 10. 是否开启监控
 		tioConfig.statOn = this.statEnable;
-		// 11. tioClient
+		// 11. 自定义处理
+		if (this.tioConfigCustomize != null) {
+			this.tioConfigCustomize.accept(tioConfig);
+		}
+		// 12. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
 			tioClient.asynConnect(new Node(this.ip, this.port), this.timeout);
@@ -495,6 +506,24 @@ public final class MqttClientCreator {
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
 		}
+	}
+
+	/**
+	 * 默认异步连接
+	 *
+	 * @return TioClient
+	 */
+	public MqttClient connect() {
+		return this.build().connect();
+	}
+
+	/**
+	 * 同步连接
+	 *
+	 * @return TioClient
+	 */
+	public MqttClient connectSync() {
+		return this.build().connectSync();
 	}
 
 }

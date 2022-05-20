@@ -18,13 +18,13 @@
 - 而每当有订阅者建立订阅时，服务端就会查找是否存在匹配该订阅的保留消息，如果保留消息存在，就会立即转发给订阅者。
 - 借助保留消息，新的订阅者能够立即获取最近的状态。
 
-### mica-mqtt 多个客户端直接交互
+### 共享订阅
+mica-mqtt client 支持两种**共享订阅**方式：
 
-- A APP 端订阅 `/a/door/open`，
-- B web 网页端 mqtt.js 订阅 `/a/door/open`，
-- Mqtt 服务端实现 `IMqttMessageListener`，将消息转交给 `AbstractMqttMessageDispatcher`（自定义实现）处理。
-- C 发布 `/a/door/open`
-- 结果：A 和 B 将收到 C 发布的消息，并完成相应的效果展示。
+1. 共享订阅：订阅前缀 `$queue/`，多个客户端订阅了 `$queue/topic`，发布者发布到topic，则只有一个客户端会接收到消息。
+2. 分组订阅：订阅前缀 `$share/<group>/`，组客户端订阅了`$queue/group1/topic`、`$queue/group2/topic`..，发布者发布到topic，则消息会发布到每个group中，但是每个group中只有一个客户端会接收到消息。
+
+**注意：** mica-mqtt server 暂时还不支持共享订阅。
 
 ## 客户端使用
 ```java

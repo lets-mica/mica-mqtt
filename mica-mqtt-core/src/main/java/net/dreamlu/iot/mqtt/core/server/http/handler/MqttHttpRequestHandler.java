@@ -20,7 +20,10 @@ import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import net.dreamlu.iot.mqtt.core.server.http.api.result.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.http.common.*;
+import org.tio.http.common.HttpConfig;
+import org.tio.http.common.HttpRequest;
+import org.tio.http.common.HttpResponse;
+import org.tio.http.common.RequestLine;
 import org.tio.http.common.handler.HttpRequestHandler;
 
 import java.util.List;
@@ -41,25 +44,22 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 		try {
 			for (HttpFilter filter : httpFilters) {
 				if (!filter.filter(request)) {
-					HttpResponse response = new HttpResponse(request);
-					return filter.response(request, response);
+					return filter.response(request);
 				}
 			}
 		} catch (Exception e) {
 			return resp500(request, requestLine, e);
 		}
 		// 2. 路由处理
-		HandlerInfo handler = MqttHttpRoutes.getHandler(requestLine);
+		HttpHandler handler = MqttHttpRoutes.getHandler(requestLine);
 		if (handler == null) {
 			return resp404(request, requestLine);
 		}
-		Method method = requestLine.getMethod();
-		if (handler.getMethod() != method) {
-			return Result.fail(new HttpResponse(request), ResultCode.E104);
+		if (logger.isInfoEnabled()) {
+			logger.info("mqtt http api {} path:{}", requestLine.method, requestLine.getPathAndQuery());
 		}
-		logger.info("mqtt http api {} path:{}", method.name(), requestLine.getPathAndQuery());
 		try {
-			return handler.getHandler().apply(request);
+			return handler.apply(request);
 		} catch (Exception e) {
 			return resp500(request, requestLine, e);
 		}
@@ -67,17 +67,18 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 
 	@Override
 	public HttpResponse resp404(HttpRequest request, RequestLine requestLine) {
-		logger.error("mqtt http {} path:{} 404", requestLine.getMethod().name(), requestLine.getPathAndQuery());
-		HttpResponse response = new HttpResponse(request);
-		response.setStatus(HttpResponseStatus.C404);
-		return response;
+		if (logger.isErrorEnabled()) {
+			logger.error("mqtt http {} path:{} 404", requestLine.getMethod().name(), requestLine.getPathAndQuery());
+		}
+		return Result.fail(request, ResultCode.E404);
 	}
 
 	@Override
 	public HttpResponse resp500(HttpRequest request, RequestLine requestLine, Throwable throwable) {
-		logger.error("mqtt http {} path:{} error", requestLine.getMethod().name(), requestLine.getPathAndQuery(), throwable);
-		HttpResponse response = new HttpResponse(request);
-		return Result.fail(response, ResultCode.E105);
+		if (logger.isErrorEnabled()) {
+			logger.error("mqtt http {} path:{} error", requestLine.getMethod().name(), requestLine.getPathAndQuery(), throwable);
+		}
+		return Result.fail(request, ResultCode.E105);
 	}
 
 	@Override
@@ -87,7 +88,7 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 
 	@Override
 	public void clearStaticResCache() {
-
+		// ignore
 	}
 
 }

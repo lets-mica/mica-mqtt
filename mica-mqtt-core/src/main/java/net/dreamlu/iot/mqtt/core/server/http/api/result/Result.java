@@ -20,6 +20,7 @@ import com.alibaba.fastjson.JSONObject;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
 import org.tio.http.common.HeaderName;
 import org.tio.http.common.HeaderValue;
+import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 
 import java.nio.charset.Charset;
@@ -37,6 +38,15 @@ public final class Result {
 	/**
 	 * 响应成功
 	 *
+	 * @return HttpResponse
+	 */
+	public static HttpResponse ok() {
+		return ok(new HttpResponse());
+	}
+
+	/**
+	 * 响应成功
+	 *
 	 * @param response HttpResponse
 	 * @return HttpResponse
 	 */
@@ -45,6 +55,27 @@ public final class Result {
 		JSONObject json = new JSONObject();
 		json.put("code", resultCode.getResultCode());
 		return result(response, resultCode, json);
+	}
+
+	/**
+	 * 响应成功
+	 *
+	 * @param data Object
+	 * @return HttpResponse
+	 */
+	public static HttpResponse ok(Object data) {
+		return ok(new HttpResponse(), data);
+	}
+
+	/**
+	 * 响应成功
+	 *
+	 * @param request HttpRequest
+	 * @param data    Object
+	 * @return HttpResponse
+	 */
+	public static HttpResponse ok(HttpRequest request, Object data) {
+		return ok(new HttpResponse(request), data);
 	}
 
 	/**
@@ -60,6 +91,27 @@ public final class Result {
 		json.put("code", resultCode.getResultCode());
 		json.put("data", data);
 		return result(response, resultCode, json);
+	}
+
+	/**
+	 * 响应失败
+	 *
+	 * @param resultCode ResultCode
+	 * @return HttpResponse
+	 */
+	public static HttpResponse fail(ResultCode resultCode) {
+		return fail(new HttpResponse(), resultCode);
+	}
+
+	/**
+	 * 响应失败
+	 *
+	 * @param request    HttpRequest
+	 * @param resultCode ResultCode
+	 * @return HttpResponse
+	 */
+	public static HttpResponse fail(HttpRequest request, ResultCode resultCode) {
+		return fail(new HttpResponse(request), resultCode);
 	}
 
 	/**

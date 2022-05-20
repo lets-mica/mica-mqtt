@@ -18,9 +18,8 @@ package net.dreamlu.iot.mqtt.broker.config;
 
 import net.dreamlu.iot.mqtt.broker.cluster.*;
 import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
-import net.dreamlu.iot.mqtt.broker.service.IMqttMessageService;
+import net.dreamlu.iot.mqtt.broker.listener.RedisMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
-import net.dreamlu.iot.mqtt.core.server.broker.MqttBrokerMessageListener;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.serializer.DefaultMessageSerializer;
@@ -30,6 +29,7 @@ import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * mica mqtt broker 配置
@@ -57,35 +57,29 @@ public class MqttBrokerConfiguration {
 	}
 
 	@Bean
-	public RedisMqttMessageExchangeReceiver mqttMessageUpReceiver(MicaRedisCache redisCache,
+	public RedisMqttMessageExchangeReceiver mqttMessageUpReceiver(RedisTemplate<String, Object> redisTemplate,
 																  IMessageSerializer messageSerializer,
 																  MqttServer mqttServer) {
-		return new RedisMqttMessageExchangeReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey(), mqttServer);
+		return new RedisMqttMessageExchangeReceiver(redisTemplate, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey(), mqttServer);
 	}
 
 	@Bean
-	public RedisMqttMessageDownReceiver mqttMessageDownReceiver(MicaRedisCache redisCache,
+	public RedisMqttMessageDownReceiver mqttMessageDownReceiver(RedisTemplate<String, Object> redisTemplate,
 																IMessageSerializer messageSerializer,
 																MqttServer mqttServer) {
-		return new RedisMqttMessageDownReceiver(redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_DOWN.getKey(), mqttServer);
+		return new RedisMqttMessageDownReceiver(redisTemplate, messageSerializer, RedisKeys.REDIS_CHANNEL_DOWN.getKey(), mqttServer);
 	}
 
 	@Bean
-	public IMqttMessageDispatcher mqttMessageDispatcher(IMqttMessageService messageService,
-														MicaRedisCache redisCache,
+	public IMqttMessageDispatcher mqttMessageDispatcher(RedisTemplate<String, Object> redisTemplate,
 														IMessageSerializer messageSerializer) {
-		return new RedisMqttMessageDispatcher(messageService, redisCache, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey());
+		return new RedisMqttMessageDispatcher(redisTemplate, messageSerializer, RedisKeys.REDIS_CHANNEL_EXCHANGE.getKey());
 	}
 
 	@Bean
-	public MqttBrokerMessageListener brokerMessageListener(IMqttMessageDispatcher mqttMessageDispatcher) {
-		return new MqttBrokerMessageListener(mqttMessageDispatcher);
-	}
-
-	@Bean
-	public RedisMqttServerManage mqttServerManage(MicaRedisCache redisCache,
+	public RedisMqttServerManage mqttServerManage(RedisTemplate<String, Object> redisTemplate,
 												  MqttServer mqttServer) {
-		return new RedisMqttServerManage(redisCache, mqttServer);
+		return new RedisMqttServerManage(redisTemplate, mqttServer);
 	}
 
 }

@@ -40,9 +40,9 @@ public class MqttHttpAuthFilter implements HttpFilter, InitializingBean {
 	}
 
 	@Override
-	public HttpResponse response(HttpRequest request, HttpResponse response) {
+	public HttpResponse response(HttpRequest request) {
 		// 认证不通过时的响应
-		return Result.fail(response, ResultCode.E103);
+		return Result.fail(request, ResultCode.E103);
 	}
 
 	@Override
