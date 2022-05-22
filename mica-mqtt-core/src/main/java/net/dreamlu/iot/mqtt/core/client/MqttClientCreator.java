@@ -515,7 +515,7 @@ public final class MqttClientCreator {
 	 * @return TioClient
 	 */
 	public MqttClient connect() {
-		return this.build().connect();
+		return this.build().start(false);
 	}
 
 	/**
@@ -524,7 +524,7 @@ public final class MqttClientCreator {
 	 * @return TioClient
 	 */
 	public MqttClient connectSync() {
-		return this.build().connectSync();
+		return this.build().start(true);
 	}
 
 }

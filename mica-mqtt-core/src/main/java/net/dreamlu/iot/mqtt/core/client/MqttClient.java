@@ -402,28 +402,20 @@ public final class MqttClient {
 	 *
 	 * @return TioClient
 	 */
-	MqttClient connect() {
+	MqttClient start(boolean sync) {
+		// 1. 启动 ack service
+		ackService.start();
+		// 2. 启动 tio
 		Node node = new Node(config.getIp(), config.getPort());
 		try {
-			this.tioClient.asynConnect(node, config.getTimeout());
+			if (sync) {
+				this.tioClient.connect(node, config.getTimeout());
+			} else {
+				this.tioClient.asynConnect(node, config.getTimeout());
+			}
 			return this;
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client async start fail.", e);
-		}
-	}
-
-	/**
-	 * 同步连接
-	 *
-	 * @return TioClient
-	 */
-	MqttClient connectSync() {
-		Node node = new Node(config.getIp(), config.getPort());
-		try {
-			this.tioClient.connect(node, config.getTimeout());
-			return this;
-		} catch (Exception e) {
-			throw new IllegalStateException("Mica mqtt client sync start fail.", e);
 		}
 	}
 

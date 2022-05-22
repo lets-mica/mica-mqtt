@@ -330,13 +330,15 @@ public final class MqttServer {
 	 * @return 是否启动
 	 */
 	public boolean start() {
-		// 1. 启动 mqtt tcp
+		// 1. 启动 ack service
+		ackService.start();
+		// 2. 启动 mqtt tcp
 		try {
 			tioServer.start(this.serverCreator.getIp(), this.serverCreator.getPort());
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
 		}
-		// 2. 启动 mqtt web
+		// 3. 启动 mqtt web
 		if (webServer != null) {
 			try {
 				webServer.start();
