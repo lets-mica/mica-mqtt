@@ -34,6 +34,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.server.ServerTioConfig;
 import org.tio.server.TioServer;
+import org.tio.utils.hutool.StrUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -283,6 +284,23 @@ public final class MqttServer {
 			publish(context, clientId, topic, payload, mqttQoS, false);
 		}
 		return true;
+	}
+
+	/**
+	 * 发送消息到客户端
+	 *
+	 * @param topic   topic
+	 * @param message Message
+	 */
+	public boolean sendToClient(String topic, Message message) {
+		// 客户端id
+		String clientId = message.getClientId();
+		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
+		if (StrUtil.isBlank(clientId)) {
+			return publishAll(topic, message.getPayload(), mqttQoS, message.isRetain());
+		} else {
+			return publish(clientId, topic, message.getPayload(), mqttQoS, message.isRetain());
+		}
 	}
 
 	/**

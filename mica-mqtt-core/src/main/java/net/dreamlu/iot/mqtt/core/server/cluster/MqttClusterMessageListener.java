@@ -16,14 +16,12 @@
 
 package net.dreamlu.iot.mqtt.core.server.cluster;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
-import org.tio.utils.hutool.StrUtil;
 
 /**
  * mqtt 集群消息处理
@@ -76,33 +74,16 @@ public class MqttClusterMessageListener {
 			}
 		} else if (MessageType.UP_STREAM == messageType) {
 			// mqtt 上行消息，需要发送到对应的监听的客户端
-			sendToClient(topic, message);
+			mqttServer.sendToClient(topic, message);
 		} else if (MessageType.DOWN_STREAM == messageType) {
 			// http rest api 下行消息也会转发到此
-			sendToClient(topic, message);
+			mqttServer.sendToClient(topic, message);
 		} else if (MessageType.DISCONNECT == messageType) {
 			String clientId = message.getClientId();
 			ChannelContext context = mqttServer.getChannelContext(clientId);
 			if (context != null) {
 				Tio.remove(context, "Mqtt server delete clients:" + clientId);
 			}
-		}
-	}
-
-	/**
-	 * 发送消息到客户端
-	 *
-	 * @param topic   topic
-	 * @param message Message
-	 */
-	private void sendToClient(String topic, Message message) {
-		// 客户端id
-		String clientId = message.getClientId();
-		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
-		if (StrUtil.isBlank(clientId)) {
-			mqttServer.publishAll(topic, message.getPayload(), mqttQoS, message.isRetain());
-		} else {
-			mqttServer.publish(clientId, topic, message.getPayload(), mqttQoS, message.isRetain());
 		}
 	}
 

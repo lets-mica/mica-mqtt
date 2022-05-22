@@ -16,14 +16,12 @@
 
 package net.dreamlu.iot.mqtt.core.server.dispatcher;
 
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
-import org.tio.utils.hutool.StrUtil;
 
 import java.util.Objects;
 
@@ -58,9 +56,9 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 		} else if (MessageType.UNSUBSCRIBE == messageType) {
 			sessionManager.removeSubscribe(message.getTopic(), message.getFromClientId());
 		} else if (MessageType.UP_STREAM == messageType) {
-			sendToClient(message.getTopic(), message);
+			mqttServer.sendToClient(message.getTopic(), message);
 		} else if (MessageType.DOWN_STREAM == messageType) {
-			sendToClient(message.getTopic(), message);
+			mqttServer.sendToClient(message.getTopic(), message);
 		} else if (MessageType.DISCONNECT == messageType) {
 			String clientId = message.getClientId();
 			ChannelContext context = mqttServer.getChannelContext(clientId);
@@ -70,23 +68,6 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 		}
 		sendAll(message);
 		return true;
-	}
-
-	/**
-	 * 发送消息到客户端
-	 *
-	 * @param topic   topic
-	 * @param message Message
-	 */
-	private void sendToClient(String topic, Message message) {
-		// 客户端id
-		String clientId = message.getClientId();
-		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
-		if (StrUtil.isBlank(clientId)) {
-			mqttServer.publishAll(topic, message.getPayload(), mqttQoS, message.isRetain());
-		} else {
-			mqttServer.publish(clientId, topic, message.getPayload(), mqttQoS, message.isRetain());
-		}
 	}
 
 }
