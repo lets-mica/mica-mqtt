@@ -29,7 +29,7 @@ import org.tio.core.DefaultAioListener;
 import org.tio.core.intf.Packet;
 import org.tio.utils.hutool.StrUtil;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * mqtt 服务监听
@@ -42,9 +42,9 @@ public class MqttServerAioListener extends DefaultAioListener {
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
-	private final ScheduledThreadPoolExecutor executor;
+	private final ThreadPoolExecutor executor;
 
-	public MqttServerAioListener(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
+	public MqttServerAioListener(MqttServerCreator serverCreator, ThreadPoolExecutor executor) {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();

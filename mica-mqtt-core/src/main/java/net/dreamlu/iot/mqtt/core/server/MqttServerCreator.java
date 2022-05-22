@@ -37,6 +37,8 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerUniqueIdServiceImpl;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
+import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.TioConfig;
@@ -48,11 +50,11 @@ import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
 import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -193,14 +195,6 @@ public class MqttServerCreator {
 	 * TioConfig 自定义配置
 	 */
 	private Consumer<TioConfig> tioConfigCustomize;
-	/**
-	 * qos 1~2 重试间隔
-	 */
-	private int messageRetryIntervalSecs;
-	/**
-	 * qos 1~2 重试次数
-	 */
-	private int messageRetryCount;
 
 	public String getName() {
 		return name;
@@ -508,24 +502,6 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public int getMessageRetryIntervalSecs() {
-		return messageRetryIntervalSecs;
-	}
-
-	public MqttServerCreator messageRetryIntervalSecs(int messageRetryIntervalSecs) {
-		this.messageRetryIntervalSecs = messageRetryIntervalSecs;
-		return this;
-	}
-
-	public int getMessageRetryCount() {
-		return messageRetryCount;
-	}
-
-	public MqttServerCreator messageRetryCount(int messageRetryCount) {
-		this.messageRetryCount = messageRetryCount;
-		return this;
-	}
-
 	public MqttServer build() {
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
@@ -549,14 +525,18 @@ public class MqttServerCreator {
 		if (this.connectStatusListener == null) {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(Threads.MAX_POOL_SIZE_FOR_TIO, DefaultThreadFactory.getInstance("MqttServer"));
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, executor);
+		// 默认的线程池
+		SynThreadPoolExecutor tioExecutor = Threads.getTioExecutor();
+		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
+		// AckService
+		AckService ackService = new DefaultAckService();
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, groupExecutor);
 		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		ServerAioListener listener = new MqttServerAioListener(this, executor);
+		ServerAioListener listener = new MqttServerAioListener(this, groupExecutor);
 		// 3. t-io 配置
-		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
+		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener, tioExecutor, groupExecutor);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);
 		tioConfig.setUseQueueSend(this.useQueueSend);
 		// 4. mqtt 消息最大长度
@@ -592,7 +572,7 @@ public class MqttServerCreator {
 			webServer = null;
 		}
 		// MqttServer
-		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, executor);
+		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, ackService);
 		// 9. 如果是默认的消息转发器，设置 mqttServer
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
 			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);

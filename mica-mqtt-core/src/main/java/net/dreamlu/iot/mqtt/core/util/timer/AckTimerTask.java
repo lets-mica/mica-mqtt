@@ -46,10 +46,6 @@ public class AckTimerTask extends TimerTask {
 	 * 当前自行的次数，默认从第二次开始，因为进重试前已经执行过一次。
 	 */
 	private int count = 1;
-	/**
-	 * 标记是否 ack 成功，已经成功的不再执行
-	 */
-	private volatile boolean ack = false;
 
 	public AckTimerTask(Timer timer, Runnable command, int maxRetryCount, int retryIntervalSecs) {
 		super(TimeUnit.SECONDS.toMillis(retryIntervalSecs));
@@ -60,7 +56,7 @@ public class AckTimerTask extends TimerTask {
 
 	@Override
 	public void run() {
-		if (++count <= maxRetryCount + 1 && !ack) {
+		if (++count <= maxRetryCount + 1) {
 			try {
 				log.info("Mqtt ack task retry running.");
 				command.run();
@@ -69,13 +65,6 @@ public class AckTimerTask extends TimerTask {
 				log.error("Mqtt ack task error ", e);
 			}
 		}
-	}
-
-	/**
-	 * ack 成功
-	 */
-	public void ack() {
-		this.ack = true;
 	}
 
 }

@@ -27,6 +27,7 @@ import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.util.TopicUtil;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -37,7 +38,6 @@ import org.tio.server.TioServer;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 服务端
@@ -51,18 +51,18 @@ public final class MqttServer {
 	private final MqttServerCreator serverCreator;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageStore messageStore;
-	private final ScheduledThreadPoolExecutor executor;
+	private final AckService ackService;
 
 	MqttServer(TioServer tioServer,
 			   MqttWebServer webServer,
 			   MqttServerCreator serverCreator,
-			   ScheduledThreadPoolExecutor executor) {
+			   AckService ackService) {
 		this.tioServer = tioServer;
 		this.webServer = webServer;
 		this.serverCreator = serverCreator;
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageStore = serverCreator.getMessageStore();
-		this.executor = executor;
+		this.ackService = ackService;
 	}
 
 	public static MqttServerCreator create() {
@@ -206,7 +206,7 @@ public final class MqttServer {
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			sessionManager.addPendingPublish(clientId, messageId, pendingPublish);
-			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
+			pendingPublish.startPublishRetransmissionTimer(ackService, msg -> Tio.send(context, msg));
 		}
 		return result;
 	}
@@ -364,7 +364,7 @@ public final class MqttServer {
 		} catch (Throwable e) {
 			logger.error("MqttServer stop session clean error.", e);
 		}
-		this.executor.shutdown();
+		this.ackService.stop();
 		return result;
 	}
 

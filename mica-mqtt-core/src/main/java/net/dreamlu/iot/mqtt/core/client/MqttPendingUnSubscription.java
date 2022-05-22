@@ -3,10 +3,10 @@ package net.dreamlu.iot.mqtt.core.client;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.MqttUnsubscribeMessage;
 import net.dreamlu.iot.mqtt.core.common.RetryProcessor;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -25,10 +25,10 @@ final class MqttPendingUnSubscription {
 		return topics;
 	}
 
-	protected void startRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
+	protected void startRetransmissionTimer(AckService ackService, Consumer<MqttMessage> sendPacket) {
 		this.retryProcessor.setHandle((fixedHeader, originalMessage) ->
 			sendPacket.accept(new MqttUnsubscribeMessage(fixedHeader, originalMessage.variableHeader(), originalMessage.payload())));
-		this.retryProcessor.start(executor);
+		this.retryProcessor.start(ackService);
 	}
 
 	protected void onUnSubAckReceived() {

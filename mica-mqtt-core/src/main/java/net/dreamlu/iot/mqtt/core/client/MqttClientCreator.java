@@ -21,6 +21,8 @@ import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
+import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
@@ -29,10 +31,8 @@ import org.tio.client.intf.ClientAioListener;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -164,9 +164,9 @@ public final class MqttClientCreator {
 	 */
 	private ThreadPoolExecutor groupExecutor;
 	/**
-	 * scheduledExecutor
+	 * ackService
 	 */
-	private ScheduledThreadPoolExecutor scheduledExecutor;
+	private AckService ackService;
 	/**
 	 * TioConfig 自定义配置
 	 */
@@ -284,8 +284,8 @@ public final class MqttClientCreator {
 		return groupExecutor;
 	}
 
-	public ScheduledThreadPoolExecutor getScheduledExecutor() {
-		return scheduledExecutor;
+	public AckService getAckService() {
+		return ackService;
 	}
 
 	public MqttClientCreator name(String name) {
@@ -438,8 +438,8 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClientCreator scheduledExecutor(ScheduledThreadPoolExecutor scheduledExecutor) {
-		this.scheduledExecutor = scheduledExecutor;
+	public MqttClientCreator ackService(AckService ackService) {
+		this.ackService = ackService;
 		return this;
 	}
 
@@ -470,9 +470,9 @@ public final class MqttClientCreator {
 		if (this.groupExecutor == null) {
 			this.groupExecutor = ThreadUtil.getGroupExecutor(2);
 		}
-		// scheduledExecutor
-		if (this.scheduledExecutor == null) {
-			this.scheduledExecutor = new ScheduledThreadPoolExecutor(2, DefaultThreadFactory.getInstance("MqttClient"));
+		// ackService
+		if (this.ackService == null) {
+			this.ackService = new DefaultAckService();
 		}
 		IMqttClientProcessor processor = new DefaultMqttClientProcessor(this);
 		// 4. 初始化 mqtt 处理器
@@ -501,7 +501,9 @@ public final class MqttClientCreator {
 		// 12. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
-			return new MqttClient(tioClient, this, this.scheduledExecutor);
+			// 启动 ack service
+			this.ackService.start();
+			return new MqttClient(tioClient, this);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
 		}

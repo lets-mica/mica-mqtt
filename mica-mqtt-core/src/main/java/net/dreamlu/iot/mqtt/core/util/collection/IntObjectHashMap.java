@@ -17,14 +17,7 @@ package net.dreamlu.iot.mqtt.core.util.collection;
 
 import net.dreamlu.iot.mqtt.core.util.MathUtil;
 
-import java.util.AbstractCollection;
-import java.util.AbstractSet;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A hash map implementation of {@link IntObjectMap} that uses open addressing for keys.
