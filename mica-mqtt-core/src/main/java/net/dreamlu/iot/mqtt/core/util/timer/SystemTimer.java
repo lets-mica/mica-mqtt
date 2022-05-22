@@ -59,7 +59,7 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 	private final ReentrantReadWriteLock.WriteLock writeLock = readWriteLock.writeLock();
 
 	public SystemTimer() {
-		this("SystemTimer");
+		this("SystemTimerExecutor");
 	}
 
 	public SystemTimer(String executeName) {
@@ -72,7 +72,7 @@ public class SystemTimer implements Timer, Function<TimerTaskEntry, Void> {
 
 	public SystemTimer(long tickMs, int wheelSize, long startMs, String executeName) {
 		taskExecutor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-			new LinkedBlockingQueue<>(Integer.MAX_VALUE), r -> new Thread(r, "SystemTimerExecutor" + executeName));
+			new LinkedBlockingQueue<>(Integer.MAX_VALUE), r -> new Thread(r, executeName));
 		timingWheel = new TimingWheel(tickMs, wheelSize, startMs, taskCounter, delayQueue);
 	}
 
