@@ -26,7 +26,7 @@ public class DefaultAckService implements AckService {
 	private final TimingWheelThread timingWheelThread;
 
 	public DefaultAckService() {
-		this(new SystemTimer());
+		this(new SystemTimer(1000L, 60, "AckServiceExecutor"));
 	}
 
 	public DefaultAckService(SystemTimer systemTimer) {
