@@ -1,7 +1,10 @@
 package net.dreamlu.iot.mqtt.core.timer;
 
+import net.dreamlu.iot.mqtt.core.util.timer.AckTimerTask;
 import net.dreamlu.iot.mqtt.core.util.timer.SystemTimer;
 import net.dreamlu.iot.mqtt.core.util.timer.TimingWheelThread;
+
+import java.util.concurrent.TimeUnit;
 
 public class SystemTimerTest {
 
@@ -12,12 +15,11 @@ public class SystemTimerTest {
 		timingWheelThread.start();
 
 		System.out.println(System.currentTimeMillis());
-		systemTimer.add(new DelayedOperation(5000));
-		systemTimer.add(new DelayedOperation(7000));
-		systemTimer.add(new DelayedOperation(10000));
-		systemTimer.add(new DelayedOperation(14000));
+		systemTimer.add(new AckTimerTask(systemTimer, () -> {
+			System.out.println("hello!");
+		}, 5, 5));
 		System.out.println(System.nanoTime());
 
-		Thread.sleep(100000L);
+		TimeUnit.MINUTES.sleep(10L);
 	}
 }
