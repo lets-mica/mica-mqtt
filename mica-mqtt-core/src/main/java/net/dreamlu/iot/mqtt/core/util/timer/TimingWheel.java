@@ -148,6 +148,9 @@ public class TimingWheel {
 
 	/**
 	 * 添加任务到时间轮
+	 *
+	 * @param timerTaskEntry TimerTaskEntry
+	 * @return 是否成功
 	 */
 	public boolean add(TimerTaskEntry timerTaskEntry) {
 		long expiration = timerTaskEntry.getExpirationMs();
@@ -183,6 +186,8 @@ public class TimingWheel {
 
 	/**
 	 * 推进时间
+	 *
+	 * @param timeMs ms
 	 */
 	public void advanceClock(Long timeMs) {
 		if (timeMs >= currentTime + tickMs) {

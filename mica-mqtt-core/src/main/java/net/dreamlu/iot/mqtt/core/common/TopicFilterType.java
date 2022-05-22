@@ -96,6 +96,7 @@ public enum TopicFilterType {
 	/**
 	 * 读取共享订阅的分组名
 	 *
+	 * @param topicFilter topicFilter
 	 * @return 共享订阅分组名
 	 */
 	public static String getShareGroupName(String topicFilter) {

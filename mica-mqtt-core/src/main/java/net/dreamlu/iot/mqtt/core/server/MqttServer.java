@@ -291,6 +291,8 @@ public final class MqttServer {
 	 *
 	 * @param topic   topic
 	 * @param message Message
+	 *
+	 * @return 是否成功
 	 */
 	public boolean sendToClient(String topic, Message message) {
 		// 客户端id

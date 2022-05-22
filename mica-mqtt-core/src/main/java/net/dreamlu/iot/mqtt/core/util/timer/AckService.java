@@ -29,6 +29,7 @@ public interface AckService {
 	 * @param command           command
 	 * @param maxRetryCount     最大重试次数
 	 * @param retryIntervalSecs 重试间隔
+	 * @return AckTimerTask
 	 */
 	AckTimerTask addTask(Runnable command, int maxRetryCount, int retryIntervalSecs);
 
