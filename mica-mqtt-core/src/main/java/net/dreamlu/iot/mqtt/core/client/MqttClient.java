@@ -469,11 +469,14 @@ public final class MqttClient {
 	 * @return 是否停止成功
 	 */
 	public boolean stop() {
-		// 先断开连接
+		// 1. 先停止 ack 服务
+		this.ackService.stop();
+		// 2. 断开连接
 		this.disconnect();
+		// 3. 停止 tio
 		boolean result = tioClient.stop();
 		logger.info("MqttClient stop result:{}", result);
-		this.ackService.stop();
+		// 4. 清理 session
 		this.clientSession.clean();
 		return result;
 	}

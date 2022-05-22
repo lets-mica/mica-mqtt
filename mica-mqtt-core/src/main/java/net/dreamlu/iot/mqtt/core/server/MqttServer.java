@@ -353,6 +353,9 @@ public final class MqttServer {
 	 * @return 是否停止
 	 */
 	public boolean stop() {
+		// 先停止 ack 服务
+		this.ackService.stop();
+		// 再停止服务
 		boolean result = this.tioServer.stop();
 		logger.info("Mqtt tcp server stop result:{}", result);
 		if (webServer != null) {
@@ -364,7 +367,6 @@ public final class MqttServer {
 		} catch (Throwable e) {
 			logger.error("MqttServer stop session clean error.", e);
 		}
-		this.ackService.stop();
 		return result;
 	}
 
