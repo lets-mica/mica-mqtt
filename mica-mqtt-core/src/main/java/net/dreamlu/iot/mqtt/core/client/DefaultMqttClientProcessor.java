@@ -53,7 +53,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		this.connectListener = mqttClientCreator.getConnectListener();
 		this.messageIdGenerator = mqttClientCreator.getMessageIdGenerator();
 		this.ackService = mqttClientCreator.getAckService();
-		this.executor = mqttClientCreator.getGroupExecutor();
+		this.executor = mqttClientCreator.getTioExecutor();
 	}
 
 	@Override
@@ -337,11 +337,13 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			subscriptionList.forEach(subscription -> {
 				IMqttClientMessageListener listener = subscription.getListener();
 				payload.rewind();
-				try {
-					listener.onMessage(topicName, payload);
-				} catch (Throwable e) {
-					logger.error(e.getMessage(), e);
-				}
+				executor.submit(() -> {
+					try {
+						listener.onMessage(topicName, payload);
+					} catch (Throwable e) {
+						logger.error(e.getMessage(), e);
+					}
+				});
 			});
 		}
 	}

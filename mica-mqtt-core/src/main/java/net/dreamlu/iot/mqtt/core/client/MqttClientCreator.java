@@ -464,7 +464,7 @@ public final class MqttClientCreator {
 		}
 		// tioExecutor
 		if (this.tioExecutor == null) {
-			this.tioExecutor = ThreadUtil.getTioExecutor(2);
+			this.tioExecutor = ThreadUtil.getTioExecutor(5);
 		}
 		// groupExecutor
 		if (this.groupExecutor == null) {

@@ -37,6 +37,7 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerUniqueIdServiceImpl;
+import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.slf4j.Logger;
@@ -50,7 +51,6 @@ import org.tio.server.intf.ServerAioHandler;
 import org.tio.server.intf.ServerAioListener;
 import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
-import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
@@ -525,18 +525,17 @@ public class MqttServerCreator {
 		if (this.connectStatusListener == null) {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
-		// 默认的线程池
-		SynThreadPoolExecutor tioExecutor = Threads.getTioExecutor();
+		// 业务线程池
+		ThreadPoolExecutor mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
 		// AckService
 		AckService ackService = new DefaultAckService();
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, tioExecutor);
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, mqttExecutor);
 		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		ServerAioListener listener = new MqttServerAioListener(this, tioExecutor);
+		ServerAioListener listener = new MqttServerAioListener(this, mqttExecutor);
 		// 3. t-io 配置
-		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
-		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener, tioExecutor, groupExecutor);
+		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);
 		tioConfig.setUseQueueSend(this.useQueueSend);
 		// 4. mqtt 消息最大长度
