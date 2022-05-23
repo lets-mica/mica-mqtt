@@ -20,7 +20,7 @@ import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import net.dreamlu.iot.mqtt.core.util.timer.AckService;
-import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
+import net.dreamlu.iot.mqtt.core.util.timer.EmptyAckService;
 import org.tio.core.Tio;
 import org.tio.utils.Threads;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
@@ -45,7 +45,7 @@ public class MqttBenchmark {
 		final List<MqttClient> clientList = new CopyOnWriteArrayList<>();
 		SynThreadPoolExecutor tioExecutor = Threads.getTioExecutor();
 		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
-		AckService ackService = new DefaultAckService();
+		AckService ackService = new EmptyAckService();
 		for (int i = 0; i < connCount; i++) {
 			int num = i;
 			groupExecutor.submit(() -> newClient(ip, num, clientList, tioExecutor, groupExecutor, ackService));

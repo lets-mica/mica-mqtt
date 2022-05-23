@@ -501,8 +501,6 @@ public final class MqttClientCreator {
 		// 12. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
-			// 启动 ack service
-			this.ackService.start();
 			return new MqttClient(tioClient, this);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
