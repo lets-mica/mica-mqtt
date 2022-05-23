@@ -527,15 +527,15 @@ public class MqttServerCreator {
 		}
 		// 默认的线程池
 		SynThreadPoolExecutor tioExecutor = Threads.getTioExecutor();
-		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
 		// AckService
 		AckService ackService = new DefaultAckService();
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, groupExecutor);
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, tioExecutor);
 		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		ServerAioListener listener = new MqttServerAioListener(this, groupExecutor);
+		ServerAioListener listener = new MqttServerAioListener(this, tioExecutor);
 		// 3. t-io 配置
+		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
 		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener, tioExecutor, groupExecutor);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);
 		tioConfig.setUseQueueSend(this.useQueueSend);

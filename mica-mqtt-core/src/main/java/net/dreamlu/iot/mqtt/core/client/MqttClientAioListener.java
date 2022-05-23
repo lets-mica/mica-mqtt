@@ -44,7 +44,7 @@ public class MqttClientAioListener extends DefaultClientAioListener {
 	public MqttClientAioListener(MqttClientCreator clientCreator) {
 		this.clientCreator = clientCreator;
 		this.connectListener = clientCreator.getConnectListener();
-		this.executor = clientCreator.getGroupExecutor();
+		this.executor = clientCreator.getTioExecutor();
 	}
 
 	@Override
