@@ -53,7 +53,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		this.connectListener = mqttClientCreator.getConnectListener();
 		this.messageIdGenerator = mqttClientCreator.getMessageIdGenerator();
 		this.ackService = mqttClientCreator.getAckService();
-		this.executor = mqttClientCreator.getTioExecutor();
+		this.executor = mqttClientCreator.getMqttExecutor();
 	}
 
 	@Override

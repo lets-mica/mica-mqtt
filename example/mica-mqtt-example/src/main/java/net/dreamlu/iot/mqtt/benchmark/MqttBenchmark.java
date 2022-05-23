@@ -79,6 +79,7 @@ public class MqttBenchmark {
 			.reconnect(false)
 			.tioExecutor(tioExecutor)
 			.groupExecutor(groupExecutor)
+			.mqttExecutor(tioExecutor)
 			.ackService(ackService)
 			.connect();
 		clientList.add(client);

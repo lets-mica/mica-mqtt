@@ -164,6 +164,10 @@ public final class MqttClientCreator {
 	 */
 	private ThreadPoolExecutor groupExecutor;
 	/**
+	 * mqttExecutor
+	 */
+	private ThreadPoolExecutor mqttExecutor;
+	/**
 	 * ackService
 	 */
 	private AckService ackService;
@@ -282,6 +286,10 @@ public final class MqttClientCreator {
 
 	public ThreadPoolExecutor getGroupExecutor() {
 		return groupExecutor;
+	}
+
+	public ThreadPoolExecutor getMqttExecutor() {
+		return mqttExecutor;
 	}
 
 	public AckService getAckService() {
@@ -438,6 +446,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator mqttExecutor(ThreadPoolExecutor mqttExecutor) {
+		this.mqttExecutor = mqttExecutor;
+		return this;
+	}
+
 	public MqttClientCreator ackService(AckService ackService) {
 		this.ackService = ackService;
 		return this;
@@ -464,11 +477,15 @@ public final class MqttClientCreator {
 		}
 		// tioExecutor
 		if (this.tioExecutor == null) {
-			this.tioExecutor = ThreadUtil.getTioExecutor(5);
+			this.tioExecutor = ThreadUtil.getTioExecutor(3);
 		}
 		// groupExecutor
 		if (this.groupExecutor == null) {
 			this.groupExecutor = ThreadUtil.getGroupExecutor(2);
+		}
+		// mqttExecutor
+		if (this.mqttExecutor == null) {
+			this.mqttExecutor = ThreadUtil.getMqttExecutor(2);
 		}
 		// ackService
 		if (this.ackService == null) {
