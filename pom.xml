@@ -23,7 +23,7 @@
         <spring.boot.version>2.6.7</spring.boot.version>
         <mica.version>2.6.7</mica.version>
         <mica.auto.version>2.2.2</mica.auto.version>
-        <fastjson.version>1.2.80</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <micrometer-core.version>1.8.5</micrometer-core.version>
         <lombok.version>1.18.24</lombok.version>
     </properties>
