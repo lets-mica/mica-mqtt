@@ -361,12 +361,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Tio.send(context, subAckMessage);
 		// 4. 发送保留消息
 		for (String topic : subscribedTopicList) {
-			List<Message> retainMessageList = messageStore.getRetainMessage(topic);
-			if (retainMessageList != null && !retainMessageList.isEmpty()) {
-				for (Message retainMessage : retainMessageList) {
-					messageDispatcher.send(clientId, retainMessage);
+			executor.submit(() -> {
+				List<Message> retainMessageList = messageStore.getRetainMessage(topic);
+				if (retainMessageList != null && !retainMessageList.isEmpty()) {
+					for (Message retainMessage : retainMessageList) {
+						messageDispatcher.send(clientId, retainMessage);
+					}
 				}
-			}
+			});
 		}
 	}
 
@@ -501,18 +503,22 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		message.setNode(serverCreator.getNodeName());
 		// 3. 消息发布
 		if (messageListener != null) {
+			executor.submit(() -> {
+				try {
+					messageListener.onMessage(context, clientId, message);
+				} catch (Throwable e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
+		}
+		// 4. 消息流转
+		executor.submit(() -> {
 			try {
-				messageListener.onMessage(context, clientId, message);
+				messageDispatcher.send(message);
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}
-		}
-		// 4. 消息流转
-		try {
-			messageDispatcher.send(message);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
+		});
 	}
 
 }
