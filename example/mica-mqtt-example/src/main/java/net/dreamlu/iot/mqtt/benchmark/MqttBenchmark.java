@@ -21,7 +21,10 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import net.dreamlu.iot.mqtt.core.util.timer.EmptyAckService;
+import org.tio.client.ClientChannelContext;
 import org.tio.core.Tio;
+import org.tio.core.stat.ChannelStat;
+import org.tio.utils.SystemTimer;
 import org.tio.utils.Threads;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
@@ -47,18 +50,23 @@ public class MqttBenchmark {
 		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
 		AckService ackService = new EmptyAckService();
 		for (int i = 0; i < connCount; i++) {
-			int num = i;
-			groupExecutor.submit(() -> newClient(ip, num, clientList, tioExecutor, groupExecutor, ackService));
+			newClient(ip, i, clientList, tioExecutor, groupExecutor, ackService);
 		}
 		// 自定义心跳
 		new Thread(() -> {
 			while (true) {
-				ThreadUtil.sleep(60 * 1000);
+				ThreadUtil.sleep(20 * 1000L);
+				long currTime = SystemTimer.currTime;
 				for (MqttClient client : clientList) {
-					if (client.isConnected()) {
-						Tio.send(client.getContext(), MqttMessage.PINGREQ);
-					} else {
-						client.reconnect();
+					ClientChannelContext context = client.getContext();
+					if (context == null || context.isClosed || context.isRemoved) {
+						continue;
+					}
+					ChannelStat stat = context.stat;
+					long compareTime = Math.max(stat.latestTimeOfReceivedByte, stat.latestTimeOfSentPacket);
+					long interval = currTime - compareTime;
+					if (interval >= 30) {
+						Tio.send(context, MqttMessage.PINGREQ);
 					}
 				}
 			}
