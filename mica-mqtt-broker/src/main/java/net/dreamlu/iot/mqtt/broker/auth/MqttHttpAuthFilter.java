@@ -26,7 +26,7 @@ import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 
 /**
- * 自定义 mqtt http 接口认证
+ * 自定义 mqtt http 接口认证，请按照自己的需求和业务进行扩展
  *
  * @author L.cm
  */
