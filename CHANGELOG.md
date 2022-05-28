@@ -2,9 +2,12 @@
 
 ## 发行版本
 ### v1.3.3 - 2022-05-28
+- :sparkles: mica-mqtt 优化线程池。
+- :sparkles: mica-mqtt 添加 Compression 压缩接口。
 - :sparkles: mica-mqtt 添加 kafka TimingWheel 重构 ack。
 - :sparkles: mica-mqtt server 添加 `MqttClusterMessageListener` 方便集群消息处理。
 - :sparkles: mica-mqtt client 优化客户端取消订阅逻辑，gitee #I5779A 感谢 `@杨钊` 同学反馈。
+- :arrow_up: 升级 fastjson 到 1.2.83。
 
 ### v1.3.2 - 2022-05-09
 - :sparkles: mica-mqtt topic 匹配完善。
