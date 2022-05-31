@@ -40,7 +40,8 @@ public interface IMqttConnectStatusListener {
 	 * @param context  ChannelContext
 	 * @param clientId clientId
 	 * @param username username
+	 * @param reason   reason
 	 */
-	void offline(ChannelContext context, String clientId, String username);
+	void offline(ChannelContext context, String clientId, String username, String reason);
 
 }
