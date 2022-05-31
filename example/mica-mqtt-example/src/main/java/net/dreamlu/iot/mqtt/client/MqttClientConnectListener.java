@@ -27,7 +27,7 @@ import org.tio.core.ChannelContext;
  * @author L.cm
  */
 public class MqttClientConnectListener implements IMqttClientConnectListener {
-	private static final Logger logger = LoggerFactory.getLogger(MqttClientTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(MqttClientConnectListener.class);
 
 	@Override
 	public void onConnected(ChannelContext context, boolean isReconnect) {
