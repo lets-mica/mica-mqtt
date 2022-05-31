@@ -31,12 +31,12 @@ public class MqttConnectStatusListener implements IMqttConnectStatusListener {
 
 	@Override
 	public void online(ChannelContext context, String clientId, String username) {
-		logger.info("Mqtt clientId:{} username:{} online...", clientId, username);
+		logger.info("Mqtt clientId:{} username:{} online.", clientId, username);
 	}
 
 	@Override
-	public void offline(ChannelContext context, String clientId, String username) {
-		logger.info("Mqtt clientId:{} username:{} offline...", clientId, username);
+	public void offline(ChannelContext context, String clientId, String username, String reason) {
+		logger.info("Mqtt clientId:{} username:{} offline reason:{}.", clientId, username, reason);
 	}
 
 }

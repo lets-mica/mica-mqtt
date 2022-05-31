@@ -43,7 +43,7 @@ public class RedisMqttConnectStatusListener implements IMqttConnectStatusListene
 	}
 
 	@Override
-	public void offline(ChannelContext context, String clientId, String username) {
+	public void offline(ChannelContext context, String clientId, String username, String reason) {
 		redisCache.sRem(getRedisKey(), clientId);
 	}
 
