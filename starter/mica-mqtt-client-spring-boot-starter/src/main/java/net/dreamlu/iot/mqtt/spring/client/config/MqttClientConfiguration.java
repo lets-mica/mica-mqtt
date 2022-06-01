@@ -14,16 +14,22 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.spring.client;
+package net.dreamlu.iot.mqtt.spring.client.config;
 
 import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientSession;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import net.dreamlu.iot.mqtt.spring.client.MqttClientCustomizer;
+import net.dreamlu.iot.mqtt.spring.client.MqttClientSubscribeDetector;
+import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
+import net.dreamlu.iot.mqtt.spring.client.event.SpringEventMqttClientConnectListener;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
@@ -44,6 +50,12 @@ import java.nio.charset.StandardCharsets;
 )
 @EnableConfigurationProperties(MqttClientProperties.class)
 public class MqttClientConfiguration {
+
+	@Bean
+	@ConditionalOnMissingBean
+	public IMqttClientConnectListener springEventMqttClientConnectListener(ApplicationEventPublisher eventPublisher) {
+		return new SpringEventMqttClientConnectListener(eventPublisher);
+	}
 
 	@Bean
 	public MqttClientCreator mqttClientCreator(MqttClientProperties properties,

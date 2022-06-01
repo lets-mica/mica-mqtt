@@ -14,33 +14,35 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.core.client;
+package net.dreamlu.iot.mqtt.spring.server.event;
 
-import org.tio.core.ChannelContext;
+import lombok.Data;
+
+import java.io.Serializable;
 
 /**
- * mqtt 客户端连接监听
+ * 客户端断开原因
  *
  * @author L.cm
  */
-public interface IMqttClientConnectListener {
+@Data
+public class MqttClientOfflineEvent implements Serializable {
 
 	/**
-	 * 监听到消息
-	 *
-	 * @param context     ChannelContext
-	 * @param isReconnect 是否重连
+	 * 客户端 Id
 	 */
-	void onConnected(ChannelContext context, boolean isReconnect);
-
+	private String clientId;
 	/**
-	 * 连接关闭前触发本方法
-	 *
-	 * @param context   the ChannelContext
-	 * @param throwable the throwable 有可能为空
-	 * @param remark    the remark 有可能为空
-	 * @param isRemove  is removed
+	 * 用户名
 	 */
-	void onDisconnect(ChannelContext context, Throwable throwable, String remark, boolean isRemove);
+	private String username;
+	/**
+	 * 断开原因
+	 */
+	private String reason;
+	/**
+	 * 时间戳
+	 */
+	private long ts;
 
 }
