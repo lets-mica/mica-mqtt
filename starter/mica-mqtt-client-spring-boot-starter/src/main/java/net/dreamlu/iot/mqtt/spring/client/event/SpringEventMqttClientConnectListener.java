@@ -44,12 +44,15 @@ public class SpringEventMqttClientConnectListener implements IMqttClientConnectL
 
 	@Override
 	public void onDisconnect(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+		String reason;
 		if (throwable == null) {
+			reason = remark;
 			log.info("mqtt 链接断开 remark:{} isRemove:{}", remark, isRemove);
 		} else {
+			reason = remark + " Exception:" + throwable.getMessage();
 			log.error("mqtt 链接断开 remark:{} isRemove:{}", remark, isRemove, throwable);
 		}
-		eventPublisher.publishEvent(new MqttDisconnectEvent(throwable, remark, isRemove));
+		eventPublisher.publishEvent(new MqttDisconnectEvent(reason, isRemove));
 	}
 
 }

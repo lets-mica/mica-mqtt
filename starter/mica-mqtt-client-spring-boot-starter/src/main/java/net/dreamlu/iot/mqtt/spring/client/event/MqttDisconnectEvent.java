@@ -33,13 +33,9 @@ import java.io.Serializable;
 public class MqttDisconnectEvent implements Serializable {
 
 	/**
-	 * 异常信息
-	 */
-	Throwable throwable;
-	/**
 	 * 断开原因
 	 */
-	String remark;
+	String reason;
 	/**
 	 * 是否删除连接
 	 */
