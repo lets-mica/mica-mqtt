@@ -59,11 +59,45 @@ mqtt:
 
 ### 2.3 可实现接口（注册成 Spring Bean 即可）
 
-| 接口                           | 是否必须       | 说明                        |
-| ---------------------------   | -------------- | ------------------------- |
-| IMqttClientConnectListener    | 是             | 客户端连接成功监听            |
+| 接口                           | 是否必须 | 说明                        |
+| ---------------------------   |------| ------------------------- |
+| IMqttClientConnectListener    | 否    | 客户端连接成功监听            |
 
-### 2.4 自定义 java 配置（可选）
+### 2.7 客户端上下线监听
+使用 Spring event 解耦客户端上下线监听，注意： `1.3.4` 开始支持。会跟自定义的 `IMqttClientConnectListener` 实现冲突，取一即可。
+
+```java
+/**
+ * 示例：客户端连接状态监听
+ *
+ * @author L.cm
+ */
+@Service
+public class MqttClientConnectListener {
+    private static final Logger logger = LoggerFactory.getLogger(MqttClientConnectListener.class);
+
+    @Autowired
+    private MqttClientCreator mqttClientCreator;
+
+    @EventListener
+    public void onConnected(MqttConnectedEvent event) {
+        logger.info("MqttConnectedEvent:{}", event);
+    }
+
+    @EventListener
+    public void onDisconnect(MqttDisconnectEvent event) {
+        // 离线时更新重连时的密码，适用于类似阿里云 mqtt clientId 连接带时间戳的方式 
+        logger.info("MqttDisconnectEvent:{}", event);
+        // 在断线时更新 clientId、username、password
+        mqttClientCreator.clientId("newClient" + System.currentTimeMillis())
+            .username("newUserName")
+            .password("newPassword");
+    }
+
+}
+```
+
+### 2.5 自定义 java 配置（可选）
 
 ```java
 @Configuration(proxyBeanMethods = false)
@@ -83,7 +117,7 @@ public class MqttClientCustomizerConfiguration {
 }
 ```
 
-### 2.5 订阅示例
+### 2.6 订阅示例
 ```java
 @Service
 public class MqttClientSubscribeListener {
@@ -102,13 +136,13 @@ public class MqttClientSubscribeListener {
 }
 ```
 
-### 2.6 共享订阅 topic 说明
+### 2.7 共享订阅 topic 说明
 mica-mqtt client 支持**两种共享订阅**方式：
 
 1. 共享订阅：订阅前缀 `$queue/`，多个客户端订阅了 `$queue/topic`，发布者发布到topic，则只有一个客户端会接收到消息。
 2. 分组订阅：订阅前缀 `$share/<group>/`，组客户端订阅了`$queue/group1/topic`、`$queue/group2/topic`..，发布者发布到topic，则消息会发布到每个group中，但是每个group中只有一个客户端会接收到消息。
 
-### 2.7 MqttClientTemplate 使用示例
+### 2.8 MqttClientTemplate 使用示例
 ```java
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;

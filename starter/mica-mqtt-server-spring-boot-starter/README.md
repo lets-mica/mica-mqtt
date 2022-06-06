@@ -134,14 +134,32 @@ public class ServerService {
 }
 ```
 
-### 2.7 基于 mq 消息广播集群处理
+### 2.7 客户端上下线监听
+使用 Spring event 解耦客户端上下线监听，注意： `1.3.4` 开始支持。会跟自定义的 `IMqttConnectStatusListener` 实现冲突，取一即可。
 
-- 实现 `IMqttConnectStatusListener` 处理设备状态存储。
-- 实现 `IMqttMessageStore` 存储遗嘱和保留消息。
-- 实现 `AbstractMqttMessageDispatcher` 将消息发往 mq，mq 再广播回 mqtt 集群，mqtt 将消息发送到设备。
-- 业务消息发送到 mq，mq 广播到 mqtt 集群，mqtt 将消息发送到设备。
+```java
+@Service
+public class MqttConnectStatusListener {
+	private static final Logger logger = LoggerFactory.getLogger(MqttConnectStatusListener.class);
 
-### 2.8 Prometheus + Grafana 监控对接
+	@EventListener
+	public void online(MqttClientOnlineEvent event) {
+		logger.info("MqttClientOnlineEvent:{}", event);
+	}
+
+	@EventListener
+	public void offline(MqttClientOfflineEvent event) {
+		logger.info("MqttClientOfflineEvent:{}", event);
+	}
+
+}
+```
+
+### 2.8 基于 mq 消息广播集群处理
+
+详见: [mica-mqtt-broker](../../mica-mqtt-broker)
+
+### 2.9 Prometheus + Grafana 监控对接
 ```xml
 <!-- 开启 prometheus 指标收集 -->
 <dependency>
