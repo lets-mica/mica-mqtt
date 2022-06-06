@@ -1,7 +1,7 @@
 # 变更记录
 
 ## 发行版本
-### v1.3.4 - 2022-06-12
+### v1.3.4 - 2022-06-06
 - :sparkles: mica-mqtt starter 使用 Spring event 解耦 mqtt client 断连事件。
 - :sparkles: mica-mqtt server `IMqttConnectStatusListener#offline` 方法添加 `reason` 断开原因字段。
 - :sparkles: 添加赞助计划。**捐助共勉，让你我走的更远！！！**
