@@ -58,8 +58,6 @@ public final class MqttClient {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.clientTioConfig = tioClient.getTioClientConfig();
-		this.executor = executor;
-		this.clientTioConfig = tioClient.getClientTioConfig();
 		this.ackService = config.getAckService();
 		this.clientSession = config.getClientSession();
 		this.messageIdGenerator = config.getMessageIdGenerator();

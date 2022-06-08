@@ -42,6 +42,7 @@ import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tio.client.intf.TioClientListener;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
@@ -529,11 +530,11 @@ public class MqttServerCreator {
 		ThreadPoolExecutor mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
 		// AckService
 		AckService ackService = new DefaultAckService();
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, mqttExecutor);
+		MqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, mqttExecutor);
 		// 1. 处理消息
 		TioServerHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		ServerAioListener listener = new MqttServerAioListener(this, mqttExecutor);
+		TioServerListener listener = new MqttServerAioListener(this, mqttExecutor);
 		// 3. t-io 配置
 		TioServerConfig tioConfig = new TioServerConfig(this.name, handler, listener);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);

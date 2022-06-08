@@ -23,13 +23,11 @@ import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
-import org.tio.client.ClientTioConfig;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 import org.tio.client.intf.TioClientHandler;
 import org.tio.client.intf.TioClientListener;
-import org.tio.core.Node;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
@@ -520,7 +518,7 @@ public final class MqttClientCreator {
 		// 12. tioClient
 		try {
 			TioClient tioClient = new TioClient(tioConfig);
-			return new MqttClient(tioClient, this, this.scheduledExecutor);
+			return new MqttClient(tioClient, this);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);
 		}
