@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import org.tio.core.ChannelContext;
 
 /**
- * mqtt tcp websocket 认证
+ * 示例 mqtt tcp、websocket 认证，请按照自己的需求和业务进行扩展
  *
  * @author L.cm
  */

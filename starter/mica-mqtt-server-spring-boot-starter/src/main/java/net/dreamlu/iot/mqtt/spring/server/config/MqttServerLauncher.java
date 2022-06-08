@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.spring.server;
+package net.dreamlu.iot.mqtt.spring.server.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

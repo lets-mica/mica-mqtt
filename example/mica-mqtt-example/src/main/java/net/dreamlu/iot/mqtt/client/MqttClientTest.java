@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.client;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,13 +58,18 @@ public class MqttClientTest {
 			})
 			.connect();
 
-		client.subQos0("/test/#", (topic, payload) -> {
-			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
-		});
+		client.subQos0("/test/123", new IMqttClientMessageListener() {
+			@Override
+			public void onSubscribed(String topicFilter, MqttQoS mqttQoS) {
+				// 订阅成功之后触发，可在此处做一些业务逻辑
+				logger.info("topicFilter:{} MqttQoS:{} 订阅成功！！！", topicFilter, mqttQoS);
+			}
 
-//		client.subQos0("/#", (topic, payload) -> {
-//			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
-//		});
+			@Override
+			public void onMessage(String topic, ByteBuffer payload) {
+				logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
+			}
+		});
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {

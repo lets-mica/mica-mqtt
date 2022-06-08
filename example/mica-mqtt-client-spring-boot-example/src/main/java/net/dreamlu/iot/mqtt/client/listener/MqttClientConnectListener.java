@@ -16,13 +16,14 @@
 
 package net.dreamlu.iot.mqtt.client.listener;
 
-import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import net.dreamlu.iot.mqtt.spring.client.event.MqttConnectedEvent;
+import net.dreamlu.iot.mqtt.spring.client.event.MqttDisconnectEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.tio.core.ChannelContext;
 
 /**
  * 客户端连接状态监听
@@ -30,24 +31,20 @@ import org.tio.core.ChannelContext;
  * @author L.cm
  */
 @Service
-public class MqttClientConnectListener implements IMqttClientConnectListener {
+public class MqttClientConnectListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientConnectListener.class);
 
 	@Autowired
 	private MqttClientCreator mqttClientCreator;
 
-	@Override
-	public void onConnected(ChannelContext context, boolean isReconnect) {
-		if (isReconnect) {
-			logger.info("重连 mqtt 服务器重连成功...");
-		} else {
-			logger.info("连接 mqtt 服务器成功...");
-		}
+	@EventListener
+	public void onConnected(MqttConnectedEvent event) {
+		logger.info("MqttConnectedEvent:{}", event);
 	}
 
-	@Override
-	public void onDisconnect(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
-		logger.error("mqtt 链接断开 remark:{} isRemove:{}", remark, isRemove, throwable);
+	@EventListener
+	public void onDisconnect(MqttDisconnectEvent event) {
+		logger.info("MqttDisconnectEvent:{}", event);
 		// 在断线时更新 clientId、username、password
 		mqttClientCreator.clientId("newClient" + System.currentTimeMillis())
 			.username("newUserName")

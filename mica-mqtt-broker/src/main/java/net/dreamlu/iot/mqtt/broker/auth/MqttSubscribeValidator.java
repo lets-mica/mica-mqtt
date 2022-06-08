@@ -22,7 +22,7 @@ import org.springframework.context.annotation.Configuration;
 import org.tio.core.ChannelContext;
 
 /**
- * 订阅校验
+ * 订阅校验，请按照自己的需求和业务进行扩展
  *
  * @author L.cm
  */

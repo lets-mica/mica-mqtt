@@ -1,6 +1,20 @@
 # 变更记录
 
 ## 发行版本
+### v1.3.4 - 2022-06-06
+- :sparkles: mica-mqtt starter 使用 Spring event 解耦 mqtt client 断连事件。
+- :sparkles: mica-mqtt server `IMqttConnectStatusListener#offline` 方法添加 `reason` 断开原因字段。
+- :sparkles: 添加赞助计划。**捐助共勉，让你我走的更远！！！**
+- :bug: 修复 http api 响应问题。
+
+### v1.3.3 - 2022-05-28
+- :sparkles: mica-mqtt 优化线程池。
+- :sparkles: mica-mqtt 添加 Compression 压缩接口。
+- :sparkles: mica-mqtt 添加 kafka TimingWheel 重构 ack。
+- :sparkles: mica-mqtt server 添加 `MqttClusterMessageListener` 方便集群消息处理。
+- :sparkles: mica-mqtt client 优化客户端取消订阅逻辑，gitee #I5779A 感谢 `@杨钊` 同学反馈。
+- :arrow_up: 升级 fastjson 到 1.2.83。
+
 ### v1.3.2 - 2022-05-09
 - :sparkles: mica-mqtt topic 匹配完善。
 - :sparkles: mica-mqtt 订阅、发布时添加 topicFilter、topicName 校验。

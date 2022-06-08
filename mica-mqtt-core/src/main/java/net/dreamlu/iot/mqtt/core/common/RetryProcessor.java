@@ -3,11 +3,10 @@ package net.dreamlu.iot.mqtt.core.common;
 
 import net.dreamlu.iot.mqtt.codec.MqttFixedHeader;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
+import net.dreamlu.iot.mqtt.core.util.timer.AckTimerTask;
 
 import java.util.Objects;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.BiConsumer;
 
 /**
@@ -17,30 +16,26 @@ import java.util.function.BiConsumer;
  */
 public final class RetryProcessor<T extends MqttMessage> {
 
-	private ScheduledFuture<?> timer;
-	private int timeout = 10;
+	private AckTimerTask ackTimerTask;
 	private BiConsumer<MqttFixedHeader, T> handler;
 	private T originalMessage;
 
-	public void start(ScheduledThreadPoolExecutor executor) {
-		Objects.requireNonNull(executor, "RetryProcessor executor is null.");
+	public void start(AckService ackService) {
+		Objects.requireNonNull(ackService, "RetryProcessor ackService is null.");
 		Objects.requireNonNull(this.handler, "RetryProcessor handler is null.");
-		this.timeout = 10;
-		this.startTimer(executor);
+		this.startTimer(ackService);
 	}
 
-	private void startTimer(ScheduledThreadPoolExecutor executor) {
-		this.timer = executor.schedule(() -> {
-			this.timeout += 5;
+	private void startTimer(AckService ackService) {
+		this.ackTimerTask = ackService.addTask(() -> {
 			MqttFixedHeader fixedHeader = new MqttFixedHeader(this.originalMessage.fixedHeader().messageType(), true, this.originalMessage.fixedHeader().qosLevel(), this.originalMessage.fixedHeader().isRetain(), this.originalMessage.fixedHeader().remainingLength());
 			handler.accept(fixedHeader, originalMessage);
-			startTimer(executor);
-		}, timeout, TimeUnit.SECONDS);
+		}, 5, 10);
 	}
 
 	public void stop() {
-		if (this.timer != null) {
-			this.timer.cancel(true);
+		if (this.ackTimerTask != null) {
+			this.ackTimerTask.cancel();
 		}
 	}
 

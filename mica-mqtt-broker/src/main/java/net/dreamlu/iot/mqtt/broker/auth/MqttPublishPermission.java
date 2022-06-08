@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 import org.tio.core.ChannelContext;
 
 /**
- * mqtt 服务端校验客户端是否有发布权限
+ * mqtt 服务端校验客户端是否有发布权限，请按照自己的需求和业务进行扩展
  *
  * @author L.cm
  */

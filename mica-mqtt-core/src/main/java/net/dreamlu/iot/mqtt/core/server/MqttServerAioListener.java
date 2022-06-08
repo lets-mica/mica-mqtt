@@ -29,7 +29,7 @@ import org.tio.core.intf.Packet;
 import org.tio.server.DefaultTioServerListener;
 import org.tio.utils.hutool.StrUtil;
 
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * mqtt 服务监听
@@ -42,9 +42,9 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
-	private final ScheduledThreadPoolExecutor executor;
+	private final ThreadPoolExecutor executor;
 
-	public MqttServerAioListener(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
+	public MqttServerAioListener(MqttServerCreator serverCreator, ThreadPoolExecutor executor) {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
@@ -89,7 +89,8 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		context.remove(MqttConst.DIS_CONNECTED);
 		// 7. 下线事件
 		String username = (String) context.get(MqttConst.USER_NAME_KEY);
-		notify(context, clientId, username);
+		context.remove(MqttConst.USER_NAME_KEY);
+		notify(context, clientId, username, remark);
 	}
 
 	private void sendWillMessage(String clientId) {
@@ -116,10 +117,10 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		}
 	}
 
-	private void notify(ChannelContext context, String clientId, String username) {
+	private void notify(ChannelContext context, String clientId, String username, String remark) {
 		executor.execute(() -> {
 			try {
-				connectStatusListener.offline(context, clientId, username);
+				connectStatusListener.offline(context, clientId, username, remark);
 			} catch (Throwable throwable) {
 				logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
 			}

@@ -22,7 +22,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 
 /**
- * mqtt tcp websocket 认证
+ * mqtt tcp、websocket 认证，请按照自己的需求和业务进行扩展
  *
  * @author L.cm
  */

@@ -37,6 +37,9 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerUniqueIdServiceImpl;
+import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
+import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.TioConfig;
@@ -48,11 +51,10 @@ import org.tio.server.intf.TioServerHandler;
 import org.tio.server.intf.TioServerListener;
 import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -523,12 +525,15 @@ public class MqttServerCreator {
 		if (this.connectStatusListener == null) {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
-		ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(Threads.MAX_POOL_SIZE_FOR_TIO, DefaultThreadFactory.getInstance("MqttServer"));
-		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, executor);
+		// 业务线程池
+		ThreadPoolExecutor mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
+		// AckService
+		AckService ackService = new DefaultAckService();
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, mqttExecutor);
 		// 1. 处理消息
 		TioServerHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		TioServerListener listener = new MqttServerAioListener(this, executor);
+		ServerAioListener listener = new MqttServerAioListener(this, mqttExecutor);
 		// 3. t-io 配置
 		TioServerConfig tioConfig = new TioServerConfig(this.name, handler, listener);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);
@@ -566,7 +571,7 @@ public class MqttServerCreator {
 			webServer = null;
 		}
 		// MqttServer
-		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, executor);
+		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, ackService);
 		// 9. 如果是默认的消息转发器，设置 mqttServer
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
 			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);

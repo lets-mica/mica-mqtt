@@ -20,6 +20,7 @@ import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 import net.dreamlu.iot.mqtt.core.util.CollUtil;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -29,7 +30,7 @@ import org.tio.core.Tio;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 
 /**
@@ -43,14 +44,16 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private final IMqttClientSession clientSession;
 	private final IMqttClientConnectListener connectListener;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
-	private final ScheduledThreadPoolExecutor executor;
+	private final AckService ackService;
+	private final ThreadPoolExecutor executor;
 
 	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator) {
 		this.reSubscribeBatchSize = mqttClientCreator.getReSubscribeBatchSize();
 		this.clientSession = mqttClientCreator.getClientSession();
 		this.connectListener = mqttClientCreator.getConnectListener();
 		this.messageIdGenerator = mqttClientCreator.getMessageIdGenerator();
-		this.executor = mqttClientCreator.getScheduledExecutor();
+		this.ackService = mqttClientCreator.getAckService();
+		this.executor = mqttClientCreator.getMqttExecutor();
 	}
 
 	@Override
@@ -151,7 +154,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(reSubscriptionList, message);
 		Boolean result = Tio.send(context, message);
 		logger.info("MQTT subscriptionList:{} messageId:{} resubscribing result:{}", reSubscriptionList, messageId, result);
-		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(context, msg));
+		pendingSubscription.startRetransmitTimer(ackService, (msg) -> Tio.send(context, msg));
 		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 	}
 
@@ -228,7 +231,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 					MqttMessage pubRecMessage = new MqttMessage(fixedHeader, MqttMessageIdVariableHeader.from(packetId));
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					clientSession.addPendingQos2Publish(packetId, pendingQos2Publish);
-					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
+					pendingQos2Publish.startPubRecRetransmitTimer(ackService, msg -> Tio.send(context, msg));
 				}
 				break;
 			case FAILURE:
@@ -244,12 +247,13 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (pendingUnSubscription == null) {
 			return;
 		}
+		List<String> unSubscriptionTopics = pendingUnSubscription.getTopics();
 		if (logger.isInfoEnabled()) {
-			logger.info("MQTT Topic:{} successfully unSubscribed  messageId:{}", pendingUnSubscription.getTopics(), messageId);
+			logger.info("MQTT Topic:{} successfully unSubscribed messageId:{}", unSubscriptionTopics, messageId);
 		}
 		pendingUnSubscription.onUnSubAckReceived();
 		clientSession.removePaddingUnSubscribe(messageId);
-		clientSession.removeSubscriptions(pendingUnSubscription.getTopics());
+		clientSession.removeSubscriptions(unSubscriptionTopics);
 	}
 
 	@Override
@@ -282,7 +286,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		Tio.send(context, pubRelMessage);
 
 		pendingPublish.setPubRelMessage(pubRelMessage);
-		pendingPublish.startPubRelRetransmissionTimer(executor, (msg) -> Tio.send(context, msg));
+		pendingPublish.startPubRelRetransmissionTimer(ackService, (msg) -> Tio.send(context, msg));
 	}
 
 	@Override
@@ -333,11 +337,13 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			subscriptionList.forEach(subscription -> {
 				IMqttClientMessageListener listener = subscription.getListener();
 				payload.rewind();
-				try {
-					listener.onMessage(topicName, payload);
-				} catch (Throwable e) {
-					logger.error(e.getMessage(), e);
-				}
+				executor.submit(() -> {
+					try {
+						listener.onMessage(topicName, payload);
+					} catch (Throwable e) {
+						logger.error(e.getMessage(), e);
+					}
+				});
 			});
 		}
 	}

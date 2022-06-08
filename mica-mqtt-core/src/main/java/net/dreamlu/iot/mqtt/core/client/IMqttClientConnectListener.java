@@ -36,11 +36,11 @@ public interface IMqttClientConnectListener {
 	/**
 	 * 连接关闭前触发本方法
 	 *
-	 * @param channelContext the channelContext
-	 * @param throwable      the throwable 有可能为空
-	 * @param remark         the remark 有可能为空
-	 * @param isRemove       is removed
+	 * @param context   the ChannelContext
+	 * @param throwable the throwable 有可能为空
+	 * @param remark    the remark 有可能为空
+	 * @param isRemove  is removed
 	 */
-	void onDisconnect(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove);
+	void onDisconnect(ChannelContext context, Throwable throwable, String remark, boolean isRemove);
 
 }

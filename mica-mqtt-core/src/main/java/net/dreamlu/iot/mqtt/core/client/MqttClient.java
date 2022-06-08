@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.core.client;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.util.TopicUtil;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
@@ -31,7 +32,6 @@ import org.tio.utils.lock.SetWithLock;
 
 import java.nio.ByteBuffer;
 import java.util.*;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -46,7 +46,7 @@ public final class MqttClient {
 	private final MqttClientCreator config;
 	private final TioClientConfig clientTioConfig;
 	private final IMqttClientSession clientSession;
-	private final ScheduledThreadPoolExecutor executor;
+	private final AckService ackService;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
 	private volatile ClientChannelContext context;
 
@@ -54,13 +54,13 @@ public final class MqttClient {
 		return new MqttClientCreator();
 	}
 
-	MqttClient(TioClient tioClient,
-			   MqttClientCreator config,
-			   ScheduledThreadPoolExecutor executor) {
+	MqttClient(TioClient tioClient, MqttClientCreator config) {
 		this.tioClient = tioClient;
 		this.config = config;
 		this.clientTioConfig = tioClient.getTioClientConfig();
 		this.executor = executor;
+		this.clientTioConfig = tioClient.getClientTioConfig();
+		this.ackService = config.getAckService();
 		this.clientSession = config.getClientSession();
 		this.messageIdGenerator = config.getMessageIdGenerator();
 	}
@@ -210,7 +210,7 @@ public final class MqttClient {
 		Boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
-		pendingSubscription.startRetransmitTimer(executor, (msg) -> Tio.send(getContext(), message));
+		pendingSubscription.startRetransmitTimer(ackService, (msg) -> Tio.send(getContext(), message));
 		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 		return this;
 	}
@@ -232,8 +232,12 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient unSubscribe(List<String> topicFilters) {
-		// 校验 topicFilter
+		// 1. 校验 topicFilter
 		TopicUtil.validateTopicFilter(topicFilters);
+		// 2. 优先取消本地订阅
+		clientSession.removePaddingSubscribes(topicFilters);
+		clientSession.removeSubscriptions(topicFilters);
+		// 3. 发送取消订阅到服务端
 		int messageId = messageIdGenerator.getId();
 		MqttUnsubscribeMessage message = MqttMessageBuilders.unsubscribe()
 			.addTopicFilters(topicFilters)
@@ -242,9 +246,9 @@ public final class MqttClient {
 		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilters, message);
 		Boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilters, messageId, result);
-		// 解绑 subManage listener
+		// 4. 启动取消订阅线程
 		clientSession.addPaddingUnSubscribe(messageId, pendingUnSubscription);
-		pendingUnSubscription.startRetransmissionTimer(executor, msg -> Tio.send(getContext(), msg));
+		pendingUnSubscription.startRetransmissionTimer(ackService, msg -> Tio.send(getContext(), msg));
 		return this;
 	}
 
@@ -390,7 +394,7 @@ public final class MqttClient {
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			clientSession.addPendingPublish(messageId, pendingPublish);
-			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(getContext(), msg));
+			pendingPublish.startPublishRetransmissionTimer(ackService, msg -> Tio.send(getContext(), msg));
 		}
 		return result;
 	}
@@ -400,28 +404,20 @@ public final class MqttClient {
 	 *
 	 * @return TioClient
 	 */
-	MqttClient connect() {
+	MqttClient start(boolean sync) {
+		// 1. 启动 ack service
+		ackService.start();
+		// 2. 启动 tio
 		Node node = new Node(config.getIp(), config.getPort());
 		try {
-			this.tioClient.asynConnect(node, config.getTimeout());
+			if (sync) {
+				this.tioClient.connect(node, config.getTimeout());
+			} else {
+				this.tioClient.asynConnect(node, config.getTimeout());
+			}
 			return this;
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client async start fail.", e);
-		}
-	}
-
-	/**
-	 * 同步连接
-	 *
-	 * @return TioClient
-	 */
-	MqttClient connectSync() {
-		Node node = new Node(config.getIp(), config.getPort());
-		try {
-			this.tioClient.connect(node, config.getTimeout());
-			return this;
-		} catch (Exception e) {
-			throw new IllegalStateException("Mica mqtt client sync start fail.", e);
 		}
 	}
 
@@ -467,11 +463,14 @@ public final class MqttClient {
 	 * @return 是否停止成功
 	 */
 	public boolean stop() {
-		// 先断开连接
+		// 1. 先停止 ack 服务
+		this.ackService.stop();
+		// 2. 断开连接
 		this.disconnect();
+		// 3. 停止 tio
 		boolean result = tioClient.stop();
 		logger.info("MqttClient stop result:{}", result);
-		this.executor.shutdown();
+		// 4. 清理 session
 		this.clientSession.clean();
 		return result;
 	}

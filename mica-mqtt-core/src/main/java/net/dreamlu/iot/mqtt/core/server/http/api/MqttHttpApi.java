@@ -74,9 +74,8 @@ public class MqttHttpApi {
 	 *
 	 * @param request HttpRequest
 	 * @return HttpResponse
-	 * @throws Exception Exception
 	 */
-	public HttpResponse publish(HttpRequest request) throws Exception {
+	public HttpResponse publish(HttpRequest request) {
 		PublishForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, PublishForm.class)
 		);
@@ -89,7 +88,7 @@ public class MqttHttpApi {
 			return validResponse;
 		}
 		sendPublish(form);
-		return Result.ok(request);
+		return Result.ok();
 	}
 
 	/**
@@ -120,7 +119,7 @@ public class MqttHttpApi {
 		for (PublishForm form : formList) {
 			sendPublish(form);
 		}
-		return Result.ok(request);
+		return Result.ok();
 	}
 
 	private void sendPublish(PublishForm form) {
@@ -145,9 +144,8 @@ public class MqttHttpApi {
 	 *
 	 * @param request HttpRequest
 	 * @return HttpResponse
-	 * @throws Exception Exception
 	 */
-	public HttpResponse subscribe(HttpRequest request) throws Exception {
+	public HttpResponse subscribe(HttpRequest request) {
 		SubscribeForm form = readForm(request, (requestBody) ->
 			JSON.parseObject(requestBody, SubscribeForm.class)
 		);
@@ -165,7 +163,7 @@ public class MqttHttpApi {
 		}
 		// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 		sendSubOrUnSubscribe(form);
-		return Result.ok(request);
+		return Result.ok();
 	}
 
 	/**
@@ -201,7 +199,7 @@ public class MqttHttpApi {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 			sendSubOrUnSubscribe(form);
 		}
-		return Result.ok(request);
+		return Result.ok();
 	}
 
 	/**
@@ -226,7 +224,7 @@ public class MqttHttpApi {
 		}
 		// 接口手动取消的订阅关系，可用来调试，不建议其他场景使用
 		sendSubOrUnSubscribe(form);
-		return Result.ok(request);
+		return Result.ok();
 	}
 
 	/**
@@ -258,7 +256,7 @@ public class MqttHttpApi {
 			// 接口手动添加的订阅关系，可用来调试，不建议其他场景使用
 			sendSubOrUnSubscribe(form);
 		}
-		return Result.ok(request);
+		return Result.ok();
 	}
 
 	/**
@@ -278,11 +276,13 @@ public class MqttHttpApi {
 		message.setClientId(clientId);
 		message.setMessageType(MessageType.DISCONNECT);
 		messageDispatcher.send(message);
-		return Result.ok(request);
+		return Result.ok();
 	}
 
 	/**
 	 * 获取客户端订阅情况
+	 * <p>
+	 * GET /api/v1/client/subscriptions
 	 *
 	 * @param request HttpRequest
 	 * @return HttpResponse

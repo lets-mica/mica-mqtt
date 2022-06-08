@@ -23,9 +23,9 @@
         <tio.version>3.8.1.v20220401-RELEASE</tio.version>
         <spring.boot.version>2.6.7</spring.boot.version>
         <mica.version>2.6.7</mica.version>
-        <mica.auto.version>2.2.2</mica.auto.version>
-        <fastjson.version>1.2.80</fastjson.version>
-        <micrometer-core.version>1.8.5</micrometer-core.version>
+        <mica.auto.version>2.3.1</mica.auto.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <micrometer-core.version>1.9.0</micrometer-core.version>
         <lombok.version>1.18.24</lombok.version>
     </properties>
 
@@ -139,7 +139,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler.version}</version>
+                <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>

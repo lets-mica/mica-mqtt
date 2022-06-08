@@ -2,9 +2,9 @@ package net.dreamlu.iot.mqtt.core.common;
 
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 
 import java.util.Objects;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -23,10 +23,10 @@ public final class MqttPendingQos2Publish {
 		return incomingPublish;
 	}
 
-	public void startPubRecRetransmitTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
+	public void startPubRecRetransmitTimer(AckService ackService, Consumer<MqttMessage> sendPacket) {
 		this.retryProcessor.setHandle((fixedHeader, originalMessage) ->
 			sendPacket.accept(new MqttMessage(fixedHeader, originalMessage.variableHeader())));
-		this.retryProcessor.start(executor);
+		this.retryProcessor.start(ackService);
 	}
 
 	public void onPubRelReceived() {

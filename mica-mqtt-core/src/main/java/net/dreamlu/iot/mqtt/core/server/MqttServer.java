@@ -37,7 +37,6 @@ import org.tio.server.TioServerConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 /**
  * mqtt 服务端
@@ -51,18 +50,18 @@ public final class MqttServer {
 	private final MqttServerCreator serverCreator;
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageStore messageStore;
-	private final ScheduledThreadPoolExecutor executor;
+	private final AckService ackService;
 
 	MqttServer(TioServer tioServer,
 			   MqttWebServer webServer,
 			   MqttServerCreator serverCreator,
-			   ScheduledThreadPoolExecutor executor) {
+			   AckService ackService) {
 		this.tioServer = tioServer;
 		this.webServer = webServer;
 		this.serverCreator = serverCreator;
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageStore = serverCreator.getMessageStore();
-		this.executor = executor;
+		this.ackService = ackService;
 	}
 
 	public static MqttServerCreator create() {
@@ -206,7 +205,7 @@ public final class MqttServer {
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			sessionManager.addPendingPublish(clientId, messageId, pendingPublish);
-			pendingPublish.startPublishRetransmissionTimer(executor, msg -> Tio.send(context, msg));
+			pendingPublish.startPublishRetransmissionTimer(ackService, msg -> Tio.send(context, msg));
 		}
 		return result;
 	}
@@ -286,6 +285,25 @@ public final class MqttServer {
 	}
 
 	/**
+	 * 发送消息到客户端
+	 *
+	 * @param topic   topic
+	 * @param message Message
+	 *
+	 * @return 是否成功
+	 */
+	public boolean sendToClient(String topic, Message message) {
+		// 客户端id
+		String clientId = message.getClientId();
+		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
+		if (StrUtil.isBlank(clientId)) {
+			return publishAll(topic, message.getPayload(), mqttQoS, message.isRetain());
+		} else {
+			return publish(clientId, topic, message.getPayload(), mqttQoS, message.isRetain());
+		}
+	}
+
+	/**
 	 * 存储保留消息
 	 *
 	 * @param topic   topic
@@ -330,13 +348,15 @@ public final class MqttServer {
 	 * @return 是否启动
 	 */
 	public boolean start() {
-		// 1. 启动 mqtt tcp
+		// 1. 启动 ack service
+		ackService.start();
+		// 2. 启动 mqtt tcp
 		try {
 			tioServer.start(this.serverCreator.getIp(), this.serverCreator.getPort());
 		} catch (IOException e) {
 			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
 		}
-		// 2. 启动 mqtt web
+		// 3. 启动 mqtt web
 		if (webServer != null) {
 			try {
 				webServer.start();
@@ -353,6 +373,9 @@ public final class MqttServer {
 	 * @return 是否停止
 	 */
 	public boolean stop() {
+		// 先停止 ack 服务
+		this.ackService.stop();
+		// 再停止服务
 		boolean result = this.tioServer.stop();
 		logger.info("Mqtt tcp server stop result:{}", result);
 		if (webServer != null) {
@@ -364,7 +387,6 @@ public final class MqttServer {
 		} catch (Throwable e) {
 			logger.error("MqttServer stop session clean error.", e);
 		}
-		this.executor.shutdown();
 		return result;
 	}
 

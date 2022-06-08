@@ -82,4 +82,20 @@ public final class ThreadUtil {
 		return tioExecutor;
 	}
 
+	/**
+	 * 获取 mqtt 业务线程池
+	 *
+	 * @param poolSize 业务线程池大小
+	 * @return ThreadPoolExecutor
+	 */
+	public static ThreadPoolExecutor getMqttExecutor(int poolSize) {
+		String threadName = "mqtt-worker";
+		LinkedBlockingQueue<Runnable> runnableQueue = new LinkedBlockingQueue<>();
+		DefaultThreadFactory defaultThreadFactory = DefaultThreadFactory.getInstance(threadName, Thread.MAX_PRIORITY);
+		ThreadPoolExecutor tioExecutor = new ThreadPoolExecutor(poolSize, poolSize,
+			Threads.KEEP_ALIVE_TIME, TimeUnit.SECONDS, runnableQueue, defaultThreadFactory, new TioCallerRunsPolicy());
+		tioExecutor.prestartCoreThread();
+		return tioExecutor;
+	}
+
 }

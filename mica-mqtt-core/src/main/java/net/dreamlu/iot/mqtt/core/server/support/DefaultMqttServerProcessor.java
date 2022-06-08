@@ -35,6 +35,7 @@ import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.util.TopicUtil;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
@@ -45,7 +46,7 @@ import org.tio.utils.hutool.StrUtil;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * mqtt broker 处理器
@@ -74,9 +75,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final IMqttSessionListener sessionListener;
 	private final IMqttMessageListener messageListener;
-	private final ScheduledThreadPoolExecutor executor;
+	private final AckService ackService;
+	private final ThreadPoolExecutor executor;
 
-	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, ScheduledThreadPoolExecutor executor) {
+	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, AckService ackService, ThreadPoolExecutor executor) {
 		this.serverCreator = serverCreator;
 		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? DEFAULT_HEARTBEAT_TIMEOUT : serverCreator.getHeartbeatTimeout();
 		this.messageStore = serverCreator.getMessageStore();
@@ -89,6 +91,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 		this.sessionListener = serverCreator.getSessionListener();
 		this.messageListener = serverCreator.getMessageListener();
+		this.ackService = ackService;
 		this.executor = executor;
 	}
 
@@ -247,7 +250,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					Boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
 					sessionManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);
-					pendingQos2Publish.startPubRecRetransmitTimer(executor, msg -> Tio.send(context, msg));
+					pendingQos2Publish.startPubRecRetransmitTimer(ackService, msg -> Tio.send(context, msg));
 				}
 				break;
 			case FAILURE:
@@ -286,7 +289,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Tio.send(context, pubRelMessage);
 
 		pendingPublish.setPubRelMessage(pubRelMessage);
-		pendingPublish.startPubRelRetransmissionTimer(executor, msg -> Tio.send(context, msg));
+		pendingPublish.startPubRelRetransmissionTimer(ackService, msg -> Tio.send(context, msg));
 	}
 
 	@Override
@@ -358,21 +361,24 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Tio.send(context, subAckMessage);
 		// 4. 发送保留消息
 		for (String topic : subscribedTopicList) {
-			List<Message> retainMessageList = messageStore.getRetainMessage(topic);
-			if (retainMessageList != null && !retainMessageList.isEmpty()) {
-				for (Message retainMessage : retainMessageList) {
-					messageDispatcher.send(clientId, retainMessage);
+			executor.submit(() -> {
+				List<Message> retainMessageList = messageStore.getRetainMessage(topic);
+				if (retainMessageList != null && !retainMessageList.isEmpty()) {
+					for (Message retainMessage : retainMessageList) {
+						messageDispatcher.send(clientId, retainMessage);
+					}
 				}
-			}
+			});
 		}
 	}
 
 	/**
 	 * 发送订阅事件
-	 * @param context ChannelContext
-	 * @param clientId clientId
+	 *
+	 * @param context     ChannelContext
+	 * @param clientId    clientId
 	 * @param topicFilter topicFilter
-	 * @param mqttQoS MqttQoS
+	 * @param mqttQoS     MqttQoS
 	 */
 	private void publishSubscribedEvent(ChannelContext context, String clientId, String topicFilter, MqttQoS mqttQoS) {
 		if (sessionListener == null) {
@@ -405,8 +411,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 
 	/**
 	 * 发送取消订阅事件
-	 * @param context ChannelContext
-	 * @param clientId clientId
+	 *
+	 * @param context     ChannelContext
+	 * @param clientId    clientId
 	 * @param topicFilter topicFilter
 	 */
 	private void publishUnsubscribedEvent(ChannelContext context, String clientId, String topicFilter) {
@@ -496,18 +503,22 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		message.setNode(serverCreator.getNodeName());
 		// 3. 消息发布
 		if (messageListener != null) {
+			executor.submit(() -> {
+				try {
+					messageListener.onMessage(context, clientId, message);
+				} catch (Throwable e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
+		}
+		// 4. 消息流转
+		executor.submit(() -> {
 			try {
-				messageListener.onMessage(context, clientId, message);
+				messageDispatcher.send(message);
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}
-		}
-		// 4. 消息流转
-		try {
-			messageDispatcher.send(message);
-		} catch (Throwable e) {
-			logger.error(e.getMessage(), e);
-		}
+		});
 	}
 
 }

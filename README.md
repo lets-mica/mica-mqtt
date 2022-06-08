@@ -55,7 +55,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.4</version>
 </dependency>
 ```
 
@@ -66,7 +66,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.4</version>
 </dependency>
 ```
 
@@ -77,7 +77,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-core</artifactId>
-  <version>1.3.2</version>
+  <version>1.3.4</version>
 </dependency>
 ```
 
@@ -89,6 +89,7 @@
 - [mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 - [mica-mqtt 使用文档](mica-mqtt-core/README.md)
 - [mica-mqtt http api 文档详见](docs/http-api.md)
+- [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt 发行版本](CHANGELOG.md)
 - [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
@@ -118,6 +119,18 @@
 [![JetBrains](docs/img/jetbrains.png)](https://www.jetbrains.com/?from=mica-mqtt)
 
 感谢 `如梦技术 VIP` **小伙伴们**的鼎力支持，更多 **VIP** 信息详见：https://www.dreamlu.net/vip/index.html
+
+## 🍱 赞助计划
+mica-mqtt 始于一份热爱，也得到不少朋友的认可，为了更好的发展，特推出赞助计划。**知识付费**，让你我走的更远！！！
+
+| 类型       | ￥    | 权益（永久）                         |
+| ---------- |------|--------------------------------|
+| 青铜赞助人 | 99   | 提供物联网 mqtt、边缘计算等技术交流少走弯路。      |
+| 黄金赞助人 | 599  | 享受如梦技术物联网相关资源，更加易用的 mqtt broker。 |
+| 铂金赞助人 | 999  | 享受如梦技术物联网 + 微服（原如梦技术VIP）相关资源。  |
+| 砖石赞助商 | 1999 | 提供个性化需求，包括 emqx 插件。            |
+
+**注意：** 加微信 **DreamLuTech** 详聊。
 
 ## 📱 微信公众号
 

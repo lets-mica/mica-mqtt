@@ -3,10 +3,10 @@ package net.dreamlu.iot.mqtt.core.common;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -40,12 +40,12 @@ public final class MqttPendingPublish {
 		return qos;
 	}
 
-	public void startPublishRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
+	public void startPublishRetransmissionTimer(AckService ackService, Consumer<MqttMessage> sendPacket) {
 		this.pubRetryProcessor.setHandle(((fixedHeader, originalMessage) -> {
 			this.payload.rewind();
 			sendPacket.accept(new MqttPublishMessage(fixedHeader, originalMessage.variableHeader(), this.payload));
 		}));
-		this.pubRetryProcessor.start(executor);
+		this.pubRetryProcessor.start(ackService);
 	}
 
 	public void onPubAckReceived() {
@@ -56,10 +56,10 @@ public final class MqttPendingPublish {
 		this.pubRelRetryProcessor.setOriginalMessage(pubRelMessage);
 	}
 
-	public void startPubRelRetransmissionTimer(ScheduledThreadPoolExecutor executor, Consumer<MqttMessage> sendPacket) {
+	public void startPubRelRetransmissionTimer(AckService ackService, Consumer<MqttMessage> sendPacket) {
 		this.pubRelRetryProcessor.setHandle((fixedHeader, originalMessage) ->
 			sendPacket.accept(new MqttMessage(fixedHeader, originalMessage.variableHeader())));
-		this.pubRelRetryProcessor.start(executor);
+		this.pubRelRetryProcessor.start(ackService);
 	}
 
 	public void onPubCompReceived() {
