@@ -18,8 +18,8 @@ package net.dreamlu.iot.mqtt.core.server.serializer;
 
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.ByteBuffer;
 
@@ -44,7 +44,7 @@ public class MessageSerializerTest {
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
-		Assert.assertEquals(message, message1);
+		Assertions.assertEquals(message, message1);
 	}
 
 	@Test
@@ -62,7 +62,7 @@ public class MessageSerializerTest {
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
-		Assert.assertEquals(message, message1);
+		Assertions.assertEquals(message, message1);
 	}
 
 	@Test
@@ -80,7 +80,7 @@ public class MessageSerializerTest {
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
-		Assert.assertEquals(message, message1);
+		Assertions.assertEquals(message, message1);
 	}
 
 	@Test
@@ -106,7 +106,7 @@ public class MessageSerializerTest {
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
-		Assert.assertEquals(message, message1);
+		Assertions.assertEquals(message, message1);
 	}
 
 	@Test
@@ -130,7 +130,7 @@ public class MessageSerializerTest {
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
-		Assert.assertEquals(message, message1);
+		Assertions.assertEquals(message, message1);
 	}
 
 	@Test
@@ -141,7 +141,7 @@ public class MessageSerializerTest {
 		Message message1 = DefaultMessageSerializer.INSTANCE.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
-		Assert.assertEquals(message, message1);
+		Assertions.assertEquals(message, message1);
 	}
 
 	@Test
@@ -168,7 +168,7 @@ public class MessageSerializerTest {
 		Message message1 = serializer.deserialize(data);
 		System.out.println(message);
 		System.out.println(message1);
-		Assert.assertEquals(message, message1);
+		Assertions.assertEquals(message, message1);
 	}
 
 }
