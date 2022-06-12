@@ -34,6 +34,7 @@
 | mqtt.client.keep-alive-secs | 60 | Keep Alive (s) 心跳维持时间 |
 | mqtt.client.version | MQTT_3_1_1 | mqtt 协议，默认：MQTT_3_1_1 |
 | mqtt.client.stat-enable | false     | 是否开启监控，默认：关闭 |
+| mqtt.client.use-ssl | false     | 是否开启 ssl ，默认：关闭   |
 
 ### 2.2 配置项示例
 ```yaml
