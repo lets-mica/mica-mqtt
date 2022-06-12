@@ -126,6 +126,10 @@ public class MqttClientProperties {
 	 * 是否开启监控，默认：false 不开启，节省内存
 	 */
 	private boolean statEnable = false;
+	/**
+	 * 开启 ssl
+	 */
+	private boolean useSsl = false;
 
 	@Getter
 	@Setter

@@ -336,6 +336,15 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator useSsl() {
+		try {
+			this.sslConfig = SslConfig.forClient();
+		} catch (Exception e) {
+			throw new IllegalArgumentException(e);
+		}
+		return this;
+	}
+
 	public MqttClientCreator sslConfig(SslConfig sslConfig) {
 		this.sslConfig = sslConfig;
 		return this;

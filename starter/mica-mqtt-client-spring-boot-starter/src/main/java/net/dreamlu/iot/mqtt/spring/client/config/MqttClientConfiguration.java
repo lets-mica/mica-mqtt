@@ -84,6 +84,10 @@ public class MqttClientConfiguration {
 		if (timeout != null && timeout > 0) {
 			clientCreator.timeout(timeout);
 		}
+		// 开启 ssl
+		if (properties.isUseSsl()) {
+			clientCreator.useSsl();
+		}
 		// 构造遗嘱消息
 		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();
 		if (willMessage != null && StringUtils.hasText(willMessage.getTopic())) {
