@@ -42,6 +42,7 @@ import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tio.core.TcpConst;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
@@ -88,11 +89,11 @@ public class MqttServerCreator {
 	 */
 	private float keepaliveBackoff = 0.75F;
 	/**
-	 * 接收数据的 buffer size，默认：8092
+	 * 接收数据的 buffer size，默认：132476（130k）
 	 */
-	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private int readBufferSize = TcpConst.MAX_DATA_LENGTH;
 	/**
-	 * 消息解析最大 bytes 长度，默认：8092
+	 * 消息解析最大 bytes 长度，默认：10M
 	 */
 	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**

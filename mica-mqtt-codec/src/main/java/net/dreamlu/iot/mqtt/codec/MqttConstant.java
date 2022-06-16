@@ -31,7 +31,7 @@ public interface MqttConstant {
 	/**
 	 * Default max bytes in message
 	 */
-	int DEFAULT_MAX_BYTES_IN_MESSAGE = 8092;
+	int DEFAULT_MAX_BYTES_IN_MESSAGE = 10 * 1024 * 1024;
 
 	/**
 	 * min client id length

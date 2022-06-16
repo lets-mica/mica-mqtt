@@ -28,6 +28,7 @@ import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.client.intf.ClientAioListener;
+import org.tio.core.TcpConst;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
@@ -64,9 +65,9 @@ public final class MqttClientCreator {
 	 */
 	private Integer timeout;
 	/**
-	 * t-io 每次消息读取长度，跟 maxBytesInMessage 相关
+	 * t-io 每次消息读取长度，默认：132476（130k）
 	 */
-	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private int readBufferSize = TcpConst.MAX_DATA_LENGTH;
 	/**
 	 * 消息解析最大 bytes 长度，默认：8092
 	 */

@@ -13,27 +13,27 @@
 ## 二、mqtt 客户端（使用到的场景有限，非必要请不要启用）
 
 ### 2.1 配置项
-| 配置项 | 默认值 | 说明 |
-| ----- | ------ | ------ |
-| mqtt.client.enabled | false | 是否启用，默认：false |
-| mqtt.client.ip | 127.0.0.1 | 服务端 ip，默认：127.0.0.1 |
-| mqtt.client.port | 1883 | 端口，默认：1883 |
+| 配置项 | 默认值              | 说明 |
+| ----- |------------------| ------ |
+| mqtt.client.enabled | false            | 是否启用，默认：false |
+| mqtt.client.ip | 127.0.0.1        | 服务端 ip，默认：127.0.0.1 |
+| mqtt.client.port | 1883             | 端口，默认：1883 |
 | mqtt.client.name | Mica-Mqtt-Client | 名称，默认：Mica-Mqtt-Client |
-| mqtt.client.user-name |  | 用户名 |
-| mqtt.client.password |  | 密码 |
-| mqtt.client.client-id |  | 客户端ID，非常重要， 默认为：MICA-MQTT- 前缀和 36进制的纳秒数 |
-| mqtt.client.clean-session | true | 清除会话 <p> false 表示如果订阅的客户机断线了，那么要保存其要推送的消息，如果其重新连接时，则将这些消息推送。 true 表示消除，表示客户机是第一次连接，消息所以以前的连接信息。 </p> |
-| mqtt.client.buffer-allocator | 堆内存 | ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存 |
-| mqtt.client.read-buffer-size | 8092 | t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：8092 |
-| mqtt.client.max-bytes-in-message | 8092 | 消息解析最大 bytes 长度，默认：8092 |
-| mqtt.client.max-client-id-length | 23 | mqtt 3.1 会校验此参数，其它协议版本不会 |
-| mqtt.client.reconnect | true | 自动重连 |
-| mqtt.client.re-interval | 5000 | 重连重试时间，单位毫秒 |
-| mqtt.client.retry-count | 0 | 连续重连次数，当连续重连这么多次都失败时，不再重连。0和负数则一直重连 |
-| mqtt.client.timeout | 5 | 连接超时时间，单位秒，t-io 配置，可为 null |
-| mqtt.client.keep-alive-secs | 60 | Keep Alive (s) 心跳维持时间 |
-| mqtt.client.version | MQTT_3_1_1 | mqtt 协议，默认：MQTT_3_1_1 |
-| mqtt.client.stat-enable | false     | 是否开启监控，默认：关闭 |
+| mqtt.client.user-name |                  | 用户名 |
+| mqtt.client.password |                  | 密码 |
+| mqtt.client.client-id |                  | 客户端ID，非常重要， 默认为：MICA-MQTT- 前缀和 36进制的纳秒数 |
+| mqtt.client.clean-session | true             | 清除会话 <p> false 表示如果订阅的客户机断线了，那么要保存其要推送的消息，如果其重新连接时，则将这些消息推送。 true 表示消除，表示客户机是第一次连接，消息所以以前的连接信息。 </p> |
+| mqtt.client.buffer-allocator | 堆内存              | ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存 |
+| mqtt.client.read-buffer-size | 132476（130k）     | t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：8092 |
+| mqtt.client.max-bytes-in-message | 10M              | 消息解析最大 bytes 长度，默认：10M |
+| mqtt.client.max-client-id-length | 23               | mqtt 3.1 会校验此参数，其它协议版本不会 |
+| mqtt.client.reconnect | true             | 自动重连 |
+| mqtt.client.re-interval | 5000             | 重连重试时间，单位毫秒 |
+| mqtt.client.retry-count | 0                | 连续重连次数，当连续重连这么多次都失败时，不再重连。0和负数则一直重连 |
+| mqtt.client.timeout | 5                | 连接超时时间，单位秒，t-io 配置，可为 null |
+| mqtt.client.keep-alive-secs | 60               | Keep Alive (s) 心跳维持时间 |
+| mqtt.client.version | MQTT_3_1_1       | mqtt 协议，默认：MQTT_3_1_1 |
+| mqtt.client.stat-enable | false            | 是否开启监控，默认：关闭 |
 | mqtt.client.use-ssl | false     | 是否开启 ssl ，默认：关闭   |
 
 ### 2.2 配置项示例
@@ -51,8 +51,8 @@ mqtt:
     reconnect: true             # 是否重连，默认：true
     re-interval: 5000           # 重连时间，默认 5000 毫秒
     version: MQTT_5             # mqtt 协议版本，默认：3.1.1
-    read-buffer-size: 8092      # t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：8092
-    max-bytes-in-message: 8092  # 消息解析最大 bytes 长度，默认：8092
+    read-buffer-size: 132476    # t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：130k
+    max-bytes-in-message: 10485760  # 消息解析最大 bytes 长度，默认：10M
     buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
     keep-alive-secs: 60         # keep-alive 心跳维持时间，单位：秒
     clean-session: true         # mqtt clean session，默认：true
