@@ -8,8 +8,8 @@ mqtt:
     name: Mica-Mqtt-Server      # 名称，默认：Mica-Mqtt-Server
     buffer-allocator: HEAP      # 堆内存和堆外内存，默认：堆内存
     heartbeat-timeout: 120000   # 心跳超时，单位毫秒，默认: 1000 * 120
-    read-buffer-size: 132476    # 接收数据的 buffer size，默认：130k
-    max-bytes-in-message: 10485760  # 消息解析最大 bytes 长度，默认：10M
+    read-buffer-size: 8KB       # 接收数据的 buffer size，默认：8k
+    max-bytes-in-message: 10MB  # 消息解析最大 bytes 长度，默认：10M
     debug: true                 # 如果开启 prometheus 指标收集建议关闭
     web-port: 8083              # http、websocket 端口，默认：8083
     websocket-enable: true      # 是否开启 websocket，默认： true

@@ -24,8 +24,8 @@
 | mqtt.client.client-id |                  | 客户端ID，非常重要， 默认为：MICA-MQTT- 前缀和 36进制的纳秒数 |
 | mqtt.client.clean-session | true             | 清除会话 <p> false 表示如果订阅的客户机断线了，那么要保存其要推送的消息，如果其重新连接时，则将这些消息推送。 true 表示消除，表示客户机是第一次连接，消息所以以前的连接信息。 </p> |
 | mqtt.client.buffer-allocator | 堆内存              | ByteBuffer Allocator，支持堆内存和堆外内存，默认为：堆内存 |
-| mqtt.client.read-buffer-size | 132476（130k）     | t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：8092 |
-| mqtt.client.max-bytes-in-message | 10M              | 消息解析最大 bytes 长度，默认：10M |
+| mqtt.client.read-buffer-size | 8KB               | t-io 每次消息读取长度，超过这个长度的消息会多次读取，默认：8KB                                                                   |
+| mqtt.client.max-bytes-in-message | 10MB              | 消息解析最大 bytes 长度，默认：10MB                                                                               |
 | mqtt.client.max-client-id-length | 23               | mqtt 3.1 会校验此参数，其它协议版本不会 |
 | mqtt.client.reconnect | true             | 自动重连 |
 | mqtt.client.re-interval | 5000             | 重连重试时间，单位毫秒 |

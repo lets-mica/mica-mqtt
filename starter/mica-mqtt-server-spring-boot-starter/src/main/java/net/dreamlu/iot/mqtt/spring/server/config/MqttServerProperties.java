@@ -21,6 +21,7 @@ import lombok.Setter;
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 import org.tio.core.TcpConst;
 
 /**
@@ -64,13 +65,13 @@ public class MqttServerProperties {
 	 */
 	private float keepaliveBackoff = 0.75F;
 	/**
-	 * 接收数据的 buffer size，默认：132476（130k）
+	 * 接收数据的 buffer size，默认：8k
 	 */
-	private int readBufferSize = TcpConst.MAX_DATA_LENGTH;
+	private DataSize readBufferSize = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_READ_BUFFER_SIZE);
 	/**
 	 * 消息解析最大 bytes 长度，默认：10M
 	 */
-	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private DataSize maxBytesInMessage = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE);
 	/**
 	 * 堆内存和堆外内存
 	 */

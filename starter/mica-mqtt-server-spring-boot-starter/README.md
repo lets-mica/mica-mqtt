@@ -23,8 +23,8 @@
 | mqtt.server.buffer-allocator | 堆内存              | 堆内存和堆外内存                                                             |
 | mqtt.server.heartbeat-timeout | 1000 * 120       | 心跳超时时间(单位: 毫秒 默认: 1000 * 120)                                        |
 | mqtt.server.keepalive-backoff | 0.75F            | MQTT 客户端 keepalive 系数，连接超时缺省为连接设置的 keepalive * keepaliveBackoff * 2，不得小于 0.5 |
-| mqtt.server.read-buffer-size | 132476             | 一次读取接收数据的 buffer size，超过这个长度的消息会多次读取，默认：132476                         |
-| mqtt.server.max-bytes-in-message | 10M              | 消息解析最大 bytes 长度，默认：10M                                              |
+| mqtt.server.read-buffer-size | 8KB               | 一次读取接收数据的 buffer size，超过这个长度的消息会多次读取，默认：8KB                                   |
+| mqtt.server.max-bytes-in-message | 10MB              | 消息解析最大 bytes 长度，默认：10MB                                                       |
 | mqtt.server.max-client-id-length | 23               | mqtt 3.1 会校验此参数，其它协议版本不会                                             |
 | mqtt.server.debug | false            | debug，如果开启 prometheus 指标收集建议关闭                                       |
 | mqtt.server.web-port | 8083             | http、websocket 端口，默认：8083                                            |
