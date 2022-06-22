@@ -1,6 +1,10 @@
 # 变更记录
 
 ## 发行版本
+### v1.3.5 - 2022-06-26
+- :sparkles: mica-mqtt 统一调整最大的消息体和一次读取的字节数。
+- :sparkles: mica-mqtt client 简化 ssl 开启。
+
 ### v1.3.4 - 2022-06-06
 - :sparkles: mica-mqtt starter 使用 Spring event 解耦 mqtt client 断连事件。
 - :sparkles: mica-mqtt server `IMqttConnectStatusListener#offline` 方法添加 `reason` 断开原因字段。
