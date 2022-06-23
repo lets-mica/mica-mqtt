@@ -32,12 +32,12 @@ import net.dreamlu.iot.mqtt.spring.server.MqttServerCustomizer;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import net.dreamlu.iot.mqtt.spring.server.event.SpringEventMqttConnectStatusListener;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.tio.core.stat.IpStatListener;
 import org.tio.utils.hutool.StrUtil;
 
@@ -46,7 +46,7 @@ import org.tio.utils.hutool.StrUtil;
  *
  * @author L.cm
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @ConditionalOnProperty(
 	prefix = MqttServerProperties.PREFIX,
 	name = "enabled",

@@ -22,7 +22,6 @@ import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
-import org.tio.core.TcpConst;
 
 /**
  * MqttServer 配置
