@@ -28,6 +28,7 @@ import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerCustomizer;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import net.dreamlu.iot.mqtt.spring.server.event.SpringEventMqttConnectStatusListener;
@@ -94,6 +95,8 @@ public class MqttServerConfiguration {
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}
+
+		// http 认证
 		MqttServerProperties.HttpBasicAuth httpBasicAuth = properties.getHttpBasicAuth();
 		if (serverCreator.isHttpEnable() && httpBasicAuth.isEnable()) {
 			serverCreator.httpBasicAuth(httpBasicAuth.getUsername(), httpBasicAuth.getPassword());
@@ -109,7 +112,9 @@ public class MqttServerConfiguration {
 		// 自定义消息监听
 		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
 		// 认证处理器
-		authHandlerObjectProvider.ifAvailable(serverCreator::authHandler);
+		MqttServerProperties.MqttAuth mqttAuth = properties.getAuth();
+		IMqttServerAuthHandler authHandler = authHandlerObjectProvider.getIfAvailable(() -> new DefaultMqttServerAuthHandler(mqttAuth.isEnable(), mqttAuth.getUsername(), mqttAuth.getPassword()));
+		serverCreator.authHandler(authHandler);
 		// mqtt 内唯一id
 		uniqueIdServiceObjectProvider.ifAvailable(serverCreator::uniqueIdService);
 		// 订阅校验

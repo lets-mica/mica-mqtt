@@ -314,6 +314,10 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public MqttServerCreator usernamePassword(String username, String password) {
+		return authHandler(new DefaultMqttServerAuthHandler(true, username, password));
+	}
+
 	public IMqttServerUniqueIdService getUniqueIdService() {
 		return uniqueIdService;
 	}

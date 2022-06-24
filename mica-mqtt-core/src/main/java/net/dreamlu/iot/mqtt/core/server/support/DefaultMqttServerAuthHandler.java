@@ -19,16 +19,31 @@ package net.dreamlu.iot.mqtt.core.server.support;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import org.tio.core.ChannelContext;
 
+import java.util.Objects;
+
 /**
  * 默认的认证处理
  *
  * @author L.cm
  */
 public class DefaultMqttServerAuthHandler implements IMqttServerAuthHandler {
+	private final boolean enabled;
+	private final String authUserName;
+	private final String authPassword;
+
+	public DefaultMqttServerAuthHandler() {
+		this(false, null, null);
+	}
+
+	public DefaultMqttServerAuthHandler(boolean enabled, String authUserName, String authPassword) {
+		this.enabled = enabled;
+		this.authUserName = enabled ? Objects.requireNonNull(authUserName, "Mqtt auth enabled but username is null.") : null;
+		this.authPassword = enabled ? Objects.requireNonNull(authPassword, "Mqtt auth enabled but password is null.") : null;
+	}
 
 	@Override
 	public boolean authenticate(ChannelContext context, String uniqueId, String clientId, String userName, String password) {
-		return true;
+		return enabled && authUserName.equals(userName) && authPassword.equals(password);
 	}
 
 }

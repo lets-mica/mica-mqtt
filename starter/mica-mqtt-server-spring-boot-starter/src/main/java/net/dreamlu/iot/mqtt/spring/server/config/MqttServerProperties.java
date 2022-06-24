@@ -54,6 +54,10 @@ public class MqttServerProperties {
 	 */
 	private int port = 1883;
 	/**
+	 * mqtt 认证
+	 */
+	private MqttAuth auth = new MqttAuth();
+	/**
 	 * 心跳超时时间(单位: 毫秒 默认: 1000 * 120)，如果用户不希望框架层面做心跳相关工作，请把此值设为0或负数
 	 */
 	private Long heartbeatTimeout;
@@ -132,6 +136,23 @@ public class MqttServerProperties {
 	@Getter
 	@Setter
 	public static class HttpBasicAuth {
+		/**
+		 * 是否启用，默认：关闭
+		 */
+		private boolean enable = false;
+		/**
+		 * http Basic 认证账号
+		 */
+		private String username;
+		/**
+		 * http Basic 认证密码
+		 */
+		private String password;
+	}
+
+	@Getter
+	@Setter
+	public static class MqttAuth {
 		/**
 		 * 是否启用，默认：关闭
 		 */

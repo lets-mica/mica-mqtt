@@ -41,8 +41,8 @@ public class MqttClientTest {
 		MqttClient client = MqttClient.create()
 			.ip("127.0.0.1")
 			.port(1883)
-			.username("admin")
-			.password("123456")
+			.username("mica")
+			.password("mica")
 //			如果包体过大，建议将此参数设置和 maxBytesInMessage 一样大
 //			.readBufferSize(1024 * 10)
 //			最大包体长度,如果包体过大需要设置此参数
