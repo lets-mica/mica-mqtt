@@ -28,7 +28,6 @@ import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.intf.ClientAioHandler;
 import org.tio.client.intf.ClientAioListener;
-import org.tio.core.TcpConst;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.hutool.StrUtil;
@@ -65,9 +64,9 @@ public final class MqttClientCreator {
 	 */
 	private Integer timeout;
 	/**
-	 * t-io 每次消息读取长度，默认：132476（130k）
+	 * 接收数据的 buffer size，默认：8k
 	 */
-	private int readBufferSize = TcpConst.MAX_DATA_LENGTH;
+	private int readBufferSize = MqttConstant.DEFAULT_MAX_READ_BUFFER_SIZE;
 	/**
 	 * 消息解析最大 bytes 长度，默认：8092
 	 */
@@ -515,8 +514,10 @@ public final class MqttClientCreator {
 		tioConfig.setName(this.name);
 		// 7. 心跳超时时间
 		tioConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
-		// 8. mqtt 消息最大长度
-		tioConfig.setReadBufferSize(this.readBufferSize);
+		// 8. mqtt 消息最大长度，小于 1 则使用默认的，可通过 property tio.default.read.buffer.size 设置默认大小
+		if (this.readBufferSize > 0) {
+			tioConfig.setReadBufferSize(this.readBufferSize);
+		}
 		// 9. ssl 证书设置
 		tioConfig.setSslConfig(this.sslConfig);
 		// 10. 是否开启监控

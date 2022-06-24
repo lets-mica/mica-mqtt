@@ -42,7 +42,6 @@ import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.core.TcpConst;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
@@ -89,9 +88,9 @@ public class MqttServerCreator {
 	 */
 	private float keepaliveBackoff = 0.75F;
 	/**
-	 * 接收数据的 buffer size，默认：132476（130k）
+	 * 接收数据的 buffer size，默认：8k
 	 */
-	private int readBufferSize = TcpConst.MAX_DATA_LENGTH;
+	private int readBufferSize = MqttConstant.DEFAULT_MAX_READ_BUFFER_SIZE;
 	/**
 	 * 消息解析最大 bytes 长度，默认：10M
 	 */
@@ -539,8 +538,10 @@ public class MqttServerCreator {
 		ServerTioConfig tioConfig = new ServerTioConfig(this.name, handler, listener);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);
 		tioConfig.setUseQueueSend(this.useQueueSend);
-		// 4. mqtt 消息最大长度
-		tioConfig.setReadBufferSize(this.readBufferSize);
+		// 4. mqtt 消息最大长度，小于 1 则使用默认的，可通过 property tio.default.read.buffer.size 设置默认大小
+		if (this.readBufferSize > 0) {
+			tioConfig.setReadBufferSize(this.readBufferSize);
+		}
 		// 5. 是否开启监控
 		tioConfig.statOn = this.statEnable;
 		// 6. 设置 t-io 心跳 timeout
