@@ -1,7 +1,7 @@
 # 变更记录
 
 ## 发行版本
-### v1.3.5 - 2022-06-24
+### v1.3.6 - 2022-06-25
 - :sparkles: mica-mqtt 统一调整最大的消息体和一次读取的字节数。
 - :sparkles: mica-mqtt client 简化 ssl 开启。
 - :sparkles: mica-mqtt server 添加默认的账号密码配置。
