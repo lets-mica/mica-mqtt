@@ -112,8 +112,10 @@ public class MqttServerConfiguration {
 		// 自定义消息监听
 		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
 		// 认证处理器
-		MqttServerProperties.MqttAuth mqttAuth = properties.getAuth();
-		IMqttServerAuthHandler authHandler = authHandlerObjectProvider.getIfAvailable(() -> new DefaultMqttServerAuthHandler(mqttAuth.isEnable(), mqttAuth.getUsername(), mqttAuth.getPassword()));
+		IMqttServerAuthHandler authHandler = authHandlerObjectProvider.getIfAvailable(() -> {
+			MqttServerProperties.MqttAuth mqttAuth = properties.getAuth();
+			return mqttAuth.isEnable() ? new DefaultMqttServerAuthHandler(mqttAuth.getUsername(), mqttAuth.getPassword()) : null;
+		});
 		serverCreator.authHandler(authHandler);
 		// mqtt 内唯一id
 		uniqueIdServiceObjectProvider.ifAvailable(serverCreator::uniqueIdService);

@@ -315,7 +315,7 @@ public class MqttServerCreator {
 	}
 
 	public MqttServerCreator usernamePassword(String username, String password) {
-		return authHandler(new DefaultMqttServerAuthHandler(true, username, password));
+		return authHandler(new DefaultMqttServerAuthHandler(username, password));
 	}
 
 	public IMqttServerUniqueIdService getUniqueIdService() {
@@ -510,9 +510,6 @@ public class MqttServerCreator {
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
 			this.nodeName = ManagementFactory.getRuntimeMXBean().getName() + ':' + port;
-		}
-		if (this.authHandler == null) {
-			this.authHandler = new DefaultMqttServerAuthHandler();
 		}
 		if (this.uniqueIdService == null) {
 			this.uniqueIdService = new DefaultMqttServerUniqueIdServiceImpl();

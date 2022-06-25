@@ -27,23 +27,17 @@ import java.util.Objects;
  * @author L.cm
  */
 public class DefaultMqttServerAuthHandler implements IMqttServerAuthHandler {
-	private final boolean enabled;
 	private final String authUserName;
 	private final String authPassword;
 
-	public DefaultMqttServerAuthHandler() {
-		this(false, null, null);
-	}
-
-	public DefaultMqttServerAuthHandler(boolean enabled, String authUserName, String authPassword) {
-		this.enabled = enabled;
-		this.authUserName = enabled ? Objects.requireNonNull(authUserName, "Mqtt auth enabled but username is null.") : null;
-		this.authPassword = enabled ? Objects.requireNonNull(authPassword, "Mqtt auth enabled but password is null.") : null;
+	public DefaultMqttServerAuthHandler(String authUserName, String authPassword) {
+		this.authUserName = Objects.requireNonNull(authUserName, "Mqtt auth enabled but username is null.");
+		this.authPassword = Objects.requireNonNull(authPassword, "Mqtt auth enabled but password is null.");
 	}
 
 	@Override
 	public boolean authenticate(ChannelContext context, String uniqueId, String clientId, String userName, String password) {
-		return enabled && authUserName.equals(userName) && authPassword.equals(password);
+		return authUserName.equals(userName) && authPassword.equals(password);
 	}
 
 }
