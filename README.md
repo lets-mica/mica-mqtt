@@ -32,8 +32,8 @@
 - [x] 支持自定义消息（mq）处理转发实现集群。
 - [x] MQTT 客户端 阿里云 mqtt 连接 demo。
 - [x] 支持 GraalVM 编译成本机可执行程序。
-- [x] 支持 Spring boot 项目快速接入（mica-mqtt-spring-boot-starter）。
-- [x] mica-mqtt-spring-boot-starter 支持对接 Prometheus + Grafana。
+- [x] 支持 Spring boot 项目快速接入。
+- [x] 支持对接 Prometheus + Grafana 实现监控。
 - [x] 基于 redis pub/sub 实现集群，详见 [mica-mqtt-broker 模块](mica-mqtt-broker)。
 
 ## 🌱 待办
