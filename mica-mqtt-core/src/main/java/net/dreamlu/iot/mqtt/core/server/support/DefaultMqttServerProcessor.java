@@ -110,7 +110,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			return;
 		}
 		// 3. 认证
-		if (!authHandler.verifyAuthenticate(context, uniqueId, clientId, userName, password)) {
+		if (authHandler != null && !authHandler.verifyAuthenticate(context, uniqueId, clientId, userName, password)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}

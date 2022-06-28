@@ -25,13 +25,13 @@ import net.dreamlu.iot.mqtt.spring.client.MqttClientSubscribeDetector;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
 import net.dreamlu.iot.mqtt.spring.client.event.SpringEventMqttClientConnectListener;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -41,7 +41,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author L.cm
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @ConditionalOnProperty(
 	prefix = MqttClientProperties.PREFIX,
 	name = "enabled",
@@ -68,8 +68,8 @@ public class MqttClientConfiguration {
 			.username(properties.getUserName())
 			.password(properties.getPassword())
 			.clientId(properties.getClientId())
-			.readBufferSize(properties.getReadBufferSize())
-			.maxBytesInMessage(properties.getMaxBytesInMessage())
+			.readBufferSize((int) properties.getReadBufferSize().toBytes())
+			.maxBytesInMessage((int) properties.getMaxBytesInMessage().toBytes())
 			.maxClientIdLength(properties.getMaxClientIdLength())
 			.keepAliveSecs(properties.getKeepAliveSecs())
 			.reconnect(properties.isReconnect())
@@ -83,6 +83,10 @@ public class MqttClientConfiguration {
 		Integer timeout = properties.getTimeout();
 		if (timeout != null && timeout > 0) {
 			clientCreator.timeout(timeout);
+		}
+		// 开启 ssl
+		if (properties.isUseSsl()) {
+			clientCreator.useSsl();
 		}
 		// 构造遗嘱消息
 		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();

@@ -1,8 +1,8 @@
 package net.dreamlu.iot.mqtt.core.util;
 
 import net.dreamlu.iot.mqtt.core.util.compression.GzipCompression;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +21,7 @@ public class CompressionTest {
 		byte[] bytes = compression.compress(text.getBytes(StandardCharsets.UTF_8));
 		byte[] decompress = compression.decompress(bytes);
 		String s = new String(decompress, StandardCharsets.UTF_8);
-		Assert.assertEquals(text, s);
+		Assertions.assertEquals(text, s);
 	}
 
 }

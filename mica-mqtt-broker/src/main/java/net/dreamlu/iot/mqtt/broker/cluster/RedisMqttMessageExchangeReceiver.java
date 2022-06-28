@@ -20,11 +20,9 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.cluster.MqttClusterMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.util.Objects;
 
@@ -34,16 +32,16 @@ import java.util.Objects;
  * @author L.cm
  */
 public class RedisMqttMessageExchangeReceiver implements MessageListener, InitializingBean {
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final MicaRedisCache redisCache;
 	private final IMessageSerializer messageSerializer;
 	private final String channel;
 	private final MqttClusterMessageListener clusterMessageListener;
 
-	public RedisMqttMessageExchangeReceiver(RedisTemplate<String, Object> redisTemplate,
+	public RedisMqttMessageExchangeReceiver(MicaRedisCache redisCache,
 											IMessageSerializer messageSerializer,
 											String channel,
 											MqttServer mqttServer) {
-		this.redisTemplate = redisTemplate;
+		this.redisCache = redisCache;
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.clusterMessageListener = new MqttClusterMessageListener(mqttServer);
@@ -62,10 +60,6 @@ public class RedisMqttMessageExchangeReceiver implements MessageListener, Initia
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		byte[] channelBytes = RedisSerializer.string().serialize(channel);
-		redisTemplate.execute((RedisCallback<Void>) connection -> {
-			connection.subscribe(RedisMqttMessageExchangeReceiver.this, channelBytes);
-			return null;
-		});
+		redisCache.subscribe(channel, this);
 	}
 }

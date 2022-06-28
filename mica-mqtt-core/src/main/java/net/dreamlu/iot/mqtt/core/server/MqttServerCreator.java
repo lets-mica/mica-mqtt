@@ -89,11 +89,11 @@ public class MqttServerCreator {
 	 */
 	private float keepaliveBackoff = 0.75F;
 	/**
-	 * 接收数据的 buffer size，默认：8092
+	 * 接收数据的 buffer size，默认：8k
 	 */
-	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private int readBufferSize = MqttConstant.DEFAULT_MAX_READ_BUFFER_SIZE;
 	/**
-	 * 消息解析最大 bytes 长度，默认：8092
+	 * 消息解析最大 bytes 长度，默认：10M
 	 */
 	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
@@ -315,6 +315,10 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public MqttServerCreator usernamePassword(String username, String password) {
+		return authHandler(new DefaultMqttServerAuthHandler(username, password));
+	}
+
 	public IMqttServerUniqueIdService getUniqueIdService() {
 		return uniqueIdService;
 	}
@@ -508,9 +512,6 @@ public class MqttServerCreator {
 		if (StrUtil.isBlank(this.nodeName)) {
 			this.nodeName = ManagementFactory.getRuntimeMXBean().getName() + ':' + port;
 		}
-		if (this.authHandler == null) {
-			this.authHandler = new DefaultMqttServerAuthHandler();
-		}
 		if (this.uniqueIdService == null) {
 			this.uniqueIdService = new DefaultMqttServerUniqueIdServiceImpl();
 		}
@@ -539,8 +540,10 @@ public class MqttServerCreator {
 		TioServerConfig tioConfig = new TioServerConfig(this.name, handler, listener);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);
 		tioConfig.setUseQueueSend(this.useQueueSend);
-		// 4. mqtt 消息最大长度
-		tioConfig.setReadBufferSize(this.readBufferSize);
+		// 4. mqtt 消息最大长度，小于 1 则使用默认的，可通过 property tio.default.read.buffer.size 设置默认大小
+		if (this.readBufferSize > 0) {
+			tioConfig.setReadBufferSize(this.readBufferSize);
+		}
 		// 5. 是否开启监控
 		tioConfig.statOn = this.statEnable;
 		// 6. 设置 t-io 心跳 timeout

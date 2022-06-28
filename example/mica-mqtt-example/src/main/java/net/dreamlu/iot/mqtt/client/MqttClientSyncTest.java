@@ -37,8 +37,8 @@ public class MqttClientSyncTest {
 		MqttClient client = MqttClient.create()
 			.ip("127.0.0.1")
 			.port(1883)
-			.username("admin")
-			.password("123456")
+			.username("mica")
+			.password("mica")
 			.connectListener(new MqttClientConnectListener())
 			// 同步连接，注意：连接会阻塞
 			.connectSync();

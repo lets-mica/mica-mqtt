@@ -32,8 +32,8 @@
 - [x] 支持自定义消息（mq）处理转发实现集群。
 - [x] MQTT 客户端 阿里云 mqtt 连接 demo。
 - [x] 支持 GraalVM 编译成本机可执行程序。
-- [x] 支持 Spring boot 项目快速接入（mica-mqtt-spring-boot-starter）。
-- [x] mica-mqtt-spring-boot-starter 支持对接 Prometheus + Grafana。
+- [x] 支持 Spring boot 项目快速接入。
+- [x] 支持对接 Prometheus + Grafana 实现监控。
 - [x] 基于 redis pub/sub 实现集群，详见 [mica-mqtt-broker 模块](mica-mqtt-broker)。
 
 ## 🌱 待办
@@ -55,7 +55,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
-  <version>1.3.4</version>
+  <version>1.3.6</version>
 </dependency>
 ```
 
@@ -66,7 +66,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
-  <version>1.3.4</version>
+  <version>1.3.6</version>
 </dependency>
 ```
 
@@ -77,7 +77,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-core</artifactId>
-  <version>1.3.4</version>
+  <version>1.3.6</version>
 </dependency>
 ```
 
@@ -132,8 +132,8 @@ mica-mqtt 始于一份热爱，也得到不少朋友的认可，为了更好的�
 
 **注意：** 加微信 **DreamLuTech** 详聊。
 
-## 📱 微信公众号
+## 📱 微信
 
 ![如梦技术](docs/img/dreamlu-weixin.jpg)
 
-精彩内容每日推荐！
+加微信暗号 **mica-mqtt** 拉入群，精彩内容每日推荐！

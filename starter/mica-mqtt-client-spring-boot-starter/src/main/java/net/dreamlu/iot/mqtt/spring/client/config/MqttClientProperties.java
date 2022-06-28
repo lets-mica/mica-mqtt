@@ -23,6 +23,7 @@ import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 /**
  * MqttClient 配置
@@ -71,13 +72,13 @@ public class MqttClientProperties {
 	 */
 	private Integer timeout;
 	/**
-	 * t-io 每次消息读取长度，跟 maxBytesInMessage 相关
+	 * 接收数据的 buffer size，默认：8k
 	 */
-	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private DataSize readBufferSize = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_READ_BUFFER_SIZE);
 	/**
-	 * 消息解析最大 bytes 长度，默认：8092
+	 * 消息解析最大 bytes 长度，默认：10M
 	 */
-	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private DataSize maxBytesInMessage = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE);
 	/**
 	 * mqtt 3.1 会校验此参数
 	 */
@@ -126,6 +127,10 @@ public class MqttClientProperties {
 	 * 是否开启监控，默认：false 不开启，节省内存
 	 */
 	private boolean statEnable = false;
+	/**
+	 * 开启 ssl
+	 */
+	private boolean useSsl = false;
 
 	@Getter
 	@Setter

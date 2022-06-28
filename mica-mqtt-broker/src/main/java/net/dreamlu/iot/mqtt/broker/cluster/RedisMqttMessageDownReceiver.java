@@ -22,11 +22,9 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.mica.core.utils.StringUtil;
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.MessageListener;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -38,16 +36,16 @@ import java.util.Objects;
  */
 @Slf4j
 public class RedisMqttMessageDownReceiver implements MessageListener, InitializingBean {
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final MicaRedisCache redisCache;
 	private final IMessageSerializer messageSerializer;
 	private final String channel;
 	private final MqttServer mqttServer;
 
-	public RedisMqttMessageDownReceiver(RedisTemplate<String, Object> redisTemplate,
+	public RedisMqttMessageDownReceiver(MicaRedisCache redisCache,
 										IMessageSerializer messageSerializer,
 										String channel,
 										MqttServer mqttServer) {
-		this.redisTemplate = redisTemplate;
+		this.redisCache = redisCache;
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.mqttServer = mqttServer;
@@ -80,10 +78,7 @@ public class RedisMqttMessageDownReceiver implements MessageListener, Initializi
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		byte[] channelBytes = RedisSerializer.string().serialize(channel);
-		redisTemplate.execute((RedisCallback<Void>) connection -> {
-			connection.subscribe(RedisMqttMessageDownReceiver.this, channelBytes);
-			return null;
-		});
+		redisCache.subscribe(channel, this);
 	}
+
 }

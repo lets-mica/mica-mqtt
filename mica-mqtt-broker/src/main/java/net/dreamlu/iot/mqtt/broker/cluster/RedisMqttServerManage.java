@@ -21,9 +21,9 @@ import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.mica.core.utils.CharPool;
 import net.dreamlu.mica.core.utils.INetUtil;
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
-import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * mqtt 服务节点管理
@@ -31,24 +31,24 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author L.cm
  */
 public class RedisMqttServerManage implements SmartInitializingSingleton, DisposableBean {
-	private final RedisTemplate<String, Object> redisTemplate;
+	private final MicaRedisCache redisCache;
 	private final String nodeName;
 	private final String hostName;
 
-	public RedisMqttServerManage(RedisTemplate<String, Object> redisTemplate, MqttServer mqttServer) {
-		this.redisTemplate = redisTemplate;
+	public RedisMqttServerManage(MicaRedisCache redisCache, MqttServer mqttServer) {
+		this.redisCache = redisCache;
 		this.nodeName = mqttServer.getServerCreator().getNodeName();
 		this.hostName = getHostName(mqttServer.getServerCreator());
 	}
 
 	@Override
 	public void afterSingletonsInstantiated() {
-		redisTemplate.opsForValue().set(RedisKeys.SERVER_NODES.getKey(nodeName), hostName);
+		redisCache.set(RedisKeys.SERVER_NODES.getKey(nodeName), hostName);
 	}
 
 	@Override
 	public void destroy() throws Exception {
-		redisTemplate.delete(RedisKeys.SERVER_NODES.getKey(nodeName));
+		redisCache.del(RedisKeys.SERVER_NODES.getKey(nodeName));
 	}
 
 	private static String getHostName(MqttServerCreator mqttServerCreator) {

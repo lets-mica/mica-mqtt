@@ -17,11 +17,11 @@
 package net.dreamlu.iot.mqtt.spring.server.config;
 
 import io.micrometer.core.instrument.binder.MeterBinder;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 
 /**
@@ -29,7 +29,7 @@ import org.springframework.context.annotation.Configuration;
  *
  * @author L.cm
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @ConditionalOnProperty(
 	prefix = MqttServerProperties.PREFIX,
 	name = "enabled",

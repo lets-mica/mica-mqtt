@@ -16,9 +16,8 @@
 
 package net.dreamlu.iot.mqtt.core.util;
 
-
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * TopicUtil 测试
@@ -30,36 +29,36 @@ public class TopicUtilTest {
 	@Test
 	public void test() {
 		// gitee issues #I56BTC /iot/test/# 无法匹配到 /iot/test 和 /iot/test/
-		Assert.assertFalse(TopicUtil.match("+", "/iot/test"));
-		Assert.assertFalse(TopicUtil.match("+", "iot/test"));
-		Assert.assertFalse(TopicUtil.match("+", "/iot/test"));
-		Assert.assertFalse(TopicUtil.match("+", "/iot"));
-		Assert.assertFalse(TopicUtil.match("+/test", "/iot/test"));
-		Assert.assertFalse(TopicUtil.match("/iot/test/+/", "/iot/test/123"));
+		Assertions.assertFalse(TopicUtil.match("+", "/iot/test"));
+		Assertions.assertFalse(TopicUtil.match("+", "iot/test"));
+		Assertions.assertFalse(TopicUtil.match("+", "/iot/test"));
+		Assertions.assertFalse(TopicUtil.match("+", "/iot"));
+		Assertions.assertFalse(TopicUtil.match("+/test", "/iot/test"));
+		Assertions.assertFalse(TopicUtil.match("/iot/test/+/", "/iot/test/123"));
 
-		Assert.assertTrue(TopicUtil.match("/iot/test/+", "/iot/test/123"));
-		Assert.assertFalse(TopicUtil.match("/iot/test/+", "/iot/test/123/"));
-		Assert.assertTrue(TopicUtil.match("/iot/+/test", "/iot/abc/test"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/test", "/iot/abc/test/"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/test", "/iot/abc/test1"));
-		Assert.assertTrue(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test1"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test/"));
-		Assert.assertTrue(TopicUtil.match("/iot/+/+/+", "/iot/abc/123/test"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/abc/123/test/"));
-		Assert.assertTrue(TopicUtil.match("/iot/+/test", "/iot/a/test"));
-		Assert.assertTrue(TopicUtil.match("/iot/+/test", "/iot/a/test"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/a//test/"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/a/b/c/"));
-		Assert.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/a"));
+		Assertions.assertTrue(TopicUtil.match("/iot/test/+", "/iot/test/123"));
+		Assertions.assertFalse(TopicUtil.match("/iot/test/+", "/iot/test/123/"));
+		Assertions.assertTrue(TopicUtil.match("/iot/+/test", "/iot/abc/test"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/test", "/iot/abc/test/"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/test", "/iot/abc/test1"));
+		Assertions.assertTrue(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test1"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/+/test", "/iot/abc/123/test/"));
+		Assertions.assertTrue(TopicUtil.match("/iot/+/+/+", "/iot/abc/123/test"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/abc/123/test/"));
+		Assertions.assertTrue(TopicUtil.match("/iot/+/test", "/iot/a/test"));
+		Assertions.assertTrue(TopicUtil.match("/iot/+/test", "/iot/a/test"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/a//test/"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/a/b/c/"));
+		Assertions.assertFalse(TopicUtil.match("/iot/+/+/+", "/iot/a"));
 
-		Assert.assertTrue(TopicUtil.match("#", "/iot/test"));
-		Assert.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test"));
-		Assert.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test/"));
-		Assert.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test/1"));
-		Assert.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test/123123/12312"));
+		Assertions.assertTrue(TopicUtil.match("#", "/iot/test"));
+		Assertions.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test"));
+		Assertions.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test/"));
+		Assertions.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test/1"));
+		Assertions.assertTrue(TopicUtil.match("/iot/test/#", "/iot/test/123123/12312"));
 
-		Assert.assertTrue(TopicUtil.match("/iot/test/123", "/iot/test/123"));
+		Assertions.assertTrue(TopicUtil.match("/iot/test/123", "/iot/test/123"));
 	}
 
 }

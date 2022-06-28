@@ -56,7 +56,7 @@ public class MqttClusterMessageListener {
 			String clientId = message.getClientId();
 			ChannelContext context = Tio.getByBsId(mqttServer.getServerConfig(), clientId);
 			if (context != null) {
-				Tio.remove(context, String.format("clientId:[%s] now bind on mqtt node:[%s]", clientId, node));
+				Tio.remove(context, "clientId:[" + clientId + "] now bind on mqtt node:" + node);
 			}
 		} else if (MessageType.SUBSCRIBE == messageType) {
 			// http api 订阅广播

@@ -21,6 +21,7 @@ import lombok.Setter;
 import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.util.unit.DataSize;
 
 /**
  * MqttServer 配置
@@ -53,6 +54,10 @@ public class MqttServerProperties {
 	 */
 	private int port = 1883;
 	/**
+	 * mqtt 认证
+	 */
+	private MqttAuth auth = new MqttAuth();
+	/**
 	 * 心跳超时时间(单位: 毫秒 默认: 1000 * 120)，如果用户不希望框架层面做心跳相关工作，请把此值设为0或负数
 	 */
 	private Long heartbeatTimeout;
@@ -63,13 +68,13 @@ public class MqttServerProperties {
 	 */
 	private float keepaliveBackoff = 0.75F;
 	/**
-	 * 接收数据的 buffer size，默认：8092
+	 * 接收数据的 buffer size，默认：8k
 	 */
-	private int readBufferSize = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private DataSize readBufferSize = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_READ_BUFFER_SIZE);
 	/**
-	 * 消息解析最大 bytes 长度，默认：8092
+	 * 消息解析最大 bytes 长度，默认：10M
 	 */
-	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
+	private DataSize maxBytesInMessage = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE);
 	/**
 	 * 堆内存和堆外内存
 	 */
@@ -131,6 +136,23 @@ public class MqttServerProperties {
 	@Getter
 	@Setter
 	public static class HttpBasicAuth {
+		/**
+		 * 是否启用，默认：关闭
+		 */
+		private boolean enable = false;
+		/**
+		 * http Basic 认证账号
+		 */
+		private String username;
+		/**
+		 * http Basic 认证密码
+		 */
+		private String password;
+	}
+
+	@Getter
+	@Setter
+	public static class MqttAuth {
 		/**
 		 * 是否启用，默认：关闭
 		 */

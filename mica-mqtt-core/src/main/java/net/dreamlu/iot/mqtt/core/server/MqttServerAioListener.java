@@ -29,6 +29,7 @@ import org.tio.core.intf.Packet;
 import org.tio.server.DefaultTioServerListener;
 import org.tio.utils.hutool.StrUtil;
 
+import java.io.IOException;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
@@ -72,7 +73,12 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		// 3. 判断是否正常断开
 		boolean isNotNormalDisconnect = context.get(MqttConst.DIS_CONNECTED) == null;
 		if (isNotNormalDisconnect || throwable != null) {
-			logger.error("Mqtt server close clientId:{}, remark:{} isRemove:{}", clientId, remark, isRemove, throwable);
+			// 避免网络异常时短期照成大量异常打印，会导致内存突增
+			if (throwable instanceof IOException) {
+				logger.error("Mqtt server close clientId:{}, remark:{} isRemove:{} error:{}", clientId, remark, isRemove, throwable.getMessage());
+			} else {
+				logger.error("Mqtt server close clientId:{}, remark:{} isRemove:{}", clientId, remark, isRemove, throwable);
+			}
 		} else {
 			logger.info("Mqtt server close clientId:{} remark:{} isRemove:{}", clientId, remark, isRemove);
 		}

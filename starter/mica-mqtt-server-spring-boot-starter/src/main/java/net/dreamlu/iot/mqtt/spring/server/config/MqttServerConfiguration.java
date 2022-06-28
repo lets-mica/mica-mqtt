@@ -28,16 +28,17 @@ import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
+import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerCustomizer;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import net.dreamlu.iot.mqtt.spring.server.event.SpringEventMqttConnectStatusListener;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.tio.core.stat.IpStatListener;
 import org.tio.utils.hutool.StrUtil;
 
@@ -46,7 +47,7 @@ import org.tio.utils.hutool.StrUtil;
  *
  * @author L.cm
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @ConditionalOnProperty(
 	prefix = MqttServerProperties.PREFIX,
 	name = "enabled",
@@ -82,8 +83,8 @@ public class MqttServerConfiguration {
 			.port(properties.getPort())
 			.heartbeatTimeout(properties.getHeartbeatTimeout())
 			.keepaliveBackoff(properties.getKeepaliveBackoff())
-			.readBufferSize(properties.getReadBufferSize())
-			.maxBytesInMessage(properties.getMaxBytesInMessage())
+			.readBufferSize((int) properties.getReadBufferSize().toBytes())
+			.maxBytesInMessage((int) properties.getMaxBytesInMessage().toBytes())
 			.bufferAllocator(properties.getBufferAllocator())
 			.maxClientIdLength(properties.getMaxClientIdLength())
 			.webPort(properties.getWebPort())
@@ -94,6 +95,8 @@ public class MqttServerConfiguration {
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}
+
+		// http 认证
 		MqttServerProperties.HttpBasicAuth httpBasicAuth = properties.getHttpBasicAuth();
 		if (serverCreator.isHttpEnable() && httpBasicAuth.isEnable()) {
 			serverCreator.httpBasicAuth(httpBasicAuth.getUsername(), httpBasicAuth.getPassword());
@@ -109,7 +112,11 @@ public class MqttServerConfiguration {
 		// 自定义消息监听
 		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
 		// 认证处理器
-		authHandlerObjectProvider.ifAvailable(serverCreator::authHandler);
+		IMqttServerAuthHandler authHandler = authHandlerObjectProvider.getIfAvailable(() -> {
+			MqttServerProperties.MqttAuth mqttAuth = properties.getAuth();
+			return mqttAuth.isEnable() ? new DefaultMqttServerAuthHandler(mqttAuth.getUsername(), mqttAuth.getPassword()) : null;
+		});
+		serverCreator.authHandler(authHandler);
 		// mqtt 内唯一id
 		uniqueIdServiceObjectProvider.ifAvailable(serverCreator::uniqueIdService);
 		// 订阅校验
