@@ -30,6 +30,7 @@ mqtt:
     read-buffer-size: 8KB       # 接收数据的 buffer size，默认：8k
     max-bytes-in-message: 10MB  # 消息解析最大 bytes 长度，默认：10M
     debug: true                 # 如果开启 prometheus 指标收集，建议关闭
+    stat-enable: true           # 开启指标收集，debug 和 prometheus 开启时需要打开，默认关闭节省内存
     web-port: 8083              # http、websocket 端口，默认：8083
     websocket-enable: true      # 是否开启 websocket，默认： true
     http-enable: true           # 是否开启 http api，默认： false
