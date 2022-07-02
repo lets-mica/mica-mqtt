@@ -186,7 +186,7 @@ public class MqttServerCreator {
 	/**
 	 * 是否用队列解码（系统初始化时确定该值，中途不要变更此值，否则在切换的时候可能导致消息丢失）
 	 */
-	private boolean useQueueDecode = false;
+	private boolean useQueueDecode = true;
 	/**
 	 * 是否开启监控，不开启可节省内存，默认：true
 	 */
