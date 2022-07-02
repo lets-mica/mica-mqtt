@@ -188,9 +188,9 @@ public class MqttServerCreator {
 	 */
 	private boolean useQueueDecode = false;
 	/**
-	 * 是否开启监控，默认：false 不开启，节省内存
+	 * 是否开启监控，不开启可节省内存，默认：true
 	 */
-	private boolean statEnable = false;
+	private boolean statEnable = true;
 	/**
 	 * TioConfig 自定义配置
 	 */

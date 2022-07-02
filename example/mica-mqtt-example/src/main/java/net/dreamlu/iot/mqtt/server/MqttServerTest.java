@@ -41,9 +41,10 @@ public class MqttServerTest {
 			.ip("0.0.0.0")
 			// 默认：1883
 			.port(1883)
-			.usernamePassword("mica", "mica")
-			// 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
-			.readBufferSize(512)
+			// mqtt 用户名密码
+//			.usernamePassword("mica", "mica")
+			// 默认为： 8192（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
+			.readBufferSize(8192)
 //			最大包体长度
 //			.maxBytesInMessage(1024 * 100)
 //			mqtt 3.1 协议会校验 clientId 长度。
