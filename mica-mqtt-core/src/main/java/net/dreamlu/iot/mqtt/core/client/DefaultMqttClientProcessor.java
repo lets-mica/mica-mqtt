@@ -193,14 +193,16 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		clientSession.addSubscriptionList(subscribedList);
 		// 触发已经监听的事件
 		subscribedList.forEach(clientSubscription -> {
+			String topicFilter = clientSubscription.getTopicFilter();
+			MqttQoS mqttQoS = clientSubscription.getMqttQoS();
 			IMqttClientMessageListener subscriptionListener = clientSubscription.getListener();
-			try {
-				executor.execute(() ->
-					subscriptionListener.onSubscribed(clientSubscription.getTopicFilter(), clientSubscription.getMqttQoS())
-				);
-			} catch (Throwable e) {
-				logger.error("MQTT SubscriptionList:{} subscribed onSubscribed event error.", subscribedList);
-			}
+			executor.execute(() -> {
+				try {
+					subscriptionListener.onSubscribed(topicFilter, mqttQoS);
+				} catch (Throwable e) {
+					logger.error("MQTT topicFilter:{} subscribed onSubscribed event error.", subscribedList, e);
+				}
+			});
 		});
 	}
 
