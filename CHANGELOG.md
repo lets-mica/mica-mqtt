@@ -1,6 +1,13 @@
 # 变更记录
 
 ## 发行版本
+### v1.3.7 - 2022-07-24
+- :sparkles: 添加 mica-mqtt jfinal client 和 server 插件。
+- :sparkles: mica-mqtt server 代码优化，useQueueDecode 默认为 true。 
+- :sparkles: mica-mqtt client 监听回调代码优化。
+- :memo: 添加赞助，让你我走的更远！！！
+- :arrow_up: 依赖升级。
+
 ### v1.3.6 - 2022-06-25
 - :sparkles: mica-mqtt 统一调整最大的消息体和一次读取的字节数。
 - :sparkles: mica-mqtt client 简化 ssl 开启。
