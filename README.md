@@ -87,6 +87,8 @@
 - [mica-mqtt 快速开始](example/README.md)
 - [mica-mqtt-client-spring-boot-starter 使用文档](starter/mica-mqtt-client-spring-boot-starter/README.md)
 - [mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
+- [jfinal-mica-mqtt-client 使用文档](starter/jfinal-mica-mqtt-client/README.md)
+- [jfinal-mica-mqtt-server 使用文档](starter/jfinal-mica-mqtt-server/README.md)
 - [mica-mqtt 使用文档](mica-mqtt-core/README.md)
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)

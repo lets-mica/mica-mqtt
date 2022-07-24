@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package net.dreamlu.iot.mqtt.spring.server;
+package net.dreamlu.iot.mqtt.jfinal.server;
 
-import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.tio.core.ChannelContext;
@@ -24,13 +23,20 @@ import org.tio.core.ChannelContext;
 import java.nio.ByteBuffer;
 
 /**
- * mqtt Server 模板
+ * mica mqtt server kit
  *
- * @author wsq（冷月宫主）
+ * @author L.cm
  */
-@RequiredArgsConstructor
-public class MqttServerTemplate {
-	private final MqttServer mqttServer;
+public class MqttServerKit {
+	private static MqttServer mqttServer;
+
+	/**
+	 * 初始化
+	 * @param mqttServer MqttServer
+	 */
+	static void init(MqttServer mqttServer) {
+		MqttServerKit.mqttServer = mqttServer;
+	}
 
 	/**
 	 * 发布消息
@@ -40,7 +46,7 @@ public class MqttServerTemplate {
 	 * @param payload  消息体
 	 * @return 是否发送成功
 	 */
-	public boolean publish(String clientId, String topic, ByteBuffer payload) {
+	public static boolean publish(String clientId, String topic, ByteBuffer payload) {
 		return mqttServer.publish(clientId, topic, payload);
 	}
 
@@ -53,7 +59,7 @@ public class MqttServerTemplate {
 	 * @param qos      MqttQoS
 	 * @return 是否发送成功
 	 */
-	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos) {
+	public static boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos) {
 		return mqttServer.publish(clientId, topic, payload, qos);
 	}
 
@@ -66,7 +72,7 @@ public class MqttServerTemplate {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public boolean publish(String clientId, String topic, ByteBuffer payload, boolean retain) {
+	public static boolean publish(String clientId, String topic, ByteBuffer payload, boolean retain) {
 		return mqttServer.publish(clientId, topic, payload, retain);
 	}
 
@@ -80,7 +86,7 @@ public class MqttServerTemplate {
 	 * @param retain   是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public static boolean publish(String clientId, String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publish(clientId, topic, payload, qos, retain);
 	}
 
@@ -91,7 +97,7 @@ public class MqttServerTemplate {
 	 * @param payload 消息体
 	 * @return 是否发送成功
 	 */
-	public boolean publishAll(String topic, ByteBuffer payload) {
+	public static boolean publishAll(String topic, ByteBuffer payload) {
 		return mqttServer.publishAll(topic, payload);
 	}
 
@@ -103,7 +109,7 @@ public class MqttServerTemplate {
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
-	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
+	public static boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
 		return mqttServer.publishAll(topic, payload, qos);
 	}
 
@@ -115,7 +121,7 @@ public class MqttServerTemplate {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public boolean publishAll(String topic, ByteBuffer payload, boolean retain) {
+	public static boolean publishAll(String topic, ByteBuffer payload, boolean retain) {
 		return mqttServer.publishAll(topic, payload, retain);
 	}
 
@@ -128,8 +134,43 @@ public class MqttServerTemplate {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public boolean publishAll(String topic, byte[] payload, MqttQoS qos, boolean retain) {
-		return publishAll(topic, payload == null ? null : ByteBuffer.wrap(payload), qos, retain);
+	public static boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+		return mqttServer.publishAll(topic, payload, qos, retain);
+	}
+
+	/**
+	 * 发布消息给所以的在线设备
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @return 是否发送成功
+	 */
+	public static boolean publishAll(String topic, byte[] payload) {
+		return mqttServer.publishAll(topic, payload, MqttQoS.AT_MOST_ONCE, false);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @return 是否发送成功
+	 */
+	public static boolean publishAll(String topic, byte[] payload, MqttQoS qos) {
+		return mqttServer.publishAll(topic, payload, qos, false);
+	}
+
+	/**
+	 * 发布消息给所以的在线设备
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public static boolean publishAll(String topic, byte[] payload, boolean retain) {
+		return mqttServer.publishAll(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
 	}
 
 	/**
@@ -141,7 +182,7 @@ public class MqttServerTemplate {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
-	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
+	public static boolean publishAll(String topic, byte[] payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publishAll(topic, payload, qos, retain);
 	}
 
@@ -151,7 +192,7 @@ public class MqttServerTemplate {
 	 * @param clientId clientId
 	 * @return ChannelContext
 	 */
-	public ChannelContext getChannelContext(String clientId) {
+	public static ChannelContext getChannelContext(String clientId) {
 		return mqttServer.getChannelContext(clientId);
 	}
 
@@ -160,7 +201,7 @@ public class MqttServerTemplate {
 	 *
 	 * @param clientId clientId
 	 */
-	public void close(String clientId) {
+	public static void close(String clientId) {
 		mqttServer.close(clientId);
 	}
 
