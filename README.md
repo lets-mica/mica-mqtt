@@ -48,6 +48,8 @@
 | 1883   | tcp             | mqtt tcp 端口                    |
 | 8083   | http、websocket | http api 和 websocket mqtt 子协议端口 |
 
+**演示地址**：mqtt.dreamlu.net 端口同上。
+
 ## 📦️ 依赖
 ### Spring boot 项目
 **客户端：**
