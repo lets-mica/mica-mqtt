@@ -1,4 +1,4 @@
-# jfinal mica-mqttx client
+# jfinal mica-mqtt client
 
 ## 使用
 
