@@ -111,6 +111,13 @@ public class MqttClientSubscribeListener {
 		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
 	}
 
+	@MqttClientSubscribe("/sys/${productKey}/${deviceName}/thing/sub/register")
+	public void thingSubRegister(String topic, ByteBuffer payload) {
+		// 1.3.8 开始支持，@MqttClientSubscribe 注解支持 ${} 变量替换，会默认替换成 +
+		// 注意：mica-mqtt 会先从 Spring boot 配置中替换参数 ${}，如果存在配置会优先被替换。
+		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
+	}
+
 }
 ```
 
