@@ -32,6 +32,7 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerCustomizer;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import net.dreamlu.iot.mqtt.spring.server.event.SpringEventMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.spring.server.event.SpringEventMqttMessageListener;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -61,6 +62,12 @@ public class MqttServerConfiguration {
 	@ConditionalOnMissingBean
 	public IMqttConnectStatusListener springEventMqttConnectStatusListener(ApplicationEventPublisher eventPublisher) {
 		return new SpringEventMqttConnectStatusListener(eventPublisher);
+	}
+
+	@Bean
+	@ConditionalOnMissingBean
+	public IMqttMessageListener springEventMqttMessageListener(ApplicationEventPublisher eventPublisher) {
+		return new SpringEventMqttMessageListener(eventPublisher);
 	}
 
 	@Bean
