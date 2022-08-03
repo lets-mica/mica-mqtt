@@ -37,7 +37,7 @@ public class SpringEventMqttMessageListener implements IMqttMessageListener {
 	@Override
 	public void onMessage(ChannelContext context, String clientId, Message message) {
 		if (log.isDebugEnabled()) {
-			log.info("mqtt server receive message clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
+			log.debug("mqtt server receive message clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
 		}
 		eventPublisher.publishEvent(message);
 	}
