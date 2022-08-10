@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.broker;
 
-import net.dreamlu.iot.mqtt.client.MqttClientTest;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
@@ -28,8 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author L.cm
  */
 public class DeviceA {
-
-	private static final Logger logger = LoggerFactory.getLogger(MqttClientTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(DeviceA.class);
 
 	public static void main(String[] args) {
 		// 初始化 mqtt 客户端
