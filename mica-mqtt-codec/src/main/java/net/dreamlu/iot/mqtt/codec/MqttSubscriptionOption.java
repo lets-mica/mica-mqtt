@@ -30,23 +30,23 @@ public final class MqttSubscriptionOption {
 		/**
 		 * 订阅发送
 		 */
-		SEND_AT_SUBSCRIBE(0),
+		SEND_AT_SUBSCRIBE((byte) 0),
 		/**
 		 * 如果还没有订阅，请发送
 		 */
-		SEND_AT_SUBSCRIBE_IF_NOT_YET_EXISTS(1),
+		SEND_AT_SUBSCRIBE_IF_NOT_YET_EXISTS((byte) 1),
 		/**
 		 * 请勿发送订阅
 		 */
-		DONT_SEND_AT_SUBSCRIBE(2);
+		DONT_SEND_AT_SUBSCRIBE((byte) 2);
 
-		private final int value;
+		private final byte value;
 
-		RetainedHandlingPolicy(int value) {
+		RetainedHandlingPolicy(byte value) {
 			this.value = value;
 		}
 
-		public int value() {
+		public byte value() {
 			return value;
 		}
 
