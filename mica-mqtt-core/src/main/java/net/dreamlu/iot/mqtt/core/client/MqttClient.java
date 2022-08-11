@@ -573,10 +573,10 @@ public final class MqttClient {
 						if (interval >= heartbeatTimeout) {
 							Packet packet = aioHandler.heartbeatPacket(channelContext);
 							if (packet != null) {
+								Boolean result = Tio.send(channelContext, packet);
 								if (logger.isInfoEnabled()) {
-									logger.info("{}发送心跳包", channelContext);
+									logger.info("{} 发送心跳包 result:{}", channelContext, result);
 								}
-								Tio.send(channelContext, packet);
 							}
 						}
 					}
@@ -595,7 +595,7 @@ public final class MqttClient {
 				} finally {
 					try {
 						readLock.unlock();
-						Thread.sleep(heartbeatTimeout / 2);
+						Thread.sleep(heartbeatTimeout / 3);
 					} catch (Throwable e) {
 						Thread.currentThread().interrupt();
 						logger.error(e.getMessage(), e);
