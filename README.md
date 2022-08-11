@@ -56,13 +56,21 @@
 **演示地址**：mqtt.dreamlu.net 端口同上。
 
 ## 📦️ 依赖
+
+### 最新版本
+
+| 版本 | 版本号            |
+|--|----------------|
+| :label:稳定版 | 1.3.8       |
+| :building_construction:快照版（提交后 github action 自动构建） | 1.3.9-SNAPSHOT |
+
 ### Spring boot 项目
 **客户端：**
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
-  <version>1.3.8</version>
+  <version>${mica-mqtt.version}</version>
 </dependency>
 ```
 
@@ -73,7 +81,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
-  <version>1.3.8</version>
+  <version>${mica-mqtt.version}</version>
 </dependency>
 ```
 
@@ -84,7 +92,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-core</artifactId>
-  <version>1.3.8</version>
+  <version>${mica-mqtt.version}</version>
 </dependency>
 ```
 
