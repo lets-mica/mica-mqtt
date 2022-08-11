@@ -23,15 +23,21 @@ import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
+import org.tio.client.ClientGroupStat;
 import org.tio.client.ClientTioConfig;
 import org.tio.client.TioClient;
+import org.tio.client.intf.ClientAioHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.core.Tio;
+import org.tio.core.intf.Packet;
+import org.tio.utils.SystemTimer;
 import org.tio.utils.lock.SetWithLock;
 
 import java.nio.ByteBuffer;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -61,6 +67,7 @@ public final class MqttClient {
 		this.ackService = config.getAckService();
 		this.clientSession = config.getClientSession();
 		this.messageIdGenerator = config.getMessageIdGenerator();
+		startHeartbeatTask();
 	}
 
 	/**
@@ -535,6 +542,61 @@ public final class MqttClient {
 	 */
 	public boolean isDisconnected() {
 		return !isConnected();
+	}
+
+	/**
+	 * mqtt 定时任务：发心跳
+	 */
+	private void startHeartbeatTask() {
+		final ClientGroupStat clientGroupStat = (ClientGroupStat) clientTioConfig.groupStat;
+		final ClientAioHandler aioHandler = clientTioConfig.getClientAioHandler();
+		final String id = clientTioConfig.getId();
+		new Thread(() -> {
+			while (!clientTioConfig.isStopped()) {
+				final long heartbeatTimeout = TimeUnit.SECONDS.toMillis(config.getKeepAliveSecs());
+				if (heartbeatTimeout <= 0) {
+					logger.warn("用户取消了 mica-mqtt 的心跳定时发送功能，请用户自己去完成心跳机制");
+					return;
+				}
+				SetWithLock<ChannelContext> setWithLock = clientTioConfig.connecteds;
+				ReentrantReadWriteLock.ReadLock readLock = setWithLock.readLock();
+				readLock.lock();
+				try {
+					Set<ChannelContext> set = setWithLock.getObj();
+					long currTime = SystemTimer.currTime;
+					for (ChannelContext entry : set) {
+						ClientChannelContext channelContext = (ClientChannelContext) entry;
+						if (channelContext.isClosed || channelContext.isRemoved) {
+							continue;
+						}
+						long interval = currTime - channelContext.stat.latestTimeOfSentPacket;
+						if (interval >= heartbeatTimeout / 2) {
+							Packet packet = aioHandler.heartbeatPacket(channelContext);
+							if (packet != null) {
+								if (logger.isInfoEnabled()) {
+									logger.info("{}发送心跳包", channelContext);
+								}
+								Tio.send(channelContext, packet);
+							}
+						}
+					}
+					if (logger.isDebugEnabled()) {
+						logger.debug("[{}]: curr:{}, closed:{}, received:({}p)({}b), handled:{}, sent:({}p)({}b)", id, set.size(), clientGroupStat.closed.get(),
+							clientGroupStat.receivedPackets.get(), clientGroupStat.receivedBytes.get(), clientGroupStat.handledPackets.get(),
+							clientGroupStat.sentPackets.get(), clientGroupStat.sentBytes.get());
+					}
+				} catch (Throwable e) {
+					logger.error("", e);
+				} finally {
+					try {
+						readLock.unlock();
+						Thread.sleep(heartbeatTimeout / 4);
+					} catch (Throwable e) {
+						logger.error(e.getMessage(), e);
+					}
+				}
+			}
+		}, "mqtt-heartbeat" + id).start();
 	}
 
 }

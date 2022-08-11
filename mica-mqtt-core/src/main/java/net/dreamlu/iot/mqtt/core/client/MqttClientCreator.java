@@ -34,7 +34,6 @@ import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -512,8 +511,8 @@ public final class MqttClientCreator {
 		// 6. tioConfig
 		ClientTioConfig tioConfig = new ClientTioConfig(clientAioHandler, clientAioListener, reconnConf, tioExecutor, groupExecutor);
 		tioConfig.setName(this.name);
-		// 7. 心跳超时时间
-		tioConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
+		// 7. 心跳超时时间，关闭默认的心跳检测，不符合 emqx
+		tioConfig.setHeartbeatTimeout(0);
 		// 8. mqtt 消息最大长度，小于 1 则使用默认的，可通过 property tio.default.read.buffer.size 设置默认大小
 		if (this.readBufferSize > 0) {
 			tioConfig.setReadBufferSize(this.readBufferSize);
