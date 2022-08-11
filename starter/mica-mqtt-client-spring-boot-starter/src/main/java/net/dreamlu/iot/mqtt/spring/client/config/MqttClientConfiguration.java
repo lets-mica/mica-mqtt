@@ -84,6 +84,9 @@ public class MqttClientConfiguration {
 		if (timeout != null && timeout > 0) {
 			clientCreator.timeout(timeout);
 		}
+		if (properties.isDebug()) {
+			clientCreator.debug();
+		}
 		// 开启 ssl
 		if (properties.isUseSsl()) {
 			clientCreator.useSsl();

@@ -155,6 +155,10 @@ public final class MqttClientCreator {
 	 */
 	private boolean statEnable = false;
 	/**
+	 * debug
+	 */
+	private boolean debug = false;
+	/**
 	 * tioExecutor
 	 */
 	private SynThreadPoolExecutor tioExecutor;
@@ -277,6 +281,10 @@ public final class MqttClientCreator {
 
 	public boolean isStatEnable() {
 		return statEnable;
+	}
+
+	public boolean isDebug() {
+		return debug;
 	}
 
 	public SynThreadPoolExecutor getTioExecutor() {
@@ -444,6 +452,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator debug() {
+		this.debug = true;
+		return this;
+	}
+
 	public MqttClientCreator tioExecutor(SynThreadPoolExecutor tioExecutor) {
 		this.tioExecutor = tioExecutor;
 		return this;
@@ -521,6 +534,9 @@ public final class MqttClientCreator {
 		tioConfig.setSslConfig(this.sslConfig);
 		// 10. 是否开启监控
 		tioConfig.statOn = this.statEnable;
+		if (this.debug) {
+			tioConfig.debug = true;
+		}
 		// 11. 自定义处理
 		if (this.tioConfigCustomize != null) {
 			this.tioConfigCustomize.accept(tioConfig);

@@ -570,7 +570,7 @@ public final class MqttClient {
 							continue;
 						}
 						long interval = currTime - channelContext.stat.latestTimeOfSentPacket;
-						if (interval >= heartbeatTimeout / 2) {
+						if (interval >= heartbeatTimeout) {
 							Packet packet = aioHandler.heartbeatPacket(channelContext);
 							if (packet != null) {
 								if (logger.isInfoEnabled()) {
@@ -580,18 +580,24 @@ public final class MqttClient {
 							}
 						}
 					}
-					if (logger.isDebugEnabled()) {
-						logger.debug("[{}]: curr:{}, closed:{}, received:({}p)({}b), handled:{}, sent:({}p)({}b)", id, set.size(), clientGroupStat.closed.get(),
-							clientGroupStat.receivedPackets.get(), clientGroupStat.receivedBytes.get(), clientGroupStat.handledPackets.get(),
-							clientGroupStat.sentPackets.get(), clientGroupStat.sentBytes.get());
+					// 打印连接信息
+					if (clientTioConfig.debug && logger.isInfoEnabled()) {
+						if (clientTioConfig.statOn) {
+							logger.info("[{}]: curr:{}, closed:{}, received:({}p)({}b), handled:{}, sent:({}p)({}b)", id, set.size(), clientGroupStat.closed.get(),
+								clientGroupStat.receivedPackets.get(), clientGroupStat.receivedBytes.get(), clientGroupStat.handledPackets.get(),
+								clientGroupStat.sentPackets.get(), clientGroupStat.sentBytes.get());
+						} else {
+							logger.info("[{}]: curr:{}, closed:{}", id, set.size(), clientGroupStat.closed.get());
+						}
 					}
 				} catch (Throwable e) {
 					logger.error("", e);
 				} finally {
 					try {
 						readLock.unlock();
-						Thread.sleep(heartbeatTimeout / 4);
+						Thread.sleep(heartbeatTimeout / 2);
 					} catch (Throwable e) {
+						Thread.currentThread().interrupt();
 						logger.error(e.getMessage(), e);
 					}
 				}
