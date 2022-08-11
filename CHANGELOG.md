@@ -1,6 +1,13 @@
 # 变更记录
 
 ## 发行版本
+### v1.3.8 - 2022-08-11
+- :sparkles: mica-mqtt codec 代码优化。
+- :sparkles: mica-mqtt server 使用 Spring event 解耦消息监听。
+- :sparkles: mica-mqtt client stater，@MqttClientSubscribe topic 支持其他变量 ${productKey} 自动替换成 +。
+- :memo: 添加演示地址
+- :bug: 修复 mica-mqtt client 心跳发送问题。gitee #I5LQXV 感谢 `@iTong` 反馈。
+
 ### v1.3.7 - 2022-07-24
 - :sparkles: 添加 mica-mqtt jfinal client 和 server 插件。
 - :sparkles: mica-mqtt server 代码优化，useQueueDecode 默认为 true。 

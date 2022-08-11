@@ -62,7 +62,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
-  <version>1.3.7</version>
+  <version>1.3.8</version>
 </dependency>
 ```
 
@@ -73,7 +73,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
-  <version>1.3.7</version>
+  <version>1.3.8</version>
 </dependency>
 ```
 
@@ -84,7 +84,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-core</artifactId>
-  <version>1.3.7</version>
+  <version>1.3.8</version>
 </dependency>
 ```
 
