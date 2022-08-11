@@ -61,8 +61,8 @@
 
 | 版本 | 版本号            |
 |--|----------------|
-| :label:稳定版 | 1.3.8       |
-| :building_construction:快照版（提交后 github action 自动构建） | 1.3.9-SNAPSHOT |
+| 🏷️稳定版 | 1.3.8       |
+| 🏗快照版（提交后 github action 自动构建） | 1.3.9-SNAPSHOT |
 
 ### Spring boot 项目
 **客户端：**
