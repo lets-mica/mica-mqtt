@@ -54,7 +54,7 @@ public final class MqttClient {
 	private final IMqttClientSession clientSession;
 	private final AckService ackService;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
-	private volatile ClientChannelContext context;
+	private ClientChannelContext context;
 
 	public static MqttClientCreator create() {
 		return new MqttClientCreator();
@@ -516,12 +516,15 @@ public final class MqttClient {
 		if (context != null) {
 			return context;
 		}
-		SetWithLock<ChannelContext> connectedSet = Tio.getConnecteds(clientTioConfig);
-		Set<ChannelContext> contextSet = connectedSet.getObj();
-		if (contextSet == null || contextSet.isEmpty()) {
-			return null;
+		synchronized (this) {
+			if (context == null) {
+				SetWithLock<ChannelContext> connectedSet = Tio.getConnecteds(clientTioConfig);
+				Set<ChannelContext> contextSet = connectedSet.getObj();
+				if (contextSet != null && !contextSet.isEmpty()) {
+					this.context = (ClientChannelContext) contextSet.iterator().next();
+				}
+			}
 		}
-		this.context = (ClientChannelContext) contextSet.iterator().next();
 		return this.context;
 	}
 
@@ -548,16 +551,17 @@ public final class MqttClient {
 	 * mqtt 定时任务：发心跳
 	 */
 	private void startHeartbeatTask() {
+		// 先判断用户是否开启心跳检测
+		final long heartbeatTimeout = TimeUnit.SECONDS.toMillis(config.getKeepAliveSecs());
+		if (heartbeatTimeout <= 0) {
+			logger.warn("用户取消了 mica-mqtt 的心跳定时发送功能，请用户自己去完成心跳机制");
+			return;
+		}
 		final ClientGroupStat clientGroupStat = (ClientGroupStat) clientTioConfig.groupStat;
 		final ClientAioHandler aioHandler = clientTioConfig.getClientAioHandler();
 		final String id = clientTioConfig.getId();
 		new Thread(() -> {
 			while (!clientTioConfig.isStopped()) {
-				final long heartbeatTimeout = TimeUnit.SECONDS.toMillis(config.getKeepAliveSecs());
-				if (heartbeatTimeout <= 0) {
-					logger.warn("用户取消了 mica-mqtt 的心跳定时发送功能，请用户自己去完成心跳机制");
-					return;
-				}
 				SetWithLock<ChannelContext> setWithLock = clientTioConfig.connecteds;
 				ReentrantReadWriteLock.ReadLock readLock = setWithLock.readLock();
 				readLock.lock();

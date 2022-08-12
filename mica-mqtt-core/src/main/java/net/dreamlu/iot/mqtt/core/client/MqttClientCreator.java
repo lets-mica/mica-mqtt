@@ -75,7 +75,7 @@ public final class MqttClientCreator {
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
-	 * Keep Alive (s)
+	 * Keep Alive (s)，如果用户不希望框架层面做心跳相关工作，请把此值设为0或负数
 	 */
 	private int keepAliveSecs = DEFAULT_KEEP_ALIVE_SECS;
 	/**
