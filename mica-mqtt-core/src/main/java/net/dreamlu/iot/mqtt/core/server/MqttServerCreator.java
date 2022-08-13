@@ -29,6 +29,7 @@ import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
+import net.dreamlu.iot.mqtt.core.server.interceptor.IMqttMessageInterceptor;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
@@ -195,7 +196,10 @@ public class MqttServerCreator {
 	 * TioConfig 自定义配置
 	 */
 	private Consumer<TioConfig> tioConfigCustomize;
-
+	/**
+	 * 消息拦截器
+	 */
+	private final MqttMessageInterceptors messageInterceptors = new MqttMessageInterceptors();
 	public String getName() {
 		return name;
 	}
@@ -503,6 +507,15 @@ public class MqttServerCreator {
 
 	public MqttServerCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
 		this.tioConfigCustomize = tioConfigCustomize;
+		return this;
+	}
+
+	public MqttMessageInterceptors getMessageInterceptors() {
+		return messageInterceptors;
+	}
+
+	public MqttServerCreator addInterceptor(IMqttMessageInterceptor interceptor) {
+		this.messageInterceptors.add(interceptor);
 		return this;
 	}
 

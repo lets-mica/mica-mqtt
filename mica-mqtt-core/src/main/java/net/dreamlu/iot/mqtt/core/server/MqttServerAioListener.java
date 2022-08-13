@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
+import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttHttpHelper;
@@ -43,6 +44,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 	private final IMqttSessionManager sessionManager;
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
+	private final MqttMessageInterceptors messageInterceptors;
 	private final ThreadPoolExecutor executor;
 
 	public MqttServerAioListener(MqttServerCreator serverCreator, ThreadPoolExecutor executor) {
@@ -50,6 +52,7 @@ public class MqttServerAioListener extends DefaultAioListener {
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
+		this.messageInterceptors = serverCreator.getMessageInterceptors();
 		this.executor = executor;
 	}
 
@@ -139,6 +142,25 @@ public class MqttServerAioListener extends DefaultAioListener {
 		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
 		if (isHttpRequest) {
 			MqttHttpHelper.close(context, packet);
+		}
+	}
+
+	@Override
+	public void onAfterReceivedBytes(ChannelContext context, int receivedBytes) throws Exception {
+		messageInterceptors.onAfterReceivedBytes(context, receivedBytes);
+	}
+
+	@Override
+	public void onAfterDecoded(ChannelContext context, Packet packet, int packetSize) {
+		if (packet instanceof MqttMessage) {
+			messageInterceptors.onAfterDecoded(context, (MqttMessage) packet, packetSize);
+		}
+	}
+
+	@Override
+	public void onAfterHandled(ChannelContext context, Packet packet, long cost) throws Exception {
+		if (packet instanceof MqttMessage) {
+			messageInterceptors.onAfterHandled(context, (MqttMessage) packet, cost);
 		}
 	}
 
