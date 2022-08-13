@@ -1,6 +1,10 @@
 # 变更记录
 
 ## 发行版本
+### v1.3.9 - 2022-08-21
+- :sparkles: mica-mqtt server 添加消息拦截器，gitee #I5KLST
+- :sparkles: 优化 mqtt 客户端心跳和心跳日志优化。
+
 ### v1.3.8 - 2022-08-11
 - :sparkles: mica-mqtt codec 代码优化。
 - :sparkles: mica-mqtt server 使用 Spring event 解耦消息监听。
