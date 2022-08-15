@@ -212,11 +212,16 @@ public final class MqttClient {
 			.messageId(messageId)
 			.properties(properties)
 			.build();
-		Boolean result = Tio.send(getContext(), message);
-		logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
-		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
-		pendingSubscription.startRetransmitTimer(ackService, (msg) -> Tio.send(getContext(), message));
-		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
+		// 4. 已经连接成功，直接订阅逻辑，未连接成功的添加到订阅列表，连接成功时会重连。
+		if (isConnected()) {
+			Boolean result = Tio.send(getContext(), message);
+			logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
+			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
+			pendingSubscription.startRetransmitTimer(ackService, (msg) -> Tio.send(getContext(), message));
+			clientSession.addPaddingSubscribe(messageId, pendingSubscription);
+		} else {
+			clientSession.addSubscriptionList(needSubscriptionList);
+		}
 		return this;
 	}
 
