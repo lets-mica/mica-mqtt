@@ -75,7 +75,7 @@ public class MqttClientTest {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				client.publish("/test/client", ByteBuffer.wrap("mica最牛皮".getBytes(StandardCharsets.UTF_8)));
+				client.publish("/test/client", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
 			}
 		}, 1000, 2000);
 	}

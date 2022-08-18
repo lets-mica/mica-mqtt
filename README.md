@@ -99,6 +99,7 @@
 **配置详见**：[mica-mqtt 使用文档](mica-mqtt-core/README.md)
 
 ## 📝 文档
+- [mqtt科普、mqttx、mica-mqtt的使用**视频**](https://b23.tv/VJ8yc7v)
 - [mica-mqtt 快速开始](example/README.md)
 - [mica-mqtt-client-spring-boot-starter 使用文档](starter/mica-mqtt-client-spring-boot-starter/README.md)
 - [mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
