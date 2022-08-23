@@ -18,6 +18,7 @@ package net.dreamlu.iot.mqtt.core.server.session;
 
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
+import net.dreamlu.iot.mqtt.core.common.TopicFilterType;
 import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import net.dreamlu.iot.mqtt.core.util.collection.IntObjectHashMap;
@@ -43,6 +44,14 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	 */
 	private final ConcurrentMap<String, ConcurrentMap<String, Integer>> subscribeStore = new ConcurrentHashMap<>();
 	/**
+	 * 共享订阅存储 queueTopicFilter: {clientId: qos}
+	 */
+	private final ConcurrentMap<String, ConcurrentMap<String, Integer>> queueSubscribeStore = new ConcurrentHashMap<>();
+	/**
+	 * 分组订阅存储 groupName : {shareTopicFilter : {clientId: qos}}
+	 */
+	private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Integer>>> shareSubscribeStore = new ConcurrentHashMap<>();
+	/**
 	 * qos1 消息过程存储 clientId: {msgId: Object}
 	 */
 	private final ConcurrentMap<String, IntObjectMap<MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
@@ -53,7 +62,17 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void addSubscribe(String topicFilter, String clientId, int mqttQoS) {
-		Map<String, Integer> data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
+		Map<String, Integer> data;
+		TopicFilterType filterType = TopicFilterType.getType(topicFilter);
+		if (TopicFilterType.QUEUE == filterType) {
+			data = queueSubscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
+		}
+		else if (TopicFilterType.SHARE == filterType){
+			String name = TopicFilterType.getShareGroupName(topicFilter);
+			ConcurrentMap<String, ConcurrentMap<String, Integer>> shareSubscribeMap = shareSubscribeStore.computeIfAbsent(name, (key) -> new ConcurrentHashMap<>(16));
+			data = shareSubscribeMap.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
+		}
+		else data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
 		// 如果不存在或者老的订阅 qos 比较小也重新设置
 		Integer existingQos = data.get(clientId);
 		if (existingQos == null || existingQos < mqttQoS) {
@@ -106,6 +125,50 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		return qosValue;
 	}
 
+	/**
+	 * 获取订阅列表  共享订阅
+	 */
+	public Map<String, Integer> getQueueSubscribeMap(ConcurrentMap<String, ConcurrentMap<String, Integer>> subscribeStore, TopicFilterType filterType, String topicName) {
+		// 排除重复订阅，例如： /test/# 和 /# 只发一份
+		Map<String, Integer> subscribeMap = new HashMap<>(32);
+		Set<String> topicFilterSet = subscribeStore.keySet();
+		for (String topicFilter : topicFilterSet) {
+			if (filterType.match(topicFilter, topicName)) {
+				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
+				if (data != null && !data.isEmpty()) {
+					data.forEach((clientId, qos) -> {
+						subscribeMap.merge(clientId, qos, Math::min);
+					});
+				}
+			}
+		}
+
+		return subscribeMap;
+	}
+
+	/**
+	 * 获取订阅列表  分组订阅
+	 */
+	public  Map<String, Map<String, Integer>> getShareSubscribeMap(ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Integer>>> shareSubscribeStore, TopicFilterType filterType, String topicName) {
+		// 排除重复订阅，例如： /test/# 和 /# 只发一份
+		Map<String, Map<String, Integer>> shareSubscribeMap = new HashMap<>(32);
+		for (String s : shareSubscribeStore.keySet()) {
+			Map<String, Integer> map = getQueueSubscribeMap(shareSubscribeStore.get(s), filterType, topicName);
+			if (map != null && map.size() != 0) shareSubscribeMap.put(s, map);
+		}
+		return shareSubscribeMap;
+	}
+
+	/**
+	 * 负载均衡策略：随机方式
+	 */
+	public void randomStrategy(Map<String, Integer> subscribeMap, Map<String, Integer> randomSubscribeMap) {
+		String[] keys = randomSubscribeMap.keySet().toArray(new String[0]);
+		Random random = new Random();
+		String key = keys[random.nextInt(keys.length)];
+		subscribeMap.merge(key, randomSubscribeMap.get(key), Math::min);
+	}
+
 	@Override
 	public List<Subscribe> searchSubscribe(String topicName) {
 		// 排除重复订阅，例如： /test/# 和 /# 只发一份
@@ -119,6 +182,19 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 						subscribeMap.merge(clientId, qos, Math::min);
 					});
 				}
+			}
+		}
+		//获取共享订阅列表 queueSubscribeMap
+		Map<String, Integer> queueSubscribeMap = getQueueSubscribeMap(queueSubscribeStore, TopicFilterType.QUEUE, topicName);
+		//将依据负载均衡策略选出的客户端放到 subscribeMap
+		if (!queueSubscribeMap.isEmpty()) {
+			randomStrategy(subscribeMap, queueSubscribeMap);
+		}
+		//获取分组订阅列表 shareSubscribeMap 并与subscribeMap合并
+		Map<String, Map<String, Integer>> shareSubscribeMap = getShareSubscribeMap(shareSubscribeStore, TopicFilterType.SHARE, topicName);
+		if (!shareSubscribeMap.isEmpty()) {
+			for (Map<String, Integer> value : shareSubscribeMap.values()) {
+				randomStrategy(subscribeMap, value);
 			}
 		}
 		List<Subscribe> subscribeList = new ArrayList<>();
