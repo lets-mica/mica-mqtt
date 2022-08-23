@@ -28,10 +28,10 @@ import java.nio.ByteBuffer;
  *
  * @author L.cm
  */
-public class MessageSerializerTest {
+class MessageSerializerTest {
 
 	@Test
-	public void testConnect() {
+	void testConnect() {
 		Message message = new Message();
 		message.setMessageType(MessageType.CONNECT);
 		message.setNode("node");
@@ -48,7 +48,7 @@ public class MessageSerializerTest {
 	}
 
 	@Test
-	public void testSubscribe() {
+	void testSubscribe() {
 		Message message = new Message();
 		message.setMessageType(MessageType.SUBSCRIBE);
 		message.setNode("node");
@@ -66,7 +66,7 @@ public class MessageSerializerTest {
 	}
 
 	@Test
-	public void testUnsubscribe() {
+	void testUnsubscribe() {
 		Message message = new Message();
 		message.setMessageType(MessageType.UNSUBSCRIBE);
 		message.setNode("node");
@@ -84,7 +84,7 @@ public class MessageSerializerTest {
 	}
 
 	@Test
-	public void testUpStream() {
+	void testUpStream() {
 		Message message = new Message();
 		message.setId(0xffff);
 		message.setFromClientId("123");
@@ -110,7 +110,7 @@ public class MessageSerializerTest {
 	}
 
 	@Test
-	public void testDownStream() {
+	void testDownStream() {
 		Message message = new Message();
 		message.setId(0xffff);
 		message.setClientId("123");
@@ -134,7 +134,7 @@ public class MessageSerializerTest {
 	}
 
 	@Test
-	public void testDefaultMessageSerializer() {
+	void testDefaultMessageSerializer() {
 		Message message = new Message();
 		message.setMessageType(MessageType.CONNECT);
 		byte[] data = DefaultMessageSerializer.INSTANCE.serialize(message);
@@ -145,7 +145,7 @@ public class MessageSerializerTest {
 	}
 
 	@Test
-	public void testFastJsonMessageSerializer() {
+	void testFastJsonMessageSerializer() {
 		Message message = new Message();
 		message.setId(0xffff);
 		message.setFromClientId("123");
