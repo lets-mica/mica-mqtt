@@ -31,7 +31,6 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
-import org.tio.utils.SystemTimer;
 import org.tio.utils.lock.SetWithLock;
 
 import java.nio.ByteBuffer;
@@ -572,7 +571,7 @@ public final class MqttClient {
 				readLock.lock();
 				try {
 					Set<ChannelContext> set = setWithLock.getObj();
-					long currTime = SystemTimer.currTime;
+					long currTime = System.currentTimeMillis();
 					for (ChannelContext entry : set) {
 						ClientChannelContext channelContext = (ClientChannelContext) entry;
 						if (channelContext.isClosed || channelContext.isRemoved) {
