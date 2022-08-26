@@ -320,10 +320,9 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (pendingPublish == null) {
 			return;
 		}
-		ByteBuffer payload = pendingPublish.getPayload();
 		if (logger.isInfoEnabled()) {
 			String topicName = pendingPublish.getMessage().variableHeader().topicName();
-			logger.info("MQTT Topic:{} payload:{} successfully PubComp", topicName, ByteBufferUtil.toString(payload));
+			logger.info("MQTT Topic:{} successfully PubComp", topicName);
 		}
 		pendingPublish.getPayload().clear();
 		pendingPublish.onPubCompReceived();
