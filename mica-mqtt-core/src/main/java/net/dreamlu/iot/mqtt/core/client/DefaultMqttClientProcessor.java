@@ -280,6 +280,9 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
 		logger.debug("MqttClient PubRec messageId:{}", messageId);
 		MqttPendingPublish pendingPublish = clientSession.getPendingPublish(messageId);
+		if (pendingPublish == null) {
+			return;
+		}
 		pendingPublish.onPubAckReceived();
 
 		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_LEAST_ONCE, false, 0);
