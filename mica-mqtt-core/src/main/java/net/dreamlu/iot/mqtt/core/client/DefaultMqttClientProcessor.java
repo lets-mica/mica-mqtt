@@ -231,6 +231,8 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				if (packetId != -1) {
 					MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(fixedHeader, MqttMessageIdVariableHeader.from(packetId));
+					Boolean resultPubRec = Tio.send(context, pubRecMessage);
+					logger.debug("Publish - PubRec send topicName:{} mqttQoS:{} packetId:{} result:{}", topicName, mqttQoS, packetId, resultPubRec);
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					clientSession.addPendingQos2Publish(packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(ackService, msg -> Tio.send(context, msg));
@@ -318,9 +320,10 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (pendingPublish == null) {
 			return;
 		}
+		ByteBuffer payload = pendingPublish.getPayload();
 		if (logger.isInfoEnabled()) {
 			String topicName = pendingPublish.getMessage().variableHeader().topicName();
-			logger.info("MQTT Topic:{} successfully PubComp", topicName);
+			logger.info("MQTT Topic:{} payload:{} successfully PubComp", topicName, ByteBufferUtil.toString(payload));
 		}
 		pendingPublish.getPayload().clear();
 		pendingPublish.onPubCompReceived();
