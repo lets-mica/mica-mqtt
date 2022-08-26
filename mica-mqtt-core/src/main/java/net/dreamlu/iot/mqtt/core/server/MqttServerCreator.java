@@ -200,6 +200,11 @@ public class MqttServerCreator {
 	 * 消息拦截器
 	 */
 	private final MqttMessageInterceptors messageInterceptors = new MqttMessageInterceptors();
+	/**
+	 * ackService
+	 */
+	private AckService ackService;
+
 	public String getName() {
 		return name;
 	}
@@ -519,6 +524,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public MqttServerCreator ackService(AckService ackService) {
+		this.ackService = ackService;
+		return this;
+	}
+
+	public MqttServerCreator ackService(long tickMs, int wheelSize) {
+		return ackService(new DefaultAckService(tickMs, wheelSize));
+	}
+
 	public MqttServer build() {
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
@@ -539,10 +553,12 @@ public class MqttServerCreator {
 		if (this.connectStatusListener == null) {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
+		if (this.ackService == null) {
+			this.ackService = new DefaultAckService();
+		}
 		// 业务线程池
 		ThreadPoolExecutor mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
 		// AckService
-		AckService ackService = new DefaultAckService();
 		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, mqttExecutor);
 		// 1. 处理消息
 		ServerAioHandler handler = new MqttServerAioHandler(this, serverProcessor);
@@ -587,7 +603,7 @@ public class MqttServerCreator {
 			webServer = null;
 		}
 		// MqttServer
-		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, ackService);
+		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, this.ackService);
 		// 9. 如果是默认的消息转发器，设置 mqttServer
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
 			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);

@@ -477,6 +477,10 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator ackService(long tickMs, int wheelSize) {
+		return ackService(new DefaultAckService(tickMs, wheelSize));
+	}
+
 	public MqttClientCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
 		this.tioConfigCustomize = tioConfigCustomize;
 		return this;
