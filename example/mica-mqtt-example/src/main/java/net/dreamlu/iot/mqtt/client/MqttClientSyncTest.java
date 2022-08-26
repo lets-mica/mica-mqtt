@@ -21,7 +21,6 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -50,6 +49,6 @@ public class MqttClientSyncTest {
 		client.unSubscribe("/test/#", "/test/123");
 
 		// 连接上之后发送消息，注意：连接时出现异常等就不会发出
-		client.publish("/test/client", ByteBuffer.wrap("mica最牛皮".getBytes(StandardCharsets.UTF_8)));
+		client.publish("/test/client", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
 	}
 }

@@ -5,6 +5,7 @@
 ### v1.3.9 - 2022-08-28
 - :sparkles: mica-mqtt server 添加消息拦截器，gitee #I5KLST
 - :sparkles: mica-mqtt client、server ack 优化和完善，可自定义 ackService。
+- :sparkles: mica-mqtt client stater MqttClientTemplate 完善，统一调整客户端示例。
 - :sparkles: mica-mqtt client 优化客户端心跳和心跳日志优化。
 - :sparkles: mica-mqtt client 订阅代码优化。
 - :sparkles: mica-mqtt codec 代码优化。
