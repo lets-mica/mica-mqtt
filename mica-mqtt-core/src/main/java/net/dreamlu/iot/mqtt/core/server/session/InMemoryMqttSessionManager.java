@@ -27,6 +27,7 @@ import net.dreamlu.iot.mqtt.core.util.collection.IntObjectMap;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -38,27 +39,27 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * messageId 存储 clientId: messageId
 	 */
-	private final ConcurrentMap<String, AtomicInteger> messageIdStore = new ConcurrentHashMap<>();
+	private final Map<String, AtomicInteger> messageIdStore = new ConcurrentHashMap<>();
 	/**
 	 * 订阅存储 topicFilter: {clientId: qos}
 	 */
-	private final ConcurrentMap<String, ConcurrentMap<String, Integer>> subscribeStore = new ConcurrentHashMap<>();
+	private final Map<String, Map<String, Integer>> subscribeStore = new ConcurrentHashMap<>();
 	/**
 	 * 共享订阅存储 queueTopicFilter: {clientId: qos}
 	 */
-	private final ConcurrentMap<String, ConcurrentMap<String, Integer>> queueSubscribeStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Map<String, Integer>> queueSubscribeStore = new ConcurrentHashMap<>();
 	/**
 	 * 分组订阅存储 groupName : {shareTopicFilter : {clientId: qos}}
 	 */
-	private final ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Integer>>> shareSubscribeStore = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Map<String, Map<String, Integer>>> shareSubscribeStore = new ConcurrentHashMap<>();
 	/**
 	 * qos1 消息过程存储 clientId: {msgId: Object}
 	 */
-	private final ConcurrentMap<String, IntObjectMap<MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
+	private final Map<String, IntObjectMap<MqttPendingPublish>> pendingPublishStore = new ConcurrentHashMap<>();
 	/**
 	 * qos2 消息过程存储 clientId: {msgId: Object}
 	 */
-	private final ConcurrentMap<String, IntObjectMap<MqttPendingQos2Publish>> pendingQos2PublishStore = new ConcurrentHashMap<>();
+	private final Map<String, IntObjectMap<MqttPendingQos2Publish>> pendingQos2PublishStore = new ConcurrentHashMap<>();
 
 	@Override
 	public void addSubscribe(String topicFilter, String clientId, int mqttQoS) {
@@ -66,13 +67,13 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		TopicFilterType filterType = TopicFilterType.getType(topicFilter);
 		if (TopicFilterType.QUEUE == filterType) {
 			data = queueSubscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
-		}
-		else if (TopicFilterType.SHARE == filterType){
+		} else if (TopicFilterType.SHARE == filterType) {
 			String name = TopicFilterType.getShareGroupName(topicFilter);
-			ConcurrentMap<String, ConcurrentMap<String, Integer>> shareSubscribeMap = shareSubscribeStore.computeIfAbsent(name, (key) -> new ConcurrentHashMap<>(16));
+			Map<String, Map<String, Integer>> shareSubscribeMap = shareSubscribeStore.computeIfAbsent(name, (key) -> new ConcurrentHashMap<>(16));
 			data = shareSubscribeMap.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
+		} else {
+			data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
 		}
-		else data = subscribeStore.computeIfAbsent(topicFilter, (key) -> new ConcurrentHashMap<>(16));
 		// 如果不存在或者老的订阅 qos 比较小也重新设置
 		Integer existingQos = data.get(clientId);
 		if (existingQos == null || existingQos < mqttQoS) {
@@ -82,7 +83,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void removeSubscribe(String topicFilter, String clientId) {
-		ConcurrentMap<String, Integer> map = subscribeStore.get(topicFilter);
+		Map<String, Integer> map = subscribeStore.get(topicFilter);
 		if (map == null) {
 			return;
 		}
@@ -97,7 +98,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	public Integer searchSubscribe(String topicName, String clientId) {
 		// 服务端发布时查找是否有订阅，只要证明有订阅即可
 		// 1. 如果订阅的就是普通的 topic
-		ConcurrentMap<String, Integer> subscribeData = subscribeStore.get(topicName);
+		Map<String, Integer> subscribeData = subscribeStore.get(topicName);
 		if (subscribeData != null && !subscribeData.isEmpty()) {
 			Integer qos = subscribeData.get(clientId);
 			if (qos != null) {
@@ -109,7 +110,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
 			if (TopicUtil.match(topicFilter, topicName)) {
-				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
+				Map<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					Integer mqttQoS = data.get(clientId);
 					if (mqttQoS != null) {
@@ -128,13 +129,13 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * 获取订阅列表  共享订阅
 	 */
-	public Map<String, Integer> getQueueSubscribeMap(ConcurrentMap<String, ConcurrentMap<String, Integer>> subscribeStore, TopicFilterType filterType, String topicName) {
+	public Map<String, Integer> getQueueSubscribeMap(Map<String, Map<String, Integer>> subscribeStore, TopicFilterType filterType, String topicName) {
 		// 排除重复订阅，例如： /test/# 和 /# 只发一份
 		Map<String, Integer> subscribeMap = new HashMap<>(32);
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
 			if (filterType.match(topicFilter, topicName)) {
-				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
+				Map<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					data.forEach((clientId, qos) -> {
 						subscribeMap.merge(clientId, qos, Math::min);
@@ -142,19 +143,22 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 				}
 			}
 		}
-
 		return subscribeMap;
 	}
 
 	/**
 	 * 获取订阅列表  分组订阅
 	 */
-	public  Map<String, Map<String, Integer>> getShareSubscribeMap(ConcurrentMap<String, ConcurrentMap<String, ConcurrentMap<String, Integer>>> shareSubscribeStore, TopicFilterType filterType, String topicName) {
+	public Map<String, Map<String, Integer>> getShareSubscribeMap(Map<String, Map<String, Map<String, Integer>>> shareSubscribeStore, TopicFilterType filterType, String topicName) {
 		// 排除重复订阅，例如： /test/# 和 /# 只发一份
 		Map<String, Map<String, Integer>> shareSubscribeMap = new HashMap<>(32);
-		for (String s : shareSubscribeStore.keySet()) {
-			Map<String, Integer> map = getQueueSubscribeMap(shareSubscribeStore.get(s), filterType, topicName);
-			if (map != null && map.size() != 0) shareSubscribeMap.put(s, map);
+		for (Map.Entry<String, Map<String, Map<String, Integer>>> entry : shareSubscribeStore.entrySet()) {
+			String entryKey = entry.getKey();
+			Map<String, Map<String, Integer>> entryValue = entry.getValue();
+			Map<String, Integer> map = getQueueSubscribeMap(entryValue, filterType, topicName);
+			if (map != null && !map.isEmpty()) {
+				shareSubscribeMap.put(entryKey, map);
+			}
 		}
 		return shareSubscribeMap;
 	}
@@ -164,7 +168,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	 */
 	public void randomStrategy(Map<String, Integer> subscribeMap, Map<String, Integer> randomSubscribeMap) {
 		String[] keys = randomSubscribeMap.keySet().toArray(new String[0]);
-		Random random = new Random();
+		Random random = ThreadLocalRandom.current();
 		String key = keys[random.nextInt(keys.length)];
 		subscribeMap.merge(key, randomSubscribeMap.get(key), Math::min);
 	}
@@ -176,7 +180,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		Set<String> topicFilterSet = subscribeStore.keySet();
 		for (String topicFilter : topicFilterSet) {
 			if (TopicUtil.match(topicFilter, topicName)) {
-				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
+				Map<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					data.forEach((clientId, qos) -> {
 						subscribeMap.merge(clientId, qos, Math::min);
@@ -208,9 +212,9 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	@Override
 	public List<Subscribe> getSubscriptions(String clientId) {
 		List<Subscribe> subscribeList = new ArrayList<>();
-		Set<Map.Entry<String, ConcurrentMap<String, Integer>>> entrySet = subscribeStore.entrySet();
-		for (Map.Entry<String, ConcurrentMap<String, Integer>> mapEntry : entrySet) {
-			ConcurrentMap<String, Integer> mapEntryValue = mapEntry.getValue();
+		Set<Map.Entry<String, Map<String, Integer>>> entrySet = subscribeStore.entrySet();
+		for (Map.Entry<String, Map<String, Integer>> mapEntry : entrySet) {
+			Map<String, Integer> mapEntryValue = mapEntry.getValue();
 			if (mapEntryValue == null || mapEntryValue.isEmpty()) {
 				continue;
 			}
