@@ -58,7 +58,7 @@ public class AckTimerTask extends TimerTask {
 	public void run() {
 		if (++count <= maxRetryCount + 1) {
 			try {
-				log.info("Mqtt ack task retry running.");
+				log.debug("Mqtt ack task retry running.");
 				command.run();
 				timer.add(this);
 			} catch (Exception e) {

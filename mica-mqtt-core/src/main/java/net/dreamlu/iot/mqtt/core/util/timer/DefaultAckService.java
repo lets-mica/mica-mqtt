@@ -26,11 +26,11 @@ public class DefaultAckService implements AckService {
 	private final TimingWheelThread timingWheelThread;
 
 	public DefaultAckService() {
-		this(100L, 60);
+		this(200L, 60);
 	}
 
 	public DefaultAckService(long tickMs, int wheelSize) {
-		this(new SystemTimer(tickMs, wheelSize, "DefaultTimerTaskService"));
+		this(new SystemTimer(tickMs, wheelSize, "DefaultAckService"));
 	}
 
 	public DefaultAckService(SystemTimer systemTimer) {
