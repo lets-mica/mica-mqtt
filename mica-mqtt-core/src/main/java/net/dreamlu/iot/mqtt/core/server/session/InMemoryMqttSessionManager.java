@@ -82,7 +82,11 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 
 	@Override
 	public void removeSubscribe(String topicFilter, String clientId) {
-		Map<String, Integer> map = subscribeStore.get(topicFilter);
+		Map<String, Integer> map;
+		TopicFilterType filterType = TopicFilterType.getType(topicFilter);
+		if (filterType == TopicFilterType.NONE) map = subscribeStore.get(topicFilter);
+		else if (filterType == TopicFilterType.QUEUE) map = queueSubscribeStore.get(topicFilter);
+		else map = shareSubscribeStore.get(TopicFilterType.getShareGroupName(topicFilter)).get(topicFilter);
 		if (map == null) {
 			return;
 		}
