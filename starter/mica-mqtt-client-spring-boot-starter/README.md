@@ -26,7 +26,7 @@ mqtt:
     timeout: 5                  # 超时时间，单位：秒，默认：5秒
     reconnect: true             # 是否重连，默认：true
     re-interval: 5000           # 重连时间，默认 5000 毫秒
-    version: MQTT_5             # mqtt 协议版本，默认：3.1.1
+    version: mqtt_3_1_1         # mqtt 协议版本，可选 MQTT_3_1、mqtt_3_1_1、mqtt_5，默认：mqtt_3_1_1
     read-buffer-size: 8KB       # 接收数据的 buffer size，默认：8k
     max-bytes-in-message: 10MB  # 消息解析最大 bytes 长度，默认：10M
     buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
