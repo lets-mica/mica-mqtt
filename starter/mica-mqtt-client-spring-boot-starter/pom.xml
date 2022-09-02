@@ -19,7 +19,7 @@
             <artifactId>mica-mqtt-core</artifactId>
             <exclusions>
                 <exclusion>
-                    <groupId>org.t-io</groupId>
+                    <groupId>net.dreamlu</groupId>
                     <artifactId>tio-websocket-server</artifactId>
                 </exclusion>
                 <exclusion>

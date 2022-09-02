@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.t-io</groupId>
+            <groupId>net.dreamlu</groupId>
             <artifactId>tio-core</artifactId>
             <scope>provided</scope>
         </dependency>
