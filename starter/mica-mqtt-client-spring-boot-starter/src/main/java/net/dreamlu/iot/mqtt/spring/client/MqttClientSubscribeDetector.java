@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.spring.client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
+import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -94,7 +95,12 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 	}
 
 	private static String[] getTopicFilters(ApplicationContext applicationContext, String[] values) {
-		return Arrays.stream(values).map(applicationContext.getEnvironment()::resolvePlaceholders).toArray(String[]::new);
+		// 1. 替换 Spring boot env 变量
+		// 2. 替换订阅中的其他变量
+		return Arrays.stream(values)
+			.map(applicationContext.getEnvironment()::resolvePlaceholders)
+			.map(TopicUtil::getTopicFilter)
+			.toArray(String[]::new);
 	}
 
 }

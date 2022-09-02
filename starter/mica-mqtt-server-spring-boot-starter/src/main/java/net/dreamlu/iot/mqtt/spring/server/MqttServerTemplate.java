@@ -128,6 +128,19 @@ public class MqttServerTemplate {
 	 * @param retain  是否在服务器上保留消息
 	 * @return 是否发送成功
 	 */
+	public boolean publishAll(String topic, byte[] payload, MqttQoS qos, boolean retain) {
+		return publishAll(topic, payload == null ? null : ByteBuffer.wrap(payload), qos, retain);
+	}
+
+	/**
+	 * 发布消息给所以的在线设备
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
 	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publishAll(topic, payload, qos, retain);
 	}

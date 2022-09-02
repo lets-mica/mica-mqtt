@@ -19,7 +19,10 @@ package net.dreamlu.iot.mqtt.core.server.http.websocket;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.WriteBuffer;
+import net.dreamlu.iot.mqtt.core.server.MqttMessageInterceptors;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.core.TioConfig;
@@ -39,6 +42,7 @@ import java.nio.ByteBuffer;
  * @author L.cm
  */
 public class MqttWsMsgHandler implements IWsMsgHandler {
+	private static final Logger logger = LoggerFactory.getLogger(MqttWsMsgHandler.class);
 	/**
 	 * mqtt websocket message body key
 	 */
@@ -52,6 +56,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 */
 	private final String[] supportedSubProtocols;
 	private final TioHandler mqttServerAioHandler;
+	private final MqttMessageInterceptors messageInterceptors;
 
 	public MqttWsMsgHandler(MqttServerCreator serverCreator, TioHandler aioHandler) {
 		this(serverCreator, new String[]{"mqtt", "mqttv3.1", "mqttv3.1.1"}, aioHandler);
@@ -63,6 +68,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 		this.serverCreator = serverCreator;
 		this.supportedSubProtocols = supportedSubProtocols;
 		this.mqttServerAioHandler = aioHandler;
+		this.messageInterceptors = serverCreator.getMessageInterceptors();
 	}
 
 	@Override
@@ -108,7 +114,8 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 		// 可能会一次有多个包，所以需要进行拆包
 		while (buffer.hasRemaining()) {
 			// 解析 mqtt 消息
-			Packet packet = mqttServerAioHandler.decode(buffer, 0, 0, buffer.remaining(), context);
+			int readableLength = buffer.remaining();
+			Packet packet = mqttServerAioHandler.decode(buffer, 0, 0, readableLength, context);
 			if (packet == null) {
 				// 如果拆包之后还有剩余，写回到 WriteBuffer
 				int remaining = buffer.remaining();
@@ -119,7 +126,20 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 				}
 				return null;
 			}
+			// 消息解析后
+			try {
+				messageInterceptors.onAfterDecoded(context, (MqttMessage) packet, readableLength);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
+			// 消息处理
 			mqttServerAioHandler.handler(packet, context);
+			// 消息处理后
+			try {
+				messageInterceptors.onAfterHandled(context, (MqttMessage) packet, readableLength);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
 		}
 		return null;
 	}

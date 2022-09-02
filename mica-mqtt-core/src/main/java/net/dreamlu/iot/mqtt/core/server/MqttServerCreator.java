@@ -29,6 +29,7 @@ import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
 import net.dreamlu.iot.mqtt.core.server.http.core.MqttWebServer;
+import net.dreamlu.iot.mqtt.core.server.interceptor.IMqttMessageInterceptor;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.session.InMemoryMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
@@ -187,15 +188,23 @@ public class MqttServerCreator {
 	/**
 	 * 是否用队列解码（系统初始化时确定该值，中途不要变更此值，否则在切换的时候可能导致消息丢失）
 	 */
-	private boolean useQueueDecode = false;
+	private boolean useQueueDecode = true;
 	/**
-	 * 是否开启监控，默认：false 不开启，节省内存
+	 * 是否开启监控，不开启可节省内存，默认：true
 	 */
-	private boolean statEnable = false;
+	private boolean statEnable = true;
 	/**
 	 * TioConfig 自定义配置
 	 */
 	private Consumer<TioConfig> tioConfigCustomize;
+	/**
+	 * 消息拦截器
+	 */
+	private final MqttMessageInterceptors messageInterceptors = new MqttMessageInterceptors();
+	/**
+	 * ackService
+	 */
+	private AckService ackService;
 
 	public String getName() {
 		return name;
@@ -507,6 +516,24 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public MqttMessageInterceptors getMessageInterceptors() {
+		return messageInterceptors;
+	}
+
+	public MqttServerCreator addInterceptor(IMqttMessageInterceptor interceptor) {
+		this.messageInterceptors.add(interceptor);
+		return this;
+	}
+
+	public MqttServerCreator ackService(AckService ackService) {
+		this.ackService = ackService;
+		return this;
+	}
+
+	public MqttServerCreator ackService(long tickMs, int wheelSize) {
+		return ackService(new DefaultAckService(tickMs, wheelSize));
+	}
+
 	public MqttServer build() {
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
@@ -527,11 +554,13 @@ public class MqttServerCreator {
 		if (this.connectStatusListener == null) {
 			this.connectStatusListener = new DefaultMqttConnectStatusListener();
 		}
+		if (this.ackService == null) {
+			this.ackService = new DefaultAckService();
+		}
 		// 业务线程池
 		ThreadPoolExecutor mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
 		// AckService
-		AckService ackService = new DefaultAckService();
-		MqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, mqttExecutor);
+		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, ackService, mqttExecutor);
 		// 1. 处理消息
 		TioServerHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
@@ -575,7 +604,7 @@ public class MqttServerCreator {
 			webServer = null;
 		}
 		// MqttServer
-		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, ackService);
+		MqttServer mqttServer = new MqttServer(tioServer, webServer, this, this.ackService);
 		// 9. 如果是默认的消息转发器，设置 mqttServer
 		if (this.messageDispatcher instanceof AbstractMqttMessageDispatcher) {
 			((AbstractMqttMessageDispatcher) this.messageDispatcher).config(mqttServer);

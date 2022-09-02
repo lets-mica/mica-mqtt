@@ -1,9 +1,11 @@
 ##  快速开始
-查看 **example/mica-mqtt-example** 中有 `mqtt` 服务端和客户端演示代码， `main` 方法运行即可。
+ **example** 中有 `mqtt` 服务端和客户端演示代码。
+
+ 也可以只启动**Server**端，**Client**端用客户端工具测试。
 
 ### 1. 启动 Server 端
 
-运行  `example/mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/server/MqttServerTest.java` 的 `main` 方法
+运行  `example/mica-mqtt-server-spring-boot-example/src/main/java/net/dreamlu/iot/mqtt/server/MqttServerApplication.java` 的 `main` 方法
 
 控制台打印如下内容：
 
@@ -60,7 +62,7 @@ Mica-Mqtt-Server
 
 ### 2. 启动 Client 端
 
-运行 `example/mica-mqtt-example/src/main/java/net/dreamlu/iot/mqtt/client/MqttClientTest.java` 的 `main` 方法
+运行 `example/mica-mqtt-client-spring-boot-example/src/main/java/net/dreamlu/iot/mqtt/client/MqttClientApplication.java` 的 `main` 方法
 
 控制台打印如下内容，表示客户端连接成功：
 ```text

@@ -3,8 +3,13 @@
 ![JAVA 8](https://img.shields.io/badge/JDK-1.8+-brightgreen.svg)
 [![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/net.dreamlu/mica-mqtt-core.svg?style=flat-square)](https://mvnrepository.com/artifact/net.dreamlu/mica-mqtt-core)
 [![Mica-mqtt maven snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/net.dreamlu/mica-mqtt-core.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/net/dreamlu/mica-mqtt-core/)
+
+[![star](https://gitee.com/596392912/mica-mqtt/badge/star.svg?theme=dark)](https://gitee.com/596392912/mica-mqtt/stargazers)
+[![GitHub Repo stars](https://img.shields.io/github/stars/lets-mica/mica-mqtt?label=Github%20Stars)](https://github.com/lets-mica/mica-mqtt)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/30dad82f79f34e41bafbc3cef6b68fc3)](https://www.codacy.com/gh/lets-mica/mica-mqtt/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lets-mica/mica-mqtt&amp;utm_campaign=Badge_Grade)
 [![GitHub](https://img.shields.io/github/license/lets-mica/mica-mqtt.svg?style=flat-square)](https://github.com/lets-mica/mica-mqtt/blob/master/LICENSE)
+
+---
 
 基于 `t-io` 实现的**低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
 
@@ -48,14 +53,24 @@
 | 1883   | tcp             | mqtt tcp 端口                    |
 | 8083   | http、websocket | http api 和 websocket mqtt 子协议端口 |
 
+**演示地址**：mqtt.dreamlu.net 端口同上。
+
 ## 📦️ 依赖
+
+### 最新版本
+
+| 版本 | 版本号            |
+|--|----------------|
+| 🏷️稳定版 | 1.3.9       |
+| 🏗快照版（提交后 github action 自动构建） | 1.3.9-SNAPSHOT |
+
 ### Spring boot 项目
 **客户端：**
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
-  <version>1.3.6</version>
+  <version>${mica-mqtt.version}</version>
 </dependency>
 ```
 
@@ -66,7 +81,7 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
-  <version>1.3.6</version>
+  <version>${mica-mqtt.version}</version>
 </dependency>
 ```
 
@@ -77,16 +92,19 @@
 <dependency>
   <groupId>net.dreamlu</groupId>
   <artifactId>mica-mqtt-core</artifactId>
-  <version>1.3.6</version>
+  <version>${mica-mqtt.version}</version>
 </dependency>
 ```
 
 **配置详见**：[mica-mqtt 使用文档](mica-mqtt-core/README.md)
 
 ## 📝 文档
+- [mqtt科普、mqttx、mica-mqtt的使用**视频**](https://b23.tv/VJ8yc7v)
 - [mica-mqtt 快速开始](example/README.md)
 - [mica-mqtt-client-spring-boot-starter 使用文档](starter/mica-mqtt-client-spring-boot-starter/README.md)
 - [mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
+- [jfinal-mica-mqtt-client 使用文档](starter/jfinal-mica-mqtt-client/README.md)
+- [jfinal-mica-mqtt-server 使用文档](starter/jfinal-mica-mqtt-server/README.md)
 - [mica-mqtt 使用文档](mica-mqtt-core/README.md)
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
@@ -123,12 +141,11 @@
 ## 🍱 赞助计划
 mica-mqtt 始于一份热爱，也得到不少朋友的认可，为了更好的发展，特推出赞助计划。**知识付费**，让你我走的更远！！！
 
-| 类型       | ￥    | 权益（永久）                         |
-| ---------- |------|--------------------------------|
-| 青铜赞助人 | 99   | 提供物联网 mqtt、边缘计算等技术交流少走弯路。      |
-| 黄金赞助人 | 599  | 享受如梦技术物联网相关资源，更加易用的 mqtt broker。 |
-| 铂金赞助人 | 999  | 享受如梦技术物联网 + 微服（原如梦技术VIP）相关资源。  |
-| 砖石赞助商 | 1999 | 提供个性化需求，包括 emqx 插件。            |
+| 类型    | ￥   | 权益（永久）                                   |
+|-------|-----|------------------------------------------|
+| 🥈赞助人 | 199 | mica-mqttx 源码。                           |
+| 🏅赞助人 | 599 | 提供 emqx kafka 插件，支持 kakfa 集群和分区。         |
+| 💎赞助人 | 699 | mica-mqttx 源码 + micax 微服务（原如梦技术VIP）相关资源。 |
 
 **注意：** 加微信 **DreamLuTech** 详聊。
 

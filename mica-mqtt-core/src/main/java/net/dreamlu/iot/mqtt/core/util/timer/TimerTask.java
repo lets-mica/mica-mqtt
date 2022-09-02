@@ -5,7 +5,7 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- *
+ * <p>
  * <a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>
  * <p>
  * Unless required by applicable law or agreed to in writing, software
@@ -34,11 +34,11 @@ public abstract class TimerTask implements Runnable {
 	 */
 	protected TimerTaskEntry timerTaskEntry;
 
-	public TimerTask() {
+	protected TimerTask() {
 		this(30000L);
 	}
 
-	public TimerTask(long delayMs) {
+	protected TimerTask(long delayMs) {
 		this.delayMs = delayMs;
 	}
 

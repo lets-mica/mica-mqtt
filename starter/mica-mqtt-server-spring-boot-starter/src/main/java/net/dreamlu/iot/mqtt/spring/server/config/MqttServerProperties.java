@@ -112,9 +112,9 @@ public class MqttServerProperties {
 	 */
 	private String nodeName;
 	/**
-	 * 是否开启监控，默认：false 不开启，节省内存
+	 * 是否开启监控，不开启可节省内存，默认：true
 	 */
-	private boolean statEnable = false;
+	private boolean statEnable = true;
 
 	@Getter
 	@Setter

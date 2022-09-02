@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>jfinal-mica-mqtt-client</artifactId>
+    <name>${project.artifactId}</name>
+
+    <parent>
+        <groupId>net.dreamlu</groupId>
+        <artifactId>mica-mqtt</artifactId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-mqtt-core</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.t-io</groupId>
+                    <artifactId>tio-websocket-server</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>net.dreamlu</groupId>
+                    <artifactId>mica-mqtt-model</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.alibaba</groupId>
+                    <artifactId>fastjson</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.jfinal</groupId>
+            <artifactId>jfinal</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -41,9 +42,10 @@ public class MqttServerTest {
 			.ip("0.0.0.0")
 			// 默认：1883
 			.port(1883)
-			.usernamePassword("mica", "mica")
-			// 默认为： 8092（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
-			.readBufferSize(512)
+			// mqtt 用户名密码
+//			.usernamePassword("mica", "mica")
+			// 默认为： 8192（mqtt 默认最大消息大小），为了降低内存可以减小小此参数，如果消息过大 t-io 会尝试解析多次（建议根据实际业务情况而定）
+			.readBufferSize(8192)
 //			最大包体长度
 //			.maxBytesInMessage(1024 * 100)
 //			mqtt 3.1 协议会校验 clientId 长度。
@@ -53,6 +55,8 @@ public class MqttServerTest {
 			})
 			// 客户端连接状态监听
 			.connectStatusListener(new MqttConnectStatusListener())
+			// 自定义消息拦截器
+//			.addInterceptor(new MqttMessageInterceptor())
 			// 开启 http
 			.httpEnable(true)
 			// http basic 认证，自定义认证，实现 HttpFilter， 注册到 MqttHttpRoutes 即可
@@ -70,7 +74,7 @@ public class MqttServerTest {
 			@Override
 			public void run() {
 				String message = "mica最牛皮 " + System.currentTimeMillis();
-				mqttServer.publishAll("/test/123", ByteBuffer.wrap(message.getBytes()), MqttQoS.AT_LEAST_ONCE);
+				mqttServer.publishAll("/test/123", ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8)), MqttQoS.AT_LEAST_ONCE);
 			}
 		}, 1000, 2000);
 	}

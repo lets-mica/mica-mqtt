@@ -20,11 +20,12 @@
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- tio version -->
         <tio.version>3.8.2.v20220628-RELEASE</tio.version>
-        <spring.boot.version>2.7.1</spring.boot.version>
-        <mica.version>2.7.1.1</mica.version>
+        <spring.boot.version>2.7.3</spring.boot.version>
+        <mica.version>2.7.3</mica.version>
         <mica.auto.version>2.3.1</mica.auto.version>
         <fastjson.version>1.2.83</fastjson.version>
         <micrometer-core.version>1.9.0</micrometer-core.version>
+        <jfinal.version>5.0.1</jfinal.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <lombok.version>1.18.24</lombok.version>
     </properties>
@@ -36,6 +37,8 @@
         <module>mica-mqtt-broker</module>
         <module>starter/mica-mqtt-client-spring-boot-starter</module>
         <module>starter/mica-mqtt-server-spring-boot-starter</module>
+        <module>starter/jfinal-mica-mqtt-client</module>
+        <module>starter/jfinal-mica-mqtt-server</module>
         <module>example/mica-mqtt-example</module>
         <module>example/mica-mqtt-client-spring-boot-example</module>
         <module>example/mica-mqtt-server-spring-boot-example</module>
@@ -77,6 +80,11 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
                 <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.jfinal</groupId>
+                <artifactId>jfinal</artifactId>
+                <version>${jfinal.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.dreamlu</groupId>

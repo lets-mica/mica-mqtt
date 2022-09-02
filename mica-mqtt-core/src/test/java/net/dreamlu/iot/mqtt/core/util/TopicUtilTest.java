@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Test;
  *
  * @author L.cm
  */
-public class TopicUtilTest {
+class TopicUtilTest {
 
 	@Test
-	public void test() {
+	void test() {
 		// gitee issues #I56BTC /iot/test/# 无法匹配到 /iot/test 和 /iot/test/
 		Assertions.assertFalse(TopicUtil.match("+", "/iot/test"));
 		Assertions.assertFalse(TopicUtil.match("+", "iot/test"));

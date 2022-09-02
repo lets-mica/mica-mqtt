@@ -18,7 +18,6 @@ package net.dreamlu.iot.mqtt.broker;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -43,7 +42,7 @@ public class DeviceC {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				client.publish("/a/door/open", ByteBuffer.wrap("open".getBytes(StandardCharsets.UTF_8)));
+				client.publish("/a/door/open", "open".getBytes(StandardCharsets.UTF_8));
 			}
 		}, 5000, 5000);
 	}

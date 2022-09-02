@@ -19,7 +19,10 @@ package net.dreamlu.iot.mqtt.aliyun;
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * 客户端测试
@@ -49,14 +52,21 @@ public class MqttClientTest {
 			.username(username)
 			.password(password)
 			.clientId(clientId)
-			.connect();
+			.connectSync(); // 使用同步
 
 		client.subQos0("/sys/" + productKey + '/' + deviceName + "/thing/event/property/post_reply", (topic, payload) -> {
 			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 
-		String content = "{\"id\":\"1\",\"version\":\"1.0\",\"params\":{\"LightSwitch\":1}}";
-		client.publish("/sys/" + productKey + "/" + deviceName + "/thing/event/property/post", ByteBuffer.wrap(content.getBytes()));
+		Timer timer = new Timer();
+		timer.schedule(new TimerTask() {
+			@Override
+			public void run() {
+				int LightSwitch = ThreadLocalRandom.current().nextBoolean() ? 0 : 1;
+				String content = "{\"id\":\"1\",\"version\":\"1.0\",\"params\":{\"LightSwitch\":" + LightSwitch + "}}";
+				client.publish("/sys/" + productKey + "/" + deviceName + "/thing/event/property/post", content.getBytes(StandardCharsets.UTF_8));
+			}
+		}, 3000, 3000);
 	}
 
 }

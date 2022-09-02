@@ -246,9 +246,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				if (packetId != -1) {
 					MqttFixedHeader pubRecFixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(pubRecFixedHeader, MqttMessageIdVariableHeader.from(packetId));
-					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					Boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
+					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					sessionManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(ackService, msg -> Tio.send(context, msg));
 				}

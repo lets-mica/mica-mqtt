@@ -34,7 +34,6 @@ import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
@@ -76,7 +75,7 @@ public final class MqttClientCreator {
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
-	 * Keep Alive (s)
+	 * Keep Alive (s)，如果用户不希望框架层面做心跳相关工作，请把此值设为0或负数
 	 */
 	private int keepAliveSecs = DEFAULT_KEEP_ALIVE_SECS;
 	/**
@@ -155,6 +154,10 @@ public final class MqttClientCreator {
 	 * 是否开启监控，默认：false 不开启，节省内存
 	 */
 	private boolean statEnable = false;
+	/**
+	 * debug
+	 */
+	private boolean debug = false;
 	/**
 	 * tioExecutor
 	 */
@@ -278,6 +281,10 @@ public final class MqttClientCreator {
 
 	public boolean isStatEnable() {
 		return statEnable;
+	}
+
+	public boolean isDebug() {
+		return debug;
 	}
 
 	public SynThreadPoolExecutor getTioExecutor() {
@@ -445,6 +452,11 @@ public final class MqttClientCreator {
 		return this;
 	}
 
+	public MqttClientCreator debug() {
+		this.debug = true;
+		return this;
+	}
+
 	public MqttClientCreator tioExecutor(SynThreadPoolExecutor tioExecutor) {
 		this.tioExecutor = tioExecutor;
 		return this;
@@ -463,6 +475,10 @@ public final class MqttClientCreator {
 	public MqttClientCreator ackService(AckService ackService) {
 		this.ackService = ackService;
 		return this;
+	}
+
+	public MqttClientCreator ackService(long tickMs, int wheelSize) {
+		return ackService(new DefaultAckService(tickMs, wheelSize));
 	}
 
 	public MqttClientCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
@@ -512,8 +528,8 @@ public final class MqttClientCreator {
 		// 6. tioConfig
 		TioClientConfig tioConfig = new TioClientConfig(clientAioHandler, clientAioListener, reconnConf, tioExecutor, groupExecutor);
 		tioConfig.setName(this.name);
-		// 7. 心跳超时时间
-		tioConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
+		// 7. 心跳超时时间，关闭默认的心跳检测，不符合 emqx
+		tioConfig.setHeartbeatTimeout(0);
 		// 8. mqtt 消息最大长度，小于 1 则使用默认的，可通过 property tio.default.read.buffer.size 设置默认大小
 		if (this.readBufferSize > 0) {
 			tioConfig.setReadBufferSize(this.readBufferSize);
@@ -522,6 +538,9 @@ public final class MqttClientCreator {
 		tioConfig.setSslConfig(this.sslConfig);
 		// 10. 是否开启监控
 		tioConfig.statOn = this.statEnable;
+		if (this.debug) {
+			tioConfig.debug = true;
+		}
 		// 11. 自定义处理
 		if (this.tioConfigCustomize != null) {
 			this.tioConfigCustomize.accept(tioConfig);

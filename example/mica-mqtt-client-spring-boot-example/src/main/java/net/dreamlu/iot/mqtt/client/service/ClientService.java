@@ -20,7 +20,7 @@ public class ClientService {
 	private MqttClientTemplate client;
 
 	public boolean publish(String body) {
-		client.publish("/test/client", ByteBuffer.wrap(body.getBytes(StandardCharsets.UTF_8)));
+		client.publish("/test/client", body.getBytes(StandardCharsets.UTF_8));
 		return true;
 	}
 

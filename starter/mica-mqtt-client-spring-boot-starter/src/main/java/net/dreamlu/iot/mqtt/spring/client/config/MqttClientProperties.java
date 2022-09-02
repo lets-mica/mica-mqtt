@@ -128,6 +128,10 @@ public class MqttClientProperties {
 	 */
 	private boolean statEnable = false;
 	/**
+	 * debug
+	 */
+	private boolean debug = false;
+	/**
 	 * 开启 ssl
 	 */
 	private boolean useSsl = false;

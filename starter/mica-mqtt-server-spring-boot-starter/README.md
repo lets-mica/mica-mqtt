@@ -30,6 +30,7 @@ mqtt:
       username: mica            # mqtt 认证用户名
       password: mica            # mqtt 认证密码
     debug: true                 # 如果开启 prometheus 指标收集建议关闭
+    stat-enable: true           # 开启指标收集，debug 和 prometheus 开启时需要打开，默认开启，关闭节省内存
     web-port: 8083              # http、websocket 端口，默认：8083
     websocket-enable: true      # 是否开启 websocket，默认： true
     http-enable: false          # 是否开启 http api，默认： false
@@ -54,6 +55,7 @@ mqtt:
 | IMqttMessageStore             | 集群是，单机否    | 遗嘱和保留消息存储                                     |
 | AbstractMqttMessageDispatcher | 集群是，单机否    | 消息转发，（遗嘱、保留消息转发）                              |
 | IpStatListener                | 否          | t-io ip 状态监听                                  |
+| IMqttMessageInterceptor       | 否          | 消息烂机器，1.3.9 新增                                |
 
 ### 2.3 IMqttMessageListener (用于监听客户端上传的消息) 使用示例
 

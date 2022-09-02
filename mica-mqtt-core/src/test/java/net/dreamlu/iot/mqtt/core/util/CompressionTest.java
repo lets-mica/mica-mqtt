@@ -12,10 +12,10 @@ import java.nio.charset.StandardCharsets;
  *
  * @author L.cm
  */
-public class CompressionTest {
+class CompressionTest {
 
 	@Test
-	public void test() throws IOException {
+	void test() throws IOException {
 		String text = "如梦技术——你的编程加油站！";
 		GzipCompression compression = new GzipCompression();
 		byte[] bytes = compression.compress(text.getBytes(StandardCharsets.UTF_8));

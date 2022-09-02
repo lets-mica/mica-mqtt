@@ -26,12 +26,14 @@ import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttSessionListener;
+import net.dreamlu.iot.mqtt.core.server.interceptor.IMqttMessageInterceptor;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerCustomizer;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import net.dreamlu.iot.mqtt.spring.server.event.SpringEventMqttConnectStatusListener;
+import net.dreamlu.iot.mqtt.spring.server.event.SpringEventMqttMessageListener;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -64,6 +66,12 @@ public class MqttServerConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
+	public IMqttMessageListener springEventMqttMessageListener(ApplicationEventPublisher eventPublisher) {
+		return new SpringEventMqttMessageListener(eventPublisher);
+	}
+
+	@Bean
 	public MqttServerCreator mqttServerCreator(MqttServerProperties properties,
 											   ObjectProvider<IMqttServerAuthHandler> authHandlerObjectProvider,
 											   ObjectProvider<IMqttServerUniqueIdService> uniqueIdServiceObjectProvider,
@@ -76,6 +84,7 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
 											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
 											   ObjectProvider<IpStatListener> ipStatListenerObjectProvider,
+											   ObjectProvider<IMqttMessageInterceptor> messageInterceptorObjectProvider,
 											   ObjectProvider<MqttServerCustomizer> customizers) {
 		MqttServerCreator serverCreator = MqttServer.create()
 			.name(properties.getName())
@@ -135,6 +144,8 @@ public class MqttServerConfiguration {
 		connectStatusListenerObjectProvider.ifAvailable(serverCreator::connectStatusListener);
 		// ip 状态监听
 		ipStatListenerObjectProvider.ifAvailable(serverCreator::ipStatListener);
+		// 消息监听器
+		messageInterceptorObjectProvider.orderedStream().forEach(serverCreator::addInterceptor);
 		// 自定义处理
 		customizers.ifAvailable((customizer) -> customizer.customize(serverCreator));
 		return serverCreator;

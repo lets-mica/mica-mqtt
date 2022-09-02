@@ -26,7 +26,7 @@ mqtt:
     timeout: 5                  # 超时时间，单位：秒，默认：5秒
     reconnect: true             # 是否重连，默认：true
     re-interval: 5000           # 重连时间，默认 5000 毫秒
-    version: MQTT_5             # mqtt 协议版本，默认：3.1.1
+    version: mqtt_3_1_1         # mqtt 协议版本，可选 MQTT_3_1、mqtt_3_1_1、mqtt_5，默认：mqtt_3_1_1
     read-buffer-size: 8KB       # 接收数据的 buffer size，默认：8k
     max-bytes-in-message: 10MB  # 消息解析最大 bytes 长度，默认：10M
     buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
@@ -111,6 +111,13 @@ public class MqttClientSubscribeListener {
 		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
 	}
 
+	@MqttClientSubscribe("/sys/${productKey}/${deviceName}/thing/sub/register")
+	public void thingSubRegister(String topic, ByteBuffer payload) {
+		// 1.3.8 开始支持，@MqttClientSubscribe 注解支持 ${} 变量替换，会默认替换成 +
+		// 注意：mica-mqtt 会先从 Spring boot 配置中替换参数 ${}，如果存在配置会优先被替换。
+		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
+	}
+
 }
 ```
 
@@ -118,7 +125,7 @@ public class MqttClientSubscribeListener {
 mica-mqtt client 支持**两种共享订阅**方式：
 
 1. 共享订阅：订阅前缀 `$queue/`，多个客户端订阅了 `$queue/topic`，发布者发布到topic，则只有一个客户端会接收到消息。
-2. 分组订阅：订阅前缀 `$share/<group>/`，组客户端订阅了`$queue/group1/topic`、`$queue/group2/topic`..，发布者发布到topic，则消息会发布到每个group中，但是每个group中只有一个客户端会接收到消息。
+2. 分组订阅：订阅前缀 `$share/<group>/`，组客户端订阅了`$share/group1/topic`、`$share/group2/topic`..，发布者发布到topic，则消息会发布到每个group中，但是每个group中只有一个客户端会接收到消息。
 
 ### 2.8 MqttClientTemplate 使用示例
 ```java

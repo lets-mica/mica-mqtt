@@ -193,14 +193,16 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		clientSession.addSubscriptionList(subscribedList);
 		// 触发已经监听的事件
 		subscribedList.forEach(clientSubscription -> {
+			String topicFilter = clientSubscription.getTopicFilter();
+			MqttQoS mqttQoS = clientSubscription.getMqttQoS();
 			IMqttClientMessageListener subscriptionListener = clientSubscription.getListener();
-			try {
-				executor.execute(() ->
-					subscriptionListener.onSubscribed(clientSubscription.getTopicFilter(), clientSubscription.getMqttQoS())
-				);
-			} catch (Throwable e) {
-				logger.error("MQTT SubscriptionList:{} subscribed onSubscribed event error.", subscribedList);
-			}
+			executor.execute(() -> {
+				try {
+					subscriptionListener.onSubscribed(topicFilter, mqttQoS);
+				} catch (Throwable e) {
+					logger.error("MQTT topicFilter:{} subscribed onSubscribed event error.", subscribedList, e);
+				}
+			});
 		});
 	}
 
@@ -229,6 +231,8 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				if (packetId != -1) {
 					MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(fixedHeader, MqttMessageIdVariableHeader.from(packetId));
+					Boolean resultPubRec = Tio.send(context, pubRecMessage);
+					logger.debug("Publish - PubRec send topicName:{} mqttQoS:{} packetId:{} result:{}", topicName, mqttQoS, packetId, resultPubRec);
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					clientSession.addPendingQos2Publish(packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(ackService, msg -> Tio.send(context, msg));
@@ -278,6 +282,9 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		int messageId = ((MqttMessageIdVariableHeader) message.variableHeader()).messageId();
 		logger.debug("MqttClient PubRec messageId:{}", messageId);
 		MqttPendingPublish pendingPublish = clientSession.getPendingPublish(messageId);
+		if (pendingPublish == null) {
+			return;
+		}
 		pendingPublish.onPubAckReceived();
 
 		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_LEAST_ONCE, false, 0);

@@ -1,6 +1,31 @@
 # 变更记录
 
 ## 发行版本
+
+### v1.3.9 - 2022-08-28
+- :sparkles: mica-mqtt server 添加消息拦截器，gitee #I5KLST
+- :sparkles: mica-mqtt client、server ack 优化和完善，可自定义 ackService。
+- :sparkles: mica-mqtt client stater MqttClientTemplate 完善，统一调整客户端示例。
+- :sparkles: mica-mqtt client 优化客户端心跳和心跳日志优化。
+- :sparkles: mica-mqtt client 订阅代码优化。
+- :sparkles: mica-mqtt codec 代码优化。
+- :sparkles: test 代码优化，更加符合 junit5 规范。
+- :bug: mqtt client Qos2 修复。
+
+### v1.3.8 - 2022-08-11
+- :sparkles: mica-mqtt codec 代码优化。
+- :sparkles: mica-mqtt server 使用 Spring event 解耦消息监听。
+- :sparkles: mica-mqtt client stater，@MqttClientSubscribe topic 支持其他变量 ${productKey} 自动替换成 +。
+- :memo: 添加演示地址
+- :bug: 修复 mica-mqtt client 心跳发送问题。gitee #I5LQXV 感谢 `@iTong` 反馈。
+
+### v1.3.7 - 2022-07-24
+- :sparkles: 添加 mica-mqtt jfinal client 和 server 插件。
+- :sparkles: mica-mqtt server 代码优化，useQueueDecode 默认为 true。 
+- :sparkles: mica-mqtt client 监听回调代码优化。
+- :memo: 添加赞助，让你我走的更远！！！
+- :arrow_up: 依赖升级。
+
 ### v1.3.6 - 2022-06-25
 - :sparkles: mica-mqtt 统一调整最大的消息体和一次读取的字节数。
 - :sparkles: mica-mqtt client 简化 ssl 开启。

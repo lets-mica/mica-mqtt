@@ -32,7 +32,7 @@ public final class MqttClientSubscription implements Serializable {
 	private final String topicFilter;
 	private final MqttQoS mqttQoS;
 	private final TopicFilterType type;
-	private final IMqttClientMessageListener listener;
+	private final transient IMqttClientMessageListener listener;
 
 	public MqttClientSubscription(MqttQoS mqttQoS,
 								  String topicFilter,
