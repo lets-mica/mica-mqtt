@@ -91,6 +91,17 @@ public class MqttServerTemplate {
 	 * @param payload 消息体
 	 * @return 是否发送成功
 	 */
+	public boolean publishAll(String topic, byte[] payload) {
+		return mqttServer.publishAll(topic, payload);
+	}
+
+	/**
+	 * 发布消息给所以的在线设备
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @return 是否发送成功
+	 */
 	public boolean publishAll(String topic, ByteBuffer payload) {
 		return mqttServer.publishAll(topic, payload);
 	}
@@ -103,8 +114,32 @@ public class MqttServerTemplate {
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
+	public boolean publishAll(String topic, byte[] payload, MqttQoS qos) {
+		return mqttServer.publishAll(topic, payload, qos);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @return 是否发送成功
+	 */
 	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
 		return mqttServer.publishAll(topic, payload, qos);
+	}
+
+	/**
+	 * 发布消息给所以的在线设备
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public boolean publishAll(String topic, byte[] payload, boolean retain) {
+		return mqttServer.publishAll(topic, payload, retain);
 	}
 
 	/**
@@ -129,7 +164,7 @@ public class MqttServerTemplate {
 	 * @return 是否发送成功
 	 */
 	public boolean publishAll(String topic, byte[] payload, MqttQoS qos, boolean retain) {
-		return publishAll(topic, payload == null ? null : ByteBuffer.wrap(payload), qos, retain);
+		return mqttServer.publishAll(topic, payload, qos, retain);
 	}
 
 	/**

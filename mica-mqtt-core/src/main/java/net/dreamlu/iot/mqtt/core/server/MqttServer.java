@@ -219,6 +219,17 @@ public final class MqttServer {
 	 * @param payload 消息体
 	 * @return 是否发送成功
 	 */
+	public boolean publishAll(String topic, byte[] payload) {
+		return publishAll(topic, payload, MqttQoS.AT_MOST_ONCE);
+	}
+
+	/**
+	 * 发布消息给所以的在线设备
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @return 是否发送成功
+	 */
 	public boolean publishAll(String topic, ByteBuffer payload) {
 		return publishAll(topic, payload, MqttQoS.AT_MOST_ONCE);
 	}
@@ -231,8 +242,32 @@ public final class MqttServer {
 	 * @param qos     MqttQoS
 	 * @return 是否发送成功
 	 */
+	public boolean publishAll(String topic, byte[] payload, MqttQoS qos) {
+		return publishAll(topic, payload, qos, false);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @return 是否发送成功
+	 */
 	public boolean publishAll(String topic, ByteBuffer payload, MqttQoS qos) {
 		return publishAll(topic, payload, qos, false);
+	}
+
+	/**
+	 * 发布消息给所以的在线设备
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public boolean publishAll(String topic, byte[] payload, boolean retain) {
+		return publishAll(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
 	}
 
 	/**

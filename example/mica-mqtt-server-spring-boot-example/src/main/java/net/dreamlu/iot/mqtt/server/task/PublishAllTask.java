@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author wsq
@@ -17,7 +17,7 @@ public class PublishAllTask {
 
 	@Scheduled(fixedDelay = 1000)
 	public void run() {
-		mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));
+		mqttServer.publishAll("/test/123", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
 	}
 
 }

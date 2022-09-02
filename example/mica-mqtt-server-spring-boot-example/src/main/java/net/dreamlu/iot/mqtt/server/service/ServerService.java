@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * @author wsq
@@ -18,7 +18,7 @@ public class ServerService {
 	private MqttServerTemplate server;
 
 	public boolean publish(String body) {
-		boolean result = server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()));
+		boolean result = server.publishAll("/test/123", body.getBytes(StandardCharsets.UTF_8));
 		logger.info("Mqtt publishAll result:{}", result);
 		return result;
 	}

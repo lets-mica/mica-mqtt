@@ -17,12 +17,10 @@
 package net.dreamlu.iot.mqtt.server;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
-import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -74,7 +72,7 @@ public class MqttServerTest {
 			@Override
 			public void run() {
 				String message = "mica最牛皮 " + System.currentTimeMillis();
-				mqttServer.publishAll("/test/123", ByteBuffer.wrap(message.getBytes(StandardCharsets.UTF_8)), MqttQoS.AT_LEAST_ONCE);
+				mqttServer.publishAll("/test/123", message.getBytes(StandardCharsets.UTF_8));
 			}
 		}, 1000, 2000);
 	}
