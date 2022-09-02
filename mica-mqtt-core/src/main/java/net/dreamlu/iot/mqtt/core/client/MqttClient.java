@@ -26,7 +26,7 @@ import org.tio.client.ClientChannelContext;
 import org.tio.client.ClientGroupStat;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
-import org.tio.client.intf.ClientAioHandler;
+import org.tio.client.intf.TioClientHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.core.Tio;
@@ -562,7 +562,7 @@ public final class MqttClient {
 			return;
 		}
 		final ClientGroupStat clientGroupStat = (ClientGroupStat) clientTioConfig.groupStat;
-		final ClientAioHandler aioHandler = clientTioConfig.getClientAioHandler();
+		final TioClientHandler clientHandler = clientTioConfig.getTioClientHandler();
 		final String id = clientTioConfig.getId();
 		new Thread(() -> {
 			while (!clientTioConfig.isStopped()) {
@@ -579,7 +579,7 @@ public final class MqttClient {
 						}
 						long interval = currTime - channelContext.stat.latestTimeOfSentPacket;
 						if (interval >= heartbeatTimeout) {
-							Packet packet = aioHandler.heartbeatPacket(channelContext);
+							Packet packet = clientHandler.heartbeatPacket(channelContext);
 							if (packet != null) {
 								Boolean result = Tio.send(channelContext, packet);
 								if (logger.isInfoEnabled()) {
