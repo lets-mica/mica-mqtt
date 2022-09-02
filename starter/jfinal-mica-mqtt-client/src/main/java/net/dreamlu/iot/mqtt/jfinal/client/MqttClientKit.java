@@ -24,8 +24,8 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
 import net.dreamlu.iot.mqtt.core.client.MqttClientSubscription;
 import org.tio.client.ClientChannelContext;
-import org.tio.client.ClientTioConfig;
 import org.tio.client.TioClient;
+import org.tio.client.TioClientConfig;
 
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -378,11 +378,11 @@ public class MqttClientKit {
 	}
 
 	/**
-	 * 获取 ClientTioConfig
+	 * 获取 TioClientConfig
 	 *
-	 * @return ClientTioConfig
+	 * @return TioClientConfig
 	 */
-	public static ClientTioConfig getClientTioConfig() {
+	public static TioClientConfig getClientTioConfig() {
 		return client.getClientTioConfig();
 	}
 
