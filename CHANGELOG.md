@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.0.0 - 2022-09-04
+- :sparkles: mica mqtt server 完善方法，方便使用。
+- :sparkles: 切换到自维护的 java8 t-io，注意：升级了 t-io 部分类名变更。
+
 ### v1.3.9 - 2022-08-28
 - :sparkles: mica-mqtt server 添加消息拦截器，gitee #I5KLST
 - :sparkles: mica-mqtt client、server ack 优化和完善，可自定义 ackService。
