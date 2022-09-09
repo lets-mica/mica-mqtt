@@ -74,11 +74,15 @@ public final class MqttDecoder {
 		if (readableLength < MQTT_PROTOCOL_LENGTH) {
 			return null;
 		}
-		// 2. 解析 FixedHeader 2 个字节
+		// 2. 解析 FixedHeader 2~5 个字节
 		MqttFixedHeader mqttFixedHeader;
 		int bytesRemainingInVariablePart;
 		try {
 			mqttFixedHeader = decodeFixedHeader(ctx, buffer);
+			// FixedHeader 的长度是变长
+			if (mqttFixedHeader == null) {
+				return null;
+			}
 			bytesRemainingInVariablePart = mqttFixedHeader.remainingLength();
 		} catch (Exception cause) {
 			return MqttMessageFactory.newInvalidMessage(cause);
@@ -136,6 +140,9 @@ public final class MqttDecoder {
 		short digit;
 		int loops = 0;
 		do {
+			if (!buffer.hasRemaining()) {
+				return null;
+			}
 			digit = ByteBufferUtil.readUnsignedByte(buffer);
 			remainingLength += (digit & 127) * multiplier;
 			multiplier *= 128;
