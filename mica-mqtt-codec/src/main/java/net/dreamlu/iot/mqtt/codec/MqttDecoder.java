@@ -76,17 +76,16 @@ public final class MqttDecoder {
 		}
 		// 2. 解析 FixedHeader 2~5 个字节
 		MqttFixedHeader mqttFixedHeader;
-		int bytesRemainingInVariablePart;
 		try {
 			mqttFixedHeader = decodeFixedHeader(ctx, buffer);
-			// FixedHeader 的长度是变长
-			if (mqttFixedHeader == null) {
-				return null;
-			}
-			bytesRemainingInVariablePart = mqttFixedHeader.remainingLength();
 		} catch (Exception cause) {
 			return MqttMessageFactory.newInvalidMessage(cause);
 		}
+		// 包长度不够解析
+		if (mqttFixedHeader == null) {
+			return null;
+		}
+		int bytesRemainingInVariablePart = mqttFixedHeader.remainingLength();
 		// 3. 判断消息长度，消息长度
 		int messageLength = bytesRemainingInVariablePart + MQTT_PROTOCOL_LENGTH;
 		// 还需要的长度
