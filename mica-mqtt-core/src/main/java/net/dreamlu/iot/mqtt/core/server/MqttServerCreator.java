@@ -43,7 +43,6 @@ import net.dreamlu.iot.mqtt.core.util.timer.AckService;
 import net.dreamlu.iot.mqtt.core.util.timer.DefaultAckService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.client.intf.TioClientListener;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.core.stat.IpStatListener;
@@ -188,7 +187,7 @@ public class MqttServerCreator {
 	/**
 	 * 是否用队列解码（系统初始化时确定该值，中途不要变更此值，否则在切换的时候可能导致消息丢失）
 	 */
-	private boolean useQueueDecode = true;
+	private boolean useQueueDecode = false;
 	/**
 	 * 是否开启监控，不开启可节省内存，默认：true
 	 */
