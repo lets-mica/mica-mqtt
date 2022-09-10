@@ -16,12 +16,11 @@
 
 package net.dreamlu.iot.mqtt.server.listener;
 
-import net.dreamlu.iot.mqtt.spring.server.event.MqttClientOfflineEvent;
-import net.dreamlu.iot.mqtt.spring.server.event.MqttClientOnlineEvent;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttConnectStatusListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.tio.core.ChannelContext;
 
 /**
  * mqtt 连接状态
@@ -29,17 +28,16 @@ import org.springframework.stereotype.Service;
  * @author L.cm
  */
 @Service
-public class MqttConnectStatusListener {
-	private static final Logger logger = LoggerFactory.getLogger(MqttConnectStatusListener.class);
+public class MqttConnectStatusListener2 implements IMqttConnectStatusListener {
+	private static final Logger logger = LoggerFactory.getLogger(MqttConnectStatusListener2.class);
 
-	@EventListener
-	public void online(MqttClientOnlineEvent event) {
-		logger.info("MqttClientOnlineEvent:{}", event);
+	@Override
+	public void online(ChannelContext context, String clientId, String username) {
+		logger.info("Mqtt clientId:{} username:{} online.", clientId, username);
 	}
 
-	@EventListener
-	public void offline(MqttClientOfflineEvent event) {
-		logger.info("MqttClientOfflineEvent:{}", event);
+	@Override
+	public void offline(ChannelContext context, String clientId, String username, String reason) {
+		logger.info("Mqtt clientId:{} username:{} offline reason:{}.", clientId, username, reason);
 	}
-
 }
