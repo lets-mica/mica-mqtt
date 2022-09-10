@@ -52,7 +52,7 @@ public class MqttClientTest {
 			.username(username)
 			.password(password)
 			.clientId(clientId)
-			.connectSync(); // 使用同步
+			.connect();
 
 		client.subQos0("/sys/" + productKey + '/' + deviceName + "/thing/event/property/post_reply", (topic, payload) -> {
 			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));

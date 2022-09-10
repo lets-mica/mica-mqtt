@@ -16,9 +16,10 @@
 
 package net.dreamlu.iot.mqtt.aliyun;
 
+import net.dreamlu.iot.mqtt.core.util.HexUtil;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
@@ -83,7 +84,7 @@ public class MqttSign {
 			SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(), "HmacSHA256");
 			mac.init(secretKeySpec);
 			byte[] hmacResult = mac.doFinal(plainText.getBytes());
-			return String.format("%064x", new BigInteger(1, hmacResult));
+			return HexUtil.encodeToString(hmacResult);
 		} catch (NoSuchAlgorithmException | InvalidKeyException e) {
 			throw new IllegalArgumentException(e);
 		}
