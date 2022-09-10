@@ -14,7 +14,6 @@
     </parent>
 
     <properties>
-        <log4j2.version>2.17.2</log4j2.version>
         <graalvm.version>22.0.0.2</graalvm.version>
         <mainClass.server>net.dreamlu.iot.mqtt.server.MqttServerTest</mainClass.server>
         <mainClass.client>net.dreamlu.iot.mqtt.client.MqttClientTest</mainClass.client>
@@ -37,6 +36,10 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <finalName>${project.artifactId}</finalName>
+    </build>
+
     <profiles>
         <profile>
             <id>jar</id>
@@ -50,45 +53,47 @@
                     <artifactId>caffeine</artifactId>
                     <version>2.9.2</version>
                 </dependency>
-                <!-- 非 GraalVM 环境用 log4j2 -->
+                <!-- 非 GraalVM 环境用 tinylog -->
                 <dependency>
-                    <groupId>org.apache.logging.log4j</groupId>
-                    <artifactId>log4j-slf4j-impl</artifactId>
-                    <version>${log4j2.version}</version>
+                    <groupId>org.tinylog</groupId>
+                    <artifactId>slf4j-tinylog</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.tinylog</groupId>
+                    <artifactId>tinylog-impl</artifactId>
                 </dependency>
             </dependencies>
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
+                        <artifactId>maven-jar-plugin</artifactId>
                         <version>3.2.0</version>
-                        <executions>
-                            <execution>
-                                <id>copy-dependencies</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy-dependencies</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>target/lib</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.1</version>
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <addClasspath>true</addClasspath>
-                                    <classpathPrefix>lib/</classpathPrefix>
                                     <mainClass>${mainClass.server}</mainClass>
                                 </manifest>
                             </archive>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>

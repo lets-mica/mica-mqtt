@@ -26,6 +26,7 @@
         <fastjson.version>1.2.83</fastjson.version>
         <micrometer-core.version>1.9.0</micrometer-core.version>
         <jfinal.version>5.0.1</jfinal.version>
+        <tinylog.version>2.4.1</tinylog.version>
         <junit-jupiter.version>5.8.2</junit-jupiter.version>
         <lombok.version>1.18.24</lombok.version>
     </properties>
@@ -110,6 +111,23 @@
                 <groupId>net.dreamlu</groupId>
                 <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
                 <version>${revision}</version>
+            </dependency>
+            <!-- tinylog 内存占用更小、性能更好，适合边缘设备 -->
+            <dependency>
+                <groupId>org.tinylog</groupId>
+                <artifactId>slf4j-tinylog</artifactId>
+                <version>${tinylog.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.tinylog</groupId>
+                <artifactId>tinylog-impl</artifactId>
+                <version>${tinylog.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>animal-sniffer-annotations</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
