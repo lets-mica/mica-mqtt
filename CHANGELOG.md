@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.0.1 - 2022-09-10
+- :sparkles: 优化 MqttWebServer 配置。
+- :bug: 修复解码异常: BufferUnderflowException。
+
 ### v2.0.0 - 2022-09-04
 - :sparkles: mica mqtt server 完善方法，方便使用。
 - :sparkles: 切换到自维护的 java8 t-io，注意：升级了 t-io 部分类名变更。
