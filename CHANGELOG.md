@@ -4,7 +4,8 @@
 
 ### v2.0.1 - 2022-09-10
 - :sparkles: 优化 MqttWebServer 配置。
-- :bug: 修复解码异常: BufferUnderflowException。
+- :sparkles: mica-mqtt-example 添加华为云iot连接示例。
+- :bug: 修复解码异常: `BufferUnderflowException`。
 
 ### v2.0.0 - 2022-09-04
 - :sparkles: mica mqtt server 完善方法，方便使用。
