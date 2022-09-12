@@ -2,9 +2,10 @@
 
 ## 发行版本
 
-### v2.0.1 - 2022-09-10
+### v2.0.1 - 2022-09-12
 - :sparkles: 优化 MqttWebServer 配置。
 - :sparkles: mica-mqtt-example 添加华为云iot连接示例。
+- :sparkles: mica-mqtt-example 改为使用 tinylog。
 - :bug: 修复解码异常: `BufferUnderflowException`。
 
 ### v2.0.0 - 2022-09-04
