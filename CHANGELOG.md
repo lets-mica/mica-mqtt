@@ -2,6 +2,9 @@
 
 ## 发行版本
 
+### v2.0.2 - 2022-09-13
+- :bug: 修复解码异常: `BufferUnderflowException`。
+
 ### v2.0.1 - 2022-09-12
 - :sparkles: 优化 MqttWebServer 配置。
 - :sparkles: mica-mqtt-example 添加华为云iot连接示例。
