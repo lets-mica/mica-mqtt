@@ -86,12 +86,9 @@ public final class MqttDecoder {
 			return null;
 		}
 		int bytesRemainingInVariablePart = mqttFixedHeader.remainingLength();
-		// 3. 判断消息长度，消息长度
-		int messageLength = bytesRemainingInVariablePart + MQTT_PROTOCOL_LENGTH;
-		// 还需要的长度
-		int stillNeededLength = messageLength - readableLength;
-		if (stillNeededLength > 0) {
-			ctx.setPacketNeededLength(messageLength);
+		// 3. 长度不够，直接返回 null
+		if (buffer.remaining() < bytesRemainingInVariablePart) {
+			ctx.setPacketNeededLength(buffer.position() + bytesRemainingInVariablePart);
 			return null;
 		}
 		// 4. 解析头信息
