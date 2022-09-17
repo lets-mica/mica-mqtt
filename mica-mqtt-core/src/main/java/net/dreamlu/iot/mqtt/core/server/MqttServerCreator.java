@@ -296,6 +296,10 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public MqttServerCreator useSsl(String jksFile, String pwd) {
+		return useSsl(jksFile, jksFile, pwd);
+	}
+
 	public MqttServerCreator useSsl(String keyStoreFile, String trustStoreFile, String pwd) {
 		try {
 			this.sslConfig = SslConfig.forServer(keyStoreFile, trustStoreFile, pwd);
