@@ -2,8 +2,12 @@
 
 ## 发行版本
 
+### v2.0.3 - 2022-09-18
+- :sparkles: 完善 ssl 方法，方便使用。
+- :arrow_up: 依赖升级，避免依赖导致的 bug。
+
 ### v2.0.2 - 2022-09-13
-- :bug: 修复解码异常: `BufferUnderflowException`。
+- :bug: 彻底修复解码异常: `BufferUnderflowException`。
 
 ### v2.0.1 - 2022-09-12
 - :sparkles: 优化 MqttWebServer 配置。
