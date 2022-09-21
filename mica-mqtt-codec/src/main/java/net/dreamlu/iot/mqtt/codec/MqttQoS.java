@@ -63,4 +63,9 @@ public enum MqttQoS {
 				throw new IllegalArgumentException("invalid QoS: " + value);
 		}
 	}
+
+	@Override
+	public String toString() {
+		return "QoS" + value;
+	}
 }
