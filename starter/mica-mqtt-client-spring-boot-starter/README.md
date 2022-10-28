@@ -10,13 +10,13 @@
 </dependency>
 ```
 
-## 二、mqtt 客户端（使用到的场景有限，非必要请不要启用）
+## 二、mqtt 客户端
 
 ### 2.1 配置项示例
 ```yaml
 mqtt:
   client:
-    enabled: true               # 是否开启客户端，默认：false 使用到的场景有限，非必要请不要启用
+    enabled: true               # 是否开启客户端，默认：true
     ip: 127.0.0.1               # 连接的服务端 ip ，默认：127.0.0.1
     port: 1883                  # 端口：默认：1883
     name: Mica-Mqtt-Client      # 名称，默认：Mica-Mqtt-Client
