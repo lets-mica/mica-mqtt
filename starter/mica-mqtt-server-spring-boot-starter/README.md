@@ -55,7 +55,7 @@ mqtt:
 | IMqttMessageStore             | 集群是，单机否    | 遗嘱和保留消息存储                                     |
 | AbstractMqttMessageDispatcher | 集群是，单机否    | 消息转发，（遗嘱、保留消息转发）                              |
 | IpStatListener                | 否          | t-io ip 状态监听                                  |
-| IMqttMessageInterceptor       | 否          | 消息烂机器，1.3.9 新增                                |
+| IMqttMessageInterceptor       | 否          | 消息拦截器，1.3.9 新增                                |
 
 ### 2.3 IMqttMessageListener (用于监听客户端上传的消息) 使用示例
 
