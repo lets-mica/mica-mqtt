@@ -81,10 +81,21 @@
 **配置详见**：[mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 
 ### 非 Spring boot 项目
+
+### 客户端
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
-  <artifactId>mica-mqtt-core</artifactId>
+  <artifactId>mica-mqtt-client</artifactId>
+  <version>${mica-mqtt.version}</version>
+</dependency>
+```
+
+### 客户端
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-server</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
 ```

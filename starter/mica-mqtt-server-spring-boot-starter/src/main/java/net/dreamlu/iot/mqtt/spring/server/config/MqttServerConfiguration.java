@@ -41,8 +41,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
-import org.tio.core.stat.IpStatListener;
-import org.tio.utils.hutool.StrUtil;
 
 /**
  * mqtt server 配置
@@ -83,7 +81,6 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttSessionListener> sessionListenerObjectProvider,
 											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
 											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
-											   ObjectProvider<IpStatListener> ipStatListenerObjectProvider,
 											   ObjectProvider<IMqttMessageInterceptor> messageInterceptorObjectProvider,
 											   ObjectProvider<MqttServerCustomizer> customizers) {
 		MqttServerCreator serverCreator = MqttServer.create()
@@ -111,12 +108,9 @@ public class MqttServerConfiguration {
 			serverCreator.httpBasicAuth(httpBasicAuth.getUsername(), httpBasicAuth.getPassword());
 		}
 		MqttServerProperties.Ssl ssl = properties.getSsl();
-		String keyStorePath = ssl.getKeyStorePath();
-		String trustStorePath = ssl.getTrustStorePath();
-		String password = ssl.getPassword();
 		// ssl 配置
-		if (StrUtil.isNotBlank(keyStorePath) && StrUtil.isNotBlank(trustStorePath) && StrUtil.isNotBlank(password)) {
-			serverCreator.useSsl(keyStorePath, trustStorePath, password);
+		if (ssl.isEnabled()) {
+			serverCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getKeystorePass(), ssl.getClientAuth());
 		}
 		// 自定义消息监听
 		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
@@ -142,8 +136,6 @@ public class MqttServerConfiguration {
 		sessionListenerObjectProvider.ifAvailable(serverCreator::sessionListener);
 		// 状态监听
 		connectStatusListenerObjectProvider.ifAvailable(serverCreator::connectStatusListener);
-		// ip 状态监听
-		ipStatListenerObjectProvider.ifAvailable(serverCreator::ipStatListener);
 		// 消息监听器
 		messageInterceptorObjectProvider.orderedStream().forEach(serverCreator::addInterceptor);
 		// 自定义处理

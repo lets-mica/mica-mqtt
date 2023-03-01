@@ -22,6 +22,7 @@ import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
+import org.tio.core.ssl.ClientAuth;
 
 /**
  * MqttServer 配置
@@ -120,17 +121,29 @@ public class MqttServerProperties {
 	@Setter
 	public static class Ssl {
 		/**
-		 * 证书路径
+		 * 启用 ssl
 		 */
-		private String keyStorePath;
+		private boolean enabled = false;
 		/**
-		 *
+		 * keystore 证书路径
 		 */
-		private String trustStorePath;
+		private String keystorePath;
 		/**
-		 * 证书密钥
+		 * keystore 密码
 		 */
-		private String password;
+		private String keystorePass;
+		/**
+		 * truststore 证书路径
+		 */
+		private String truststorePath;
+		/**
+		 * truststore 密码
+		 */
+		private String truststorePass;
+		/**
+		 * 认证类型
+		 */
+		private ClientAuth clientAuth = ClientAuth.NONE;
 	}
 
 	@Getter

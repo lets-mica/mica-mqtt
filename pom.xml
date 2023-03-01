@@ -18,23 +18,24 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-flatten.version>1.2.2</maven-flatten.version>
-        <!-- tio version -->
-        <tio.version>3.8.4.v20220917-RELEASE</tio.version>
-        <spring.boot.version>2.7.5</spring.boot.version>
-        <mica.version>2.7.5</mica.version>
-        <mica.auto.version>2.3.1</mica.auto.version>
+        <!-- mica-net version -->
+        <mica-net.version>0.0.8-SNAPSHOT</mica-net.version>
+        <mica.version>2.7.9</mica.version>
+        <mica.auto.version>2.3.2</mica.auto.version>
+        <spring.boot.version>2.7.9</spring.boot.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <micrometer-core.version>1.9.0</micrometer-core.version>
-        <jfinal.version>5.0.5</jfinal.version>
-        <tinylog.version>2.4.1</tinylog.version>
-        <junit-jupiter.version>5.8.2</junit-jupiter.version>
-        <lombok.version>1.18.24</lombok.version>
+        <micrometer-core.version>1.10.4</micrometer-core.version>
+        <jfinal.version>5.0.8</jfinal.version>
+        <tinylog.version>2.6.0</tinylog.version>
+        <junit-jupiter.version>5.9.2</junit-jupiter.version>
+        <lombok.version>1.18.26</lombok.version>
     </properties>
 
     <modules>
         <module>mica-mqtt-codec</module>
-        <module>mica-mqtt-model</module>
-        <module>mica-mqtt-core</module>
+        <module>mica-mqtt-common</module>
+        <module>mica-mqtt-client</module>
+        <module>mica-mqtt-server</module>
         <module>mica-mqtt-broker</module>
         <module>starter/mica-mqtt-client-spring-boot-starter</module>
         <module>starter/mica-mqtt-server-spring-boot-starter</module>
@@ -49,33 +50,13 @@
         <dependencies>
             <dependency>
                 <groupId>net.dreamlu</groupId>
-                <artifactId>tio-core</artifactId>
-                <version>${tio.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.alibaba</groupId>
-                        <artifactId>fastjson</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>mica-net-core</artifactId>
+                <version>${mica-net.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.dreamlu</groupId>
-                <artifactId>tio-websocket-server</artifactId>
-                <version>${tio.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.thoughtworks.paranamer</groupId>
-                        <artifactId>paranamer</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>com.esotericsoftware</groupId>
-                        <artifactId>reflectasm</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-io</groupId>
-                        <artifactId>commons-io</artifactId>
-                    </exclusion>
-                </exclusions>
+                <artifactId>mica-net-http</artifactId>
+                <version>${mica-net.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.alibaba</groupId>
@@ -94,12 +75,17 @@
             </dependency>
             <dependency>
                 <groupId>net.dreamlu</groupId>
-                <artifactId>mica-mqtt-model</artifactId>
+                <artifactId>mica-mqtt-common</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>net.dreamlu</groupId>
-                <artifactId>mica-mqtt-core</artifactId>
+                <artifactId>mica-mqtt-client</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-mqtt-server</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -122,12 +108,6 @@
                 <groupId>org.tinylog</groupId>
                 <artifactId>tinylog-impl</artifactId>
                 <version>${tinylog.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>animal-sniffer-annotations</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
@@ -157,6 +137,24 @@
             <id>aliyun</id>
             <name>aliyun</name>
             <url>https://maven.aliyun.com/repository/public</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <!-- 拉取快照版本的 mica-net -->
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
         </repository>
     </repositories>
 

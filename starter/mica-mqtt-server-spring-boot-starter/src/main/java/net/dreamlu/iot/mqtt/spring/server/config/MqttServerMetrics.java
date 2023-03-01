@@ -74,7 +74,7 @@ public class MqttServerMetrics implements ApplicationListener<ApplicationStarted
 
 	private void bindTo(MeterRegistry meterRegistry, TioServerConfig serverConfig) {
 		// 连接统计
-		Gauge.builder(MQTT_CONNECTIONS_ACCEPTED, serverConfig, (config) -> ((ServerGroupStat) config.getGroupStat()).getAccepted().get())
+		Gauge.builder(MQTT_CONNECTIONS_ACCEPTED, serverConfig, (config) -> ((ServerGroupStat) config.getGroupStat()).accepted.sum())
 			.description("Mqtt server connections accepted")
 			.tags(tags)
 			.register(meterRegistry);
@@ -82,34 +82,34 @@ public class MqttServerMetrics implements ApplicationListener<ApplicationStarted
 			.description("Mqtt server connections size")
 			.tags(tags)
 			.register(meterRegistry);
-		Gauge.builder(MQTT_CONNECTIONS_CLOSED, serverConfig, (config) -> config.getGroupStat().getClosed().get())
+		Gauge.builder(MQTT_CONNECTIONS_CLOSED, serverConfig, (config) -> config.getGroupStat().getClosed().sum())
 			.description("Mqtt server connections closed")
 			.tags(tags)
 			.register(meterRegistry);
 		// 消息统计
-		Gauge.builder(MQTT_MESSAGES_HANDLED_PACKETS, serverConfig, (config) -> config.getGroupStat().getHandledPackets().get())
+		Gauge.builder(MQTT_MESSAGES_HANDLED_PACKETS, serverConfig, (config) -> config.getGroupStat().getHandledPackets().sum())
 			.description("Mqtt server handled packets")
 			.tags(tags)
 			.register(meterRegistry);
-		Gauge.builder(MQTT_MESSAGES_HANDLED_BYTES, serverConfig, (config) -> config.getGroupStat().getHandledBytes().get())
+		Gauge.builder(MQTT_MESSAGES_HANDLED_BYTES, serverConfig, (config) -> config.getGroupStat().getHandledBytes().sum())
 			.description("Mqtt server handled bytes")
 			.tags(tags)
 			.register(meterRegistry);
 		// 接收的消息
-		Gauge.builder(MQTT_MESSAGES_RECEIVED_PACKETS, serverConfig, (config) -> config.getGroupStat().getReceivedPackets().get())
+		Gauge.builder(MQTT_MESSAGES_RECEIVED_PACKETS, serverConfig, (config) -> config.getGroupStat().getReceivedPackets().sum())
 			.description("Mqtt server received packets")
 			.tags(tags)
 			.register(meterRegistry);
-		Gauge.builder(MQTT_MESSAGES_RECEIVED_BYTES, serverConfig, (config) -> config.getGroupStat().getReceivedBytes().get())
+		Gauge.builder(MQTT_MESSAGES_RECEIVED_BYTES, serverConfig, (config) -> config.getGroupStat().getReceivedBytes().sum())
 			.description("Mqtt server received bytes")
 			.tags(tags)
 			.register(meterRegistry);
 		// 发送的消息
-		Gauge.builder(MQTT_MESSAGES_SEND_PACKETS, serverConfig, (config) -> config.getGroupStat().getSentPackets().get())
+		Gauge.builder(MQTT_MESSAGES_SEND_PACKETS, serverConfig, (config) -> config.getGroupStat().getSentPackets().sum())
 			.description("Mqtt server send packets")
 			.tags(tags)
 			.register(meterRegistry);
-		Gauge.builder(MQTT_MESSAGES_SEND_BYTES, serverConfig, (config) -> config.getGroupStat().getSentPackets().get())
+		Gauge.builder(MQTT_MESSAGES_SEND_BYTES, serverConfig, (config) -> config.getGroupStat().getSentPackets().sum())
 			.description("Mqtt server send bytes")
 			.tags(tags)
 			.register(meterRegistry);
