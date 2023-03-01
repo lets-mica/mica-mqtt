@@ -42,7 +42,7 @@ public class MqttClientSyncTest {
 			// 同步连接，注意：连接会阻塞
 			.connectSync();
 
-		client.subQos0("/test/#", (topic, payload) -> {
+		client.subQos0("/test/#", (context, topic, message, payload) -> {
 			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 
