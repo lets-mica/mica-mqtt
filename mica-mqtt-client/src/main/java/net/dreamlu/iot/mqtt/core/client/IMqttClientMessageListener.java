@@ -16,7 +16,10 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.codec.MqttSubAckMessage;
+import org.tio.core.ChannelContext;
 
 import java.nio.ByteBuffer;
 
@@ -31,19 +34,34 @@ public interface IMqttClientMessageListener {
 	/**
 	 * 订阅成功之后的事件
 	 *
+	 * @param context     ChannelContext
+	 * @param topicFilter topicFilter
+	 * @param mqttQoS     MqttQoS
+	 * @param message     MqttSubAckMessage
+	 */
+	default void onSubscribed(ChannelContext context, String topicFilter, MqttQoS mqttQoS, MqttSubAckMessage message) {
+		onSubscribed(context, topicFilter, mqttQoS);
+	}
+
+	/**
+	 * 订阅成功之后的事件
+	 *
+	 * @param context     ChannelContext
 	 * @param topicFilter topicFilter
 	 * @param mqttQoS     MqttQoS
 	 */
-	default void onSubscribed(String topicFilter, MqttQoS mqttQoS) {
+	default void onSubscribed(ChannelContext context, String topicFilter, MqttQoS mqttQoS) {
 
 	}
 
 	/**
 	 * 监听到消息
 	 *
+	 * @param context ChannelContext
 	 * @param topic   topic
+	 * @param message MqttPublishMessage
 	 * @param payload payload
 	 */
-	void onMessage(String topic, ByteBuffer payload);
+	void onMessage(ChannelContext context, String topic, MqttPublishMessage message, ByteBuffer payload);
 
 }

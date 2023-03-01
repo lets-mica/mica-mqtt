@@ -47,8 +47,9 @@ public interface IMqttClientProcessor {
 	 * 处理服务端订阅的 ack
 	 *
 	 * @param message MqttSubAckMessage
+	 * @param context ChannelContext
 	 */
-	void processSubAck(MqttSubAckMessage message);
+	void processSubAck(ChannelContext context, MqttSubAckMessage message);
 
 	/**
 	 * 处理服务端 publish 的消息

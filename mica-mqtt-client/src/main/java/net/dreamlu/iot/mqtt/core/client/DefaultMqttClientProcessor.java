@@ -143,14 +143,9 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	 */
 	private void reSendSubscription(ChannelContext context, List<MqttClientSubscription> reSubscriptionList) {
 		// 2. 批量重新订阅
-		List<MqttTopicSubscription> topicSubscriptionList = reSubscriptionList.stream()
-			.map(MqttClientSubscription::toTopicSubscription)
-			.collect(Collectors.toList());
+		List<MqttTopicSubscription> topicSubscriptionList = reSubscriptionList.stream().map(MqttClientSubscription::toTopicSubscription).collect(Collectors.toList());
 		int messageId = messageIdGenerator.getId();
-		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
-			.addSubscriptions(topicSubscriptionList)
-			.messageId(messageId)
-			.build();
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe().addSubscriptions(topicSubscriptionList).messageId(messageId).build();
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(reSubscriptionList, message);
 		Boolean result = Tio.send(context, message);
 		logger.info("MQTT subscriptionList:{} messageId:{} resubscribing result:{}", reSubscriptionList, messageId, result);
@@ -159,7 +154,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	}
 
 	@Override
-	public void processSubAck(MqttSubAckMessage message) {
+	public void processSubAck(ChannelContext context, MqttSubAckMessage message) {
 		int messageId = message.variableHeader().messageId();
 		logger.debug("MqttClient SubAck messageId:{}", messageId);
 		MqttPendingSubscription paddingSubscribe = clientSession.getPaddingSubscribe(messageId);
@@ -198,7 +193,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			IMqttClientMessageListener subscriptionListener = clientSubscription.getListener();
 			executor.execute(() -> {
 				try {
-					subscriptionListener.onSubscribed(topicFilter, mqttQoS);
+					subscriptionListener.onSubscribed(context, topicFilter, mqttQoS, message);
 				} catch (Throwable e) {
 					logger.error("MQTT topicFilter:{} subscribed onSubscribed event error.", subscribedList, e);
 				}
@@ -216,14 +211,12 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		logger.debug("MqttClient received publish topic:{} qoS:{} packetId:{}", topicName, mqttQoS, packetId);
 		switch (mqttFixedHeader.qosLevel()) {
 			case AT_MOST_ONCE:
-				invokeListenerForPublish(topicName, message);
+				invokeListenerForPublish(context, topicName, message);
 				break;
 			case AT_LEAST_ONCE:
-				invokeListenerForPublish(topicName, message);
+				invokeListenerForPublish(context, topicName, message);
 				if (packetId != -1) {
-					MqttMessage messageAck = MqttMessageBuilders.pubAck()
-						.packetId(packetId)
-						.build();
+					MqttMessage messageAck = MqttMessageBuilders.pubAck().packetId(packetId).build();
 					Tio.send(context, messageAck);
 				}
 				break;
@@ -304,7 +297,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (pendingQos2Publish != null) {
 			MqttPublishMessage incomingPublish = pendingQos2Publish.getIncomingPublish();
 			String topicName = incomingPublish.variableHeader().topicName();
-			this.invokeListenerForPublish(topicName, incomingPublish);
+			this.invokeListenerForPublish(context, topicName, incomingPublish);
 			pendingQos2Publish.onPubRelReceived();
 			clientSession.removePendingQos2Publish(messageId);
 		}
@@ -332,10 +325,11 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	/**
 	 * 处理订阅的消息
 	 *
+	 * @param context   ChannelContext
 	 * @param topicName topicName
 	 * @param message   MqttPublishMessage
 	 */
-	private void invokeListenerForPublish(String topicName, MqttPublishMessage message) {
+	private void invokeListenerForPublish(ChannelContext context, String topicName, MqttPublishMessage message) {
 		List<MqttClientSubscription> subscriptionList = clientSession.getMatchedSubscription(topicName);
 		if (subscriptionList.isEmpty()) {
 			logger.warn("Mqtt message to accept topic:{} subscriptionList is empty.", topicName);
@@ -346,7 +340,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				payload.rewind();
 				executor.submit(() -> {
 					try {
-						listener.onMessage(topicName, payload);
+						listener.onMessage(context, topicName, message, payload);
 					} catch (Throwable e) {
 						logger.error(e.getMessage(), e);
 					}

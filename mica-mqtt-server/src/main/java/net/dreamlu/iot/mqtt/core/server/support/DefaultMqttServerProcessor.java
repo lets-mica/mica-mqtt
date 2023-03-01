@@ -505,7 +505,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		if (messageListener != null) {
 			executor.submit(() -> {
 				try {
-					messageListener.onMessage(context, clientId, message);
+					messageListener.onMessage(context, clientId, publishMessage);
 				} catch (Throwable e) {
 					logger.error(e.getMessage(), e);
 				}
