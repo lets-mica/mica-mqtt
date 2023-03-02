@@ -2,8 +2,8 @@ package net.dreamlu.iot.mqtt.server.listener;
 
 import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
-import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ public class MqttServerMessageListener2 implements IMqttMessageListener, SmartIn
 	private MqttServerTemplate mqttServerTemplate;
 
 	@Override
-	public void onMessage(ChannelContext context, String clientId, MqttPublishMessage message) {
+	public void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qos, MqttPublishMessage message) {
 		logger.info("context:{} clientId:{} message:{} payload:{}", context, clientId, message, ByteBufferUtil.toString(message.getPayload()));
 	}
 

@@ -48,7 +48,7 @@ public class MqttServerTest {
 //			.maxBytesInMessage(1024 * 100)
 //			mqtt 3.1 协议会校验 clientId 长度。
 //			.maxClientIdLength(64)
-			.messageListener((context, clientId, message) -> {
+			.messageListener((context, clientId, topic, qos, message) -> {
 				logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
 			})
 			// 客户端连接状态监听

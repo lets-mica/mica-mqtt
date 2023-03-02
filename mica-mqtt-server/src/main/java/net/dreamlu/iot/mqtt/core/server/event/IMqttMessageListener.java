@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.core.server.event;
 
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import org.tio.core.ChannelContext;
 
@@ -31,10 +32,26 @@ public interface IMqttMessageListener {
 	/**
 	 * 监听到消息
 	 *
+	 * @param context        ChannelContext
+	 * @param clientId       clientId
+	 * @param topic          topic
+	 * @param qoS            MqttQoS
+	 * @param publishMessage MqttPublishMessage
+	 * @param message        Message
+	 */
+	default void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qoS, MqttPublishMessage publishMessage, Message message) {
+		onMessage(context, clientId, topic, qoS, publishMessage);
+	}
+
+	/**
+	 * 监听到消息
+	 *
 	 * @param context  ChannelContext
 	 * @param clientId clientId
-	 * @param message  MqttPublishMessage
+	 * @param topic    topic
+	 * @param qoS      MqttQoS
+	 * @param message  Message
 	 */
-	void onMessage(ChannelContext context, String clientId, MqttPublishMessage message);
+	void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qoS, MqttPublishMessage message);
 
 }
