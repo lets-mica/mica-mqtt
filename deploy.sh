@@ -9,4 +9,4 @@ mvn -version
 printf "\n"
 
 ## 3. deploy
-mvn clean package deploy -Prelease -pl mica-mqtt-codec,mica-mqtt-model,mica-mqtt-core,starter/mica-mqtt-client-spring-boot-starter,starter/mica-mqtt-server-spring-boot-starter,starter/jfinal-mica-mqtt-client,starter/jfinal-mica-mqtt-server
+mvn clean package deploy -Prelease -pl mica-mqtt-codec,mica-mqtt-common,mica-mqtt-client,mica-mqtt-server,starter/mica-mqtt-client-spring-boot-starter,starter/mica-mqtt-server-spring-boot-starter,starter/jfinal-mica-mqtt-client,starter/jfinal-mica-mqtt-server
