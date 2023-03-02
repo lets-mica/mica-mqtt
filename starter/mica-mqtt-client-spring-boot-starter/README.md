@@ -1,5 +1,11 @@
 # mica-mqtt-client-spring-boot-starter 使用文档
 
+## 版本兼容
+| 要求  | Spring boot 版本 |
+|-----|----------------|
+| 最低  | 2.1.0.RELEASE  |
+| 最高  | 3.x            |
+
 ## 一、添加依赖
 
 ```xml
