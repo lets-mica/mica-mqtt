@@ -91,7 +91,7 @@
 </dependency>
 ```
 
-### 客户端
+### 服务端
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
