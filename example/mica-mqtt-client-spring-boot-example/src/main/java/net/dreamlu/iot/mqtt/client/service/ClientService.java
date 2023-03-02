@@ -24,7 +24,7 @@ public class ClientService {
 	}
 
 	public boolean sub() {
-		client.subQos0("/test/#", (context, topic, message, payload) -> {
+		client.subQos0("/test/#", (topic, message, payload) -> {
 			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 		return true;

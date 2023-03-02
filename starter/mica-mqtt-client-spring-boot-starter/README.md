@@ -165,7 +165,7 @@ public class MainService {
     }
 
     public boolean sub() {
-        client.subQos0("/test/#", (topic, payload) -> {
+        client.subQos0("/test/#", (topic, message, payload) -> {
             logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
         });
         return true;

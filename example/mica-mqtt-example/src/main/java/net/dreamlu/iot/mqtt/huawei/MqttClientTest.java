@@ -57,7 +57,7 @@ public class MqttClientTest {
 		// 订阅命令下发topic
 		String cmdRequestTopic =  "$oc/devices/" + deviceId + "/sys/commands/#";
 
-		client.subQos0(cmdRequestTopic, (context, topic, message, payload) -> {
+		client.subQos0(cmdRequestTopic, (topic, message, payload) -> {
 			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 

@@ -193,7 +193,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			IMqttClientMessageListener subscriptionListener = clientSubscription.getListener();
 			executor.execute(() -> {
 				try {
-					subscriptionListener.onSubscribed(context, topicFilter, mqttQoS, message);
+					subscriptionListener.onSubscribed(topicFilter, mqttQoS, message);
 				} catch (Throwable e) {
 					logger.error("MQTT topicFilter:{} subscribed onSubscribed event error.", subscribedList, e);
 				}
@@ -340,7 +340,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				payload.rewind();
 				executor.submit(() -> {
 					try {
-						listener.onMessage(context, topicName, message, payload);
+						listener.onMessage(topicName, message, payload);
 					} catch (Throwable e) {
 						logger.error(e.getMessage(), e);
 					}

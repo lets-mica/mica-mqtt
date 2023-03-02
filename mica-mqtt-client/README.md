@@ -61,7 +61,7 @@ MqttClient client = MqttClient.create()
     .connect();
 
     // 消息订阅，同类方法 subxxx
-    client.subQos0("/test/#", (topic, payload) -> {
+    client.subQos0("/test/#", (topic, message, payload) -> {
         logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
     });
     // 取消订阅
