@@ -88,8 +88,9 @@ public class MqttClientConfiguration {
 			clientCreator.debug();
 		}
 		// 开启 ssl
-		if (properties.isUseSsl()) {
-			clientCreator.useSsl();
+		MqttClientProperties.Ssl ssl = properties.getSsl();
+		if (ssl.isEnabled()) {
+			clientCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getKeystorePass());
 		}
 		// 构造遗嘱消息
 		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();

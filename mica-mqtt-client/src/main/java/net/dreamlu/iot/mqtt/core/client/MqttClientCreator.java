@@ -33,6 +33,7 @@ import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
 
+import java.io.InputStream;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
@@ -344,12 +345,23 @@ public final class MqttClientCreator {
 	}
 
 	public MqttClientCreator useSsl() {
-		try {
-			this.sslConfig = SslConfig.forClient();
-		} catch (Exception e) {
-			throw new IllegalArgumentException(e);
-		}
-		return this;
+		return sslConfig(SslConfig.forClient());
+	}
+
+	public MqttClientCreator useSsl(String trustStoreFile, String trustPassword) {
+		return sslConfig(SslConfig.forClient(trustStoreFile, trustPassword));
+	}
+
+	public MqttClientCreator useSsl(String keyStoreFile, String keyPasswd, String trustStoreFile, String trustPassword) {
+		return sslConfig(SslConfig.forClient(keyStoreFile, keyPasswd, trustStoreFile, trustPassword));
+	}
+
+	public MqttClientCreator useSsl(InputStream trustStoreInputStream, String trustPassword) {
+		return sslConfig(SslConfig.forClient(trustStoreInputStream, trustPassword));
+	}
+
+	public MqttClientCreator useSsl(InputStream keyStoreInputStream, String keyPasswd, InputStream trustStoreInputStream, String trustPassword) {
+		return sslConfig(SslConfig.forClient(keyStoreInputStream, keyPasswd, trustStoreInputStream, trustPassword));
 	}
 
 	public MqttClientCreator sslConfig(SslConfig sslConfig) {
