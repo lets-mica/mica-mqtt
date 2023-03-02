@@ -38,7 +38,7 @@ public class DeviceA {
 			.password("123456")
 			.connect();
 
-		client.subQos0("/a/door/open", (topic, message, payload) -> {
+		client.subQos0("/a/door/open", (context, topic, message, payload) -> {
 			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
 		});
 	}
