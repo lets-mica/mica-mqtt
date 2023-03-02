@@ -5,6 +5,8 @@
 ### v2.1.0 - 2023-03-05
 - :sparkles: 【不兼容】调整接口参数，方便使用
 - :sparkles: 【不兼容】底层重构调整
+- :sparkles: 兼容更多 Spring boot 版本，支持 `2.1.0.RELEASE` 以上版本。
+- :sparkles: ssl 支持双向认证 gitee #I61AHJ 感谢 @DoubleH 反馈
 - :bug: 修复遗嘱消息判断 gitee #I6BRBV 感谢 @tan90 反馈。
 - :bug: 修复错别字 gitee #I6F2PA 感谢 @hpz 反馈
 - :arrow_up: 依赖升级
