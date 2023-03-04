@@ -1,5 +1,11 @@
 # mica-mqtt-client-spring-boot-starter 使用文档
 
+## 版本兼容
+| 要求  | Spring boot 版本 |
+|-----|----------------|
+| 最低  | 2.1.0.RELEASE  |
+| 最高  | 3.x            |
+
 ## 一、添加依赖
 
 ```xml
@@ -32,7 +38,12 @@ mqtt:
     buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
     keep-alive-secs: 60         # keep-alive 时间，单位：秒
     clean-session: true         # mqtt clean session，默认：true
-    use-ssl: false              # 是否启用 ssl，默认：false
+    ssl:
+      enabled: false            # 是否开启 ssl 认证，2.1.0 开始支持双向认证
+      keystore-path:            # 可选参数：ssl 双向认证 keystore 目录，支持 classpath:/ 路径。
+      keystore-pass:            # 可选参数：ssl 双向认证 keystore 密码
+      truststore-path:          # 可选参数：ssl 双向认证 truststore 目录，支持 classpath:/ 路径。
+      truststore-pass:          # 可选参数：ssl 双向认证 truststore 密码
 ```
 
 ### 2.2 可实现接口（注册成 Spring Bean 即可）
@@ -154,7 +165,7 @@ public class MainService {
     }
 
     public boolean sub() {
-        client.subQos0("/test/#", (topic, payload) -> {
+        client.subQos0("/test/#", (context, topic, message, payload) -> {
             logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
         });
         return true;

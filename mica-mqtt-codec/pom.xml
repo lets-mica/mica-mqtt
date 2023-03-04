@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>net.dreamlu</groupId>
-            <artifactId>tio-core</artifactId>
+            <artifactId>mica-net-core</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

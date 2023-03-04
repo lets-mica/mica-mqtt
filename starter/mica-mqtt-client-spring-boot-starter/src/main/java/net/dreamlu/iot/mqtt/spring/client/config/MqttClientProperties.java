@@ -132,9 +132,9 @@ public class MqttClientProperties {
 	 */
 	private boolean debug = false;
 	/**
-	 * 开启 ssl
+	 * ssl 配置
 	 */
-	private boolean useSsl = false;
+	private Ssl ssl = new Ssl();
 
 	@Getter
 	@Setter
@@ -155,6 +155,31 @@ public class MqttClientProperties {
 		 * 遗嘱消息保留标识符，默认: false
 		 */
 		private boolean retain = false;
+	}
+
+	@Getter
+	@Setter
+	public static class Ssl {
+		/**
+		 * 启用 ssl
+		 */
+		private boolean enabled = false;
+		/**
+		 * keystore 证书路径
+		 */
+		private String keystorePath;
+		/**
+		 * keystore 密码
+		 */
+		private String keystorePass;
+		/**
+		 * truststore 证书路径
+		 */
+		private String truststorePath;
+		/**
+		 * truststore 密码
+		 */
+		private String truststorePass;
 	}
 
 }

@@ -16,7 +16,7 @@
 
 package net.dreamlu.iot.mqtt.huawei;
 
-import net.dreamlu.iot.mqtt.core.util.HexUtil;
+import org.tio.utils.mica.HexUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -89,7 +89,7 @@ public class MqttSign {
 			Mac hmacSHA256 = Mac.getInstance("HmacSHA256");
 			hmacSHA256.init(new SecretKeySpec(tStamp.getBytes(), "HmacSHA256"));
 			byte[] bytes = hmacSHA256.doFinal(message.getBytes());
-			return HexUtil.encodeToString(bytes);
+			return HexUtils.encodeToString(bytes);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

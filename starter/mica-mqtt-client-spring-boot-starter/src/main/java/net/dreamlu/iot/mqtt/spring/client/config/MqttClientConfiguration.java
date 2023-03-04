@@ -25,13 +25,13 @@ import net.dreamlu.iot.mqtt.spring.client.MqttClientSubscribeDetector;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
 import net.dreamlu.iot.mqtt.spring.client.event.SpringEventMqttClientConnectListener;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
@@ -41,7 +41,7 @@ import java.nio.charset.StandardCharsets;
  *
  * @author L.cm
  */
-@AutoConfiguration
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(
 	prefix = MqttClientProperties.PREFIX,
 	name = "enabled",
@@ -88,8 +88,9 @@ public class MqttClientConfiguration {
 			clientCreator.debug();
 		}
 		// 开启 ssl
-		if (properties.isUseSsl()) {
-			clientCreator.useSsl();
+		MqttClientProperties.Ssl ssl = properties.getSsl();
+		if (ssl.isEnabled()) {
+			clientCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getKeystorePass());
 		}
 		// 构造遗嘱消息
 		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();

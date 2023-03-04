@@ -16,25 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>net.dreamlu</groupId>
-            <artifactId>mica-mqtt-core</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>net.dreamlu</groupId>
-                    <artifactId>tio-websocket-server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>net.dreamlu</groupId>
-                    <artifactId>mica-mqtt-model</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.alibaba</groupId>
-                    <artifactId>fastjson</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.github.ben-manes.caffeine</groupId>
-                    <artifactId>caffeine</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>mica-mqtt-client</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -1,8 +1,8 @@
 # 🌐 mica mqtt 组件
 [![Java CI](https://github.com/lets-mica/mica-mqtt/workflows/Java%20CI/badge.svg)](https://github.com/lets-mica/mica-mqtt/actions)
 ![JAVA 8](https://img.shields.io/badge/JDK-1.8+-brightgreen.svg)
-[![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/net.dreamlu/mica-mqtt-core.svg?style=flat-square)](https://mvnrepository.com/artifact/net.dreamlu/mica-mqtt-core)
-[![Mica-mqtt maven snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/net.dreamlu/mica-mqtt-core.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/net/dreamlu/mica-mqtt-core/)
+[![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/net.dreamlu/mica-mqtt-codec.svg?style=flat-square)](https://mvnrepository.com/artifact/net.dreamlu/mica-mqtt-codec/)
+[![Mica-mqtt maven snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/net.dreamlu/mica-mqtt-codec.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/net/dreamlu/mica-mqtt-codec/)
 
 [![star](https://gitee.com/596392912/mica-mqtt/badge/star.svg?theme=dark)](https://gitee.com/596392912/mica-mqtt/stargazers)
 [![GitHub Repo stars](https://img.shields.io/github/stars/lets-mica/mica-mqtt?label=Github%20Stars)](https://github.com/lets-mica/mica-mqtt)
@@ -11,7 +11,7 @@
 
 ---
 
-基于 `t-io` 实现的**低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
+`mica-mqtt` **低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
 
 ## 🍱 使用场景
 
@@ -81,10 +81,21 @@
 **配置详见**：[mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 
 ### 非 Spring boot 项目
+
+### 客户端
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
-  <artifactId>mica-mqtt-core</artifactId>
+  <artifactId>mica-mqtt-client</artifactId>
+  <version>${mica-mqtt.version}</version>
+</dependency>
+```
+
+### 服务端
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-server</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
 ```
@@ -102,7 +113,6 @@
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt 发行版本](CHANGELOG.md)
-- [t-io 官方文档](https://www.tiocloud.com/doc/tio/85)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
 
 ## 💡 参考vs借鉴

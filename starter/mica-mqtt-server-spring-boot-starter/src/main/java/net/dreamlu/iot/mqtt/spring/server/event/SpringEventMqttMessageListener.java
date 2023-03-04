@@ -18,11 +18,13 @@ package net.dreamlu.iot.mqtt.spring.server.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
+import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import org.springframework.context.ApplicationEventPublisher;
 import org.tio.core.ChannelContext;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 /**
  * 使用 Spring event 解耦消息监听
@@ -35,11 +37,16 @@ public class SpringEventMqttMessageListener implements IMqttMessageListener {
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Override
-	public void onMessage(ChannelContext context, String clientId, Message message) {
+	public void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qoS, MqttPublishMessage publishMessage, Message message) {
 		if (log.isDebugEnabled()) {
 			log.debug("mqtt server receive message clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
 		}
 		eventPublisher.publishEvent(message);
+	}
+
+	@Override
+	public void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qoS, MqttPublishMessage message) {
+		// 不需要实现
 	}
 
 }

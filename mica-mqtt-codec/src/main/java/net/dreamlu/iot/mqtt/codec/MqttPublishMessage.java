@@ -41,4 +41,8 @@ public class MqttPublishMessage extends MqttMessage {
 		return (ByteBuffer) super.payload();
 	}
 
+	public ByteBuffer getPayload() {
+		return payload();
+	}
+
 }

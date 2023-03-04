@@ -81,7 +81,7 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 					// 4. 订阅
 					MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
 					String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
-					clientTemplate.subscribe(topicFilters, subscribe.qos(), (topic, payload) ->
+					clientTemplate.subscribe(topicFilters, subscribe.qos(), (topic, message, payload) ->
 						ReflectionUtils.invokeMethod(method, bean, topic, payload)
 					);
 				}

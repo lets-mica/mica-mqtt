@@ -1,5 +1,11 @@
 # mica-mqtt-server-spring-boot-starter 使用文档
 
+## 版本兼容
+| 要求  | Spring boot 版本 |
+|-----|----------------|
+| 最低  | 2.1.0.RELEASE  |
+| 最高  | 3.x            |
+
 ## 一、添加依赖
 
 ```xml
@@ -38,6 +44,13 @@ mqtt:
       enable: false             # 是否开启 http basic auth，默认： false
       username: mica            # http basic auth 用户名
       password: mica            # http basic auth 密码
+    ssl:                        # mqtt tcp ssl 认证
+      enabled: false            # 是否开启 ssl 认证，2.1.0 开始支持双向认证
+      keystore-path:            # 必须参数：ssl keystore 目录，支持 classpath:/ 路径。
+      keystore-pass:            # 必选参数：ssl keystore 密码
+      truststore-path:          # 可选参数：ssl 双向认证 truststore 目录，支持 classpath:/ 路径。
+      truststore-pass:          # 可选参数：ssl 双向认证 truststore 密码
+      client-auth: none         # 是否需要客户端认证（双向认证），默认：NONE（不需要）
 ```
 
 ### 2.2 可实现接口（注册成 Spring Bean 即可）

@@ -22,17 +22,19 @@
     <dependencies>
         <dependency>
             <groupId>net.dreamlu</groupId>
-            <artifactId>mica-mqtt-core</artifactId>
-            <!--
-            为了支持 GraalVM 排除 caffeine 2.x， 3.x 最低支持 java11，请按实际情况选择
-            可使用 idea 右侧面板 maven 视图切换 profile，使用不同的依赖
-             -->
-            <exclusions>
-                <exclusion>
-                    <groupId>com.github.ben-manes.caffeine</groupId>
-                    <artifactId>caffeine</artifactId>
-                </exclusion>
-            </exclusions>
+            <artifactId>mica-mqtt-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-mqtt-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-net-http</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
         </dependency>
     </dependencies>
 
