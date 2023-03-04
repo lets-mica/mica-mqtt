@@ -53,6 +53,14 @@ mqtt:
       client-auth: none         # 是否需要客户端认证（双向认证），默认：NONE（不需要）
 ```
 
+注意：**ssl** 存在三种情况
+
+| 服务端开启ssl                            | 客户端                                        |
+| ---------------------------------------- | --------------------------------------------- |
+| ClientAuth 为 NONE（不需要客户端验证）   | 仅仅需要开启 ssl 即可不用配置证书             |
+| ClientAuth 为 OPTIONAL（与客户端协商）   | 需开启 ssl 并且配置 truststore 证书           |
+| ClientAuth 为 REQUIRE (必须的客户端验证) | 需开启 ssl 并且配置 truststore、 keystore证书 |
+
 ### 2.2 可实现接口（注册成 Spring Bean 即可）
 
 | 接口                            | 是否必须       | 说明                                            |
