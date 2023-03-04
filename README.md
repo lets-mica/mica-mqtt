@@ -91,6 +91,8 @@
 </dependency>
 ```
 
+**配置详见**：[mica-mqtt-client 使用文档](mica-mqtt-client/README.md)
+
 ### 服务端
 ```xml
 <dependency>
@@ -100,16 +102,13 @@
 </dependency>
 ```
 
-**配置详见**：[mica-mqtt 使用文档](mica-mqtt-core/README.md)
+**配置详见**：[mica-mqtt-server 使用文档](mica-mqtt-server/README.md)
 
 ## 📝 文档
 - [mqtt科普、mqttx、mica-mqtt的使用**视频**](https://b23.tv/VJ8yc7v)
 - [mica-mqtt 快速开始](example/README.md)
-- [mica-mqtt-client-spring-boot-starter 使用文档](starter/mica-mqtt-client-spring-boot-starter/README.md)
-- [mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 - [jfinal-mica-mqtt-client 使用文档](starter/jfinal-mica-mqtt-client/README.md)
 - [jfinal-mica-mqtt-server 使用文档](starter/jfinal-mica-mqtt-server/README.md)
-- [mica-mqtt 使用文档](mica-mqtt-core/README.md)
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt 发行版本](CHANGELOG.md)
