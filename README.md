@@ -138,7 +138,7 @@
 
 ## 赞助商
 
-[![业界领先的单点登录](docs/img/maxkey.png)](http://www.maxkey.top/?from=mica-mqtt)
+[![业界领先的单点登录](docs/img/maxkey.png)](https://gitee.com/dromara/MaxKey/?from=mica-mqtt)
 
 ## 💚 鸣谢
 感谢 JetBrains 提供的免费开源 License：
