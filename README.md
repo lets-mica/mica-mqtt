@@ -136,6 +136,10 @@
 - `JustAuth` 史上最全的第三方登录开源库: [https://github.com/zhangyd-c/JustAuth](https://github.com/zhangyd-c/JustAuth)
 - `spring-boot-demo` Spring boot 深度学习实战: [https://github.com/xkcoding/spring-boot-demo](https://github.com/xkcoding/spring-boot-demo)
 
+## 赞助商
+
+[![业界领先的单点登录](docs/img/maxkey.png)](http://www.maxkey.top/?from=mica-mqtt)
+
 ## 💚 鸣谢
 感谢 JetBrains 提供的免费开源 License：
 
