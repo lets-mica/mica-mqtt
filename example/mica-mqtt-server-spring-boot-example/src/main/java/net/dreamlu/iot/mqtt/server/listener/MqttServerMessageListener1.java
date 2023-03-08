@@ -1,6 +1,5 @@
 package net.dreamlu.iot.mqtt.server.listener;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
 import org.slf4j.Logger;
@@ -8,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.tio.core.ChannelContext;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 /**
  * 监听器1，使用 Spring boot event 的方式

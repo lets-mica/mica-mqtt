@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.client;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
@@ -24,6 +23,7 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

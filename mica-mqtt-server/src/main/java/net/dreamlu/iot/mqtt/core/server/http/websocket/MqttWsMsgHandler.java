@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server.http.websocket;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.WriteBuffer;
 import net.dreamlu.iot.mqtt.core.server.MqttMessageInterceptors;
@@ -30,6 +29,7 @@ import org.tio.core.intf.Packet;
 import org.tio.core.intf.TioHandler;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
+import org.tio.utils.buffer.ByteBufferUtil;
 import org.tio.websocket.common.WsRequest;
 import org.tio.websocket.common.WsResponse;
 import org.tio.websocket.server.handler.IWsMsgHandler;

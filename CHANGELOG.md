@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.1.1 - 2023-04-08
+- :sparkles: 删除 `net.dreamlu.iot.mqtt.codec.ByteBufferUtil`，2.1.0 漏删。
+- :sparkles: mica-mqtt-client 优化链接时的遗嘱消息构建，默认为 qos0。
+
 ### v2.1.0 - 2023-03-05
 - :sparkles: 【不兼容】调整接口参数，方便使用
 - :sparkles: 【不兼容】底层重构调整

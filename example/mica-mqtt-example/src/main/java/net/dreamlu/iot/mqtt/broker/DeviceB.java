@@ -16,10 +16,10 @@
 
 package net.dreamlu.iot.mqtt.broker;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 /**
  * 设备 B，这里默认 web 端
