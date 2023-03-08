@@ -1,6 +1,5 @@
 package net.dreamlu.iot.mqtt.server.listener;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.tio.core.ChannelContext;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 /**
  * 消息监听器示例2,优点：性能损失小

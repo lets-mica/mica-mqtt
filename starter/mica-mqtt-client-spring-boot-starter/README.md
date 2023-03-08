@@ -148,8 +148,9 @@ mica-mqtt client 支持**两种共享订阅**方式：
 2. 分组订阅：订阅前缀 `$share/<group>/`，组客户端订阅了`$share/group1/topic`、`$share/group2/topic`..，发布者发布到topic，则消息会发布到每个group中，但是每个group中只有一个客户端会接收到消息。
 
 ### 2.8 MqttClientTemplate 使用示例
+
 ```java
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
+
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

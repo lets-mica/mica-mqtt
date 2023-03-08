@@ -80,8 +80,14 @@ public final class MqttWillMessage {
 	public static final class Builder {
 		private String topic;
 		private byte[] message;
-		private boolean retain;
-		private MqttQoS qos;
+		/**
+		 * 默认为不保存
+		 */
+		private boolean retain = false;
+		/**
+		 * 默认为 qos 0
+		 */
+		private MqttQoS qos = MqttQoS.AT_MOST_ONCE;
 		private MqttProperties willProperties;
 
 		public Builder topic(String topic) {

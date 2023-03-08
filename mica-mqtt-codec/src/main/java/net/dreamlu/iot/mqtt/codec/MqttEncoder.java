@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.codec;
 
 import org.tio.core.ChannelContext;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;

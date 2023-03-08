@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.codec;
 
 import net.dreamlu.iot.mqtt.codec.MqttProperties.MqttPropertyType;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

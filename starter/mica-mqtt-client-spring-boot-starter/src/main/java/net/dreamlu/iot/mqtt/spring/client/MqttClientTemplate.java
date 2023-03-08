@@ -244,7 +244,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 * @return MqttClientCreator
 	 */
 	public MqttClientCreator getClientCreator() {
-		return client.getClientCreator();
+		return mqttClientCreator;
 	}
 
 	/**

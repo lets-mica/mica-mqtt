@@ -16,8 +16,8 @@
 
 package net.dreamlu.iot.mqtt.huawei;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
+import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
