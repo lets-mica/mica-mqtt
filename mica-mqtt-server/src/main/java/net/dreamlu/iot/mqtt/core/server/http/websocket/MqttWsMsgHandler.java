@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server.http.websocket;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferUtil;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.WriteBuffer;
 import net.dreamlu.iot.mqtt.core.server.MqttMessageInterceptors;
@@ -30,6 +29,7 @@ import org.tio.core.intf.Packet;
 import org.tio.core.intf.TioHandler;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
+import org.tio.utils.buffer.ByteBufferUtil;
 import org.tio.websocket.common.WsRequest;
 import org.tio.websocket.common.WsResponse;
 import org.tio.websocket.server.handler.IWsMsgHandler;
@@ -43,6 +43,7 @@ import java.nio.ByteBuffer;
  */
 public class MqttWsMsgHandler implements IWsMsgHandler {
 	private static final Logger logger = LoggerFactory.getLogger(MqttWsMsgHandler.class);
+
 	/**
 	 * mqtt websocket message body key
 	 */
@@ -94,11 +95,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	@Override
 	public void onAfterHandshaked(HttpRequest request, HttpResponse response, ChannelContext context) {
 		// 在连接中添加 WriteBuffer 用来处理半包消息
-		WriteBuffer wsBody = (WriteBuffer) context.get(MQTT_WS_MSG_BODY_KEY);
-		if (wsBody == null) {
-			wsBody = new WriteBuffer();
-			context.set(MQTT_WS_MSG_BODY_KEY, wsBody);
-		}
+		context.computeIfAbsent(MQTT_WS_MSG_BODY_KEY, key -> new WriteBuffer());
 	}
 
 	/**
@@ -106,7 +103,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 */
 	@Override
 	public Object onBytes(WsRequest wsRequest, byte[] bytes, ChannelContext context) throws Exception {
-		WriteBuffer wsBody = (WriteBuffer) context.get(MQTT_WS_MSG_BODY_KEY);
+		WriteBuffer wsBody = context.get(MQTT_WS_MSG_BODY_KEY);
 		ByteBuffer buffer = getMqttBody(wsBody, bytes);
 		if (buffer == null) {
 			return null;
@@ -183,8 +180,8 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 			return null;
 		}
 		ByteBuffer buffer = wsBody.toBuffer();
-		int mqttLength = getMqttLength(buffer) + 2;
-		if (length < mqttLength) {
+		Integer mqttLength = getMqttLength(buffer);
+		if (mqttLength == null || length < (mqttLength + 2)) {
 			return null;
 		}
 		// 数据已经读取完毕，此处需要重构
@@ -200,13 +197,16 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 * @param buffer the buffer to decode from
 	 * @return mqtt 消息长度
 	 */
-	private static int getMqttLength(ByteBuffer buffer) {
+	private static Integer getMqttLength(ByteBuffer buffer) {
 		ByteBufferUtil.skipBytes(buffer, 1);
 		int remainingLength = 0;
 		int multiplier = 1;
 		short digit;
 		int loops = 0;
 		do {
+			if (!buffer.hasRemaining()) {
+				return null;
+			}
 			digit = ByteBufferUtil.readUnsignedByte(buffer);
 			remainingLength += (digit & 127) * multiplier;
 			multiplier *= 128;

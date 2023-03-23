@@ -343,7 +343,6 @@ public class MqttWebServerAioHandler implements TioServerHandler {
 	private WsResponse handlerWs(WsRequest websocketPacket, byte[] bytes, Opcode opcode, ChannelContext channelContext) throws Exception {
 		if (opcode == Opcode.TEXT) {
 			if (bytes == null || bytes.length == 0) {
-				Tio.remove(channelContext, "错误的websocket包，body为空");
 				return null;
 			}
 			String text = new String(bytes, httpConfig.getCharset());
@@ -352,7 +351,6 @@ public class MqttWebServerAioHandler implements TioServerHandler {
 			return processRetObj(retObj, methodName, channelContext);
 		} else if (opcode == Opcode.BINARY) {
 			if (bytes == null || bytes.length == 0) {
-				Tio.remove(channelContext, "错误的websocket包，body为空");
 				return null;
 			}
 			Object retObj = wsMsgHandler.onBytes(websocketPacket, bytes, channelContext);
