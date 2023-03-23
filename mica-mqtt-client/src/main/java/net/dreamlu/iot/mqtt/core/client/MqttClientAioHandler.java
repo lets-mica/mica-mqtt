@@ -51,7 +51,7 @@ public class MqttClientAioHandler implements TioClientHandler {
 
 	@Override
 	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws TioDecodeException {
-		return mqttDecoder.doDecode(context, buffer, limit, position, readableLength);
+		return mqttDecoder.doDecode(context, buffer, readableLength);
 	}
 
 	@Override
