@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server.http.api;
 
-import com.alibaba.fastjson.JSON;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
@@ -31,13 +30,14 @@ import net.dreamlu.iot.mqtt.core.server.model.Subscribe;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.util.PayloadEncode;
 import net.dreamlu.iot.mqtt.core.util.TopicUtil;
+import org.tio.http.common.HttpConst;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.http.common.Method;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.json.JsonUtil;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.function.Function;
 
@@ -77,7 +77,7 @@ public class MqttHttpApi {
 	 */
 	public HttpResponse publish(HttpRequest request) {
 		PublishForm form = readForm(request, (requestBody) ->
-			JSON.parseObject(requestBody, PublishForm.class)
+			JsonUtil.readValue(requestBody, PublishForm.class)
 		);
 		if (form == null) {
 			return Result.fail(request, ResultCode.E101);
@@ -100,10 +100,9 @@ public class MqttHttpApi {
 	 * @return HttpResponse
 	 */
 	public HttpResponse publishBatch(HttpRequest request) {
-		List<PublishForm> formList = readForm(request, (requestBody) -> {
-			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
-			return JSON.parseArray(jsonBody, PublishForm.class);
-		});
+		List<PublishForm> formList = readForm(request, (requestBody) ->
+			JsonUtil.readList(requestBody, PublishForm.class)
+		);
 		if (formList == null || formList.isEmpty()) {
 			return Result.fail(request, ResultCode.E101);
 		}
@@ -147,7 +146,7 @@ public class MqttHttpApi {
 	 */
 	public HttpResponse subscribe(HttpRequest request) {
 		SubscribeForm form = readForm(request, (requestBody) ->
-			JSON.parseObject(requestBody, SubscribeForm.class)
+			JsonUtil.readValue(requestBody, SubscribeForm.class)
 		);
 		if (form == null) {
 			return Result.fail(request, ResultCode.E101);
@@ -175,10 +174,9 @@ public class MqttHttpApi {
 	 * @return HttpResponse
 	 */
 	public HttpResponse subscribeBatch(HttpRequest request) {
-		List<SubscribeForm> formList = readForm(request, (requestBody) -> {
-			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
-			return JSON.parseArray(jsonBody, SubscribeForm.class);
-		});
+		List<SubscribeForm> formList = readForm(request, (requestBody) ->
+			JsonUtil.readList(requestBody, SubscribeForm.class)
+		);
 		if (formList == null || formList.isEmpty()) {
 			return Result.fail(request, ResultCode.E101);
 		}
@@ -212,7 +210,7 @@ public class MqttHttpApi {
 	 */
 	public HttpResponse unsubscribe(HttpRequest request) {
 		BaseForm form = readForm(request, (requestBody) ->
-			JSON.parseObject(requestBody, BaseForm.class)
+			JsonUtil.readValue(requestBody, BaseForm.class)
 		);
 		if (form == null) {
 			return Result.fail(request, ResultCode.E101);
@@ -236,10 +234,9 @@ public class MqttHttpApi {
 	 * @return HttpResponse
 	 */
 	public HttpResponse unsubscribeBatch(HttpRequest request) {
-		List<BaseForm> formList = readForm(request, (requestBody) -> {
-			String jsonBody = new String(requestBody, StandardCharsets.UTF_8);
-			return JSON.parseArray(jsonBody, BaseForm.class);
-		});
+		List<BaseForm> formList = readForm(request, (requestBody) ->
+			JsonUtil.readList(requestBody, BaseForm.class)
+		);
 		if (formList == null || formList.isEmpty()) {
 			return Result.fail(request, ResultCode.E101);
 		}
@@ -317,12 +314,12 @@ public class MqttHttpApi {
 	 * @param <T>      泛型
 	 * @return 表单
 	 */
-	private static <T> T readForm(HttpRequest request, Function<byte[], T> function) {
+	private static <T> T readForm(HttpRequest request, Function<String, T> function) {
 		byte[] requestBody = request.getBody();
 		if (requestBody == null) {
 			return null;
 		}
-		return function.apply(requestBody);
+		return function.apply(new String(requestBody, HttpConst.CHARSET));
 	}
 
 	/**

@@ -206,6 +206,7 @@ import org.tio.http.common.handler.HttpRequestHandler;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.server.intf.TioServerListener;
+import org.tio.utils.json.JsonUtil;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import org.tio.websocket.server.handler.IWsMsgHandler;
 
@@ -284,10 +285,12 @@ public class MqttWebServer {
 	public static MqttWebServer config(MqttServerCreator serverCreator, TioServerConfig mqttServerConfig) {
 		// 1. 判断是否开启 http
 		if (serverCreator.isHttpEnable()) {
-			// 1.1 http 路由配置
+			// 1.1 http-api 用到 json
+			serverCreator.jsonAdapter(JsonUtil.getJsonAdapter(serverCreator.getJsonAdapter()));
+			// 1.2 http 路由配置
 			MqttHttpApi httpApi = new MqttHttpApi(serverCreator);
 			httpApi.register();
-			// 1.2 认证配置
+			// 1.3 认证配置
 			String username = serverCreator.getHttpBasicUsername();
 			String password = serverCreator.getHttpBasicPassword();
 			if (Objects.nonNull(username) && Objects.nonNull(password)) {

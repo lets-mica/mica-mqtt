@@ -16,15 +16,12 @@
 
 package net.dreamlu.iot.mqtt.core.server.http.api.result;
 
-import com.alibaba.fastjson.JSONObject;
 import net.dreamlu.iot.mqtt.core.server.http.api.code.ResultCode;
-import org.tio.http.common.HeaderName;
-import org.tio.http.common.HeaderValue;
-import org.tio.http.common.HttpRequest;
-import org.tio.http.common.HttpResponse;
+import org.tio.http.common.*;
+import org.tio.utils.json.JsonUtil;
 
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * api Result
@@ -32,7 +29,6 @@ import java.nio.charset.StandardCharsets;
  * @author L.cm
  */
 public final class Result {
-	private static final Charset UTF_8 = StandardCharsets.UTF_8;
 
 	/**
 	 * 响应成功
@@ -51,7 +47,7 @@ public final class Result {
 	 */
 	public static HttpResponse ok(HttpResponse response) {
 		ResultCode resultCode = ResultCode.SUCCESS;
-		JSONObject json = new JSONObject();
+		Map<String, Object> json = new HashMap<>(2);
 		json.put("code", resultCode.getResultCode());
 		return result(response, resultCode, json);
 	}
@@ -86,7 +82,7 @@ public final class Result {
 	 */
 	public static HttpResponse ok(HttpResponse response, Object data) {
 		ResultCode resultCode = ResultCode.SUCCESS;
-		JSONObject json = new JSONObject();
+		Map<String, Object> json = new HashMap<>(4);
 		json.put("code", resultCode.getResultCode());
 		json.put("data", data);
 		return result(response, resultCode, json);
@@ -121,16 +117,16 @@ public final class Result {
 	 * @return HttpResponse
 	 */
 	public static HttpResponse fail(HttpResponse response, ResultCode resultCode) {
-		JSONObject json = new JSONObject();
+		Map<String, Object> json = new HashMap<>(2);
 		json.put("code", resultCode.getResultCode());
 		return result(response, resultCode, json);
 	}
 
-	private static HttpResponse result(HttpResponse response, ResultCode resultCode, JSONObject json) {
+	private static HttpResponse result(HttpResponse response, ResultCode resultCode, Object value) {
 		response.addHeader(HeaderName.Content_Type, HeaderValue.Content_Type.TEXT_PLAIN_JSON);
 		response.setStatus(resultCode.getStatusCode());
-		response.setBody(json.toJSONString().getBytes(UTF_8));
-		response.setCharset(UTF_8);
+		response.setBody(JsonUtil.toJsonString(value).getBytes(HttpConst.CHARSET));
+		response.setCharset(HttpConst.CHARSET);
 		return response;
 	}
 

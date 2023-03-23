@@ -50,6 +50,8 @@ import org.tio.server.intf.TioServerHandler;
 import org.tio.server.intf.TioServerListener;
 import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.json.JsonAdapter;
+import org.tio.utils.json.JsonUtil;
 import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
 
@@ -200,6 +202,10 @@ public class MqttServerCreator {
 	 * taskService
 	 */
 	private TimerTaskService taskService;
+	/**
+	 * json 处理器
+	 */
+	private JsonAdapter jsonAdapter;
 
 	public String getName() {
 		return name;
@@ -524,6 +530,15 @@ public class MqttServerCreator {
 
 	public MqttServerCreator taskService(TimerTaskService taskService) {
 		this.taskService = taskService;
+		return this;
+	}
+
+	public JsonAdapter getJsonAdapter() {
+		return jsonAdapter;
+	}
+
+	public MqttServerCreator jsonAdapter(JsonAdapter jsonAdapter) {
+		this.jsonAdapter = JsonUtil.getJsonAdapter(jsonAdapter);
 		return this;
 	}
 

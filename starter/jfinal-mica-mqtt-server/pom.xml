@@ -23,10 +23,6 @@
             <artifactId>mica-net-http</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.jfinal</groupId>
             <artifactId>jfinal</artifactId>
             <scope>provided</scope>
