@@ -38,7 +38,7 @@ public final class MqttCodecUtil {
 	 * @return MqttVersion
 	 */
 	public static MqttVersion getMqttVersion(ChannelContext ctx) {
-		MqttVersion version = (MqttVersion) ctx.get(MQTT_VERSION_KEY);
+		MqttVersion version = ctx.get(MQTT_VERSION_KEY);
 		if (version == null) {
 			return MqttVersion.MQTT_3_1_1;
 		}
@@ -74,10 +74,6 @@ public final class MqttCodecUtil {
 	public static boolean isValidPublishTopicName(String topicName) {
 		// publish topic name must not contain any wildcard
 		return !isTopicFilter(topicName);
-	}
-
-	protected static boolean isValidMessageId(int messageId) {
-		return messageId != 0;
 	}
 
 	protected static boolean isValidClientId(MqttVersion mqttVersion, int maxClientIdLength, String clientId) {

@@ -28,7 +28,7 @@ public final class MqttFixedHeader {
 
 	private final MqttMessageType messageType;
 	private final boolean isDup;
-	private final MqttQoS qosLevel;
+	private MqttQoS qosLevel;
 	private final boolean isRetain;
 	private final int remainingLength;
 
@@ -55,6 +55,13 @@ public final class MqttFixedHeader {
 
 	public MqttQoS qosLevel() {
 		return qosLevel;
+	}
+
+	/**
+	 * 做 qos 降级，mqtt 规定 qos > 0，messageId 必须大于 0，为了兼容，固做降级处理
+	 */
+	void downgradeQos() {
+		this.qosLevel = MqttQoS.AT_MOST_ONCE;
 	}
 
 	public boolean isRetain() {

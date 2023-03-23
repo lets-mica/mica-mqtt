@@ -56,7 +56,7 @@ public final class MqttDecoder {
 		this.maxClientIdLength = maxClientIdLength;
 	}
 
-	public MqttMessage doDecode(ChannelContext ctx, ByteBuffer buffer, int limit, int position, int readableLength) throws TioDecodeException {
+	public MqttMessage doDecode(ChannelContext ctx, ByteBuffer buffer, int readableLength) throws TioDecodeException {
 		// 1. 半包
 		MqttMessage message = decode(ctx, buffer, readableLength);
 		if (message == null) {
@@ -172,12 +172,12 @@ public final class MqttDecoder {
 			case SUBSCRIBE:
 			case SUBACK:
 			case UNSUBACK:
-				return decodeMessageIdAndPropertiesVariableHeader(ctx, buffer);
+				return decodeMessageIdAndPropertiesVariableHeader(ctx, buffer, mqttFixedHeader);
 			case PUBACK:
 			case PUBREC:
 			case PUBCOMP:
 			case PUBREL:
-				return decodePubReplyMessage(buffer, bytesRemainingInVariablePart);
+				return decodePubReplyMessage(buffer, mqttFixedHeader, bytesRemainingInVariablePart);
 			case PUBLISH:
 				return decodePublishVariableHeader(ctx, buffer, mqttFixedHeader);
 			case DISCONNECT:
@@ -271,9 +271,9 @@ public final class MqttDecoder {
 	}
 
 	private static Result<MqttMessageIdAndPropertiesVariableHeader> decodeMessageIdAndPropertiesVariableHeader(
-		ChannelContext ctx, ByteBuffer buffer) {
+		ChannelContext ctx, ByteBuffer buffer, MqttFixedHeader mqttFixedHeader) {
 		final MqttVersion mqttVersion = MqttCodecUtil.getMqttVersion(ctx);
-		final int packetId = decodeMessageId(buffer);
+		final int packetId = decodeMessageId(buffer, mqttFixedHeader);
 
 		final MqttMessageIdAndPropertiesVariableHeader mqttVariableHeader;
 		final int mqtt5Consumed;
@@ -290,9 +290,9 @@ public final class MqttDecoder {
 		return new Result<>(mqttVariableHeader, 2 + mqtt5Consumed);
 	}
 
-	private Result<MqttPubReplyMessageVariableHeader> decodePubReplyMessage(ByteBuffer buffer,
-																			int bytesRemainingInVariablePart) {
-		final int packetId = decodeMessageId(buffer);
+	private Result<MqttPubReplyMessageVariableHeader> decodePubReplyMessage(
+		ByteBuffer buffer, MqttFixedHeader mqttFixedHeader, int bytesRemainingInVariablePart) {
+		final int packetId = decodeMessageId(buffer, mqttFixedHeader);
 		final MqttPubReplyMessageVariableHeader mqttPubAckVariableHeader;
 		final int consumed;
 		final int packetIdNumberOfBytesConsumed = 2;
@@ -352,13 +352,11 @@ public final class MqttDecoder {
 			throw new DecoderException("invalid publish topic name: " + decodedTopic.value + " (contains wildcards)");
 		}
 		int numberOfBytesConsumed = decodedTopic.numberOfBytesConsumed;
-
 		int messageId = -1;
 		if (mqttFixedHeader.qosLevel().value() > 0) {
-			messageId = decodeMessageId(buffer);
+			messageId = decodeMessageId(buffer, mqttFixedHeader);
 			numberOfBytesConsumed += 2;
 		}
-
 		final MqttProperties properties;
 		if (mqttVersion == MqttVersion.MQTT_5) {
 			final Result<MqttProperties> propertiesResult = decodeProperties(buffer);
@@ -376,10 +374,11 @@ public final class MqttDecoder {
 	/**
 	 * @return messageId with numberOfBytesConsumed is 2
 	 */
-	private static int decodeMessageId(ByteBuffer buffer) {
+	private static int decodeMessageId(ByteBuffer buffer, MqttFixedHeader mqttFixedHeader) {
 		final int messageId = decodeMsbLsb(buffer);
-		if (!MqttCodecUtil.isValidMessageId(messageId)) {
-			throw new DecoderException("invalid messageId: " + messageId);
+		// 注意：此处做 qos 降级处理，mqtt 规定 qos > 0，messageId 必须大于 0，固做降级处理
+		if (messageId == 0) {
+			mqttFixedHeader.downgradeQos();
 		}
 		return messageId;
 	}
