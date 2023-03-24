@@ -45,8 +45,7 @@ public interface MqttConstant {
 
 	/**
 	 * Default max client id length,In the mqtt3.1 protocol,
-	 * the default maximum Client Identifier length is 23
+	 * the default maximum Client Identifier length is 23，设置成 64，减少问题
 	 */
-	int DEFAULT_MAX_CLIENT_ID_LENGTH = 23;
-
+	int DEFAULT_MAX_CLIENT_ID_LENGTH = 64;
 }

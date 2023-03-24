@@ -72,7 +72,7 @@ public final class MqttClientCreator {
 	 */
 	private int maxBytesInMessage = MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE;
 	/**
-	 * mqtt 3.1 会校验此参数
+	 * mqtt 3.1 会校验此参数为 23，为了减少问题设置成了 64
 	 */
 	private int maxClientIdLength = MqttConstant.DEFAULT_MAX_CLIENT_ID_LENGTH;
 	/**
