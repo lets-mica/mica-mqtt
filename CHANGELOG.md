@@ -6,6 +6,7 @@
 - :sparkles: mica-mqtt-server http-api 不再强制依赖 `fastjson` 还支持 `Jackson`、`Fastjson2`、`Gson`、`hutool-json` 和自定义。
 - :sparkles: mica-mqtt-codec 删除 `net.dreamlu.iot.mqtt.codec.ByteBufferUtil`，2.1.0 漏删。
 - :sparkles: mica-mqtt-codec 兼容 qos大于0，messageId == 0，做 qos 降级处理，`@那一刹的容颜` 反馈，详见 gitee #I6PFIH
+- :sparkles: mica-mqtt-codec maxClientIdLength 默认改为 64。
 - :sparkles: mica-mqtt-client 优化链接时的遗嘱消息构建，默认为 qos0。
 - :bug: mqtt-server 修复 mqtt.js websocket 空包问题。
 - :bug: mqtt-server 修复 websocket mqtt 包长度判断问题。
