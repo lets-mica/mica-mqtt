@@ -10,6 +10,7 @@
 - :sparkles: mica-mqtt-client 优化链接时的遗嘱消息构建，默认为 qos0。`@tan90` 反馈 gitee #I6BRBV
 - :bug: mqtt-server 修复 mqtt.js websocket 空包问题，感谢群友反馈。
 - :bug: mqtt-server 修复 websocket mqtt 包长度判断问题。
+- :arrow_up: 依赖升级
 
 ### v2.1.0 - 2023-03-05
 - :sparkles: 【不兼容】调整接口参数，方便使用
