@@ -1,6 +1,6 @@
 # 升级指南
 
-## 迁移到 mica-mqtt 2.1.0
+## 迁移到 mica-mqtt 2.1.x
 
 - `mica-mqtt-core` 拆分成了 `mica-mqtt-client` 和 `mica-mqtt-server`，避免一些依赖引用问题。
 - `ByteBufferUtil` 由 `net.dreamlu.iot.mqtt.codec.ByteBufferUtil` 移动到了 `org.tio.utils.buffer.ByteBufferUtil`。
@@ -24,12 +24,13 @@ client.subQos0("/test/#", (context, topic, message, payload) -> {
 #### 1.2 SSL 双向认证支持
 ```yaml
 mica:
-  ssl:
-    enabled: false            # 是否开启 ssl 认证，2.1.0 开始支持双向认证
-    keystore-path:            # 可选参数：ssl 双向认证 keystore 目录，支持 classpath:/ 路径。
-    keystore-pass:            # 可选参数：ssl 双向认证 keystore 密码
-    truststore-path:          # 可选参数：ssl 双向认证 truststore 目录，支持 classpath:/ 路径。
-    truststore-pass:          # 可选参数：ssl 双向认证 truststore 密码
+  client:
+    ssl:
+      enabled: false            # 是否开启 ssl 认证，2.1.0 开始支持双向认证
+      keystore-path:            # 可选参数：ssl 双向认证 keystore 目录，支持 classpath:/ 路径。
+      keystore-pass:            # 可选参数：ssl 双向认证 keystore 密码
+      truststore-path:          # 可选参数：ssl 双向认证 truststore 目录，支持 classpath:/ 路径。
+      truststore-pass:          # 可选参数：ssl 双向认证 truststore 密码
 ```
 
 注意： ssl 存在三种情况
@@ -61,11 +62,12 @@ void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qo
 #### 2.2 ssl 双向认证支持
 ```yaml
 mica:
-  ssl:                        # mqtt tcp ssl 认证
-    enabled: false            # 是否开启 ssl 认证，2.1.0 开始支持双向认证
-    keystore-path:            # 必须参数：ssl keystore 目录，支持 classpath:/ 路径。
-    keystore-pass:            # 必选参数：ssl keystore 密码
-    truststore-path:          # 可选参数：ssl 双向认证 truststore 目录，支持 classpath:/ 路径。
-    truststore-pass:          # 可选参数：ssl 双向认证 truststore 密码
-    client-auth: none         # 是否需要客户端认证（双向认证），默认：NONE（不需要）
+  server:
+    ssl:                        # mqtt tcp ssl 认证
+      enabled: false            # 是否开启 ssl 认证，2.1.0 开始支持双向认证
+      keystore-path:            # 必须参数：ssl keystore 目录，支持 classpath:/ 路径。
+      keystore-pass:            # 必选参数：ssl keystore 密码
+      truststore-path:          # 可选参数：ssl 双向认证 truststore 目录，支持 classpath:/ 路径。
+      truststore-pass:          # 可选参数：ssl 双向认证 truststore 密码
+      client-auth: none         # 是否需要客户端认证（双向认证），默认：NONE（不需要）
 ```
