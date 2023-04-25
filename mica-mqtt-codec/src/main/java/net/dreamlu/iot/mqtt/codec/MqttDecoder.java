@@ -86,10 +86,16 @@ public final class MqttDecoder {
 		if (mqttFixedHeader == null) {
 			return null;
 		}
+		// 包长度计算
+		int headLength = mqttFixedHeader.headLength();
 		int bytesRemainingInVariablePart = mqttFixedHeader.remainingLength();
+		int messageLength = headLength + bytesRemainingInVariablePart;
+		if (messageLength > maxBytesInMessage) {
+			throw new DecoderException("too large message: " + messageLength + " bytes but maxBytesInMessage is " + maxBytesInMessage);
+		}
 		// 3. 长度不够，直接返回 null
-		if (buffer.remaining() < bytesRemainingInVariablePart) {
-			ctx.setPacketNeededLength(buffer.position() + bytesRemainingInVariablePart);
+		if (readableLength < messageLength) {
+			ctx.setPacketNeededLength(messageLength);
 			return null;
 		}
 		// 4. 解析头信息
@@ -97,9 +103,6 @@ public final class MqttDecoder {
 		try {
 			Result<?> decodedVariableHeader = decodeVariableHeader(ctx, buffer, mqttFixedHeader, bytesRemainingInVariablePart);
 			variableHeader = decodedVariableHeader.value;
-			if (bytesRemainingInVariablePart > maxBytesInMessage) {
-				throw new DecoderException("too large message: " + bytesRemainingInVariablePart + " bytes but maxBytesInMessage is " + maxBytesInMessage);
-			}
 			bytesRemainingInVariablePart -= decodedVariableHeader.numberOfBytesConsumed;
 		} catch (Exception cause) {
 			return MqttMessageFactory.newInvalidMessage(mqttFixedHeader, variableHeader, cause);
@@ -149,7 +152,8 @@ public final class MqttDecoder {
 		if (loops == 4 && (digit & 128) != 0) {
 			throw new DecoderException("remaining length exceeds 4 digits (" + messageType + ')');
 		}
-		MqttFixedHeader decodedFixedHeader = new MqttFixedHeader(messageType, dupFlag, MqttQoS.valueOf(qosLevel), retain, remainingLength);
+		int headLength = 1 + loops;
+		MqttFixedHeader decodedFixedHeader = new MqttFixedHeader(messageType, dupFlag, MqttQoS.valueOf(qosLevel), retain, headLength, remainingLength);
 		return MqttCodecUtil.validateFixedHeader(ctx, MqttCodecUtil.resetUnusedFields(decodedFixedHeader));
 	}
 

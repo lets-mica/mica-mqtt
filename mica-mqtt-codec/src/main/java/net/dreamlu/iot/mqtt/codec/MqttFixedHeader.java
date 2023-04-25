@@ -22,7 +22,7 @@ import java.util.Objects;
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#fixed-header">
  * MQTTV3.1/fixed-header</a>
  *
- * @author netty
+ * @author netty、L.cm
  */
 public final class MqttFixedHeader {
 
@@ -30,6 +30,7 @@ public final class MqttFixedHeader {
 	private final boolean isDup;
 	private MqttQoS qosLevel;
 	private final boolean isRetain;
+	private final int headLength;
 	private final int remainingLength;
 
 	public MqttFixedHeader(
@@ -38,10 +39,21 @@ public final class MqttFixedHeader {
 		MqttQoS qosLevel,
 		boolean isRetain,
 		int remainingLength) {
+		this(messageType, isDup, qosLevel, isRetain, 0, remainingLength);
+	}
+
+	public MqttFixedHeader(
+		MqttMessageType messageType,
+		boolean isDup,
+		MqttQoS qosLevel,
+		boolean isRetain,
+		int headLength,
+		int remainingLength) {
 		this.messageType = Objects.requireNonNull(messageType, "messageType is null.");
 		this.isDup = isDup;
 		this.qosLevel = Objects.requireNonNull(qosLevel, "qosLevel is null.");
 		this.isRetain = isRetain;
+		this.headLength = headLength;
 		this.remainingLength = remainingLength;
 	}
 
@@ -68,8 +80,16 @@ public final class MqttFixedHeader {
 		return isRetain;
 	}
 
+	public int headLength() {
+		return headLength;
+	}
+
 	public int remainingLength() {
 		return remainingLength;
+	}
+
+	public int getMessageLength() {
+		return headLength + remainingLength;
 	}
 
 	@Override
