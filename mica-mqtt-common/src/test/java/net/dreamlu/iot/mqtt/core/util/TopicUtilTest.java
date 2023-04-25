@@ -61,4 +61,12 @@ class TopicUtilTest {
 		Assertions.assertTrue(TopicUtil.match("/iot/test/123", "/iot/test/123"));
 	}
 
+	@Test
+	void test2() {
+		String s1 = "$SYS/brokers/${node}/clients/${clientId}/disconnected";
+		String s2 = "$SYS/brokers/+/clients/+/disconnected";
+		String s3 = TopicUtil.getTopicFilter(s1);
+		Assertions.assertEquals(s3, s2);
+	}
+
 }

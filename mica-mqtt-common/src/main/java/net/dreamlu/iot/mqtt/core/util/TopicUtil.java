@@ -172,9 +172,16 @@ public final class TopicUtil {
 	 * @return 获取处理完成之后的 topic
 	 */
 	public static String getTopicFilter(String topicTemplate) {
-		// 替换 ${name} 为 + 替换 #{name} 为 #
-		return topicTemplate.replaceAll("\\$\\{[\\s\\w.]+}", "+")
-			.replaceAll("#\\{[\\s\\w.]+}", "#");
+		// 替换 ${name} 为 +
+		StringBuilder sb = new StringBuilder(topicTemplate.length());
+		int cursor = 0;
+		for (int start, end; (start = topicTemplate.indexOf("${", cursor)) != -1 && (end = topicTemplate.indexOf('}', start)) != -1; ) {
+			sb.append(topicTemplate, cursor, start);
+			sb.append('+');
+			cursor = end + 1;
+		}
+		sb.append(topicTemplate.substring(cursor));
+		return sb.toString();
 	}
 
 }
