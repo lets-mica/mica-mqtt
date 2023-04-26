@@ -211,6 +211,15 @@
 
     <profiles>
         <profile>
+            <id>snapshot</id>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
             <id>release</id>
             <build>
                 <plugins>
