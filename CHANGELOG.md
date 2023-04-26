@@ -3,10 +3,11 @@
 ## 发行版本
 
 ### v2.1.2 - 2023-04-26
+- :sparkles: mica-mqttx-client 支持 `reconnect(String ip, int port)` 转移到其他服务，订阅保留，连接成功时自动重新订阅。感谢 `@powerxie` 反馈
 - :sparkles: 优化 `TopicUtil#getTopicFilter()` topic 占位符替换。
-- :sparkles: 调整 mica-mqtt-client-spring-boot-starter 启动时机。`MqttClientCustomizer` 支持从数据库中获取配置。
+- :sparkles: 调整 mica-mqtt-client-spring-boot-starter 启动时机。`MqttClientCustomizer` 支持从数据库中获取配置。感谢 `@powerxie` 反馈
 - :memo: 修复迁移指南**ssl配置**文档错误
-- :bug: 修复包长度计算错误，压测下协议解析异常 gitee #I6YOMD
+- :bug: 修复包长度计算错误，压测下协议解析异常 gitee #I6YOMD 感谢 `@powerxie` 反馈
 
 ### v2.1.1 - 2023-04-08
 - :sparkles: mica-mqtt-server http-api 不再强制依赖 `fastjson` 还支持 `Jackson`、`Fastjson2`、`Gson`、`hutool-json` 和自定义, `@皮球` 反馈 gitee #I6O49D。
