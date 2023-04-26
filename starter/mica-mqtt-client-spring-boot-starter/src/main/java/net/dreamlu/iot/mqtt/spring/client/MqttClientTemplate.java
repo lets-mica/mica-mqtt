@@ -16,18 +16,18 @@
 
 package net.dreamlu.iot.mqtt.spring.client;
 
-import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.*;
 import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -35,12 +35,27 @@ import java.util.List;
  *
  * @author wsq（冷月宫主）
  */
-@RequiredArgsConstructor
-public class MqttClientTemplate implements InitializingBean, DisposableBean, Ordered {
+public class MqttClientTemplate implements SmartInitializingSingleton, DisposableBean, Ordered {
 	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
-	private final MqttClientCreator mqttClientCreator;
+	private final MqttClientCreator clientCreator;
 	private final ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider;
+	private final ObjectProvider<MqttClientCustomizer> customizersObjectProvider;
+	private final List<MqttClientSubscription> tempSubscriptionList;
 	private MqttClient client;
+
+	public MqttClientTemplate(MqttClientCreator clientCreator,
+							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider) {
+		this(clientCreator, clientConnectListenerObjectProvider, null);
+	}
+
+	public MqttClientTemplate(MqttClientCreator clientCreator,
+							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
+							  ObjectProvider<MqttClientCustomizer> customizersObjectProvider) {
+		this.clientCreator = clientCreator;
+		this.clientConnectListenerObjectProvider = clientConnectListenerObjectProvider;
+		this.customizersObjectProvider = customizersObjectProvider;
+		this.tempSubscriptionList = new ArrayList<>();
+	}
 
 	/**
 	 * 订阅
@@ -244,7 +259,7 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 	 * @return MqttClientCreator
 	 */
 	public MqttClientCreator getClientCreator() {
-		return mqttClientCreator;
+		return clientCreator;
 	}
 
 	/**
@@ -292,11 +307,37 @@ public class MqttClientTemplate implements InitializingBean, DisposableBean, Ord
 		return client;
 	}
 
+	/**
+	 * 添加启动时的临时订阅
+	 *
+	 * @param topicFilters    topicFilters
+	 * @param qos             MqttQoS
+	 * @param messageListener IMqttClientMessageListener
+	 */
+	void addSubscriptionList(String[] topicFilters, MqttQoS qos, IMqttClientMessageListener messageListener) {
+		for (String topicFilter : topicFilters) {
+			tempSubscriptionList.add(new MqttClientSubscription(qos, topicFilter, messageListener));
+		}
+	}
+
 	@Override
-	public void afterPropertiesSet() {
-		// 配置客户端链接监听器
-		clientConnectListenerObjectProvider.ifAvailable(mqttClientCreator::connectListener);
-		client = mqttClientCreator.connect();
+	public void afterSingletonsInstantiated() {
+		// 配置客户端连接监听器
+		clientConnectListenerObjectProvider.ifAvailable(clientCreator::connectListener);
+		// 自定义处理
+		if (customizersObjectProvider != null) {
+			customizersObjectProvider.ifAvailable(customizer -> customizer.customize(clientCreator));
+		}
+		// 连接超时时间，如果没设置，改成 3s，减少因连不上卡顿时间
+		Integer timeout = clientCreator.getTimeout();
+		if (timeout == null) {
+			clientCreator.timeout(3);
+		}
+		// 使用同步连接，不过如果连不上会卡一会
+		client = clientCreator.connectSync();
+		// 添加订阅并清理零时订阅存储
+		client.subscribe(tempSubscriptionList);
+		tempSubscriptionList.clear();
 	}
 
 	@Override

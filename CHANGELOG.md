@@ -2,6 +2,12 @@
 
 ## 发行版本
 
+### v2.1.2 - 2023-04-26
+- :sparkles: 优化 `TopicUtil#getTopicFilter()` topic 占位符替换。
+- :sparkles: 调整 mica-mqtt-client-spring-boot-starter 启动时机。`MqttClientCustomizer` 支持从数据库中获取配置。
+- :memo: 修复迁移指南**ssl配置**文档错误
+- :bug: 修复包长度计算错误，压测下协议解析异常 gitee #I6YOMD
+
 ### v2.1.1 - 2023-04-08
 - :sparkles: mica-mqtt-server http-api 不再强制依赖 `fastjson` 还支持 `Jackson`、`Fastjson2`、`Gson`、`hutool-json` 和自定义, `@皮球` 反馈 gitee #I6O49D。
 - :sparkles: mica-mqtt-codec 删除 `net.dreamlu.iot.mqtt.codec.ByteBufferUtil`，2.1.0 漏删。

@@ -51,7 +51,7 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 			if (subscribe != null) {
 				MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
 				String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
-				clientTemplate.subscribe(topicFilters, subscribe.qos(), (IMqttClientMessageListener) bean);
+				clientTemplate.addSubscriptionList(topicFilters, subscribe.qos(), (IMqttClientMessageListener) bean);
 			}
 		} else {
 			// 2. 查找方法上的 MqttClientSubscribe 注解
@@ -81,7 +81,7 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 					// 4. 订阅
 					MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
 					String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
-					clientTemplate.subscribe(topicFilters, subscribe.qos(), (context, topic, message, payload) ->
+					clientTemplate.addSubscriptionList(topicFilters, subscribe.qos(), (context, topic, message, payload) ->
 						ReflectionUtils.invokeMethod(method, bean, topic, payload)
 					);
 				}
