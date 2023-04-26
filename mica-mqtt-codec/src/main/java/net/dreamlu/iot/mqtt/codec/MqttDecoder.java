@@ -70,7 +70,7 @@ public final class MqttDecoder {
 		return message;
 	}
 
-	private MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int readableLength) {
+	private MqttMessage decode(ChannelContext ctx, ByteBuffer buffer, int readableLength) throws TioDecodeException {
 		// 1. 首先判断缓存中协议头是否读完（MQTT协议头为2字节）
 		if (readableLength < MQTT_PROTOCOL_LENGTH) {
 			return null;
@@ -91,7 +91,7 @@ public final class MqttDecoder {
 		int bytesRemainingInVariablePart = mqttFixedHeader.remainingLength();
 		int messageLength = headLength + bytesRemainingInVariablePart;
 		if (messageLength > maxBytesInMessage) {
-			throw new DecoderException("too large message: " + messageLength + " bytes but maxBytesInMessage is " + maxBytesInMessage);
+			throw new TioDecodeException("too large message: " + messageLength + " bytes but maxBytesInMessage is " + maxBytesInMessage);
 		}
 		// 3. 长度不够，直接返回 null
 		if (readableLength < messageLength) {
