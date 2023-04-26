@@ -236,6 +236,17 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 	}
 
 	/**
+	 * 重连到新的服务端节点
+	 *
+	 * @param ip   ip
+	 * @param port port
+	 * @return 是否成功
+	 */
+	public boolean reconnect(String ip, int port) {
+		return client.reconnect(ip, port);
+	}
+
+	/**
 	 * 断开 mqtt 连接
 	 *
 	 * @return 是否成功

@@ -45,6 +45,10 @@ import java.util.stream.Collectors;
  */
 public final class MqttClient {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
+	/**
+	 * 是否需要重新订阅
+	 */
+	private static final String MQTT_NEED_RE_SUB = "MQTT_NEED_RE_SUB";
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
 	private final TioClientConfig clientTioConfig;
@@ -445,6 +449,56 @@ public final class MqttClient {
 		} catch (Exception e) {
 			logger.error("mqtt client reconnect error", e);
 		}
+	}
+
+
+	/**
+	 * 重连到新的服务端节点
+	 *
+	 * @param ip   ip
+	 * @param port port
+	 * @return 是否成功
+	 */
+	public boolean reconnect(String ip, int port) {
+		return reconnect(new Node(ip, port));
+	}
+
+	/**
+	 * 重连到新的服务端节点
+	 *
+	 * @param serverNode Node
+	 * @return 是否成功
+	 */
+	public boolean reconnect(Node serverNode) {
+		// 更新 ip 和端口
+		this.config.ip(serverNode.getIp()).port(serverNode.getPort());
+		// 获取老的
+		ClientChannelContext oldContext = getContext();
+		if (oldContext != null) {
+			Tio.remove(context, "切换服务地址：" + serverNode);
+		}
+		try {
+			this.context = tioClient.connect(serverNode, config.getTimeout());
+			this.context.set(MQTT_NEED_RE_SUB, (byte) 1);
+			return true;
+		} catch (Exception e) {
+			logger.error("mqtt client reconnect error", e);
+		}
+		return false;
+	}
+
+	/**
+	 * 是否需要重新订阅
+	 *
+	 * @param context ChannelContext
+	 * @return 是否需要重新订阅
+	 */
+	public static boolean isNeedReSub(ChannelContext context) {
+		if (context.containsKey(MQTT_NEED_RE_SUB)) {
+			context.remove(MQTT_NEED_RE_SUB);
+			return true;
+		}
+		return false;
 	}
 
 	/**

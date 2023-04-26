@@ -75,8 +75,8 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				}
 				// 2. 发布连接通知
 				publishConnectEvent(context);
-				// 3. 如果 session 不存在重连时发送重新订阅
-				if (!connAckVariableHeader.isSessionPresent()) {
+				// 3. 如果 session 不存在重连时发送重新订阅，更改 ip、端口之后需要重新发送订阅
+				if (!connAckVariableHeader.isSessionPresent() || MqttClient.isNeedReSub(context)) {
 					reSendSubscription(context);
 				}
 				break;
