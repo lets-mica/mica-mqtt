@@ -75,7 +75,7 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 					Class<?>[] parameterTypes = method.getParameterTypes();
 					Class<?> topicParamType = parameterTypes[0];
 					Class<?> payloadParamType = parameterTypes[1];
-					if (String.class != topicParamType || ByteBuffer.class != payloadParamType) {
+					if (String.class != topicParamType || byte[].class != payloadParamType) {
 						throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String and ByteBuffer.");
 					}
 					// 4. 订阅
