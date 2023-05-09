@@ -66,7 +66,7 @@ public class RedisMqttMessageDownReceiver implements MessageListener, Initializi
 			return;
 		}
 		String clientId = mqttMessage.getClientId();
-		ByteBuffer payload = mqttMessage.getPayload();
+		byte[] payload = mqttMessage.getPayload();
 		MqttQoS mqttQoS = MqttQoS.valueOf(mqttMessage.getQos());
 		boolean retain = mqttMessage.isRetain();
 		if (StringUtil.isBlank(clientId)) {

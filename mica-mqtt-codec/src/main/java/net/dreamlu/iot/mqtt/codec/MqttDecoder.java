@@ -528,11 +528,10 @@ public final class MqttDecoder {
 		return new Result<>(new MqttUnsubscribePayload(unsubscribeTopics), numberOfBytesConsumed);
 	}
 
-	private static Result<ByteBuffer> decodePublishPayload(ByteBuffer buffer, int bytesRemainingInVariablePart) {
-		byte[] slice = new byte[bytesRemainingInVariablePart];
-		buffer.get(slice, 0, bytesRemainingInVariablePart);
-		ByteBuffer byteBuffer = ByteBuffer.wrap(slice);
-		return new Result<>(byteBuffer, bytesRemainingInVariablePart);
+	private static Result<byte[]> decodePublishPayload(ByteBuffer buffer, int bytesRemainingInVariablePart) {
+		byte[] payload = new byte[bytesRemainingInVariablePart];
+		buffer.get(payload, 0, bytesRemainingInVariablePart);
+		return new Result<>(payload, bytesRemainingInVariablePart);
 	}
 
 	private static Result<String> decodeString(ByteBuffer buffer) {

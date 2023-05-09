@@ -369,7 +369,8 @@ public final class MqttEncoder {
 		MqttVersion mqttVersion = MqttCodecUtil.getMqttVersion(ctx);
 		MqttFixedHeader mqttFixedHeader = message.fixedHeader();
 		MqttPublishVariableHeader variableHeader = message.variableHeader();
-		ByteBuffer payload = message.payload().duplicate();
+		// 处理 payload 为 null 的情况
+		byte[] payload = message.payload() == null ? ByteBufferUtil.EMPTY_BYTES : message.payload();
 
 		String topicName = variableHeader.topicName();
 		byte[] topicNameBytes = encodeStringUtf8(topicName);
@@ -379,7 +380,7 @@ public final class MqttEncoder {
 
 		int variableHeaderBufferSize = 2 + topicNameBytes.length +
 			(mqttFixedHeader.qosLevel().value() > 0 ? 2 : 0) + propertiesBytes.length;
-		int payloadBufferSize = payload.array().length;
+		int payloadBufferSize = payload.length;
 		int variablePartSize = variableHeaderBufferSize + payloadBufferSize;
 		int fixedHeaderBufferSize = 1 + getVariableLengthInt(variablePartSize);
 

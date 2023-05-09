@@ -36,7 +36,7 @@ public final class MqttMessageBuilders {
 		private String topic;
 		private boolean retained;
 		private MqttQoS qos;
-		private ByteBuffer payload;
+		private byte[] payload;
 		private int messageId;
 		private MqttProperties mqttProperties;
 
@@ -58,7 +58,7 @@ public final class MqttMessageBuilders {
 			return this;
 		}
 
-		public PublishBuilder payload(ByteBuffer payload) {
+		public PublishBuilder payload(byte[] payload) {
 			this.payload = payload;
 			return this;
 		}
@@ -81,7 +81,7 @@ public final class MqttMessageBuilders {
 			MqttFixedHeader mqttFixedHeader = new MqttFixedHeader(MqttMessageType.PUBLISH, false, qos, retained, 0);
 			MqttPublishVariableHeader mqttVariableHeader =
 				new MqttPublishVariableHeader(topic, messageId, mqttProperties);
-			return new MqttPublishMessage(mqttFixedHeader, mqttVariableHeader, ByteBufferUtil.clone(payload));
+			return new MqttPublishMessage(mqttFixedHeader, mqttVariableHeader, payload);
 		}
 	}
 

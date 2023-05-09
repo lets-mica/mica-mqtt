@@ -58,7 +58,7 @@ public final class MqttMessageFactory {
 				return new MqttPublishMessage(
 					mqttFixedHeader,
 					(MqttPublishVariableHeader) variableHeader,
-					(ByteBuffer) payload);
+					(byte[]) payload);
 			case PUBACK:
 				//Having MqttPubReplyMessageVariableHeader or MqttMessageIdVariableHeader
 				return new MqttPubAckMessage(mqttFixedHeader, (MqttMessageIdVariableHeader) variableHeader);

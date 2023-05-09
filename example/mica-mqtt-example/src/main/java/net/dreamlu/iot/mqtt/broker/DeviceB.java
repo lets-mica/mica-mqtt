@@ -19,7 +19,8 @@ package net.dreamlu.iot.mqtt.broker;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.utils.buffer.ByteBufferUtil;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 设备 B，这里默认 web 端
@@ -39,7 +40,7 @@ public class DeviceB {
 			.connect();
 
 		client.subQos0("/a/door/open", (context, topic, message, payload) -> {
-			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
+			logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
 		});
 	}
 }

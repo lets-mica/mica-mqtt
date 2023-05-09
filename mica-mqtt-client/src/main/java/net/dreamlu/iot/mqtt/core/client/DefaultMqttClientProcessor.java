@@ -27,7 +27,6 @@ import org.tio.core.Tio;
 import org.tio.utils.hutool.CollUtil;
 import org.tio.utils.timer.TimerTaskService;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -267,7 +266,6 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 		pendingPublish.onPubAckReceived();
 		clientSession.removePendingPublish(messageId);
-		pendingPublish.getPayload().clear();
 	}
 
 	@Override
@@ -317,7 +315,6 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			String topicName = pendingPublish.getMessage().variableHeader().topicName();
 			logger.info("MQTT Topic:{} successfully PubComp", topicName);
 		}
-		pendingPublish.getPayload().clear();
 		pendingPublish.onPubCompReceived();
 		clientSession.removePendingPublish(messageId);
 	}
@@ -334,10 +331,9 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		if (subscriptionList.isEmpty()) {
 			logger.warn("Mqtt message to accept topic:{} subscriptionList is empty.", topicName);
 		} else {
-			final ByteBuffer payload = message.payload();
+			final byte[] payload = message.payload();
 			subscriptionList.forEach(subscription -> {
 				IMqttClientMessageListener listener = subscription.getListener();
-				payload.rewind();
 				executor.submit(() -> {
 					try {
 						listener.onMessage(context, topicName, message, payload);

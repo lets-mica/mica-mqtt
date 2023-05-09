@@ -21,8 +21,6 @@ import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttSubAckMessage;
 import org.tio.core.ChannelContext;
 
-import java.nio.ByteBuffer;
-
 /**
  * mqtt 消息处理
  *
@@ -62,6 +60,6 @@ public interface IMqttClientMessageListener {
 	 * @param message MqttPublishMessage
 	 * @param payload payload
 	 */
-	void onMessage(ChannelContext context, String topic, MqttPublishMessage message, ByteBuffer payload);
+	void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload);
 
 }

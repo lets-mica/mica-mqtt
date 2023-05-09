@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.aliyun;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
-import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
@@ -55,7 +54,7 @@ public class MqttClientTest {
 			.connect();
 
 		client.subQos0("/sys/" + productKey + '/' + deviceName + "/thing/event/property/post_reply", (context, topic, message, payload) -> {
-			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
+			System.out.println(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
 		});
 
 		Timer timer = new Timer();

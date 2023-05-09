@@ -19,7 +19,7 @@ package net.dreamlu.iot.mqtt.core.server.model;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
 
 import java.io.Serializable;
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -76,7 +76,7 @@ public class Message implements Serializable {
 	/**
 	 * 消息内容
 	 */
-	private ByteBuffer payload;
+	private byte[] payload;
 	/**
 	 * 客户端的 IPAddress
 	 */
@@ -178,11 +178,11 @@ public class Message implements Serializable {
 		this.retain = retain;
 	}
 
-	public ByteBuffer getPayload() {
+	public byte[] getPayload() {
 		return payload;
 	}
 
-	public void setPayload(ByteBuffer payload) {
+	public void setPayload(byte[] payload) {
 		this.payload = payload;
 	}
 
@@ -219,12 +219,12 @@ public class Message implements Serializable {
 			return false;
 		}
 		Message message = (Message) o;
-		return dup == message.dup && qos == message.qos && retain == message.retain && timestamp == message.timestamp && Objects.equals(node, message.node) && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && messageType == message.messageType && Objects.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt);
+		return dup == message.dup && qos == message.qos && retain == message.retain && timestamp == message.timestamp && Objects.equals(node, message.node) && Objects.equals(id, message.id) && Objects.equals(fromClientId, message.fromClientId) && Objects.equals(fromUsername, message.fromUsername) && Objects.equals(clientId, message.clientId) && Objects.equals(username, message.username) && Objects.equals(topic, message.topic) && messageType == message.messageType && Arrays.equals(payload, message.payload) && Objects.equals(peerHost, message.peerHost) && Objects.equals(publishReceivedAt, message.publishReceivedAt);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(node, id, fromClientId, fromUsername, clientId, username, topic, messageType, dup, qos, retain, payload, peerHost, timestamp, publishReceivedAt);
+		return Objects.hash(node, id, fromClientId, fromUsername, clientId, username, topic, messageType, dup, qos, retain, Arrays.hashCode(payload), peerHost, timestamp, publishReceivedAt);
 	}
 
 	@Override

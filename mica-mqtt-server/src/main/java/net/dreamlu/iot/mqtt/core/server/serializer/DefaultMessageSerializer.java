@@ -323,11 +323,9 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			protocolLength += topicBytes.length;
 		}
 		// 消息内容
-		ByteBuffer payload = message.getPayload();
-		byte[] payloadBytes = null;
+		byte[] payload = message.getPayload();
 		if (payload != null) {
-			payloadBytes = payload.array();
-			protocolLength += payloadBytes.length;
+			protocolLength += payload.length;
 		}
 		// 客户端的 IPAddress
 		String peerHost = message.getPeerHost();
@@ -406,9 +404,9 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		}
 		buffer.put((byte) byte1);
 		// 消息内容
-		if (payloadBytes != null) {
-			buffer.putInt(payloadBytes.length);
-			buffer.put(payloadBytes);
+		if (payload != null) {
+			buffer.putInt(payload.length);
+			buffer.put(payload);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
@@ -463,11 +461,9 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 			protocolLength += topicBytes.length;
 		}
 		// 消息内容
-		ByteBuffer payload = message.getPayload();
-		byte[] payloadBytes = null;
+		byte[] payload = message.getPayload();
 		if (payload != null) {
-			payloadBytes = payload.array();
-			protocolLength += payloadBytes.length;
+			protocolLength += payload.length;
 		}
 		// 客户端的 IPAddress
 		String peerHost = message.getPeerHost();
@@ -525,9 +521,9 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		}
 		buffer.put((byte) byte1);
 		// 消息内容
-		if (payloadBytes != null) {
-			buffer.putInt(payloadBytes.length);
-			buffer.put(payloadBytes);
+		if (payload != null) {
+			buffer.putInt(payload.length);
+			buffer.put(payload);
 		} else {
 			buffer.put(EMPTY_INT_BYTES);
 		}
@@ -748,7 +744,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		if (payloadLen > 0) {
 			byte[] payloadBytes = new byte[payloadLen];
 			buffer.get(payloadBytes);
-			message.setPayload(ByteBuffer.wrap(payloadBytes));
+			message.setPayload(payloadBytes);
 		}
 		// 客户端的 peerHost IPAddress
 		byte peerHostLen = buffer.get();
@@ -817,7 +813,7 @@ public enum DefaultMessageSerializer implements IMessageSerializer {
 		if (payloadLen > 0) {
 			byte[] payloadBytes = new byte[payloadLen];
 			buffer.get(payloadBytes);
-			message.setPayload(ByteBuffer.wrap(payloadBytes));
+			message.setPayload(payloadBytes);
 		}
 		// 客户端的 peerHost IPAddress
 		byte peerHostLen = buffer.get();

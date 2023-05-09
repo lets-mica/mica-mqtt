@@ -32,7 +32,6 @@ import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
 import org.tio.utils.timer.TimerTaskService;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -267,34 +266,11 @@ public final class MqttClient {
 	 * 发布消息
 	 *
 	 * @param topic   topic
-	 * @param payload 消息体
-	 * @return 是否发送成功
-	 */
-	public boolean publish(String topic, ByteBuffer payload) {
-		return publish(topic, payload, MqttQoS.AT_MOST_ONCE);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
 	 * @param payload 消息内容
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, byte[] payload) {
 		return publish(topic, payload, MqttQoS.AT_MOST_ONCE);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
-	 * @param payload 消息体
-	 * @param qos     MqttQoS
-	 * @return 是否发送成功
-	 */
-	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
-		return publish(topic, payload, qos, false);
 	}
 
 	/**
@@ -307,18 +283,6 @@ public final class MqttClient {
 	 */
 	public boolean publish(String topic, byte[] payload, MqttQoS qos) {
 		return publish(topic, payload, qos, false);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
-	 * @param payload 消息体
-	 * @param retain  是否在服务器上保留消息
-	 * @return 是否发送成功
-	 */
-	public boolean publish(String topic, ByteBuffer payload, boolean retain) {
-		return publish(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
 	}
 
 	/**
@@ -343,19 +307,6 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, byte[] payload, MqttQoS qos, boolean retain) {
-		return publish(topic, payload == null ? null : ByteBuffer.wrap(payload), qos, retain);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
-	 * @param payload 消息体
-	 * @param qos     MqttQoS
-	 * @param retain  是否在服务器上保留消息
-	 * @return 是否发送成功
-	 */
-	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
 		return publish(topic, payload, qos, (publishBuilder) -> publishBuilder.retained(retain));
 	}
 
@@ -369,7 +320,7 @@ public final class MqttClient {
 	 * @param properties MqttProperties
 	 * @return 是否发送成功
 	 */
-	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain, MqttProperties properties) {
+	public boolean publish(String topic, byte[] payload, MqttQoS qos, boolean retain, MqttProperties properties) {
 		return publish(topic, payload, qos, (publishBuilder) -> publishBuilder.retained(retain).properties(properties));
 	}
 
@@ -382,15 +333,12 @@ public final class MqttClient {
 	 * @param builder PublishBuilder
 	 * @return 是否发送成功
 	 */
-	public boolean publish(String topic, ByteBuffer payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
+	public boolean publish(String topic, byte[] payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
 		// 校验 topic
 		TopicUtil.validateTopicName(topic);
 		// qos 判断
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? messageIdGenerator.getId() : -1;
-		if (payload == null) {
-			payload = ByteBuffer.allocate(0);
-		}
 		MqttMessageBuilders.PublishBuilder publishBuilder = MqttMessageBuilders.publish();
 		// 自定义配置
 		builder.accept(publishBuilder);

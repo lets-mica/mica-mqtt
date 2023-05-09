@@ -43,7 +43,6 @@ import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.timer.TimerTaskService;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -158,7 +157,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setTopic(payload.willTopic());
 			byte[] willMessageInBytes = payload.willMessageInBytes();
 			if (willMessageInBytes != null) {
-				willMessage.setPayload(ByteBuffer.wrap(willMessageInBytes));
+				willMessage.setPayload(willMessageInBytes);
 			}
 			willMessage.setQos(variableHeader.willQos());
 			willMessage.setRetain(variableHeader.isWillRetain());
@@ -270,7 +269,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		}
 		pendingPublish.onPubAckReceived();
 		sessionManager.removePendingPublish(clientId, messageId);
-		pendingPublish.getPayload().clear();
 	}
 
 	@Override
@@ -320,7 +318,6 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		logger.debug("PubComp - clientId:{}, messageId:{}", clientId, messageId);
 		MqttPendingPublish pendingPublish = sessionManager.getPendingPublish(clientId, messageId);
 		if (pendingPublish != null) {
-			pendingPublish.getPayload().clear();
 			pendingPublish.onPubCompReceived();
 			sessionManager.removePendingPublish(clientId, messageId);
 		}
@@ -457,11 +454,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 										  String topicName, MqttPublishMessage publishMessage) {
 		MqttFixedHeader fixedHeader = publishMessage.fixedHeader();
 		boolean isRetain = fixedHeader.isRetain();
-		ByteBuffer payload = publishMessage.payload();
+		byte[] payload = publishMessage.payload();
 		// 1. retain 消息逻辑
 		if (isRetain) {
 			// qos == 0 or payload is none,then clear previous retain message
-			if (MqttQoS.AT_MOST_ONCE == mqttQoS || payload == null || payload.array().length == 0) {
+			if (MqttQoS.AT_MOST_ONCE == mqttQoS || payload == null || payload.length == 0) {
 				this.messageStore.clearRetainMessage(topicName);
 			} else {
 				Message retainMessage = new Message();

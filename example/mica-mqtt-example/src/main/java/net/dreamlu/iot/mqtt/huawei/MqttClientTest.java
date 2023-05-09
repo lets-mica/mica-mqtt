@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.huawei;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
-import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
@@ -58,7 +57,7 @@ public class MqttClientTest {
 		String cmdRequestTopic =  "$oc/devices/" + deviceId + "/sys/commands/#";
 
 		client.subQos0(cmdRequestTopic, (context, topic, message, payload) -> {
-			System.out.println(topic + '\t' + ByteBufferUtil.toString(payload));
+			System.out.println(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
 		});
 
 		// 属性上报消息

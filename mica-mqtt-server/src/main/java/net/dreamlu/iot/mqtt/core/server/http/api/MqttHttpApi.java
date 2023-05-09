@@ -37,7 +37,6 @@ import org.tio.http.common.Method;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.json.JsonUtil;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.function.Function;
 
@@ -131,7 +130,7 @@ public class MqttHttpApi {
 		message.setRetain(form.isRetain());
 		// payload 解码
 		if (StrUtil.isNotBlank(payload)) {
-			message.setPayload(ByteBuffer.wrap(PayloadEncode.decode(payload, form.getEncoding())));
+			message.setPayload(PayloadEncode.decode(payload, form.getEncoding()));
 		}
 		messageDispatcher.send(message);
 	}

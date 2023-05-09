@@ -24,7 +24,8 @@ import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import org.springframework.context.ApplicationEventPublisher;
 import org.tio.core.ChannelContext;
-import org.tio.utils.buffer.ByteBufferUtil;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 使用 Spring event 解耦消息监听
@@ -39,7 +40,7 @@ public class SpringEventMqttMessageListener implements IMqttMessageListener {
 	@Override
 	public void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qoS, MqttPublishMessage publishMessage, Message message) {
 		if (log.isDebugEnabled()) {
-			log.debug("mqtt server receive message clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
+			log.debug("mqtt server receive message clientId:{} message:{} payload:{}", clientId, message, new String(message.getPayload(), StandardCharsets.UTF_8));
 		}
 		eventPublisher.publishEvent(message);
 	}

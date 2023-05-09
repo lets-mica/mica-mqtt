@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.tio.core.ChannelContext;
-import org.tio.utils.buffer.ByteBufferUtil;
 
 /**
  * 监听器1，使用 Spring boot event 的方式
@@ -29,7 +28,7 @@ public class MqttServerMessageListener1 {
 	public void onMessage(Message message) {
 		String clientId = message.getFromClientId();
 		ChannelContext context = mqttServerTemplate.getChannelContext(clientId);
-		logger.info("context:{} clientId:{} message:{} payload:{}", context, clientId, message, ByteBufferUtil.toString(message.getPayload()));
+		logger.info("context:{} clientId:{} message:{} payload:{}", context, clientId, message, new String(message.getPayload()));
 	}
 
 }

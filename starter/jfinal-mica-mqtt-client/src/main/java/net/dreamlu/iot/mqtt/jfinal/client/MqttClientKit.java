@@ -27,7 +27,6 @@ import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -224,34 +223,11 @@ public class MqttClientKit {
 	 * 发布消息
 	 *
 	 * @param topic   topic
-	 * @param payload 消息体
-	 * @return 是否发送成功
-	 */
-	public static boolean publish(String topic, ByteBuffer payload) {
-		return client.publish(topic, payload);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
 	 * @param payload 消息内容
 	 * @return 是否发送成功
 	 */
 	public static boolean publish(String topic, byte[] payload) {
 		return client.publish(topic, payload);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
-	 * @param payload 消息体
-	 * @param qos     MqttQoS
-	 * @return 是否发送成功
-	 */
-	public static boolean publish(String topic, ByteBuffer payload, MqttQoS qos) {
-		return client.publish(topic, payload, qos);
 	}
 
 	/**
@@ -264,18 +240,6 @@ public class MqttClientKit {
 	 */
 	public static boolean publish(String topic, byte[] payload, MqttQoS qos) {
 		return client.publish(topic, payload, qos);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
-	 * @param payload 消息体
-	 * @param retain  是否在服务器上保留消息
-	 * @return 是否发送成功
-	 */
-	public static boolean publish(String topic, ByteBuffer payload, boolean retain) {
-		return client.publish(topic, payload, retain);
 	}
 
 	/**
@@ -309,37 +273,10 @@ public class MqttClientKit {
 	 * @param topic   topic
 	 * @param payload 消息体
 	 * @param qos     MqttQoS
-	 * @param retain  是否在服务器上保留消息
-	 * @return 是否发送成功
-	 */
-	public static boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain) {
-		return client.publish(topic, payload, qos, retain);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic      topic
-	 * @param payload    消息体
-	 * @param qos        MqttQoS
-	 * @param retain     是否在服务器上保留消息
-	 * @param properties MqttProperties
-	 * @return 是否发送成功
-	 */
-	public static boolean publish(String topic, ByteBuffer payload, MqttQoS qos, boolean retain, MqttProperties properties) {
-		return client.publish(topic, payload, qos, retain, properties);
-	}
-
-	/**
-	 * 发布消息
-	 *
-	 * @param topic   topic
-	 * @param payload 消息体
-	 * @param qos     MqttQoS
 	 * @param builder PublishBuilder
 	 * @return 是否发送成功
 	 */
-	public static boolean publish(String topic, ByteBuffer payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
+	public static boolean publish(String topic, byte[] payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
 		return client.publish(topic, payload, qos, builder);
 	}
 

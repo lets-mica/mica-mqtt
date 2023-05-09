@@ -23,9 +23,7 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
-import org.tio.utils.buffer.ByteBufferUtil;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -68,8 +66,8 @@ public class MqttClientTest {
 			}
 
 			@Override
-			public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, ByteBuffer payload) {
-				logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
+			public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
+				logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
 			}
 		});
 

@@ -16,18 +16,16 @@
 
 package net.dreamlu.iot.mqtt.codec;
 
-import java.nio.ByteBuffer;
-
 /**
  * See <a href="https://public.dhe.ibm.com/software/dw/webservices/ws-mqtt/mqtt-v3r1.html#publish">MQTTV3.1/publish</a>
  *
- * @author netty
+ * @author netty、L.cm
  */
 public class MqttPublishMessage extends MqttMessage {
 	public MqttPublishMessage(
 		MqttFixedHeader mqttFixedHeader,
 		MqttPublishVariableHeader variableHeader,
-		ByteBuffer payload) {
+		byte[] payload) {
 		super(mqttFixedHeader, variableHeader, payload);
 	}
 
@@ -37,12 +35,12 @@ public class MqttPublishMessage extends MqttMessage {
 	}
 
 	@Override
-	public ByteBuffer payload() {
-		return (ByteBuffer) super.payload();
+	public byte[] payload() {
+		return (byte[]) super.payload();
 	}
 
-	public ByteBuffer getPayload() {
-		return payload();
+	public byte[] getPayload() {
+		return this.payload();
 	}
 
 }

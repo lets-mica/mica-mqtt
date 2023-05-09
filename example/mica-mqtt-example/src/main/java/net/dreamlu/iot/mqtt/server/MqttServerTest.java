@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.server;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
@@ -49,7 +48,7 @@ public class MqttServerTest {
 //			mqtt 3.1 协议会校验 clientId 长度。
 //			.maxClientIdLength(64)
 			.messageListener((context, clientId, topic, qos, message) -> {
-				logger.info("clientId:{} payload:{}", clientId, ByteBufferUtil.toString(message.getPayload()));
+				logger.info("clientId:{} payload:{}", clientId, new String(message.payload(), StandardCharsets.UTF_8));
 			})
 			// 客户端连接状态监听
 			.connectStatusListener(new MqttConnectStatusListener())

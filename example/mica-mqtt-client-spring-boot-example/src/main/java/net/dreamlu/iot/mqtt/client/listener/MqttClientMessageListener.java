@@ -7,9 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.tio.core.ChannelContext;
-import org.tio.utils.buffer.ByteBufferUtil;
 
-import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 客户端消息监听的另一种方式
@@ -22,8 +21,8 @@ public class MqttClientMessageListener implements IMqttClientMessageListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientMessageListener.class);
 
 	@Override
-	public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, ByteBuffer payload) {
-		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
+	public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
+		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}
 }
 

@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 import org.tio.core.ChannelContext;
-import org.tio.utils.buffer.ByteBufferUtil;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * 消息监听器示例2,优点：性能损失小
@@ -27,7 +28,7 @@ public class MqttServerMessageListener2 implements IMqttMessageListener, SmartIn
 
 	@Override
 	public void onMessage(ChannelContext context, String clientId, String topic, MqttQoS qos, MqttPublishMessage message) {
-		logger.info("context:{} clientId:{} message:{} payload:{}", context, clientId, message, ByteBufferUtil.toString(message.getPayload()));
+		logger.info("context:{} clientId:{} message:{} payload:{}", context, clientId, message, new String(message.payload(), StandardCharsets.UTF_8));
 	}
 
 	@Override

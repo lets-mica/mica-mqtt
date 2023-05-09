@@ -15,20 +15,20 @@ import java.util.function.Consumer;
  * @author netty
  */
 public final class MqttPendingPublish {
-	private final ByteBuffer payload;
+	private final byte[] payload;
 	private final MqttPublishMessage message;
 	private final MqttQoS qos;
 	private final RetryProcessor<MqttPublishMessage> pubRetryProcessor = new RetryProcessor<>();
 	private final RetryProcessor<MqttMessage> pubRelRetryProcessor = new RetryProcessor<>();
 
-	public MqttPendingPublish(ByteBuffer payload, MqttPublishMessage message, MqttQoS qos) {
+	public MqttPendingPublish(byte[] payload, MqttPublishMessage message, MqttQoS qos) {
 		this.payload = payload;
 		this.message = message;
 		this.qos = qos;
 		this.pubRetryProcessor.setOriginalMessage(message);
 	}
 
-	public ByteBuffer getPayload() {
+	public byte[] getPayload() {
 		return payload;
 	}
 
@@ -42,7 +42,6 @@ public final class MqttPendingPublish {
 
 	public void startPublishRetransmissionTimer(TimerTaskService taskService, Consumer<MqttMessage> sendPacket) {
 		this.pubRetryProcessor.setHandle(((fixedHeader, originalMessage) -> {
-			this.payload.rewind();
 			sendPacket.accept(new MqttPublishMessage(fixedHeader, originalMessage.variableHeader(), this.payload));
 		}));
 		this.pubRetryProcessor.start(taskService);

@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.client;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.charset.StandardCharsets;
 
@@ -43,7 +42,7 @@ public class MqttClientSyncTest {
 			.connectSync();
 
 		client.subQos0("/test/#", (context, topic, message, payload) -> {
-			logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
+			logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
 		});
 
 		client.unSubscribe("/test/#", "/test/123");
