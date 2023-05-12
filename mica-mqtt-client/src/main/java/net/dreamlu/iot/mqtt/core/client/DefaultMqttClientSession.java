@@ -26,6 +26,7 @@ import org.tio.utils.collection.IntObjectMap;
 import org.tio.utils.collection.MultiValueMap;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 客户端 session 管理，包括 sub 和 pub
@@ -131,15 +132,10 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 
 	@Override
 	public List<MqttClientSubscription> getMatchedSubscription(String topicName) {
-		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
-		for (Set<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
-			for (MqttClientSubscription subscription : mqttSubscriptions) {
-				if (subscription.matches(topicName)) {
-					subscriptionList.add(subscription);
-				}
-			}
-		}
-		return Collections.unmodifiableList(subscriptionList);
+		return subscriptions.values().stream()
+			.flatMap(Collection::stream)
+			.filter(subscription -> subscription.matches(topicName))
+			.collect(Collectors.toList());
 	}
 
 	@Override
