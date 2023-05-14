@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.2.0 - 2023-05-14
+- :sparkles: MqttPublishMessage payload 改为 `byte[]`，简化代码，
+- :bug: 修复 高并发场景下取消订阅时报 ConcurrentModificationException github #5 感谢 `@yinyuncan` 反馈
+
 ### v2.1.2 - 2023-04-26
 - :sparkles: mica-mqttx-client 支持 `reconnect(String ip, int port)` 转移到其他服务，订阅保留，连接成功时自动重新订阅。感谢 `@powerxie` 反馈
 - :sparkles: 优化 `TopicUtil#getTopicFilter()` topic 占位符替换。
