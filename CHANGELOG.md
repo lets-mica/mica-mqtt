@@ -3,7 +3,7 @@
 ## 发行版本
 
 ### v2.2.0 - 2023-05-14
-- :sparkles: MqttPublishMessage payload 改为 `byte[]`，简化代码，
+- :sparkles: MqttPublishMessage payload 参数均由 `ByteBuffer` 改为 `byte[]`，简化代码，方便使用。
 - :bug: 修复 高并发场景下取消订阅时报 ConcurrentModificationException github #5 感谢 `@yinyuncan` 反馈
 
 ### v2.1.2 - 2023-04-26
