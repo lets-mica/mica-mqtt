@@ -120,14 +120,15 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 	}
 
 	@Override
-	public List<MqttClientSubscription> getAndCleanSubscription() {
+	public synchronized List<MqttClientSubscription> getAndCleanSubscription() {
 		List<MqttClientSubscription> subscriptionList = new ArrayList<>();
-		for (Set<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
-			subscriptionList.addAll(mqttSubscriptions);
+		synchronized (subscriptions) {
+			for (Set<MqttClientSubscription> mqttSubscriptions : subscriptions.values()) {
+				subscriptionList.addAll(mqttSubscriptions);
+			}
+			subscriptions.clear();
 		}
-		List<MqttClientSubscription> data = Collections.unmodifiableList(subscriptionList);
-		subscriptions.clear();
-		return data;
+		return Collections.unmodifiableList(subscriptionList);
 	}
 
 	@Override
