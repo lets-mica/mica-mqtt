@@ -87,7 +87,7 @@ public class MqttServerMessageListener implements IMqttMessageListener {
 
     @Override
     public void onMessage(ChannelContext context, String clientId, Message message) {
-        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
+        logger.info("clientId:{} message:{} payload:{}", clientId, message, new String(message.getPayload(), StandardCharsets.UTF_8));
     }
 }
 ```
@@ -131,7 +131,7 @@ public class ServerService {
     private MqttServerTemplate server;
 
     public boolean publish(String body) {
-        server.publishAll("/test/123", ByteBuffer.wrap(body.getBytes()));
+        server.publishAll("/test/123", body.getBytes(StandardCharsets.UTF_8));
         return true;
     }
 }

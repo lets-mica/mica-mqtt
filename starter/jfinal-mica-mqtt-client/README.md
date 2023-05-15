@@ -74,8 +74,8 @@ public class MqttClientConnectListener implements IMqttClientConnectListener {
 ```java
 public class TestMqttClientMessageListener implements IMqttClientMessageListener {
     @Override
-    public void onMessage(String topic, MqttPublishMessage message, ByteBuffer byteBuffer) {
-        System.out.println("收到消息 topic:" + topic + "内容:\n" + ByteBufferUtil.toString(byteBuffer));
+    public void onMessage(String topic, MqttPublishMessage message, byte[] payload) {
+        System.out.println("收到消息 topic:" + topic + "内容:\n" + new String(payload, StandardCharsets.UTF_8));
     }
 }
 ```

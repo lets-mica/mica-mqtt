@@ -34,5 +34,5 @@ plugin.config(mqttServerCreator -> {
 #### 5. 插件使用
 ```java
 // 更多方法可以直接使用 MqttServerKit 点出来
-MqttServerKit.publish(String clientId, String topic, ByteBuffer payload);
+MqttServerKit.publish(String clientId, String topic, byte[] payload);
 ```

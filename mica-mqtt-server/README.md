@@ -16,7 +16,7 @@ MqttServer mqttServer = MqttServer.create()
     .authHandler((clientId, userName, password) -> true)
     // 消息监听
     .messageListener((context, clientId, message) -> {
-        logger.info("clientId:{} message:{} payload:{}", clientId, message, ByteBufferUtil.toString(message.getPayload()));
+        logger.info("clientId:{} message:{} payload:{}", clientId, message, new String(message.getPayload(), StandardCharsets.UTF_8));
     })
     // 堆内存和堆外内存选择，默认：堆内存
     .bufferAllocator(ByteBufferAllocator.HEAP)
@@ -57,10 +57,10 @@ MqttServer mqttServer = MqttServer.create()
     .start();
 
 // 发送给某个客户端
-mqttServer.publish("clientId","/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));
+mqttServer.publish("clientId","/test/123", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
 
 // 发送给所有在线监听这个 topic 的客户端
-mqttServer.publishAll("/test/123", ByteBuffer.wrap("mica最牛皮".getBytes()));
+mqttServer.publishAll("/test/123", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
 
 // 停止服务
 mqttServer.stop();

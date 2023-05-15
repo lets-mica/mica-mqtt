@@ -122,20 +122,20 @@ public class MqttClientSubscribeListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientSubscribeListener.class);
 
 	@MqttClientSubscribe("/test/#")
-	public void subQos0(String topic, ByteBuffer payload) {
-		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
+	public void subQos0(String topic, byte[] payload) {
+		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}
 
 	@MqttClientSubscribe(value = "/qos1/#", qos = MqttQoS.AT_LEAST_ONCE)
-	public void subQos1(String topic, ByteBuffer payload) {
-		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
+	public void subQos1(String topic, byte[] payload) {
+		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}
 
 	@MqttClientSubscribe("/sys/${productKey}/${deviceName}/thing/sub/register")
-	public void thingSubRegister(String topic, ByteBuffer payload) {
+	public void thingSubRegister(String topic, byte[] payload) {
 		// 1.3.8 开始支持，@MqttClientSubscribe 注解支持 ${} 变量替换，会默认替换成 +
 		// 注意：mica-mqtt 会先从 Spring boot 配置中替换参数 ${}，如果存在配置会优先被替换。
-		logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
+		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}
 
 }
@@ -170,13 +170,13 @@ public class MainService {
     private MqttClientTemplate client;
 
     public boolean publish() {
-        client.publish("/test/client", ByteBuffer.wrap("mica最牛皮".getBytes(StandardCharsets.UTF_8)));
+        client.publish("/test/client", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
         return true;
     }
 
     public boolean sub() {
         client.subQos0("/test/#", (context, topic, message, payload) -> {
-            logger.info(topic + '\t' + ByteBufferUtil.toString(payload));
+            logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
         });
         return true;
     }
