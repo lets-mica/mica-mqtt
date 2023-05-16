@@ -17,6 +17,7 @@
 package net.dreamlu.iot.mqtt.codec;
 
 import org.tio.core.ChannelContext;
+import org.tio.utils.buffer.ByteBufferAllocator;
 import org.tio.utils.buffer.ByteBufferUtil;
 
 import java.nio.ByteBuffer;
@@ -504,7 +505,7 @@ public final class MqttEncoder {
 	}
 
 	private static byte[] encodeProperties(MqttProperties mqttProperties) {
-		WriteBuffer writeBuffer = new WriteBuffer();
+		WriteBuffer writeBuffer = new WriteBuffer(128);
 		for (MqttProperties.MqttProperty property : mqttProperties.listAll()) {
 			MqttProperties.MqttPropertyType propertyType = MqttProperties.MqttPropertyType.valueOf(property.propertyId);
 			switch (propertyType) {

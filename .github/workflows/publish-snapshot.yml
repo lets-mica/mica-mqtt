@@ -2,9 +2,9 @@ name: Publish Snapshot
 
 on:
   push:
-    branches: [ feature ]
+    branches: [ dev ]
   pull_request:
-    branches: [ feature ]
+    branches: [ dev ]
 
 jobs:
   publish:

@@ -16,7 +16,6 @@
 
 package net.dreamlu.iot.mqtt.core.server;
 
-import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerPublishPermission;
@@ -49,6 +48,7 @@ import org.tio.server.TioServerConfig;
 import org.tio.server.intf.TioServerHandler;
 import org.tio.server.intf.TioServerListener;
 import org.tio.utils.Threads;
+import org.tio.utils.buffer.ByteBufferAllocator;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.json.JsonAdapter;
 import org.tio.utils.json.JsonUtil;

@@ -18,12 +18,12 @@ package net.dreamlu.iot.mqtt.spring.client.config;
 
 import lombok.Getter;
 import lombok.Setter;
-import net.dreamlu.iot.mqtt.codec.ByteBufferAllocator;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
+import org.tio.utils.buffer.ByteBufferAllocator;
 
 /**
  * MqttClient 配置
