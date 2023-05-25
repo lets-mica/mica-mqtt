@@ -42,10 +42,6 @@ public enum TopicFilterType {
 		@Override
 		public boolean match(String topicFilter, String topicName) {
 			int prefixLen = TopicFilterType.SHARE_QUEUE_PREFIX.length();
-			// 匹配 topicName / 前缀
-			if (startsWithSlash(topicName)) {
-				prefixLen = prefixLen - 1;
-			}
 			return TopicUtil.match(topicFilter.substring(prefixLen), topicName);
 		}
 	},
@@ -57,7 +53,7 @@ public enum TopicFilterType {
 		@Override
 		public boolean match(String topicFilter, String topicName) {
 			// 去除前缀 $share/<group-name>/ ,匹配 topicName / 前缀
-			int prefixLen = TopicFilterType.findShareTopicIndex(topicFilter, startsWithSlash(topicName));
+			int prefixLen = TopicFilterType.findShareTopicIndex(topicFilter);
 			return TopicUtil.match(topicFilter.substring(prefixLen), topicName);
 		}
 	};
@@ -111,19 +107,16 @@ public enum TopicFilterType {
 		throw new IllegalArgumentException("Share subscription topicFilter: " + topicFilter + " not conform to the $share/<group-name>/xxx");
 	}
 
-	private static int findShareTopicIndex(String topicFilter, boolean startDelimiter) {
+	private static int findShareTopicIndex(String topicFilter) {
 		int prefixLength = TopicFilterType.SHARE_GROUP_PREFIX.length();
 		int topicFilterLength = topicFilter.length();
 		for (int i = prefixLength; i < topicFilterLength; i++) {
 			char ch = topicFilter.charAt(i);
 			if ('/' == ch) {
-				return startDelimiter ? i : i + 1;
+				return i + 1;
 			}
 		}
 		throw new IllegalArgumentException("Share subscription topicFilter: " + topicFilter + " not conform to the $share/<group-name>/xxx");
 	}
 
-	private static boolean startsWithSlash(String text) {
-		return '/' == text.charAt(0);
-	}
 }
