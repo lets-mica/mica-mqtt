@@ -4,6 +4,7 @@
 
 ### v2.2.1 - 2023-05-28
 - :zap: mica-mqtt-client 共享订阅更好的兼容 emqx 高版本，gitee #I786GU
+- :arrow_up: 依赖升级
 
 ### v2.2.0 - 2023-05-14
 - :sparkles: MqttPublishMessage payload 参数均由 `ByteBuffer` 改为 `byte[]`，简化代码，方便使用。
