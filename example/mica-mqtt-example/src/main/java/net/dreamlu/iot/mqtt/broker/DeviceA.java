@@ -37,7 +37,7 @@ public class DeviceA {
 			.port(1883)
 			.username("admin")
 			.password("123456")
-			.connect();
+			.connectSync();
 
 		client.subQos0("/a/door/open", (context, topic, message, payload) -> {
 			logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));

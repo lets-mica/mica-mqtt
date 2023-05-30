@@ -58,7 +58,7 @@ MqttClient client = MqttClient.create()
         }
     })
     .properties()                   // mqtt5 properties
-    .connect();
+    .connectSync();                 // 同步连接，也可以使用 connect()，可以避免 broker 没启动照成启动卡住。
 
     // 消息订阅，同类方法 subxxx
     client.subQos0("/test/#", (context, topic, message, payload) -> {

@@ -51,7 +51,7 @@ public class MqttClientTest {
 			.password(password)
 			.clientId(clientId)
 			.useSsl()
-			.connect();
+			.connectSync();
 
 		// 订阅命令下发topic
 		String cmdRequestTopic =  "$oc/devices/" + deviceId + "/sys/commands/#";

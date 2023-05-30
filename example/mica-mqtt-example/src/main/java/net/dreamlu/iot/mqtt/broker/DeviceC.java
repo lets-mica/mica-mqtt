@@ -36,7 +36,7 @@ public class DeviceC {
 			.port(1883)
 			.username("admin")
 			.password("123456")
-			.connect();
+			.connectSync();
 
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {

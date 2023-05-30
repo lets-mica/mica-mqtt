@@ -51,7 +51,7 @@ public class MqttClientTest {
 			.username(username)
 			.password(password)
 			.clientId(clientId)
-			.connect();
+			.connectSync();
 
 		client.subQos0("/sys/" + productKey + '/' + deviceName + "/thing/event/property/post_reply", (context, topic, message, payload) -> {
 			System.out.println(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
