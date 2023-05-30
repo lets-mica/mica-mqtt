@@ -15,6 +15,8 @@
 
 [**迁移到 mica-mqtt 2.1.x**](docs/update.md)
 
+承接各种**协议解析**，￥600起，按复杂度收费，详询：**DreamLuTech**（微信）
+
 ## 🍱 使用场景
 
 - 物联网（云端 mqtt broker）
