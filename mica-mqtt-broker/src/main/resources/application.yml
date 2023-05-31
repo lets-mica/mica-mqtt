@@ -5,6 +5,11 @@ spring:
     name: mica-mqtt-broker
   profiles:
     active: dev
+# 开启 redis stream
+mica:
+  redis:
+    stream:
+      enable: true
 # actuator management
 management:
   info:

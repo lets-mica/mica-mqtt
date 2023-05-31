@@ -16,14 +16,19 @@
 
 package net.dreamlu.iot.mqtt.broker.cluster;
 
+import net.dreamlu.iot.mqtt.broker.enums.RedisKeys;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.cluster.MqttClusterMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
 import net.dreamlu.mica.redis.cache.MicaRedisCache;
+import net.dreamlu.mica.redis.stream.MessageModel;
+import net.dreamlu.mica.redis.stream.RStreamListener;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.MessageListener;
+import org.springframework.data.redis.connection.stream.MapRecord;
 
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -31,35 +36,32 @@ import java.util.Objects;
  *
  * @author L.cm
  */
-public class RedisMqttMessageExchangeReceiver implements MessageListener, InitializingBean {
-	private final MicaRedisCache redisCache;
+public class RedisMqttMessageExchangeReceiver {
 	private final IMessageSerializer messageSerializer;
-	private final String channel;
 	private final MqttClusterMessageListener clusterMessageListener;
 
-	public RedisMqttMessageExchangeReceiver(MicaRedisCache redisCache,
-											IMessageSerializer messageSerializer,
-											String channel,
+	public RedisMqttMessageExchangeReceiver(IMessageSerializer messageSerializer,
 											MqttServer mqttServer) {
-		this.redisCache = redisCache;
 		this.messageSerializer = messageSerializer;
-		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 		this.clusterMessageListener = new MqttClusterMessageListener(mqttServer);
 	}
 
-	@Override
-	public void onMessage(org.springframework.data.redis.connection.Message message, byte[] bytes) {
-		byte[] messageBody = message.getBody();
+	@RStreamListener(
+		name = RedisKeys.REDIS_CHANNEL_EXCHANGE_KEY,
+		messageModel = MessageModel.BROADCASTING,
+		readRawBytes = true
+	)
+	public void mqttMessageUpReceiver(MapRecord<String, String, byte[]> mapRecord) {
 		// 手动序列化和反序列化，避免 redis 序列化不一致问题
-		Message mqttMessage = messageSerializer.deserialize(messageBody);
-		if (mqttMessage == null) {
-			return;
-		}
-		clusterMessageListener.onMessage(mqttMessage);
+		Map<String, byte[]> recordValue = mapRecord.getValue();
+		recordValue.forEach((key, messageBody) -> {
+			// 手动序列化和反序列化，避免 redis 序列化不一致问题
+			Message mqttMessage = messageSerializer.deserialize(messageBody);
+			if (mqttMessage == null) {
+				return;
+			}
+			clusterMessageListener.onMessage(mqttMessage);
+		});
 	}
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		redisCache.subscribe(channel, this);
-	}
 }

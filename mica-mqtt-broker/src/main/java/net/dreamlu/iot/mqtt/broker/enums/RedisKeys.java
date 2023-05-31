@@ -35,15 +35,11 @@ public enum RedisKeys {
 	/**
 	 * mqtt <-> redis pug/sub 集群内消息交互
 	 */
-	REDIS_CHANNEL_EXCHANGE("mqtt:channel:exchange"),
-	/**
-	 * 设备 -> 云端 redis pug/sub 上行消息通道，适合 mq 的集群模式消费
-	 */
-	REDIS_CHANNEL_UP("mqtt:channel:up"),
+	REDIS_CHANNEL_EXCHANGE(RedisKeys.REDIS_CHANNEL_EXCHANGE_KEY),
 	/**
 	 * 云端 -> 设备 redis pug/sub 下行数据通道，广播到 mqtt 集群
 	 */
-	REDIS_CHANNEL_DOWN("mqtt:channel:down"),
+	REDIS_CHANNEL_DOWN(RedisKeys.REDIS_CHANNEL_DOWN_KEY),
 	/**
 	 * 连接状态存储
 	 */
@@ -71,4 +67,6 @@ public enum RedisKeys {
 		return this.key.concat(suffix);
 	}
 
+	public static final String REDIS_CHANNEL_EXCHANGE_KEY = "mqtt:channel:exchange";
+	public static final String REDIS_CHANNEL_DOWN_KEY = "mqtt:channel:down";
 }

@@ -19,7 +19,7 @@ package net.dreamlu.iot.mqtt.broker.cluster;
 import net.dreamlu.iot.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
+import net.dreamlu.mica.redis.stream.RStreamTemplate;
 
 import java.util.Objects;
 
@@ -29,14 +29,14 @@ import java.util.Objects;
  * @author L.cm
  */
 public class RedisMqttMessageDispatcher implements IMqttMessageDispatcher {
-	private final MicaRedisCache redisCache;
+	private final RStreamTemplate streamTemplate;
 	private final IMessageSerializer messageSerializer;
 	private final String channel;
 
-	public RedisMqttMessageDispatcher(MicaRedisCache redisCache,
+	public RedisMqttMessageDispatcher(RStreamTemplate streamTemplate,
 									  IMessageSerializer messageSerializer,
 									  String channel) {
-		this.redisCache = redisCache;
+		this.streamTemplate = streamTemplate;
 		this.messageSerializer = messageSerializer;
 		this.channel = Objects.requireNonNull(channel, "Redis pub/sub channel is null.");
 	}
@@ -44,7 +44,9 @@ public class RedisMqttMessageDispatcher implements IMqttMessageDispatcher {
 	@Override
 	public boolean send(Message message) {
 		// 手动序列化和反序列化，避免 redis 序列化不一致问题
-		redisCache.publish(channel, message, messageSerializer::serialize);
+		String topic = message.getTopic();
+		String key = topic == null ? message.getClientId() : topic;
+		streamTemplate.send(channel, key, message, messageSerializer::serialize);
 		return true;
 	}
 
