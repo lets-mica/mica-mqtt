@@ -110,7 +110,7 @@ public class MqttServerConfiguration {
 		MqttServerProperties.Ssl ssl = properties.getSsl();
 		// ssl 配置
 		if (ssl.isEnabled()) {
-			serverCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getKeystorePass(), ssl.getClientAuth());
+			serverCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass(), ssl.getClientAuth());
 		}
 		// 自定义消息监听
 		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
