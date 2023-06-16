@@ -578,7 +578,7 @@ public final class MqttClient {
 							Packet packet = clientHandler.heartbeatPacket(channelContext);
 							if (packet != null) {
 								Boolean result = Tio.send(channelContext, packet);
-								if (logger.isInfoEnabled()) {
+								if (clientTioConfig.debug && logger.isInfoEnabled()) {
 									logger.info("{} 发送心跳包 result:{}", channelContext, result);
 								}
 							}
