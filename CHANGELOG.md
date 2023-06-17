@@ -2,7 +2,7 @@
 
 ## 发行版本
 
-### v2.2.2 - 2023-05-28
+### v2.2.2 - 2023-06-17
 - :sparkles: mica-mqtt-client 心跳包日志受 debug 控制
 - :sparkles: mica-mqtt-broker 的集群改为 redis stream 实现。
 - :bug: 修复 starter ssl truststorePass 配置，github #6 感谢 `@zkname` 反馈
