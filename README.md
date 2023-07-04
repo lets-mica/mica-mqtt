@@ -163,4 +163,4 @@ mica-mqtt 始于一份热爱，也得到不少朋友的认可，为了更好的�
 
 ![如梦技术](docs/img/dreamlu-weixin.jpg)
 
-加微信暗号 **mica-mqtt** 拉入群，精彩内容每日推荐！
+**JAVA架构日记**，精彩内容每日推荐！
