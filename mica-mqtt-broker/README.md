@@ -4,7 +4,7 @@
 - 服务器需要安装 `Redis 5.0` 或以上版本。
 
 ## 功能
-- 基于 redis stream（轻量级MQ）实现 mqtt 集群。
+- 基于 redis stream（轻量级MQ）实现 mqtt 集群，**仅供参考**请按实际情况选择MQ。
 - 基于 redis 实现客户端状态存储。
 - 基于 redis 实现遗嘱、保留消息存储。
 
