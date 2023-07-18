@@ -123,7 +123,7 @@ public class MqttHttpApi {
 	private void sendPublish(PublishForm form) {
 		String payload = form.getPayload();
 		Message message = new Message();
-		message.setMessageType(MessageType.DOWN_STREAM);
+		message.setMessageType(MessageType.HTTP_API);
 		message.setClientId(form.getClientId());
 		message.setTopic(form.getTopic());
 		message.setQos(form.getQos());

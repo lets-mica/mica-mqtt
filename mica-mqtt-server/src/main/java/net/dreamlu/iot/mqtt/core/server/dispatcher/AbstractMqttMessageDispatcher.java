@@ -16,12 +16,20 @@
 
 package net.dreamlu.iot.mqtt.core.server.dispatcher;
 
+import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
+import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.enums.MessageType;
+import net.dreamlu.iot.mqtt.core.server.event.IMqttMessageListener;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
+import org.tio.core.Node;
 import org.tio.core.Tio;
+import org.tio.server.ServerChannelContext;
 
 import java.util.Objects;
 
@@ -31,11 +39,14 @@ import java.util.Objects;
  * @author L.cm
  */
 public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispatcher {
+	private static final Logger logger = LoggerFactory.getLogger(AbstractMqttMessageDispatcher.class);
 	protected MqttServer mqttServer;
+	protected IMqttMessageListener messageListener;
 	protected IMqttSessionManager sessionManager;
 
 	public void config(MqttServer mqttServer) {
 		this.mqttServer = mqttServer;
+		this.messageListener = mqttServer.getServerCreator().getMessageListener();
 		this.sessionManager = mqttServer.getServerCreator().getSessionManager();
 	}
 
@@ -59,6 +70,17 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 			mqttServer.sendToClient(message.getTopic(), message);
 		} else if (MessageType.DOWN_STREAM == messageType) {
 			mqttServer.sendToClient(message.getTopic(), message);
+		} else if (MessageType.HTTP_API == messageType) {
+			String topic = message.getTopic();
+			// http rest api 消息也会转发到此
+			MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
+			mqttServer.publishAll(topic, message.getPayload(), mqttQoS, message.isRetain());
+			// 触发消息
+			try {
+				onHttpApiMessage(topic, mqttQoS, message);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
 		} else if (MessageType.DISCONNECT == messageType) {
 			String clientId = message.getClientId();
 			ChannelContext context = mqttServer.getChannelContext(clientId);
@@ -68,6 +90,26 @@ public abstract class AbstractMqttMessageDispatcher implements IMqttMessageDispa
 		}
 		sendAll(message);
 		return true;
+	}
+
+	private void onHttpApiMessage(String topic, MqttQoS mqttQoS, Message message) {
+		String clientId = message.getClientId();
+		// 构造 context
+		ServerChannelContext context = new ServerChannelContext(mqttServer.getServerConfig());
+		Node serverNode = mqttServer.getTioServer().getServerNode();
+		context.setServerNode(serverNode);
+		Node clientNode = mqttServer.getWebServer().getTioServer().getServerNode();
+		context.setClientNode(clientNode);
+		context.setBsId(clientId);
+		context.setUserId(MessageType.HTTP_API.name());
+		// 构造 MqttPublishMessage
+		MqttPublishMessage publishMessage = MqttMessageBuilders.publish()
+			.topicName(topic)
+			.qos(mqttQoS)
+			.retained(message.isRetain())
+			.payload(message.getPayload())
+			.build();
+		messageListener.onMessage(context, clientId, topic, mqttQoS, publishMessage, message);
 	}
 
 }

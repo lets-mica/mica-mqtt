@@ -47,6 +47,10 @@ public enum MessageType {
 	 * 断开连接
 	 */
 	DISCONNECT(6),
+	/**
+	 * http api 上下行消息
+	 */
+	HTTP_API(7),
 	;
 
 	private static final MessageType[] VALUES;

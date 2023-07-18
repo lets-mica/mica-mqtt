@@ -77,7 +77,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final TimerTaskService taskService;
 	private final ThreadPoolExecutor executor;
 
-	public DefaultMqttServerProcessor(MqttServerCreator serverCreator, TimerTaskService taskService, ThreadPoolExecutor executor) {
+	public DefaultMqttServerProcessor(MqttServerCreator serverCreator,
+									  TimerTaskService taskService,
+									  ThreadPoolExecutor executor) {
 		this.serverCreator = serverCreator;
 		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? DEFAULT_HEARTBEAT_TIMEOUT : serverCreator.getHeartbeatTimeout();
 		this.messageStore = serverCreator.getMessageStore();
@@ -129,11 +131,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			context.set(MqttConst.USER_NAME_KEY, userName);
 		}
 		// 6. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
-		float keepaliveBackoff = serverCreator.getKeepaliveBackoff();
+		float keepAliveBackoff = serverCreator.getKeepaliveBackoff();
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
-		// keepalive * keepaliveBackoff * 2 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
-		long keepAliveTimeout = (long) (keepAliveSeconds * keepaliveBackoff * KEEP_ALIVE_UNIT);
+		// keepAlive * keepAliveBackoff * 2 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
+		long keepAliveTimeout = (long) (keepAliveSeconds * keepAliveBackoff * KEEP_ALIVE_UNIT);
 		if (keepAliveSeconds > 0 && heartbeatTimeout != keepAliveTimeout) {
 			context.setHeartbeatTimeout(keepAliveTimeout);
 		}
