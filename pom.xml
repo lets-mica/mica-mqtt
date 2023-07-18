@@ -13,16 +13,16 @@
 
     <properties>
         <!-- mica-mqtt version -->
-        <revision>2.2.2</revision>
+        <revision>2.2.3-SNAPSHOT</revision>
         <!-- java version -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- mica-net version -->
-        <mica-net.version>0.0.9</mica-net.version>
-        <mica.version>2.7.12</mica.version>
+        <mica-net.version>0.1.4</mica-net.version>
+        <mica.version>2.7.13</mica.version>
         <mica.auto.version>2.3.2</mica.auto.version>
-        <spring.boot.version>2.7.12</spring.boot.version>
+        <spring.boot.version>2.7.13</spring.boot.version>
         <fastjson.version>1.2.83</fastjson.version>
         <micrometer-core.version>1.11.0</micrometer-core.version>
         <jfinal.version>5.1.0</jfinal.version>

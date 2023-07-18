@@ -201,8 +201,8 @@ import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.http.websocket.MqttWsMsgHandler;
 import org.tio.http.common.HttpConfig;
-import org.tio.http.common.HttpUuid;
 import org.tio.http.common.handler.HttpRequestHandler;
+import org.tio.core.uuid.SeqTioUuid;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.server.intf.TioServerListener;
@@ -243,7 +243,7 @@ public class MqttWebServer {
 		this.serverTioConfig.setSslConfig(serverCreator.getSslConfig());
 		this.serverTioConfig.setHeartbeatTimeout(0);
 		this.serverTioConfig.setReadBufferSize(1024 * 30);
-		this.serverTioConfig.setTioUuid(new HttpUuid());
+		this.serverTioConfig.setTioUuid(new SeqTioUuid());
 		this.tioServer = new TioServer(serverTioConfig);
 	}
 
