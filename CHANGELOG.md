@@ -5,6 +5,7 @@
 ### v2.2.3 - 2023-07-23
 - :sparkles: mqtt server http api publish 不按 clientId 进行路由（无实际意义），而是按 topic，规则改为同 emqx。
 - :sparkles: mqtt server http api publish 触发 onMessage 消息监听。
+- :arrow_up: 依赖升级
 
 ### v2.2.2 - 2023-06-17
 - :sparkles: mica-mqtt-client 心跳包日志受 debug 控制
