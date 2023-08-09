@@ -140,10 +140,6 @@
 - `JustAuth` 史上最全的第三方登录开源库: [https://github.com/zhangyd-c/JustAuth](https://github.com/zhangyd-c/JustAuth)
 - `spring-boot-demo` Spring boot 深度学习实战: [https://github.com/xkcoding/spring-boot-demo](https://github.com/xkcoding/spring-boot-demo)
 
-## 🍱 赞助商
-
-[![业界领先的单点登录](docs/img/maxkey.png)](https://gitee.com/dromara/MaxKey/?from=mica-mqtt)
-
 ## 💚 鸣谢
 感谢 JetBrains 提供的免费开源 License：
 
@@ -151,15 +147,19 @@
 
 感谢 `如梦技术 VIP` **小伙伴们**的鼎力支持，更多 **VIP** 信息详见：https://www.dreamlu.net/vip/index.html
 
-## 🍱 赞助计划
+## 🍱 推广
+
+[![简单、易用业界领先的单点登录](docs/img/maxkey.png)](https://gitee.com/dromara/MaxKey/?from=mica-mqtt)
+
+## 🍱 捐助
 mica-mqtt 始于一份热爱，也得到不少朋友的认可，为了更好的发展，特推出赞助计划。**知识付费**，让你我走的更远！！！
 
-| 类型    | ￥   | 权益（永久）                                                |
-|-------|-----|-------------------------------------------------------|
-| 🏅赞助人 | 199 | mica-mqttx、mica-net 源码。                                       |
-| 💎赞助人 | 699 | mica-mqttx、mica-net 源码 + mica-links(物联网平台源码，开发中价优，后续会涨价) 。 |
+| 类型   | ￥   | 权益（永久）                                                |
+|------|-----|-------------------------------------------------------|
+| 🏅捐助人 | 199 | mica-mqttx、mica-net 源码。                                       |
+| 💎捐助人 | 699 | mica-mqttx、mica-net 源码 + mica-links(物联网平台源码，开发中价优，后续会涨价) 。 |
 
-**注意：** 赞助人限免加入**mica开源知识星球**，加微信 **DreamLuTech** 详聊。
+**注意：** 捐助人限免加入**mica开源知识星球**，加微信 **DreamLuTech** 详聊。
 
 ## 📱 微信
 
