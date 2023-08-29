@@ -27,6 +27,7 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BinaryOperator;
 
 /**
  * 内存 session 管理
@@ -34,6 +35,10 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author L.cm
  */
 public class InMemoryMqttSessionManager implements IMqttSessionManager {
+	/**
+	 * 较大的 qos
+	 */
+	public static final BinaryOperator<Integer> MAX_QOS = (a, b) -> (a > b) ? a : b;
 	/**
 	 * messageId 存储 clientId: messageId
 	 */
@@ -97,7 +102,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 						if (qosValue == null) {
 							qosValue = mqttQoS;
 						} else {
-							qosValue = Math.min(qosValue, mqttQoS);
+							qosValue = MAX_QOS.apply(qosValue, mqttQoS);
 						}
 					}
 				}
@@ -115,16 +120,12 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 			if (TopicUtil.match(topicFilter, topicName)) {
 				ConcurrentMap<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
-					data.forEach((clientId, qos) -> {
-						subscribeMap.merge(clientId, qos, Math::min);
-					});
+					data.forEach((clientId, qos) -> subscribeMap.merge(clientId, qos, MAX_QOS));
 				}
 			}
 		}
 		List<Subscribe> subscribeList = new ArrayList<>();
-		subscribeMap.forEach((clientId, qos) -> {
-			subscribeList.add(new Subscribe(clientId, qos));
-		});
+		subscribeMap.forEach((clientId, qos) -> subscribeList.add(new Subscribe(clientId, qos)));
 		subscribeMap.clear();
 		return subscribeList;
 	}
@@ -139,11 +140,10 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 				continue;
 			}
 			Integer qos = mapEntryValue.get(clientId);
-			if (qos == null) {
-				continue;
+			if (qos != null) {
+				String topicFilter = mapEntry.getKey();
+				subscribeList.add(new Subscribe(topicFilter, clientId, qos));
 			}
-			String topicFilter = mapEntry.getKey();
-			subscribeList.add(new Subscribe(topicFilter, clientId, qos));
 		}
 		return subscribeList;
 	}
