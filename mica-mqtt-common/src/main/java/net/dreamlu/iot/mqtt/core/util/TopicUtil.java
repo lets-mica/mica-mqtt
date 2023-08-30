@@ -61,8 +61,8 @@ public final class TopicUtil {
 					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
 				}
 			} else if (ch == MqttCodecUtil.TOPIC_WILDCARDS_ONE) {
-				// 校验: 单独 + 是允许的，判断 + 号前一位是否为 /
-				if (i > 0 && topicFilterChars[i - 1] != '/') {
+				// 校验: 单独 + 是允许的，判断 + 号前一位是否为 /，如果有后一位也必须为 /
+				if ((i > 0 && topicFilterChars[i - 1] != '/') || (i < topicFilterIdxEnd && topicFilterChars[i + 1] != '/')) {
 					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
 				}
 			}
@@ -110,8 +110,8 @@ public final class TopicUtil {
 				}
 				return true;
 			} else if (ch == MqttCodecUtil.TOPIC_WILDCARDS_ONE) {
-				// 校验: 单独 + 是允许的，判断 + 号前一位是否为 /
-				if (i > 0 && topicFilterChars[i - 1] != '/') {
+				// 校验: 单独 + 是允许的，判断 + 号前一位是否为 /，如果有后一位也必须为 /
+				if ((i > 0 && topicFilterChars[i - 1] != '/') || (i < topicFilterIdxEnd && topicFilterChars[i + 1] != '/')) {
 					throw new IllegalArgumentException("Mqtt subscribe topicFilter illegal:" + topicFilter);
 				}
 				// 如果 + 是最后一位，判断 topicName 中是否还存在层级 /

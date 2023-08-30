@@ -69,4 +69,23 @@ class TopicUtilTest {
 		Assertions.assertEquals(s3, s2);
 	}
 
+	@Test
+	void test3() {
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			TopicUtil.validateTopicFilter("/iot/test/+a");
+		});
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			TopicUtil.validateTopicFilter("/iot/test/a+");
+		});
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			TopicUtil.validateTopicFilter("/iot/test/+a/");
+		});
+		Assertions.assertThrows(IllegalArgumentException.class, () -> {
+			TopicUtil.validateTopicFilter("/iot/test/a+/");
+		});
+		Assertions.assertDoesNotThrow(() -> TopicUtil.validateTopicFilter("+"));
+		Assertions.assertDoesNotThrow(() -> TopicUtil.validateTopicFilter("/iot/test/+"));
+		Assertions.assertDoesNotThrow(() -> TopicUtil.validateTopicFilter("/iot/test/+/"));
+	}
+
 }
