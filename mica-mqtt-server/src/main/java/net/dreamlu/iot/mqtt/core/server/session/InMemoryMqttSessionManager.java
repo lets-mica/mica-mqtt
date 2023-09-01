@@ -131,6 +131,8 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 				}
 			}
 		}
+		// TODO 3. 共享订阅
+		// TODO 4. 分组订阅有
 		return qosValue;
 	}
 
@@ -214,6 +216,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	@Override
 	public List<Subscribe> getSubscriptions(String clientId) {
 		List<Subscribe> subscribeList = new ArrayList<>();
+		// 普通订阅
 		Set<Map.Entry<String, Map<String, Integer>>> entrySet = subscribeStore.entrySet();
 		for (Map.Entry<String, Map<String, Integer>> mapEntry : entrySet) {
 			Map<String, Integer> mapEntryValue = mapEntry.getValue();
@@ -226,6 +229,8 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 				subscribeList.add(new Subscribe(topicFilter, clientId, qos));
 			}
 		}
+		// TODO 共享订阅 queueSubscribeStore
+		// TODO 分组订阅 shareSubscribeStore
 		return subscribeList;
 	}
 
