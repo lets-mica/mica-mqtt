@@ -89,9 +89,13 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	public void removeSubscribe(String topicFilter, String clientId) {
 		Map<String, Integer> map;
 		TopicFilterType filterType = TopicFilterType.getType(topicFilter);
-		if (filterType == TopicFilterType.NONE) map = subscribeStore.get(topicFilter);
-		else if (filterType == TopicFilterType.QUEUE) map = queueSubscribeStore.get(topicFilter);
-		else map = shareSubscribeStore.get(TopicFilterType.getShareGroupName(topicFilter)).get(topicFilter);
+		if (filterType == TopicFilterType.NONE) {
+			map = subscribeStore.get(topicFilter);
+		} else if (filterType == TopicFilterType.QUEUE) {
+			map = queueSubscribeStore.get(topicFilter);
+		} else {
+			map = shareSubscribeStore.get(TopicFilterType.getShareGroupName(topicFilter)).get(topicFilter);
+		}
 		if (map == null) {
 			return;
 		}
@@ -141,9 +145,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 			if (filterType.match(topicFilter, topicName)) {
 				Map<String, Integer> data = subscribeStore.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
-					data.forEach((clientId, qos) -> {
-						subscribeMap.merge(clientId, qos, Math::min);
-					});
+					data.forEach((clientId, qos) -> subscribeMap.merge(clientId, qos, MAX_QOS));
 				}
 			}
 		}
