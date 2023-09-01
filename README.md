@@ -38,6 +38,7 @@
 - [x] 支持 http rest api，[http api 文档详见](docs/http-api.md)。
 - [x] 支持 MQTT client 客户端。
 - [x] 支持 MQTT server 服务端。
+- [x] 支持 MQTT client、server 共享订阅支持（捐助VIP版采用 topic 树存储，跟 topic 数无关，百万 topic 性能依旧）。
 - [x] 支持 MQTT 遗嘱消息。
 - [x] 支持 MQTT 保留消息。
 - [x] 支持自定义消息（mq）处理转发实现集群。
