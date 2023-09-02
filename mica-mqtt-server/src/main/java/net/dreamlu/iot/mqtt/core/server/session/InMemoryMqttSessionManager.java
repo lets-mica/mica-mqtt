@@ -198,7 +198,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		String[] keys = randomSubscribeMap.keySet().toArray(new String[0]);
 		Random random = ThreadLocalRandom.current();
 		String key = keys[random.nextInt(keys.length)];
-		subscribeMap.merge(key, randomSubscribeMap.get(key), Math::min);
+		subscribeMap.merge(key, randomSubscribeMap.get(key), MAX_QOS);
 	}
 
 	@Override
