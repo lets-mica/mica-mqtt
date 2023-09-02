@@ -3,7 +3,7 @@
 ## 发行版本
 
 ### v2.2.4 - 2023-09-02
-- :sparkles: 合并去年开源之夏的服务端共享订阅和完善
+- :sparkles: 合并去年开源之夏的服务端共享订阅和完善（捐助VIP版采用 topic 树存储，跟 topic 数无关，百万 topic 性能依旧）。
 - :sparkles: 优化 topic 检验
 - :bug: 相同 clientId 订阅相同 匹配 topic 应该取最大的qos gitee #I7WWPN
 
