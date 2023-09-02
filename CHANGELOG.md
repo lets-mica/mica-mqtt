@@ -2,6 +2,11 @@
 
 ## 发行版本
 
+### v2.2.4 - 2023-09-02
+- :sparkles: 合并去年开源之夏的服务端共享订阅和完善
+- :sparkles: 优化 topic 检验
+- :bug: 相同 clientId 订阅相同 匹配 topic 应该取最大的qos gitee #I7WWPN
+
 ### v2.2.3 - 2023-07-23
 - :sparkles: mqtt server http api publish 不按 clientId 进行路由（无实际意义），而是按 topic，规则改为同 emqx。
 - :sparkles: mqtt server http api publish 触发 onMessage 消息监听。
