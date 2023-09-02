@@ -114,11 +114,33 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 			}
 		}
 		// 2. 如果订阅的事通配符
+		Integer subscribeQos = searchSubscribeQos(topicName, clientId, subscribeStore, TopicFilterType.NONE);
+		if (subscribeQos != null) {
+			return subscribeQos;
+		}
+		// 3. 共享订阅
+		subscribeQos = searchSubscribeQos(topicName, clientId, queueSubscribeStore, TopicFilterType.QUEUE);
+		if (subscribeQos != null) {
+			return subscribeQos;
+		}
+		// 4. 分组订阅有
+		for (Map<String, Map<String, Integer>> shareSubscribeStoreMap : shareSubscribeStore.values()) {
+			subscribeQos = searchSubscribeQos(topicName, clientId, shareSubscribeStoreMap, TopicFilterType.SHARE);
+			if (subscribeQos != null) {
+				return subscribeQos;
+			}
+		}
+		return null;
+	}
+
+	private static Integer searchSubscribeQos(String topicName, String clientId,
+											  Map<String, Map<String, Integer>> subscribeStoreMap,
+											  TopicFilterType filterType) {
 		Integer qosValue = null;
-		Set<String> topicFilterSet = subscribeStore.keySet();
+		Set<String> topicFilterSet = subscribeStoreMap.keySet();
 		for (String topicFilter : topicFilterSet) {
-			if (TopicUtil.match(topicFilter, topicName)) {
-				Map<String, Integer> data = subscribeStore.get(topicFilter);
+			if (filterType.match(topicFilter, topicName)) {
+				Map<String, Integer> data = subscribeStoreMap.get(topicFilter);
 				if (data != null && !data.isEmpty()) {
 					Integer mqttQoS = data.get(clientId);
 					if (mqttQoS != null) {
@@ -131,15 +153,13 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 				}
 			}
 		}
-		// TODO 3. 共享订阅
-		// TODO 4. 分组订阅有
 		return qosValue;
 	}
 
 	/**
 	 * 获取订阅列表  共享订阅
 	 */
-	public Map<String, Integer> getQueueSubscribeMap(Map<String, Map<String, Integer>> subscribeStore, TopicFilterType filterType, String topicName) {
+	private static Map<String, Integer> getQueueSubscribeMap(Map<String, Map<String, Integer>> subscribeStore, TopicFilterType filterType, String topicName) {
 		// 排除重复订阅，例如： /test/# 和 /# 只发一份
 		Map<String, Integer> subscribeMap = new HashMap<>(32);
 		Set<String> topicFilterSet = subscribeStore.keySet();
@@ -157,7 +177,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * 获取订阅列表  分组订阅
 	 */
-	public Map<String, Map<String, Integer>> getShareSubscribeMap(Map<String, Map<String, Map<String, Integer>>> shareSubscribeStore, TopicFilterType filterType, String topicName) {
+	private static Map<String, Map<String, Integer>> getShareSubscribeMap(Map<String, Map<String, Map<String, Integer>>> shareSubscribeStore, TopicFilterType filterType, String topicName) {
 		// 排除重复订阅，例如： /test/# 和 /# 只发一份
 		Map<String, Map<String, Integer>> shareSubscribeMap = new HashMap<>(32);
 		for (Map.Entry<String, Map<String, Map<String, Integer>>> entry : shareSubscribeStore.entrySet()) {
@@ -174,7 +194,7 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	/**
 	 * 负载均衡策略：随机方式
 	 */
-	public void randomStrategy(Map<String, Integer> subscribeMap, Map<String, Integer> randomSubscribeMap) {
+	private static void randomStrategy(Map<String, Integer> subscribeMap, Map<String, Integer> randomSubscribeMap) {
 		String[] keys = randomSubscribeMap.keySet().toArray(new String[0]);
 		Random random = ThreadLocalRandom.current();
 		String key = keys[random.nextInt(keys.length)];
@@ -217,7 +237,20 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 	public List<Subscribe> getSubscriptions(String clientId) {
 		List<Subscribe> subscribeList = new ArrayList<>();
 		// 普通订阅
-		Set<Map.Entry<String, Map<String, Integer>>> entrySet = subscribeStore.entrySet();
+		getSubscriptions(subscribeList, subscribeStore, clientId);
+		// 共享订阅 queueSubscribeStore
+		getSubscriptions(subscribeList, queueSubscribeStore, clientId);
+		// 分组订阅 shareSubscribeStore
+		for (Map<String, Map<String, Integer>> shareSubscribeMap : shareSubscribeStore.values()) {
+			getSubscriptions(subscribeList, shareSubscribeMap, clientId);
+		}
+		return subscribeList;
+	}
+
+	private static void getSubscriptions(List<Subscribe> subscribeList,
+										 Map<String, Map<String, Integer>> subscribeStoreMap,
+										 String clientId) {
+		Set<Map.Entry<String, Map<String, Integer>>> entrySet = subscribeStoreMap.entrySet();
 		for (Map.Entry<String, Map<String, Integer>> mapEntry : entrySet) {
 			Map<String, Integer> mapEntryValue = mapEntry.getValue();
 			if (mapEntryValue == null || mapEntryValue.isEmpty()) {
@@ -229,9 +262,6 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 				subscribeList.add(new Subscribe(topicFilter, clientId, qos));
 			}
 		}
-		// TODO 共享订阅 queueSubscribeStore
-		// TODO 分组订阅 shareSubscribeStore
-		return subscribeList;
 	}
 
 	@Override
