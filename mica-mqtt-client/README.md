@@ -24,7 +24,7 @@ mica-mqtt client 支持两种**共享订阅**方式：
 1. 共享订阅：订阅前缀 `$queue/`，多个客户端订阅了 `$queue/topic`，发布者发布到topic，则只有一个客户端会接收到消息。
 2. 分组订阅：订阅前缀 `$share/<group>/`，组客户端订阅了`$share/group1/topic`、`$share/group2/topic`..，发布者发布到topic，则消息会发布到每个group中，但是每个group中只有一个客户端会接收到消息。
 
-**注意：** 如果 `topic` 以 `/` 开头，例如：`/topic/test`，需要订阅 `$share/group1//topic/test`，开源版 mica-mqtt-server 暂时还不支持共享订阅，可赞助使用私服版。
+**注意：** 如果 `topic` 以 `/` 开头，例如：`/topic/test`，需要订阅 `$share/group1//topic/test`。
 
 ## 客户端使用
 ```java
