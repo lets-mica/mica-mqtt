@@ -55,7 +55,7 @@ English | [简体中文](README.md)
 | 1883 | tcp             | MQTT TCP port                    |
 | 8083 | http, websocket | HTTP API and WebSocket MQTT port |
 
-**Demo Address**: mqtt.dreamlu.net, same ports.
+**Demo Address**: mqtt.dreamlu.net, same ports，user: mica password: mica
 
 ## 📦️ Dependencies
 

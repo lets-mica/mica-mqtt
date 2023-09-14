@@ -60,7 +60,7 @@
 | 1883   | tcp             | mqtt tcp 端口                    |
 | 8083   | http、websocket | http api 和 websocket mqtt 子协议端口 |
 
-**演示地址**：mqtt.dreamlu.net 端口同上。
+**演示地址**：mqtt.dreamlu.net 端口同上，账号：mica 密码：mica
 
 ## 📦️ 依赖
 
