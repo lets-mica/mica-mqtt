@@ -19,7 +19,7 @@
 - 借助保留消息，新的订阅者能够立即获取最近的状态。
 
 ### 共享订阅
-mica-mqtt client 支持两种**共享订阅**方式：
+mica-mqtt 支持两种**共享订阅**方式：
 
 1. 共享订阅：订阅前缀 `$queue/`，多个客户端订阅了 `$queue/topic`，发布者发布到 `topic`，则只有一个客户端会接收到消息。
 2. 分组订阅：订阅前缀 `$share/<group>/`，组客户端订阅了 `$share/group1/topic`、`$share/group2/topic`..，发布者发布到 `topic`，则消息会发布到每个 **group** 中，但是每个 **group** 中只有一个客户端会接收到消息。
