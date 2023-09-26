@@ -29,7 +29,7 @@ import org.tio.utils.timer.TimerTaskService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 /**
@@ -44,7 +44,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private final IMqttClientConnectListener connectListener;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
 	private final TimerTaskService taskService;
-	private final ThreadPoolExecutor executor;
+	private final ExecutorService executor;
 
 	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator) {
 		this.reSubscribeBatchSize = mqttClientCreator.getReSubscribeBatchSize();

@@ -31,7 +31,7 @@ import org.tio.server.DefaultTioServerListener;
 import org.tio.utils.hutool.StrUtil;
 
 import java.io.IOException;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * mqtt 服务监听
@@ -45,9 +45,9 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final MqttMessageInterceptors messageInterceptors;
-	private final ThreadPoolExecutor executor;
+	private final ExecutorService executor;
 
-	public MqttServerAioListener(MqttServerCreator serverCreator, ThreadPoolExecutor executor) {
+	public MqttServerAioListener(MqttServerCreator serverCreator, ExecutorService executor) {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();

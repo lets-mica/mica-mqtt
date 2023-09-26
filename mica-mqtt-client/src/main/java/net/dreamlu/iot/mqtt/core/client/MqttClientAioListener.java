@@ -28,7 +28,7 @@ import org.tio.core.Tio;
 import org.tio.utils.hutool.StrUtil;
 
 import java.nio.charset.StandardCharsets;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * mqtt 客户端监听器
@@ -39,7 +39,7 @@ public class MqttClientAioListener extends DefaultTioClientListener {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClientAioListener.class);
 	private final MqttClientCreator clientCreator;
 	private final IMqttClientConnectListener connectListener;
-	private final ThreadPoolExecutor executor;
+	private final ExecutorService executor;
 
 	public MqttClientAioListener(MqttClientCreator clientCreator) {
 		this.clientCreator = clientCreator;

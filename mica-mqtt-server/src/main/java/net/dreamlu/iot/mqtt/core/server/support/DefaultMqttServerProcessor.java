@@ -45,7 +45,7 @@ import org.tio.utils.timer.TimerTaskService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * mqtt broker 处理器
@@ -75,11 +75,11 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private final IMqttSessionListener sessionListener;
 	private final IMqttMessageListener messageListener;
 	private final TimerTaskService taskService;
-	private final ThreadPoolExecutor executor;
+	private final ExecutorService executor;
 
 	public DefaultMqttServerProcessor(MqttServerCreator serverCreator,
 									  TimerTaskService taskService,
-									  ThreadPoolExecutor executor) {
+									  ExecutorService executor) {
 		this.serverCreator = serverCreator;
 		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? DEFAULT_HEARTBEAT_TIMEOUT : serverCreator.getHeartbeatTimeout();
 		this.messageStore = serverCreator.getMessageStore();

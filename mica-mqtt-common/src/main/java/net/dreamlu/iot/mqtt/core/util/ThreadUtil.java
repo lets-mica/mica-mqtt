@@ -21,6 +21,7 @@ import org.tio.utils.thread.pool.DefaultThreadFactory;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import org.tio.utils.thread.pool.TioCallerRunsPolicy;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -57,13 +58,7 @@ public final class ThreadUtil {
 	 * @return ThreadPoolExecutor
 	 */
 	public static ThreadPoolExecutor getGroupExecutor(int groupPoolSize) {
-		String threadName = "tio-group";
-		DefaultThreadFactory threadFactory = DefaultThreadFactory.getInstance(threadName, Thread.MAX_PRIORITY);
-		LinkedBlockingQueue<Runnable> runnableQueue = new LinkedBlockingQueue<>();
-		ThreadPoolExecutor groupExecutor = new ThreadPoolExecutor(groupPoolSize, groupPoolSize,
-			Threads.KEEP_ALIVE_TIME, TimeUnit.SECONDS, runnableQueue, threadFactory, new TioCallerRunsPolicy());
-		groupExecutor.prestartCoreThread();
-		return groupExecutor;
+		return Threads.getGroupExecutor(groupPoolSize);
 	}
 
 	/**
@@ -73,13 +68,7 @@ public final class ThreadUtil {
 	 * @return SynThreadPoolExecutor
 	 */
 	public static SynThreadPoolExecutor getTioExecutor(int tioPoolSize) {
-		String threadName = "tio-worker";
-		LinkedBlockingQueue<Runnable> runnableQueue = new LinkedBlockingQueue<>();
-		DefaultThreadFactory defaultThreadFactory = DefaultThreadFactory.getInstance(threadName, Thread.MAX_PRIORITY);
-		SynThreadPoolExecutor tioExecutor = new SynThreadPoolExecutor(tioPoolSize, tioPoolSize,
-			Threads.KEEP_ALIVE_TIME, runnableQueue, defaultThreadFactory, new TioCallerRunsPolicy());
-		tioExecutor.prestartCoreThread();
-		return tioExecutor;
+		return Threads.getTioExecutor(tioPoolSize);
 	}
 
 	/**
@@ -88,7 +77,7 @@ public final class ThreadUtil {
 	 * @param poolSize 业务线程池大小
 	 * @return ThreadPoolExecutor
 	 */
-	public static ThreadPoolExecutor getMqttExecutor(int poolSize) {
+	public static ExecutorService getMqttExecutor(int poolSize) {
 		String threadName = "mqtt-worker";
 		LinkedBlockingQueue<Runnable> runnableQueue = new LinkedBlockingQueue<>();
 		DefaultThreadFactory defaultThreadFactory = DefaultThreadFactory.getInstance(threadName, Thread.MAX_PRIORITY);

@@ -57,7 +57,7 @@ import org.tio.utils.timer.TimerTaskService;
 
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;
 
 /**
@@ -202,6 +202,10 @@ public class MqttServerCreator {
 	 * taskService
 	 */
 	private TimerTaskService taskService;
+	/**
+	 * 业务消费线程
+	 */
+	private ExecutorService mqttExecutor;
 	/**
 	 * json 处理器
 	 */
@@ -533,6 +537,15 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public ExecutorService getMqttExecutor() {
+		return mqttExecutor;
+	}
+
+	public MqttServerCreator mqttExecutor(ExecutorService mqttExecutor) {
+		this.mqttExecutor = mqttExecutor;
+		return this;
+	}
+
 	public JsonAdapter getJsonAdapter() {
 		return jsonAdapter;
 	}
@@ -567,7 +580,9 @@ public class MqttServerCreator {
 			this.taskService = new DefaultTimerTaskService(200L, 60);
 		}
 		// 业务线程池
-		ThreadPoolExecutor mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
+		if (this.mqttExecutor == null) {
+			this.mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
+		}
 		// AckService
 		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, this.taskService, mqttExecutor);
 		// 1. 处理消息

@@ -27,6 +27,7 @@ import org.tio.client.intf.TioClientHandler;
 import org.tio.client.intf.TioClientListener;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
+import org.tio.utils.Threads;
 import org.tio.utils.buffer.ByteBufferAllocator;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
@@ -34,6 +35,7 @@ import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.io.InputStream;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
@@ -170,7 +172,7 @@ public final class MqttClientCreator {
 	/**
 	 * mqttExecutor
 	 */
-	private ThreadPoolExecutor mqttExecutor;
+	private ExecutorService mqttExecutor;
 	/**
 	 * taskService
 	 */
@@ -296,7 +298,7 @@ public final class MqttClientCreator {
 		return groupExecutor;
 	}
 
-	public ThreadPoolExecutor getMqttExecutor() {
+	public ExecutorService getMqttExecutor() {
 		return mqttExecutor;
 	}
 
@@ -510,11 +512,11 @@ public final class MqttClientCreator {
 		}
 		// tioExecutor
 		if (this.tioExecutor == null) {
-			this.tioExecutor = ThreadUtil.getTioExecutor(3);
+			this.tioExecutor = Threads.getTioExecutor(3);
 		}
 		// groupExecutor
 		if (this.groupExecutor == null) {
-			this.groupExecutor = ThreadUtil.getGroupExecutor(2);
+			this.groupExecutor = Threads.getGroupExecutor(2);
 		}
 		// mqttExecutor
 		if (this.mqttExecutor == null) {
