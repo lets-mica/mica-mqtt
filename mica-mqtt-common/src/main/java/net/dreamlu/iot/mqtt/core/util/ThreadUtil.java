@@ -22,7 +22,7 @@ import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import java.util.concurrent.ExecutorService;
 
 /**
- * mqtt 线程工具类
+ * mqtt 线程工具类，已弃用，使用 org.tio.utils.thread.ThreadUtils
  *
  * @author L.cm
  */
@@ -30,7 +30,7 @@ import java.util.concurrent.ExecutorService;
 public final class ThreadUtil {
 
 	/**
-	 * 挂起当前线程
+	 * 挂起当前线程，建议使用 ThreadUtils#sleep
 	 *
 	 * @param millis 挂起的毫秒数
 	 * @return 被中断返回false，否则true
@@ -40,7 +40,7 @@ public final class ThreadUtil {
 	}
 
 	/**
-	 * 获取 tio group 线程池
+	 * 获取 tio group 线程池，建议使用 ThreadUtils#getGroupExecutor
 	 *
 	 * @param groupPoolSize group 线程大小
 	 * @return ThreadPoolExecutor
@@ -50,7 +50,7 @@ public final class ThreadUtil {
 	}
 
 	/**
-	 * 获取 getTioExecutor 线程池
+	 * 获取 getTioExecutor 线程池，建议使用 ThreadUtils#getTioExecutor
 	 *
 	 * @param tioPoolSize tio 线程池大小
 	 * @return SynThreadPoolExecutor
@@ -59,9 +59,8 @@ public final class ThreadUtil {
 		return ThreadUtils.getTioExecutor(tioPoolSize);
 	}
 
-
 	/**
-	 * 获取 mqtt 业务线程池
+	 * 获取 mqtt 业务线程池，建议使用 ThreadUtils#getBizExecutor
 	 *
 	 * @param poolSize 业务线程池大小
 	 * @return ThreadPoolExecutor
