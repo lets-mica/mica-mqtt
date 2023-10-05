@@ -2,6 +2,11 @@
 
 ## 发行版本
 
+### v2.2.5 - 2023-10-05
+- :sparkles: mqtt 业务线程池支持自定义设置为 java21虚拟线程。
+- :sparkles: 更新 GitHub action，java17 改为 java21。
+- :sparkles: ThreadUtil 弃用（暂时未删），切换到 mica-net 中的 ThreadUtils。
+
 ### v2.2.4 - 2023-09-02
 - :sparkles: 合并去年开源之夏的服务端共享订阅和完善（捐助VIP版采用 topic 树存储，跟 topic 数无关，百万 topic 性能依旧）。
 - :sparkles: 优化 topic 检验

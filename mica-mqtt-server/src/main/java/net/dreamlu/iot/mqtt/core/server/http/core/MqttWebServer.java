@@ -200,9 +200,9 @@ import net.dreamlu.iot.mqtt.core.server.http.api.auth.BasicAuthFilter;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.http.websocket.MqttWsMsgHandler;
+import org.tio.core.uuid.SeqTioUuid;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.handler.HttpRequestHandler;
-import org.tio.core.uuid.SeqTioUuid;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.server.intf.TioServerListener;
@@ -212,7 +212,7 @@ import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * mqtt web Server，集成 http 和 websocket
@@ -231,7 +231,7 @@ public class MqttWebServer {
 		this(serverCreator, mqttServerConfig.getTioServerListener(), wsMsgHandler, mqttServerConfig.tioExecutor, mqttServerConfig.groupExecutor);
 	}
 
-	public MqttWebServer(MqttServerCreator serverCreator, TioServerListener serverAioListener, IWsMsgHandler wsMsgHandler, SynThreadPoolExecutor tioExecutor, ThreadPoolExecutor groupExecutor) {
+	public MqttWebServer(MqttServerCreator serverCreator, TioServerListener serverAioListener, IWsMsgHandler wsMsgHandler, SynThreadPoolExecutor tioExecutor, ExecutorService groupExecutor) {
 		this.httpRequestHandler = new MqttHttpRequestHandler();
 		this.httpConfig = new HttpConfig(serverCreator.getWebPort());
 		this.httpConfig.setBindIp(serverCreator.getIp());
