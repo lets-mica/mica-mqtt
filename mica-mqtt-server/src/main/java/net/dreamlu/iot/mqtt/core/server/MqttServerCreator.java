@@ -37,7 +37,6 @@ import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttConnectStatusListener
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerUniqueIdServiceImpl;
-import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.TioConfig;
@@ -47,11 +46,11 @@ import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.server.intf.TioServerHandler;
 import org.tio.server.intf.TioServerListener;
-import org.tio.utils.Threads;
 import org.tio.utils.buffer.ByteBufferAllocator;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.json.JsonAdapter;
 import org.tio.utils.json.JsonUtil;
+import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
 
@@ -581,7 +580,7 @@ public class MqttServerCreator {
 		}
 		// 业务线程池
 		if (this.mqttExecutor == null) {
-			this.mqttExecutor = ThreadUtil.getMqttExecutor(Threads.MAX_POOL_SIZE_FOR_TIO);
+			this.mqttExecutor = ThreadUtils.getBizExecutor(ThreadUtils.MAX_POOL_SIZE_FOR_TIO);
 		}
 		// AckService
 		DefaultMqttServerProcessor serverProcessor = new DefaultMqttServerProcessor(this, this.taskService, mqttExecutor);

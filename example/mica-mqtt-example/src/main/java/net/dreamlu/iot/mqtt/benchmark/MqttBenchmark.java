@@ -17,15 +17,15 @@
 package net.dreamlu.iot.mqtt.benchmark;
 
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
-import org.tio.utils.Threads;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 /**
  * mqtt 压力测试
@@ -40,8 +40,8 @@ public class MqttBenchmark {
 		int connCount = 5_0000;
 		String ip = "127.0.0.1";
 		final List<MqttClient> clientList = new CopyOnWriteArrayList<>();
-		SynThreadPoolExecutor tioExecutor = Threads.getTioExecutor();
-		ThreadPoolExecutor groupExecutor = Threads.getGroupExecutor();
+		SynThreadPoolExecutor tioExecutor = ThreadUtils.getTioExecutor();
+		ExecutorService groupExecutor = ThreadUtils.getGroupExecutor();
 		// 自定义全局 taskService，避免每个 client new，创建过多线程
 		TimerTaskService taskService = new DefaultTimerTaskService(200L, 60);
 		for (int i = 0; i < connCount; i++) {
@@ -51,7 +51,7 @@ public class MqttBenchmark {
 
 	private static void newClient(String ip, int i, final List<MqttClient> clientList,
 								  SynThreadPoolExecutor tioExecutor,
-								  ThreadPoolExecutor groupExecutor,
+								  ExecutorService groupExecutor,
 								  TimerTaskService taskService) {
 		MqttClient client = MqttClient.create()
 			.ip(ip)

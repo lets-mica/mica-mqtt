@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.core.client;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
-import net.dreamlu.iot.mqtt.core.util.ThreadUtil;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
@@ -27,9 +26,9 @@ import org.tio.client.intf.TioClientHandler;
 import org.tio.client.intf.TioClientListener;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
-import org.tio.utils.Threads;
 import org.tio.utils.buffer.ByteBufferAllocator;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
 import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
@@ -168,7 +167,7 @@ public final class MqttClientCreator {
 	/**
 	 * groupExecutor
 	 */
-	private ThreadPoolExecutor groupExecutor;
+	private ExecutorService groupExecutor;
 	/**
 	 * mqttExecutor
 	 */
@@ -294,7 +293,7 @@ public final class MqttClientCreator {
 		return tioExecutor;
 	}
 
-	public ThreadPoolExecutor getGroupExecutor() {
+	public ExecutorService getGroupExecutor() {
 		return groupExecutor;
 	}
 
@@ -476,7 +475,7 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClientCreator groupExecutor(ThreadPoolExecutor groupExecutor) {
+	public MqttClientCreator groupExecutor(ExecutorService groupExecutor) {
 		this.groupExecutor = groupExecutor;
 		return this;
 	}
@@ -512,15 +511,15 @@ public final class MqttClientCreator {
 		}
 		// tioExecutor
 		if (this.tioExecutor == null) {
-			this.tioExecutor = Threads.getTioExecutor(3);
+			this.tioExecutor = ThreadUtils.getTioExecutor(3);
 		}
 		// groupExecutor
 		if (this.groupExecutor == null) {
-			this.groupExecutor = Threads.getGroupExecutor(2);
+			this.groupExecutor = ThreadUtils.getGroupExecutor(2);
 		}
 		// mqttExecutor
 		if (this.mqttExecutor == null) {
-			this.mqttExecutor = ThreadUtil.getMqttExecutor(2);
+			this.mqttExecutor = ThreadUtils.getBizExecutor(2);
 		}
 		// taskService
 		if (this.taskService == null) {

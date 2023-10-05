@@ -16,21 +16,17 @@
 
 package net.dreamlu.iot.mqtt.core.util;
 
-import org.tio.utils.Threads;
-import org.tio.utils.thread.pool.DefaultThreadFactory;
+import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.thread.pool.SynThreadPoolExecutor;
-import org.tio.utils.thread.pool.TioCallerRunsPolicy;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /**
  * mqtt 线程工具类
  *
  * @author L.cm
  */
+@Deprecated
 public final class ThreadUtil {
 
 	/**
@@ -40,15 +36,7 @@ public final class ThreadUtil {
 	 * @return 被中断返回false，否则true
 	 */
 	public static boolean sleep(long millis) {
-		if (millis > 0) {
-			try {
-				Thread.sleep(millis);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
-				return false;
-			}
-		}
-		return true;
+		return ThreadUtils.sleep(millis);
 	}
 
 	/**
@@ -57,8 +45,8 @@ public final class ThreadUtil {
 	 * @param groupPoolSize group 线程大小
 	 * @return ThreadPoolExecutor
 	 */
-	public static ThreadPoolExecutor getGroupExecutor(int groupPoolSize) {
-		return Threads.getGroupExecutor(groupPoolSize);
+	public static ExecutorService getGroupExecutor(int groupPoolSize) {
+		return ThreadUtils.getGroupExecutor(groupPoolSize);
 	}
 
 	/**
@@ -68,23 +56,7 @@ public final class ThreadUtil {
 	 * @return SynThreadPoolExecutor
 	 */
 	public static SynThreadPoolExecutor getTioExecutor(int tioPoolSize) {
-		return Threads.getTioExecutor(tioPoolSize);
-	}
-
-	/**
-	 * 获取 mqtt 业务线程池
-	 *
-	 * @param poolSize 业务线程池大小
-	 * @return ThreadPoolExecutor
-	 */
-	public static ExecutorService getMqttExecutor(int poolSize) {
-		String threadName = "mqtt-worker";
-		LinkedBlockingQueue<Runnable> runnableQueue = new LinkedBlockingQueue<>();
-		DefaultThreadFactory defaultThreadFactory = DefaultThreadFactory.getInstance(threadName, Thread.MAX_PRIORITY);
-		ThreadPoolExecutor tioExecutor = new ThreadPoolExecutor(poolSize, poolSize,
-			Threads.KEEP_ALIVE_TIME, TimeUnit.SECONDS, runnableQueue, defaultThreadFactory, new TioCallerRunsPolicy());
-		tioExecutor.prestartCoreThread();
-		return tioExecutor;
+		return ThreadUtils.getTioExecutor(tioPoolSize);
 	}
 
 }
