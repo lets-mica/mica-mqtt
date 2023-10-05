@@ -59,4 +59,15 @@ public final class ThreadUtil {
 		return ThreadUtils.getTioExecutor(tioPoolSize);
 	}
 
+
+	/**
+	 * 获取 mqtt 业务线程池
+	 *
+	 * @param poolSize 业务线程池大小
+	 * @return ThreadPoolExecutor
+	 */
+	public static ExecutorService getMqttExecutor(int poolSize) {
+		return ThreadUtils.getBizExecutor(poolSize);
+	}
+
 }
