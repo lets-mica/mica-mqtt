@@ -37,7 +37,7 @@ English | [简体中文](README.md)
 - [x] Support for MQTT Will messages.
 - [x] Support for MQTT Retained messages.
 - [x] Support for custom message (MQ) processing and forwarding to achieve clustering.
-- [x] MQTT client Alibaba Cloud MQTT connection demo.
+- [x] MQTT client **Alibaba Cloud MQTT**、**HuaWei MQTT** connection demo.
 - [x] Support for GraalVM compilation into native executable programs.
 - [x] Support for rapid access to Spring Boot projects.
 - [x] Support for integration with Prometheus + Grafana for monitoring.
