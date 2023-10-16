@@ -68,7 +68,7 @@ MqttClient client = MqttClient.create()
     client.unSubscribe("/test/#");
 
     // 发送消息
-    client.publish("/test/client", ByteBuffer.wrap("mica最牛皮".getBytes(StandardCharsets.UTF_8)));
+    client.publish("/test/client", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
 
     // 断开连接
     client.disconnect();
