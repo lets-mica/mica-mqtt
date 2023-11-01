@@ -35,7 +35,6 @@ import org.tio.utils.timer.TimerTaskService;
 
 import java.io.InputStream;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.function.Consumer;
 
 /**
@@ -480,7 +479,7 @@ public final class MqttClientCreator {
 		return this;
 	}
 
-	public MqttClientCreator mqttExecutor(ThreadPoolExecutor mqttExecutor) {
+	public MqttClientCreator mqttExecutor(ExecutorService mqttExecutor) {
 		this.mqttExecutor = mqttExecutor;
 		return this;
 	}
