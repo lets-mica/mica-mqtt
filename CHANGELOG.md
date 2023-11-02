@@ -2,6 +2,9 @@
 
 ## 发行版本
 
+### v2.2.5.1 - 2023-11-01
+- :poop: mica-mqtt-client mqttExecutor 方法参数类型漏改。
+
 ### v2.2.5 - 2023-10-05
 - :sparkles: mqtt 业务线程池支持自定义设置为 java21虚拟线程。
 - :sparkles: 更新 GitHub action，java17 改为 java21。
