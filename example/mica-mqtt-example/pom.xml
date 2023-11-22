@@ -14,7 +14,7 @@
     </parent>
 
     <properties>
-        <graalvm.version>22.0.0.2</graalvm.version>
+        <graalvm.version>23.1.1</graalvm.version>
         <mainClass.server>net.dreamlu.iot.mqtt.server.MqttServerTest</mainClass.server>
         <mainClass.client>net.dreamlu.iot.mqtt.client.MqttClientTest</mainClass.client>
     </properties>
@@ -49,12 +49,6 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <dependencies>
-                <!-- 非 GraalVM 用 caffeine 2.x 支持 jdk8 -->
-                <dependency>
-                    <groupId>com.github.ben-manes.caffeine</groupId>
-                    <artifactId>caffeine</artifactId>
-                    <version>2.9.2</version>
-                </dependency>
                 <!-- 非 GraalVM 环境用 tinylog -->
                 <dependency>
                     <groupId>org.tinylog</groupId>
@@ -103,12 +97,6 @@
         <profile>
             <id>mqtt-server-graal</id>
             <dependencies>
-                <!-- caffeine 3.x 减少反射，对 graalvm 支持更好，最低 JDK11 -->
-                <dependency>
-                    <groupId>com.github.ben-manes.caffeine</groupId>
-                    <artifactId>caffeine</artifactId>
-                    <version>3.0.3</version>
-                </dependency>
                 <!-- GraalVM 环境使用 jdk log -->
                 <dependency>
                     <groupId>org.slf4j</groupId>
@@ -145,7 +133,6 @@
                             <buildArgs>
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
-                                -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
                             </buildArgs>
                         </configuration>
                     </plugin>
@@ -155,12 +142,6 @@
         <profile>
             <id>mqtt-client-graal</id>
             <dependencies>
-                <!-- caffeine 3.x 减少反射，对 graalvm 支持更好，最低 JDK11 -->
-                <dependency>
-                    <groupId>com.github.ben-manes.caffeine</groupId>
-                    <artifactId>caffeine</artifactId>
-                    <version>3.0.3</version>
-                </dependency>
                 <!-- GraalVM 环境使用 jdk log -->
                 <dependency>
                     <groupId>org.slf4j</groupId>
@@ -197,7 +178,6 @@
                             <buildArgs>
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
-                                -H:ReflectionConfigurationFiles=../graalvm/reflect-config.json
                             </buildArgs>
                         </configuration>
                     </plugin>
