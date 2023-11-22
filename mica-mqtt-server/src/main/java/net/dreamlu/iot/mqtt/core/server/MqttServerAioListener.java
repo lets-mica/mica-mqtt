@@ -97,7 +97,7 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		cleanSession(clientId);
 		context.remove(MqttConst.DIS_CONNECTED);
 		// 7. 下线事件
-		String username = (String) context.get(MqttConst.USER_NAME_KEY);
+		String username = context.get(MqttConst.USER_NAME_KEY);
 		context.remove(MqttConst.USER_NAME_KEY);
 		notify(context, clientId, username, remark);
 	}
