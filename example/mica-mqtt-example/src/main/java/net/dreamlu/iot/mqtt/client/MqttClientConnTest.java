@@ -26,7 +26,7 @@ import net.dreamlu.iot.mqtt.core.client.MqttClient;
  */
 public class MqttClientConnTest {
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		// 初始化 mqtt 客户端
 		MqttConnectReasonCode reasonCode = MqttClient.create()
 //			.ip("127.0.0.1")
