@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttConnectReasonCode;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
@@ -24,6 +25,7 @@ import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 import org.tio.client.intf.TioClientHandler;
 import org.tio.client.intf.TioClientListener;
+import org.tio.core.Node;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
 import org.tio.utils.buffer.ByteBufferAllocator;
@@ -34,7 +36,7 @@ import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.io.InputStream;
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.*;
 import java.util.function.Consumer;
 
 /**
@@ -578,6 +580,53 @@ public final class MqttClientCreator {
 	 */
 	public MqttClient connectSync() {
 		return this.build().start(true);
+	}
+
+	/**
+	 * 连接测试
+	 *
+	 * @return MqttConnectReasonCode
+	 */
+	public MqttConnectReasonCode connectTest() {
+		return connectTest(3, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * 连接测试
+	 *
+	 * @return MqttConnectReasonCode
+	 */
+	public MqttConnectReasonCode connectTest(long timeout, TimeUnit timeUnit) {
+		// 1. clientId 为空，生成默认的 clientId
+		if (StrUtil.isBlank(this.clientId)) {
+			// 默认为：MICA-MQTT- 前缀和 36进制的纳秒数
+			this.clientId("MICA-MQTT-" + Long.toString(System.nanoTime(), 36));
+		}
+		CompletableFuture<MqttConnectReasonCode> future = new CompletableFuture<>();
+		IMqttClientProcessor processor = new MqttClientConnectTestProcessor(future);
+		// 2. 初始化 mqtt 处理器
+		TioClientHandler clientAioHandler = new MqttClientAioHandler(this, processor);
+		TioClientListener clientAioListener = new MqttClientAioListener(this);
+		// 3. tioConfig
+		TioClientConfig tioConfig = new TioClientConfig(clientAioHandler, clientAioListener);
+		tioConfig.setName(this.name);
+		// 4. 心跳超时时间，关闭心跳检测
+		tioConfig.setHeartbeatTimeout(0);
+		TioClient tioClient;
+		try {
+			tioClient = new TioClient(tioConfig);
+			tioClient.asyncConnect(new Node(this.getIp(), this.getPort()));
+		} catch (Exception e) {
+			throw new IllegalStateException("Mica mqtt client start fail.", e);
+		}
+		try {
+			return future.get(timeout, timeUnit);
+		} catch (Exception e) {
+			// 超时，一般为服务器不可用
+			return MqttConnectReasonCode.CONNECTION_REFUSED_SERVER_UNAVAILABLE;
+		} finally {
+			tioClient.stop();
+		}
 	}
 
 }
