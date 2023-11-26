@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.ClientAuth;
 import org.tio.core.ssl.SslConfig;
+import org.tio.http.common.HttpConfig;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.server.intf.TioServerHandler;
@@ -57,6 +58,7 @@ import org.tio.utils.timer.TimerTaskService;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.util.concurrent.ExecutorService;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
@@ -192,7 +194,11 @@ public class MqttServerCreator {
 	/**
 	 * TioConfig 自定义配置
 	 */
-	private Consumer<TioConfig> tioConfigCustomize;
+	private Consumer<TioServerConfig> tioConfigCustomize;
+	/**
+	 * TioConfig 自定义配置
+	 */
+	private BiConsumer<TioServerConfig, HttpConfig> webConfigCustomize;
 	/**
 	 * 消息拦截器
 	 */
@@ -517,8 +523,17 @@ public class MqttServerCreator {
 		return this;
 	}
 
-	public MqttServerCreator tioConfigCustomize(Consumer<TioConfig> tioConfigCustomize) {
+	public MqttServerCreator tioConfigCustomize(Consumer<TioServerConfig> tioConfigCustomize) {
 		this.tioConfigCustomize = tioConfigCustomize;
+		return this;
+	}
+
+	public BiConsumer<TioServerConfig, HttpConfig> getWebConfigCustomize() {
+		return webConfigCustomize;
+	}
+
+	public MqttServerCreator webConfigCustomize(BiConsumer<TioServerConfig, HttpConfig> webConfigCustomize) {
+		this.webConfigCustomize = webConfigCustomize;
 		return this;
 	}
 

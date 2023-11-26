@@ -200,6 +200,7 @@ import net.dreamlu.iot.mqtt.core.server.http.api.auth.BasicAuthFilter;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRequestHandler;
 import net.dreamlu.iot.mqtt.core.server.http.handler.MqttHttpRoutes;
 import net.dreamlu.iot.mqtt.core.server.http.websocket.MqttWsMsgHandler;
+import org.tio.core.TioConfig;
 import org.tio.core.uuid.SeqTioUuid;
 import org.tio.http.common.HttpConfig;
 import org.tio.http.common.handler.HttpRequestHandler;
@@ -213,6 +214,8 @@ import org.tio.websocket.server.handler.IWsMsgHandler;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 /**
  * mqtt web Server，集成 http 和 websocket
@@ -300,10 +303,14 @@ public class MqttWebServer {
 		// 2. 初始化处理器
 		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(serverCreator, mqttServerConfig.getTioHandler());
 		MqttWebServer httpServerStarter = new MqttWebServer(serverCreator, mqttServerConfig, mqttWsMsgHandler);
-		TioServerConfig httpIioConfig = httpServerStarter.getServerTioConfig();
+		TioServerConfig httpTioConfig = httpServerStarter.getServerTioConfig();
+		BiConsumer<TioServerConfig, HttpConfig> webConfigCustomize = serverCreator.getWebConfigCustomize();
+		if (webConfigCustomize != null) {
+			webConfigCustomize.accept(httpTioConfig, httpServerStarter.getHttpConfig());
+		}
 		// 3. tcp + websocket mqtt 共享公共配置
-		httpIioConfig.share(mqttServerConfig);
-		httpIioConfig.groupStat = mqttServerConfig.groupStat;
+		httpTioConfig.share(mqttServerConfig);
+		httpTioConfig.groupStat = mqttServerConfig.groupStat;
 		return httpServerStarter;
 	}
 
