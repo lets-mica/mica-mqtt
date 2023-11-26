@@ -304,13 +304,13 @@ public class MqttWebServer {
 		IWsMsgHandler mqttWsMsgHandler = new MqttWsMsgHandler(serverCreator, mqttServerConfig.getTioHandler());
 		MqttWebServer httpServerStarter = new MqttWebServer(serverCreator, mqttServerConfig, mqttWsMsgHandler);
 		TioServerConfig httpTioConfig = httpServerStarter.getServerTioConfig();
+		// 自定义 http 和 ws 配置
 		BiConsumer<TioServerConfig, HttpConfig> webConfigCustomize = serverCreator.getWebConfigCustomize();
 		if (webConfigCustomize != null) {
 			webConfigCustomize.accept(httpTioConfig, httpServerStarter.getHttpConfig());
 		}
 		// 3. tcp + websocket mqtt 共享公共配置
 		httpTioConfig.share(mqttServerConfig);
-		httpTioConfig.groupStat = mqttServerConfig.groupStat;
 		return httpServerStarter;
 	}
 
