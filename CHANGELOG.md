@@ -2,6 +2,11 @@
 
 ## 发行版本
 
+### v2.2.6 - 2023-11-26
+- :sparkles: mica-mqtt-server 添加 `webConfigCustomize` 支持自定义 http 和 ws 配置，可用于 gitee #I8HF7P
+- :sparkles: mica-mqtt-client 添加连接测试功能 connectTest gitee #I8J35M 感谢 `@彭蕾` 反馈
+- :sparkles: mica-mqtt-example 更新 graalvm 配置
+
 ### v2.2.5.1 - 2023-11-01
 - :poop: mica-mqtt-client mqttExecutor 方法参数类型漏改。
 
