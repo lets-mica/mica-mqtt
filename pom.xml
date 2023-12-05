@@ -20,15 +20,11 @@
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- mica-net version -->
         <mica-net.version>0.1.6</mica-net.version>
-        <mica.version>2.7.15</mica.version>
-        <mica.auto.version>2.3.2</mica.auto.version>
-        <spring.boot.version>2.7.16</spring.boot.version>
+        <mica.version>2.7.18</mica.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <micrometer-core.version>1.11.4</micrometer-core.version>
         <jfinal.version>5.1.5</jfinal.version>
         <tinylog.version>2.6.2</tinylog.version>
-        <junit-jupiter.version>5.10.0</junit-jupiter.version>
-        <lombok.version>1.18.30</lombok.version>
     </properties>
 
     <modules>
@@ -48,6 +44,20 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.dreamlu</groupId>
+                <artifactId>mica-bom</artifactId>
+                <version>${mica.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>net.dreamlu</groupId>
                 <artifactId>mica-net-core</artifactId>
@@ -108,12 +118,6 @@
                 <groupId>org.tinylog</groupId>
                 <artifactId>tinylog-impl</artifactId>
                 <version>${tinylog.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-engine</artifactId>
-                <version>${junit-jupiter.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

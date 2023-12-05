@@ -101,7 +101,6 @@
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-jdk14</artifactId>
-                    <version>1.7.31</version>
                 </dependency>
                 <!-- GraalVM -->
                 <dependency>
@@ -146,7 +145,6 @@
                 <dependency>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-jdk14</artifactId>
-                    <version>1.7.31</version>
                 </dependency>
                 <!-- GraalVM -->
                 <dependency>
