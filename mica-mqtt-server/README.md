@@ -67,7 +67,8 @@ mqttServer.stop();
 ```
 
 ## http 和 websocket 依赖：
-开启 http 或 websocket 需要添加 mica-net-http 依赖:
+
+开启 http 或 websocket 需要添加 mica-net-http 依赖，如果不需要 http、websocket 把它们可以使用 `.httpEnable(false)` 和 `.websocketEnable(false)` 关掉就不需要该依赖了。
 
 ```xml
 <dependency>
@@ -77,4 +78,4 @@ mqttServer.stop();
 </dependency>
 ```
 
-另外 http api 需要项目带有 jackson、fastjson、fastjson2、gson、hutool-json 这些json工具。
+另外 http api 需要项目带有 jackson、fastjson、fastjson2、gson、hutool-json 这些json工具其一。
