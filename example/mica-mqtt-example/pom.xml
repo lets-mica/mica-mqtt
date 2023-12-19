@@ -132,6 +132,7 @@
                             <buildArgs>
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
+                                --no-fallback
                             </buildArgs>
                         </configuration>
                     </plugin>
@@ -176,6 +177,7 @@
                             <buildArgs>
                                 -H:+RemoveSaturatedTypeFlows
                                 --allow-incomplete-classpath
+                                --no-fallback
                             </buildArgs>
                         </configuration>
                     </plugin>
