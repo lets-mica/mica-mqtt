@@ -101,7 +101,7 @@ public class MqttServerAioHandler implements TioServerHandler {
 		}
 		// 3. 判定是否认证成功
 		if (!context.isAccepted()) {
-			Tio.remove(context, "Mqtt connected but clientId is blank.");
+			Tio.remove(context, "Mqtt connected but is not accepted.");
 			return;
 		}
 		// 4. 按类型的消息处理
