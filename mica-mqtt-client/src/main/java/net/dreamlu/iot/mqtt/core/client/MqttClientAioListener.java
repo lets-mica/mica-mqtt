@@ -57,7 +57,8 @@ public class MqttClientAioListener extends DefaultTioClientListener {
 	}
 
 	@Override
-	public void onBeforeClose(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+	public void onBeforeClose(ChannelContext context, Throwable throwable, String remark, boolean isRemove) {
+		context.setAccepted(false);
 		// 先判断是否配置监听
 		if (connectListener == null) {
 			return;
@@ -65,7 +66,7 @@ public class MqttClientAioListener extends DefaultTioClientListener {
 		// 2. 触发客户断开连接事件
 		executor.submit(() -> {
 			try {
-				connectListener.onDisconnect(channelContext, throwable, remark, isRemove);
+				connectListener.onDisconnect(context, throwable, remark, isRemove);
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}

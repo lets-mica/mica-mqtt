@@ -161,7 +161,7 @@ public final class MqttServer {
 		TopicUtil.validateTopicName(topic);
 		// 获取 context
 		ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
-		if (context == null || context.isClosed) {
+		if (context == null || context.isClosed()) {
 			logger.warn("Mqtt Topic:{} publish to clientId:{} ChannelContext is null may be disconnected.", topic, clientId);
 			return false;
 		}
@@ -267,7 +267,7 @@ public final class MqttServer {
 		for (Subscribe subscribe : subscribeList) {
 			String clientId = subscribe.getClientId();
 			ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
-			if (context == null || context.isClosed) {
+			if (context == null || context.isClosed()) {
 				logger.warn("Mqtt Topic:{} publish to clientId:{} channel is null may be disconnected.", topic, clientId);
 				continue;
 			}

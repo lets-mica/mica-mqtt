@@ -115,6 +115,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD);
 			return;
 		}
+		// 认证成功
+		context.setAccepted(true);
 		// 4. 判断 uniqueId 是否在多个地方使用，如果在其他地方有使用，先解绑
 		ChannelContext otherContext = Tio.getByBsId(context.getTioConfig(), uniqueId);
 		if (otherContext != null) {
@@ -440,7 +442,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		String clientId = context.getBsId();
 		logger.info("DisConnect - clientId:{} contextId:{}", clientId, context.getId());
 		// 设置正常断开的标识
-		context.set(MqttConst.DIS_CONNECTED, (byte) 1);
+		context.setBizStatus(true);
 		Tio.remove(context, "Mqtt DisConnect");
 	}
 

@@ -68,6 +68,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		switch (returnCode) {
 			case CONNECTION_ACCEPTED:
 				// 1. 连接成功的日志
+				context.setAccepted(true);
 				if (logger.isInfoEnabled()) {
 					Node node = context.getServerNode();
 					logger.info("MqttClient contextId:{} connection:{}:{} succeeded!", context.getId(), node.getIp(), node.getPort());
@@ -104,7 +105,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		// 触发客户端连接事件
 		executor.submit(() -> {
 			try {
-				connectListener.onConnected(context, context.isReconnect);
+				connectListener.onConnected(context, context.isReconnect());
 			} catch (Throwable e) {
 				logger.error(e.getMessage(), e);
 			}

@@ -390,7 +390,7 @@ public final class MqttClient {
 		}
 		try {
 			// 判断是否 removed
-			if (channelContext.isRemoved) {
+			if (channelContext.isRemoved()) {
 				channelContext.setRemoved(false);
 			}
 			tioClient.reconnect(channelContext, config.getTimeout());
@@ -538,7 +538,7 @@ public final class MqttClient {
 	 */
 	public boolean isConnected() {
 		ClientChannelContext channelContext = getContext();
-		return channelContext != null && !channelContext.isClosed;
+		return channelContext != null && !channelContext.isAccepted();
 	}
 
 	/**
@@ -570,7 +570,7 @@ public final class MqttClient {
 					long currTime = System.currentTimeMillis();
 					for (ChannelContext entry : set) {
 						ClientChannelContext channelContext = (ClientChannelContext) entry;
-						if (channelContext.isClosed || channelContext.isRemoved) {
+						if (channelContext.isClosed() || channelContext.isRemoved()) {
 							continue;
 						}
 						long interval = currTime - channelContext.stat.latestTimeOfSentPacket;

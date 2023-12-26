@@ -99,9 +99,8 @@ public class MqttServerAioHandler implements TioServerHandler {
 			processor.processConnect(context, (MqttConnectMessage) mqttMessage);
 			return;
 		}
-		// 3. 客户端 id 是创建连接之后才有的，如果客户端 id 为空，直接关闭
-		String clientId = context.getBsId();
-		if (StrUtil.isBlank(clientId)) {
+		// 3. 判定是否认证成功
+		if (!context.isAccepted()) {
 			Tio.remove(context, "Mqtt connected but clientId is blank.");
 			return;
 		}

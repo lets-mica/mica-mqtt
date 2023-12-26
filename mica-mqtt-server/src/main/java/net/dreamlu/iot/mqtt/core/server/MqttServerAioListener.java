@@ -65,6 +65,8 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 
 	@Override
 	public void onBeforeClose(ChannelContext context, Throwable throwable, String remark, boolean isRemove) {
+		// 标记认证为 false
+		context.setAccepted(false);
 		// 1. http 请求跳过
 		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
 		if (isHttpRequest) {
@@ -74,7 +76,8 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		// 2. 业务 id
 		String clientId = context.getBsId();
 		// 3. 判断是否正常断开
-		boolean isNotNormalDisconnect = context.get(MqttConst.DIS_CONNECTED) == null;
+		boolean isNotNormalDisconnect = context.isBizStatus();
+		context.setBizStatus(false);
 		if (isNotNormalDisconnect || throwable != null) {
 			// 避免网络异常时短期照成大量异常打印，会导致内存突增
 			if (throwable instanceof IOException) {
@@ -95,7 +98,6 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		}
 		// 6. 会话清理
 		cleanSession(clientId);
-		context.remove(MqttConst.DIS_CONNECTED);
 		// 7. 下线事件
 		String username = context.get(MqttConst.USER_NAME_KEY);
 		context.remove(MqttConst.USER_NAME_KEY);
