@@ -1,7 +1,7 @@
 # 🌐 mica mqtt
 [![Java CI](https://github.com/lets-mica/mica-mqtt/workflows/Java%20CI/badge.svg)](https://github.com/lets-mica/mica-mqtt/actions)
 ![JAVA 8](https://img.shields.io/badge/JDK-1.8+-brightgreen.svg)
-[![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/net.dreamlu/mica-mqtt-codec.svg?style=flat-square)](https://mvnrepository.com/artifact/net.dreamlu/mica-mqtt-codec/)
+[![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/net.dreamlu/mica-mqtt-codec.svg?style=flat-square)](https://central.sonatype.com/artifact/net.dreamlu/mica-mqtt-codec/versions)
 [![Mica-mqtt maven snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/net.dreamlu/mica-mqtt-codec.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/net/dreamlu/mica-mqtt-codec/)
 
 [![star](https://gitee.com/596392912/mica-mqtt/badge/star.svg?theme=dark)](https://gitee.com/596392912/mica-mqtt/stargazers)
