@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.2.7 - 2024-01-03
+- :sparkles: mica-mqtt-server mqttws开启了ssl后，使用mqtt.js去连接，多刷新几次就会超时 gitee #I8LCMY 
+- :sparkles: mica-mqtt-example 优化 graalvm 配置，感谢 github `@litongjava` 反馈
+
 ### v2.2.6 - 2023-11-26
 - :sparkles: mica-mqtt-server 添加 `webConfigCustomize` 支持自定义 http 和 ws 配置，可用于 gitee #I8HF7P
 - :sparkles: mica-mqtt-client 添加连接测试功能 connectTest gitee #I8J35M 感谢 `@彭蕾` 反馈
