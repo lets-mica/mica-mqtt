@@ -47,7 +47,13 @@ public class MqttClientPlugin implements IPlugin {
 	@Override
 	public boolean start() {
 		if (this.mqttClient == null) {
-			this.mqttClient = clientCreator.connect();
+			// 连接超时时间，如果没设置，改成 3s，减少因连不上卡顿时间
+			Integer timeout = clientCreator.getTimeout();
+			if (timeout == null) {
+				clientCreator.timeout(3);
+			}
+			// 使用同步连接
+			this.mqttClient = clientCreator.connectSync();
 		} else {
 			this.mqttClient.reconnect();
 		}
