@@ -538,7 +538,7 @@ public final class MqttClient {
 	 */
 	public boolean isConnected() {
 		ClientChannelContext channelContext = getContext();
-		return channelContext != null && !channelContext.isAccepted();
+		return channelContext != null && channelContext.isAccepted();
 	}
 
 	/**
