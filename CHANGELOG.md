@@ -2,6 +2,11 @@
 
 ## 发行版本
 
+### v2.2.8 - 2024-01-19
+- :sparkles: jfinal-mica-mqtt-client 启动改为同步连接。
+- :bug: mica-mqtt-client 修复 `isConnected` 判断。`2.2.7` 中存在此问题。
+- :arrow_up: 依赖升级
+
 ### v2.2.7 - 2024-01-03
 - :sparkles: mica-mqtt-server mqttws开启了ssl后，使用mqtt.js去连接，多刷新几次就会超时 gitee #I8LCMY 
 - :sparkles: mica-mqtt-example 优化 graalvm 配置，感谢 github `@litongjava` 反馈
