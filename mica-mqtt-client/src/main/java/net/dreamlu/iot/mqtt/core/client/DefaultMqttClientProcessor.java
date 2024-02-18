@@ -29,6 +29,7 @@ import org.tio.utils.timer.TimerTaskService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
@@ -39,17 +40,19 @@ import java.util.stream.Collectors;
  */
 public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttClientProcessor.class);
-	private final int reSubscribeBatchSize;
+	private final MqttClientCreator mqttClientCreator;
 	private final IMqttClientSession clientSession;
 	private final IMqttClientConnectListener connectListener;
+	private final IMqttClientGlobalMessageListener globalMessageListener;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
 	private final TimerTaskService taskService;
 	private final ExecutorService executor;
 
 	public DefaultMqttClientProcessor(MqttClientCreator mqttClientCreator) {
-		this.reSubscribeBatchSize = mqttClientCreator.getReSubscribeBatchSize();
+		this.mqttClientCreator = mqttClientCreator;
 		this.clientSession = mqttClientCreator.getClientSession();
 		this.connectListener = mqttClientCreator.getConnectListener();
+		this.globalMessageListener = mqttClientCreator.getGlobalMessageListener();
 		this.messageIdGenerator = mqttClientCreator.getMessageIdGenerator();
 		this.taskService = mqttClientCreator.getTaskService();
 		this.executor = mqttClientCreator.getMqttExecutor();
@@ -118,6 +121,11 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	 * @param context ChannelContext
 	 */
 	private void reSendSubscription(ChannelContext context) {
+		// 0. 全局订阅
+		Set<MqttTopicSubscription> globalSubscribe = mqttClientCreator.getGlobalSubscribe();
+		if (globalSubscribe != null && !globalSubscribe.isEmpty()) {
+			globalReSendSubscription(context, globalSubscribe);
+		}
 		List<MqttClientSubscription> reSubscriptionList = clientSession.getAndCleanSubscription();
 		// 1. 判断是否为空
 		if (reSubscriptionList.isEmpty()) {
@@ -125,6 +133,8 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 		// 2. 订阅的数量
 		int subscribedSize = reSubscriptionList.size();
+		// 重新订阅批次大小
+		int reSubscribeBatchSize = mqttClientCreator.getReSubscribeBatchSize();
 		if (subscribedSize <= reSubscribeBatchSize) {
 			reSendSubscription(context, reSubscriptionList);
 		} else {
@@ -133,6 +143,22 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				reSendSubscription(context, partition);
 			}
 		}
+	}
+
+	/**
+	 * 全局订阅，不需要存储 session
+	 *
+	 * @param context                  ChannelContext
+	 * @param globalReSubscriptionList globalReSubscriptionList
+	 */
+	private void globalReSendSubscription(ChannelContext context, Set<MqttTopicSubscription> globalReSubscriptionList) {
+		int messageId = messageIdGenerator.getId();
+		MqttSubscribeMessage message = MqttMessageBuilders.subscribe()
+			.addSubscriptions(globalReSubscriptionList)
+			.messageId(messageId)
+			.build();
+		boolean result = Tio.send(context, message);
+		logger.info("MQTT globalReSubscriptionList:{} messageId:{} resubscribing result:{}", globalReSubscriptionList, messageId, result);
 	}
 
 	/**
@@ -328,11 +354,26 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 	 * @param message   MqttPublishMessage
 	 */
 	private void invokeListenerForPublish(ChannelContext context, String topicName, MqttPublishMessage message) {
+		final byte[] payload = message.payload();
+		// 全局消息监听器
+		if (globalMessageListener != null) {
+			executor.submit(() -> {
+				try {
+					globalMessageListener.onMessage(context, topicName, message, payload);
+				} catch (Throwable e) {
+					logger.error(e.getMessage(), e);
+				}
+			});
+		}
+		// topic 订阅监听
 		List<MqttClientSubscription> subscriptionList = clientSession.getMatchedSubscription(topicName);
 		if (subscriptionList.isEmpty()) {
-			logger.warn("Mqtt message to accept topic:{} subscriptionList is empty.", topicName);
+			if (globalMessageListener == null || mqttClientCreator.isDebug()) {
+				logger.warn("Mqtt message to accept topic:{} subscriptionList is empty.", topicName);
+			} else {
+				logger.debug("Mqtt message to accept topic:{} subscriptionList is empty.", topicName);
+			}
 		} else {
-			final byte[] payload = message.payload();
 			subscriptionList.forEach(subscription -> {
 				IMqttClientMessageListener listener = subscription.getListener();
 				executor.submit(() -> {

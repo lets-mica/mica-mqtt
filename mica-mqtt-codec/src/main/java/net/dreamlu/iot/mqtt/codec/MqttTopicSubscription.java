@@ -27,6 +27,10 @@ public final class MqttTopicSubscription {
 	private final String topicFilter;
 	private final MqttSubscriptionOption option;
 
+	public MqttTopicSubscription(String topicFilter) {
+		this(topicFilter, MqttQoS.AT_MOST_ONCE);
+	}
+
 	public MqttTopicSubscription(String topicFilter, MqttQoS qualityOfService) {
 		this.topicFilter = topicFilter;
 		this.option = MqttSubscriptionOption.onlyFromQos(qualityOfService);

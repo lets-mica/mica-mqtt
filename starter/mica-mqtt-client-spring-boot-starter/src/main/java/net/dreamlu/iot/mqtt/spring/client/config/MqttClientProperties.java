@@ -20,10 +20,13 @@ import lombok.Getter;
 import lombok.Setter;
 import net.dreamlu.iot.mqtt.codec.MqttConstant;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
 import net.dreamlu.iot.mqtt.codec.MqttVersion;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.util.unit.DataSize;
 import org.tio.utils.buffer.ByteBufferAllocator;
+
+import java.util.List;
 
 /**
  * MqttClient 配置
@@ -123,6 +126,10 @@ public class MqttClientProperties {
 	 * 遗嘱消息
 	 */
 	private WillMessage willMessage;
+	/**
+	 * 全局订阅
+	 */
+	private List<MqttTopicSubscription> globalSubscribe;
 	/**
 	 * 是否开启监控，默认：false 不开启，节省内存
 	 */

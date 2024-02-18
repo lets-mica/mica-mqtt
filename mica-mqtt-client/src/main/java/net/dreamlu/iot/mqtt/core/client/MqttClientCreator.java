@@ -16,10 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.MqttConnectReasonCode;
-import net.dreamlu.iot.mqtt.codec.MqttConstant;
-import net.dreamlu.iot.mqtt.codec.MqttProperties;
-import net.dreamlu.iot.mqtt.codec.MqttVersion;
+import net.dreamlu.iot.mqtt.codec.*;
 import org.tio.client.ReconnConf;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
@@ -36,8 +33,10 @@ import org.tio.utils.timer.DefaultTimerTaskService;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.io.InputStream;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * mqtt 客户端构造器
@@ -145,6 +144,14 @@ public final class MqttClientCreator {
 	 * 连接监听器
 	 */
 	private IMqttClientConnectListener connectListener;
+	/**
+	 * 全局订阅
+	 */
+	private Set<MqttTopicSubscription> globalSubscribe;
+	/**
+	 * 全局消息监听器
+	 */
+	private IMqttClientGlobalMessageListener globalMessageListener;
 	/**
 	 * 客户端 session
 	 */
@@ -272,6 +279,14 @@ public final class MqttClientCreator {
 
 	public IMqttClientConnectListener getConnectListener() {
 		return connectListener;
+	}
+
+	public Set<MqttTopicSubscription> getGlobalSubscribe() {
+		return globalSubscribe;
+	}
+
+	public IMqttClientGlobalMessageListener getGlobalMessageListener() {
+		return globalMessageListener;
 	}
 
 	public IMqttClientSession getClientSession() {
@@ -444,6 +459,34 @@ public final class MqttClientCreator {
 
 	public MqttClientCreator connectListener(IMqttClientConnectListener connectListener) {
 		this.connectListener = connectListener;
+		return this;
+	}
+
+	public MqttClientCreator globalSubscribe(String... topics) {
+		Objects.requireNonNull(topics, "globalSubscribe topics is null.");
+		List<MqttTopicSubscription> subscriptionList = Arrays.stream(topics)
+			.map(MqttTopicSubscription::new)
+			.collect(Collectors.toList());
+		return globalSubscribe(subscriptionList);
+	}
+
+	public MqttClientCreator globalSubscribe(MqttTopicSubscription... topics) {
+		Objects.requireNonNull(topics, "globalSubscribe topics is null.");
+		return globalSubscribe(Arrays.asList(topics));
+	}
+
+	public MqttClientCreator globalSubscribe(List<MqttTopicSubscription> topicList) {
+		Objects.requireNonNull(topicList, "globalSubscribe topicList is null.");
+		if (this.globalSubscribe == null) {
+			this.globalSubscribe = new HashSet<>(topicList);
+		} else {
+			this.globalSubscribe.addAll(topicList);
+		}
+		return this;
+	}
+
+	public MqttClientCreator globalMessageListener(IMqttClientGlobalMessageListener globalMessageListener) {
+		this.globalMessageListener = globalMessageListener;
 		return this;
 	}
 

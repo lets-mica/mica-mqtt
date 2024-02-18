@@ -38,20 +38,23 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
 	private final MqttClientCreator clientCreator;
 	private final ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider;
+	private final ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider;
 	private final ObjectProvider<MqttClientCustomizer> customizersObjectProvider;
 	private final List<MqttClientSubscription> tempSubscriptionList;
 	private MqttClient client;
 
 	public MqttClientTemplate(MqttClientCreator clientCreator,
 							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider) {
-		this(clientCreator, clientConnectListenerObjectProvider, null);
+		this(clientCreator, clientConnectListenerObjectProvider, null, null);
 	}
 
 	public MqttClientTemplate(MqttClientCreator clientCreator,
 							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
+							  ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider,
 							  ObjectProvider<MqttClientCustomizer> customizersObjectProvider) {
 		this.clientCreator = clientCreator;
 		this.clientConnectListenerObjectProvider = clientConnectListenerObjectProvider;
+		this.globalMessageListenerObjectProvider = globalMessageListenerObjectProvider;
 		this.customizersObjectProvider = customizersObjectProvider;
 		this.tempSubscriptionList = new ArrayList<>();
 	}
@@ -286,6 +289,10 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 	public void afterSingletonsInstantiated() {
 		// 配置客户端连接监听器
 		clientConnectListenerObjectProvider.ifAvailable(clientCreator::connectListener);
+		// 全局监听器
+		if (globalMessageListenerObjectProvider != null) {
+			globalMessageListenerObjectProvider.ifAvailable(clientCreator::globalMessageListener);
+		}
 		// 自定义处理
 		if (customizersObjectProvider != null) {
 			customizersObjectProvider.ifAvailable(customizer -> customizer.customize(clientCreator));

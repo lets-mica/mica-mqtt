@@ -16,10 +16,8 @@
 
 package net.dreamlu.iot.mqtt.spring.client.config;
 
-import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
-import net.dreamlu.iot.mqtt.core.client.IMqttClientSession;
-import net.dreamlu.iot.mqtt.core.client.MqttClient;
-import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
+import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
+import net.dreamlu.iot.mqtt.core.client.*;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientCustomizer;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientSubscribeDetector;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
@@ -35,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * mqtt client 配置
@@ -103,6 +102,11 @@ public class MqttClientConfiguration {
 				}
 			});
 		}
+		// 全局订阅
+		List<MqttTopicSubscription> globalSubscribe = properties.getGlobalSubscribe();
+		if (globalSubscribe != null && !globalSubscribe.isEmpty()) {
+			clientCreator.globalSubscribe(globalSubscribe);
+		}
 		// 客户端 session
 		clientSessionObjectProvider.ifAvailable(clientCreator::clientSession);
 		return clientCreator;
@@ -111,8 +115,9 @@ public class MqttClientConfiguration {
 	@Bean(MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN)
 	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator,
 												 ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
+												 ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider,
 												 ObjectProvider<MqttClientCustomizer> customizers) {
-		return new MqttClientTemplate(mqttClientCreator, clientConnectListenerObjectProvider, customizers);
+		return new MqttClientTemplate(mqttClientCreator, clientConnectListenerObjectProvider, globalMessageListenerObjectProvider, customizers);
 	}
 
 	@Bean
