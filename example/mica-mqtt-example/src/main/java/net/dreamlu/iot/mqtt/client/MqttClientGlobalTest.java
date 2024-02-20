@@ -34,7 +34,7 @@ public class MqttClientGlobalTest {
 			.username("admin")
 			.password("123456")
 			// 全局订阅的 topic
-			.globalSubscribe("/test", "/test/123")
+			.globalSubscribe("/test", "/test/123", "/debug/#")
 			// 全局监听，也会监听到服务端 http api 订阅的数据
 			.globalMessageListener((context, topic, message, payload) -> {
 				System.out.println("topic:\t" + topic);

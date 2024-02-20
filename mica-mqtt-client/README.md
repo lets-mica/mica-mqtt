@@ -77,3 +77,23 @@ MqttClient client = MqttClient.create()
     // 停止
     client.stop();
 ```
+
+## 全局订阅（2.2.9开始支持）
+**说明**：由于 mica-mqtt-client 采用传统 mq 的思维进行的开发。其实是跟 mqtt 部分是有违背的。传统 mqtt client 不会按 topic 进行不通的订阅，采用的是这里的**全局订阅**方式。
+**注意**：全局订阅也是可以监听到 `subQos0`、`subQos1`、`subQos2` 的消息。采用 `globalSubscribe`，保留 session 停机重启，依然可以接受到消息。
+```java
+// 初始化 mqtt 客户端
+MqttClient.create()
+    .ip("127.0.0.1")
+    .port(1883)
+    .username("admin")
+    .password("123456")
+    // 全局订阅的 topic
+    .globalSubscribe("/test", "/test/123", "/debug/#")
+    // 全局监听，也会监听到服务端 http api 订阅的数据
+    .globalMessageListener((context, topic, message, payload) -> {
+        System.out.println("topic:\t" + topic);
+        System.out.println("payload:\t" + ByteBufferUtil.toString(payload));
+    })
+    .connectSync();
+```

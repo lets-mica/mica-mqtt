@@ -26,9 +26,10 @@ mqtt:
     ip: 127.0.0.1               # 连接的服务端 ip ，默认：127.0.0.1
     port: 1883                  # 端口：默认：1883
     name: Mica-Mqtt-Client      # 名称，默认：Mica-Mqtt-Client
-    clientId: 000001            # 客户端Id（非常重要，一般为设备 sn，不可重复）
+    client-id: 000001           # 客户端Id（非常重要，一般为设备 sn，不可重复）
     user-name: mica             # 认证的用户名
     password: 123456            # 认证的密码
+    global-subscribe:           # 全局订阅的 topic，可被全局监听到，保留 session 停机重启，依然可以接受到消息。（2.2.9开始支持）
     timeout: 5                  # 超时时间，单位：秒，默认：5秒
     reconnect: true             # 是否重连，默认：true
     re-interval: 5000           # 重连时间，默认 5000 毫秒
@@ -57,9 +58,10 @@ mqtt:
 
 ### 2.2 可实现接口（注册成 Spring Bean 即可）
 
-| 接口                           | 是否必须 | 说明                        |
-| ---------------------------   |------| ------------------------- |
-| IMqttClientConnectListener    | 否    | 客户端连接成功监听            |
+| 接口                           | 是否必须 | 说明                             |
+| ---------------------------   |------|--------------------------------|
+| IMqttClientConnectListener    | 否    | 客户端连接成功监听                      |
+| IMqttClientGlobalMessageListener    | 否    | 全局消息监听，可以监听到所有订阅消息。（2.2.9开始支持） |
 
 ### 2.3 客户端上下线监听
 使用 Spring event 解耦客户端上下线监听，注意： `1.3.4` 开始支持。会跟自定义的 `IMqttClientConnectListener` 实现冲突，取一即可。
