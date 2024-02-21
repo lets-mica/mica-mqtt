@@ -22,10 +22,21 @@ import org.tio.core.ChannelContext;
 /**
  * mqtt 消息拦截器
  *
- * @since 1.3.9
  * @author L.cm
  */
 public interface IMqttMessageInterceptor {
+
+	/**
+	 * 建链后触发本方法，注：建链不一定成功，需要关注参数isConnected
+	 *
+	 * @param context     ChannelContext
+	 * @param isConnected 是否连接成功,true:表示连接成功，false:表示连接失败
+	 * @param isReconnect 是否是重连, true: 表示这是重新连接，false: 表示这是第一次连接
+	 * @throws Exception Exception
+	 */
+	default void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) throws Exception {
+
+	}
 
 	/**
 	 * 接收到TCP层传过来的数据后
@@ -44,8 +55,9 @@ public interface IMqttMessageInterceptor {
 	 * @param context    ChannelContext
 	 * @param message    MqttMessage
 	 * @param packetSize packetSize
+	 * @throws Exception Exception
 	 */
-	default void onAfterDecoded(ChannelContext context, MqttMessage message, int packetSize) {
+	default void onAfterDecoded(ChannelContext context, MqttMessage message, int packetSize) throws Exception {
 
 	}
 
@@ -61,4 +73,15 @@ public interface IMqttMessageInterceptor {
 
 	}
 
+	/**
+	 * 处理一个消息包后
+	 *
+	 * @param context       ChannelContext
+	 * @param message       MqttMessage
+	 * @param isSentSuccess 是否发送成功
+	 * @throws Exception Exception
+	 */
+	default void onAfterSent(ChannelContext context, MqttMessage message, boolean isSentSuccess) throws Exception {
+
+	}
 }

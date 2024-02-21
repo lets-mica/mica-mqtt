@@ -26,7 +26,6 @@ import java.util.List;
 /**
  * mqtt 消息拦截器集合
  *
- * @since 1.3.9
  * @author L.cm
  */
 public class MqttMessageInterceptors {
@@ -43,6 +42,20 @@ public class MqttMessageInterceptors {
 	 */
 	void add(IMqttMessageInterceptor interceptor) {
 		this.interceptors.add(interceptor);
+	}
+
+	/**
+	 * 建链后触发本方法，注：建链不一定成功，需要关注参数isConnected
+	 *
+	 * @param context     ChannelContext
+	 * @param isConnected 是否连接成功,true:表示连接成功，false:表示连接失败
+	 * @param isReconnect 是否是重连, true: 表示这是重新连接，false: 表示这是第一次连接
+	 * @throws Exception Exception
+	 */
+	public void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) throws Exception {
+		for (IMqttMessageInterceptor interceptor : interceptors) {
+			interceptor.onAfterConnected(context, isConnected, isReconnect);
+		}
 	}
 
 	/**
@@ -64,8 +77,9 @@ public class MqttMessageInterceptors {
 	 * @param context    ChannelContext
 	 * @param message    MqttMessage
 	 * @param packetSize packetSize
+	 * @throws Exception Exception
 	 */
-	public void onAfterDecoded(ChannelContext context, MqttMessage message, int packetSize) {
+	public void onAfterDecoded(ChannelContext context, MqttMessage message, int packetSize) throws Exception {
 		for (IMqttMessageInterceptor interceptor : interceptors) {
 			interceptor.onAfterDecoded(context, message, packetSize);
 		}
@@ -82,6 +96,20 @@ public class MqttMessageInterceptors {
 	public void onAfterHandled(ChannelContext context, MqttMessage message, long cost) throws Exception {
 		for (IMqttMessageInterceptor interceptor : interceptors) {
 			interceptor.onAfterHandled(context, message, cost);
+		}
+	}
+
+	/**
+	 * 处理一个消息包后
+	 *
+	 * @param context       ChannelContext
+	 * @param message       MqttMessage
+	 * @param isSentSuccess 是否发送成功
+	 * @throws Exception Exception
+	 */
+	public void onAfterSent(ChannelContext context, MqttMessage message, boolean isSentSuccess) throws Exception {
+		for (IMqttMessageInterceptor interceptor : interceptors) {
+			interceptor.onAfterSent(context, message, isSentSuccess);
 		}
 	}
 

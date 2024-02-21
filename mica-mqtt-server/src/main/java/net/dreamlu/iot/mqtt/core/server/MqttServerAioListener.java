@@ -64,6 +64,11 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 	}
 
 	@Override
+	public void onAfterConnected(ChannelContext context, boolean isConnected, boolean isReconnect) throws Exception {
+		messageInterceptors.onAfterConnected(context, isConnected, isReconnect);
+	}
+
+	@Override
 	public void onBeforeClose(ChannelContext context, Throwable throwable, String remark, boolean isRemove) {
 		// 标记认证为 false
 		context.setAccepted(false);
@@ -139,11 +144,13 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 	}
 
 	@Override
-	public void onAfterSent(ChannelContext context, Packet packet, boolean isSentSuccess) {
+	public void onAfterSent(ChannelContext context, Packet packet, boolean isSentSuccess) throws Exception {
 		// 1. http 请求处理
 		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
 		if (isHttpRequest) {
 			MqttHttpHelper.close(context, packet);
+		} else if (packet instanceof MqttMessage) {
+			messageInterceptors.onAfterSent(context, (MqttMessage) packet, isSentSuccess);
 		}
 	}
 
@@ -153,7 +160,7 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 	}
 
 	@Override
-	public void onAfterDecoded(ChannelContext context, Packet packet, int packetSize) {
+	public void onAfterDecoded(ChannelContext context, Packet packet, int packetSize) throws Exception {
 		if (packet instanceof MqttMessage) {
 			messageInterceptors.onAfterDecoded(context, (MqttMessage) packet, packetSize);
 		}
