@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.2.9 - 2024-02-25
+- :sparkles: mica-mqtt-server 拦截器 IMqttMessageInterceptor 添加 onAfterConnected 方法，方便在连接时做黑名单等功能。
+- :sparkles: mica-mqtt-client 添加私服版客户端全局订阅功能和添加使用文档。
+
 ### v2.2.8 - 2024-01-19
 - :sparkles: jfinal-mica-mqtt-client 启动改为同步连接。
 - :bug: mica-mqtt-client 修复 `isConnected` 判断。`2.2.7` 中存在此问题。
