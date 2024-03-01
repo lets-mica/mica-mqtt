@@ -1,0 +1,28 @@
+name: 问题咨询
+description: "请尽可能详细的描述问题，提供足够的上下文"
+body:
+  - type: dropdown
+    id: version
+    attributes:
+      label: mica-mqtt版本
+      options:
+        - "2.2.x"
+        - "老版本存在编解码异常，请先升级"
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: 服务端还是客户端
+      options:
+        - "mica-mqtt client 客户端"
+        - "mica-mqtt server 服务端"
+    validations:
+      required: true
+  - type: textarea
+    id: desired-solution
+    attributes:
+      label: 问题描述
+      description: 详细问题，提供相应截图和日志
+    validations:
+      required: true
