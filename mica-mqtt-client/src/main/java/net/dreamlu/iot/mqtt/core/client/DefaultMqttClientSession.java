@@ -79,10 +79,8 @@ public final class DefaultMqttClientSession implements IMqttClientSession {
 	}
 
 	@Override
-	public void addSubscriptionList(List<MqttClientSubscription> subscriptionList) {
-		for (MqttClientSubscription subscription : subscriptionList) {
-			subscriptions.add(subscription.getTopicFilter(), subscription);
-		}
+	public void addSubscription(MqttClientSubscription subscription) {
+		subscriptions.add(subscription.getTopicFilter(), subscription);
 	}
 
 	@Override

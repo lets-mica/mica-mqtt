@@ -35,7 +35,6 @@ import java.util.List;
  * @author wsq（冷月宫主）
  */
 public class MqttClientTemplate implements SmartInitializingSingleton, DisposableBean, Ordered {
-	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
 	private final MqttClientCreator clientCreator;
 	private final ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider;
 	private final ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider;

@@ -16,6 +16,7 @@
 
 package net.dreamlu.iot.mqtt.core.client;
 
+import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
 
@@ -62,9 +63,33 @@ public interface IMqttClientSession {
 	/**
 	 * 添加订阅
 	 *
+	 * @param subscription MqttClientSubscription
+	 */
+	void addSubscription(MqttClientSubscription subscription);
+
+	/**
+	 * 添加启动时的临时订阅
+	 *
+	 * @param topicFilters    topicFilters
+	 * @param qos             MqttQoS
+	 * @param messageListener IMqttClientMessageListener
+	 */
+	default void addSubscriptionList(String[] topicFilters, MqttQoS qos, IMqttClientMessageListener messageListener) {
+		for (String topicFilter : topicFilters) {
+			addSubscription(new MqttClientSubscription(qos, topicFilter, messageListener));
+		}
+	}
+
+	/**
+	 * 添加订阅
+	 *
 	 * @param subscriptionList MqttClientSubscription 集合
 	 */
-	void addSubscriptionList(List<MqttClientSubscription> subscriptionList);
+	default void addSubscriptionList(List<MqttClientSubscription> subscriptionList) {
+		for (MqttClientSubscription subscription : subscriptionList) {
+			addSubscription(subscription);
+		}
+	}
 
 	/**
 	 * 判断是否已经订阅过

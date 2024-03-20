@@ -57,8 +57,14 @@ public class MqttClientConfiguration {
 	}
 
 	@Bean
+	@ConditionalOnMissingBean
+	public IMqttClientSession mqttClientSession() {
+		return new DefaultMqttClientSession();
+	}
+
+	@Bean
 	public MqttClientCreator mqttClientCreator(MqttClientProperties properties,
-											   ObjectProvider<IMqttClientSession> clientSessionObjectProvider) {
+											   IMqttClientSession mqttClientSession) {
 		MqttClientCreator clientCreator = MqttClient.create()
 			.name(properties.getName())
 			.ip(properties.getIp())
@@ -108,11 +114,11 @@ public class MqttClientConfiguration {
 			clientCreator.globalSubscribe(globalSubscribe);
 		}
 		// 客户端 session
-		clientSessionObjectProvider.ifAvailable(clientCreator::clientSession);
+		clientCreator.clientSession(mqttClientSession);
 		return clientCreator;
 	}
 
-	@Bean(MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN)
+	@Bean
 	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator,
 												 ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
 												 ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider,
@@ -121,8 +127,9 @@ public class MqttClientConfiguration {
 	}
 
 	@Bean
-	public MqttClientSubscribeDetector mqttClientSubscribeDetector(ApplicationContext applicationContext) {
-		return new MqttClientSubscribeDetector(applicationContext);
+	public MqttClientSubscribeDetector mqttClientSubscribeDetector(ApplicationContext applicationContext,
+																   IMqttClientSession mqttClientSession) {
+		return new MqttClientSubscribeDetector(applicationContext, mqttClientSession);
 	}
 
 }

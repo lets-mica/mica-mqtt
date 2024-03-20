@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.spring.client;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
+import net.dreamlu.iot.mqtt.core.client.IMqttClientSession;
 import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -29,7 +30,6 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Modifier;
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 
 /**
@@ -41,6 +41,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class MqttClientSubscribeDetector implements BeanPostProcessor {
 	private final ApplicationContext applicationContext;
+	private final IMqttClientSession mqttClientSession;
 
 	@Override
 	public Object postProcessAfterInitialization(@NonNull Object bean, String beanName) throws BeansException {
@@ -49,9 +50,8 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 		if (bean instanceof IMqttClientMessageListener) {
 			MqttClientSubscribe subscribe = AnnotationUtils.findAnnotation(userClass, MqttClientSubscribe.class);
 			if (subscribe != null) {
-				MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
 				String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
-				clientTemplate.addSubscriptionList(topicFilters, subscribe.qos(), (IMqttClientMessageListener) bean);
+				mqttClientSession.addSubscriptionList(topicFilters, subscribe.qos(), (IMqttClientMessageListener) bean);
 			}
 		} else {
 			// 2. 查找方法上的 MqttClientSubscribe 注解
@@ -79,19 +79,14 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 						throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String and ByteBuffer.");
 					}
 					// 4. 订阅
-					MqttClientTemplate clientTemplate = getMqttClientTemplate(applicationContext, subscribe.clientTemplateBean());
 					String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
-					clientTemplate.addSubscriptionList(topicFilters, subscribe.qos(), (context, topic, message, payload) ->
+					mqttClientSession.addSubscriptionList(topicFilters, subscribe.qos(), (context, topic, message, payload) ->
 						ReflectionUtils.invokeMethod(method, bean, topic, payload)
 					);
 				}
 			}, ReflectionUtils.USER_DECLARED_METHODS);
 		}
 		return bean;
-	}
-
-	private static MqttClientTemplate getMqttClientTemplate(ApplicationContext applicationContext, String beanName) {
-		return applicationContext.getBean(beanName, MqttClientTemplate.class);
 	}
 
 	private static String[] getTopicFilters(ApplicationContext applicationContext, String[] values) {
