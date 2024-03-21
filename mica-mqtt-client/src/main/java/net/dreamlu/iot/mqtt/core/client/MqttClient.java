@@ -30,6 +30,7 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
+import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.util.*;
@@ -213,11 +214,12 @@ public final class MqttClient {
 			.properties(properties)
 			.build();
 		// 4. 已经连接成功，直接订阅逻辑，未连接成功的添加到订阅列表，连接成功时会重连。
-		if (isConnected()) {
-			Boolean result = Tio.send(getContext(), message);
+		ClientChannelContext clientContext = getContext();
+		if (clientContext.isAccepted()) {
+			Boolean result = Tio.send(clientContext, message);
 			logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
 			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
-			pendingSubscription.startRetransmitTimer(taskService, (msg) -> Tio.send(getContext(), message));
+			pendingSubscription.startRetransmitTimer(taskService, (msg) -> Tio.send(clientContext, message));
 			clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 		} else {
 			clientSession.addSubscriptionList(needSubscriptionList);
@@ -342,18 +344,26 @@ public final class MqttClient {
 		MqttMessageBuilders.PublishBuilder publishBuilder = MqttMessageBuilders.publish();
 		// 自定义配置
 		builder.accept(publishBuilder);
-		// 内置
+		// 内置配置
 		publishBuilder.topicName(topic)
 			.payload(payload)
 			.messageId(messageId)
 			.qos(qos);
 		MqttPublishMessage message = publishBuilder.build();
-		boolean result = Tio.send(getContext(), message);
+		ClientChannelContext clientContext = getContext();
+		// 如果已经连接成功，但是还没有 mqtt 认证，则进行休眠等待
+		if (!clientContext.isClosed()) {
+			while (!clientContext.isAccepted()) {
+				ThreadUtils.sleep(10);
+			}
+		}
+		// 发送消息
+		boolean result = Tio.send(clientContext, message);
 		logger.debug("MQTT Topic:{} qos:{} retain:{} publish result:{}", topic, qos, publishBuilder.isRetained(), result);
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			clientSession.addPendingPublish(messageId, pendingPublish);
-			pendingPublish.startPublishRetransmissionTimer(taskService, msg -> Tio.send(getContext(), msg));
+			pendingPublish.startPublishRetransmissionTimer(taskService, msg -> Tio.send(clientContext, msg));
 		}
 		return result;
 	}

@@ -72,6 +72,10 @@ public class MqttClientTest {
 			}
 		});
 
+		client.publish("/test/client", "mica最牛皮1".getBytes(StandardCharsets.UTF_8));
+		client.publish("/test/client", "mica最牛皮2".getBytes(StandardCharsets.UTF_8));
+		client.publish("/test/client", "mica最牛皮3".getBytes(StandardCharsets.UTF_8));
+
 		Timer timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
