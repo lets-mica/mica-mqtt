@@ -21,10 +21,10 @@
         <maven-flatten.version>1.2.2</maven-flatten.version>
         <!-- mica-net version -->
         <mica-net.version>0.1.9</mica-net.version>
-        <mica.version>2.7.18.2</mica.version>
+        <mica.version>2.7.18.3</mica.version>
         <spring.boot.version>2.7.18</spring.boot.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <jfinal.version>5.1.5</jfinal.version>
+        <jfinal.version>5.1.7</jfinal.version>
         <tinylog.version>2.6.2</tinylog.version>
     </properties>
 
