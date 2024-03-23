@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.2.10 - 2024-02-30
+- :sparkles: mica-mqtt-client 优化 client publish 时还没有认证的情况。
+- :sparkles: mica-mqtt-client-spring-boot-starter 优化注解订阅，支持 clean session false 重启接收消息。 
+
 ### v2.2.9 - 2024-02-25
 - :sparkles: mica-mqtt-server 拦截器 IMqttMessageInterceptor 添加 onAfterConnected 方法，方便在连接时做黑名单等功能。
 - :sparkles: mica-mqtt-client 添加私服版客户端全局订阅功能和添加使用文档。
