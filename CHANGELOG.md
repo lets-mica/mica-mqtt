@@ -2,7 +2,7 @@
 
 ## 发行版本
 
-### v2.2.10 - 2024-02-30
+### v2.2.10 - 2024-02-23
 - :sparkles: mica-mqtt-client 优化 client publish 时还没有认证的情况。
 - :sparkles: mica-mqtt-client-spring-boot-starter 优化注解订阅，支持 clean session false 重启接收消息。 
 
