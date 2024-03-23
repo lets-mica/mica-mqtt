@@ -26,7 +26,6 @@ import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,7 +38,6 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 	private final ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider;
 	private final ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider;
 	private final ObjectProvider<MqttClientCustomizer> customizersObjectProvider;
-	private final List<MqttClientSubscription> tempSubscriptionList;
 	private MqttClient client;
 
 	public MqttClientTemplate(MqttClientCreator clientCreator,
@@ -55,7 +53,6 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 		this.clientConnectListenerObjectProvider = clientConnectListenerObjectProvider;
 		this.globalMessageListenerObjectProvider = globalMessageListenerObjectProvider;
 		this.customizersObjectProvider = customizersObjectProvider;
-		this.tempSubscriptionList = new ArrayList<>();
 	}
 
 	/**
@@ -271,19 +268,6 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 		return client;
 	}
 
-	/**
-	 * 添加启动时的临时订阅
-	 *
-	 * @param topicFilters    topicFilters
-	 * @param qos             MqttQoS
-	 * @param messageListener IMqttClientMessageListener
-	 */
-	void addSubscriptionList(String[] topicFilters, MqttQoS qos, IMqttClientMessageListener messageListener) {
-		for (String topicFilter : topicFilters) {
-			tempSubscriptionList.add(new MqttClientSubscription(qos, topicFilter, messageListener));
-		}
-	}
-
 	@Override
 	public void afterSingletonsInstantiated() {
 		// 配置客户端连接监听器
@@ -303,9 +287,6 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 		}
 		// 使用同步连接，不过如果连不上会卡一会
 		client = clientCreator.connectSync();
-		// 添加订阅并清理零时订阅存储
-		client.subscribe(tempSubscriptionList);
-		tempSubscriptionList.clear();
 	}
 
 	@Override
