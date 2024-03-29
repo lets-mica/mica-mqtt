@@ -11,7 +11,7 @@
 
 ---
 
-简体中文 | [English](README_EN.md)
+📖简体中文 | [📖English](README.en.md)
 
 `mica-mqtt` **低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
 

@@ -11,7 +11,7 @@
 
 ---
 
-English | [简体中文](README.md)
+📖English | [📖简体中文](README.md)
 
 `mica-mqtt` is a **low-latency** and **high-performance** `mqtt` Internet of Things component. For more usage details, please refer to the **mica-mqtt-example** module.
 
