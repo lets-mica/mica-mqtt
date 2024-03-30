@@ -168,7 +168,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			willMessage.setTimestamp(System.currentTimeMillis());
 			Node clientNode = context.getClientNode();
 			// 客户端 ip:端口
-			willMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+			willMessage.setPeerHost(clientNode.getPeerHost());
 			willMessage.setNode(serverCreator.getNodeName());
 			messageStore.addWillMessage(uniqueId, willMessage);
 		}
@@ -204,7 +204,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		message.setNode(serverCreator.getNodeName());
 		message.setTimestamp(System.currentTimeMillis());
 		Node clientNode = context.getClientNode();
-		message.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+		message.setPeerHost(clientNode.getPeerHost());
 		messageDispatcher.send(message);
 	}
 
@@ -476,7 +476,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				retainMessage.setTimestamp(System.currentTimeMillis());
 				Node clientNode = context.getClientNode();
 				// 客户端 ip:端口
-				retainMessage.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+				retainMessage.setPeerHost(clientNode.getPeerHost());
 				retainMessage.setNode(serverCreator.getNodeName());
 				this.messageStore.addRetainMessage(topicName, retainMessage);
 			}
@@ -500,7 +500,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		message.setTimestamp(System.currentTimeMillis());
 		Node clientNode = context.getClientNode();
 		// 客户端 ip:端口
-		message.setPeerHost(clientNode.getIp() + ':' + clientNode.getPort());
+		message.setPeerHost(clientNode.getPeerHost());
 		message.setNode(serverCreator.getNodeName());
 		// 3. 消息发布
 		if (messageListener != null) {
