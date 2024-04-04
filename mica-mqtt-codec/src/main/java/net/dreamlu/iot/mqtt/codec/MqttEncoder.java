@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.codec;
 import org.tio.core.ChannelContext;
 import org.tio.utils.buffer.ByteBufferAllocator;
 import org.tio.utils.buffer.ByteBufferUtil;
+import org.tio.utils.hutool.FastByteBuffer;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -138,7 +139,7 @@ public final class MqttEncoder {
 		final byte[] willPropertiesBytes;
 		if (variableHeader.isWillFlag()) {
 			willPropertiesBytes = encodePropertiesIfNeeded(mqttVersion, payload.willProperties());
-			payloadBufferSize += propertiesBytes.length;
+			payloadBufferSize += willPropertiesBytes.length;
 		} else {
 			willPropertiesBytes = ByteBufferUtil.EMPTY_BYTES;
 		}
@@ -505,7 +506,7 @@ public final class MqttEncoder {
 	}
 
 	private static byte[] encodeProperties(MqttProperties mqttProperties) {
-		WriteBuffer writeBuffer = new WriteBuffer(128);
+		FastByteBuffer writeBuffer = new FastByteBuffer(128);
 		for (MqttProperties.MqttProperty property : mqttProperties.listAll()) {
 			MqttProperties.MqttPropertyType propertyType = MqttProperties.MqttPropertyType.valueOf(property.propertyId);
 			switch (propertyType) {
@@ -528,7 +529,7 @@ public final class MqttEncoder {
 					writeBuffer.writeVarLengthInt(property.propertyId);
 					final short twoBytesInPropValue =
 						((MqttProperties.IntegerProperty) property).value.shortValue();
-					writeBuffer.writeShort(twoBytesInPropValue);
+					writeBuffer.writeShortBE(twoBytesInPropValue);
 					break;
 				case PUBLICATION_EXPIRY_INTERVAL:
 				case SESSION_EXPIRY_INTERVAL:
@@ -536,7 +537,7 @@ public final class MqttEncoder {
 				case MAXIMUM_PACKET_SIZE:
 					writeBuffer.writeVarLengthInt(property.propertyId);
 					final int fourBytesIntPropValue = ((MqttProperties.IntegerProperty) property).value;
-					writeBuffer.writeInt(fourBytesIntPropValue);
+					writeBuffer.writeIntBE(fourBytesIntPropValue);
 					break;
 				case SUBSCRIPTION_IDENTIFIER:
 					writeBuffer.writeVarLengthInt(property.propertyId);
@@ -566,7 +567,7 @@ public final class MqttEncoder {
 				case AUTHENTICATION_DATA:
 					writeBuffer.writeVarLengthInt(property.propertyId);
 					final byte[] binaryPropValue = ((MqttProperties.BinaryProperty) property).value;
-					writeBuffer.writeShort((short) binaryPropValue.length);
+					writeBuffer.writeShortBE((short) binaryPropValue.length);
 					writeBuffer.writeBytes(binaryPropValue, 0, binaryPropValue.length);
 					break;
 				default:
@@ -614,12 +615,12 @@ public final class MqttEncoder {
 		return count;
 	}
 
-	private static void writeEagerUTF8String(WriteBuffer buf, String s) {
+	private static void writeEagerUTF8String(FastByteBuffer buf, String s) {
 		if (s == null) {
-			buf.writeShort((short) 0);
+			buf.writeShortBE((short) 0);
 		} else {
 			byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
-			buf.writeShort((short) bytes.length);
+			buf.writeShortBE((short) bytes.length);
 			buf.writeBytes(bytes);
 		}
 	}

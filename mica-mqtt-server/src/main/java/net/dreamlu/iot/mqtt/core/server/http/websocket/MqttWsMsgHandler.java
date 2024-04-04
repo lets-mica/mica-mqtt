@@ -17,7 +17,6 @@
 package net.dreamlu.iot.mqtt.core.server.http.websocket;
 
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
-import net.dreamlu.iot.mqtt.codec.WriteBuffer;
 import net.dreamlu.iot.mqtt.core.server.MqttMessageInterceptors;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import org.slf4j.Logger;
@@ -30,6 +29,7 @@ import org.tio.core.intf.TioHandler;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.utils.buffer.ByteBufferUtil;
+import org.tio.utils.hutool.FastByteBuffer;
 import org.tio.websocket.common.WsRequest;
 import org.tio.websocket.common.WsResponse;
 import org.tio.websocket.server.handler.IWsMsgHandler;
@@ -95,7 +95,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	@Override
 	public void onAfterHandshaked(HttpRequest request, HttpResponse response, ChannelContext context) {
 		// 在连接中添加 WriteBuffer 用来处理半包消息
-		context.computeIfAbsent(MQTT_WS_MSG_BODY_KEY, key -> new WriteBuffer());
+		context.computeIfAbsent(MQTT_WS_MSG_BODY_KEY, key -> new FastByteBuffer());
 	}
 
 	/**
@@ -103,7 +103,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 */
 	@Override
 	public Object onBytes(WsRequest wsRequest, byte[] bytes, ChannelContext context) throws Exception {
-		WriteBuffer wsBody = context.get(MQTT_WS_MSG_BODY_KEY);
+		FastByteBuffer wsBody = context.get(MQTT_WS_MSG_BODY_KEY);
 		ByteBuffer buffer = getMqttBody(wsBody, bytes);
 		if (buffer == null) {
 			return null;
@@ -173,7 +173,7 @@ public class MqttWsMsgHandler implements IWsMsgHandler {
 	 * @param bytes 消息类容
 	 * @return ByteBuffer
 	 */
-	private static synchronized ByteBuffer getMqttBody(WriteBuffer wsBody, byte[] bytes) {
+	private static synchronized ByteBuffer getMqttBody(FastByteBuffer wsBody, byte[] bytes) {
 		wsBody.writeBytes(bytes);
 		int length = wsBody.size();
 		if (length < 2) {
