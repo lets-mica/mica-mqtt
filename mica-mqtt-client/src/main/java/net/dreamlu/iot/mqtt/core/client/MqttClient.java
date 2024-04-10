@@ -215,7 +215,7 @@ public final class MqttClient {
 			.build();
 		// 4. 已经连接成功，直接订阅逻辑，未连接成功的添加到订阅列表，连接成功时会重连。
 		ClientChannelContext clientContext = getContext();
-		if (clientContext.isAccepted()) {
+		if (clientContext != null && clientContext.isAccepted()) {
 			Boolean result = Tio.send(clientContext, message);
 			logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
 			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
@@ -351,6 +351,10 @@ public final class MqttClient {
 			.qos(qos);
 		MqttPublishMessage message = publishBuilder.build();
 		ClientChannelContext clientContext = getContext();
+		if (clientContext == null) {
+			logger.error("MQTT client publish fail, TCP not connected.");
+			return false;
+		}
 		// 如果已经连接成功，但是还没有 mqtt 认证，则进行休眠等待
 		if (!clientContext.isClosed()) {
 			while (!clientContext.isAccepted()) {
