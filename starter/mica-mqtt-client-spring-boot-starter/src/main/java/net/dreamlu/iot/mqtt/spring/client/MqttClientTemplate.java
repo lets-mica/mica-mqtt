@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.spring.client;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.*;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.core.Ordered;
@@ -33,8 +34,10 @@ import java.util.List;
  *
  * @author wsq（冷月宫主）
  */
-public class MqttClientTemplate implements SmartInitializingSingleton, DisposableBean, Ordered {
+public class MqttClientTemplate implements SmartInitializingSingleton, InitializingBean, DisposableBean, Ordered {
+	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
 	private final MqttClientCreator clientCreator;
+	private final ObjectProvider<IMqttClientSession> clientSessionObjectProvider;
 	private final ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider;
 	private final ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider;
 	private final ObjectProvider<MqttClientCustomizer> customizersObjectProvider;
@@ -42,14 +45,16 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 
 	public MqttClientTemplate(MqttClientCreator clientCreator,
 							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider) {
-		this(clientCreator, clientConnectListenerObjectProvider, null, null);
+		this(clientCreator, null, clientConnectListenerObjectProvider, null, null);
 	}
 
 	public MqttClientTemplate(MqttClientCreator clientCreator,
+							  ObjectProvider<IMqttClientSession> clientSessionObjectProvider,
 							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
 							  ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider,
 							  ObjectProvider<MqttClientCustomizer> customizersObjectProvider) {
 		this.clientCreator = clientCreator;
+		this.clientSessionObjectProvider = clientSessionObjectProvider;
 		this.clientConnectListenerObjectProvider = clientConnectListenerObjectProvider;
 		this.globalMessageListenerObjectProvider = globalMessageListenerObjectProvider;
 		this.customizersObjectProvider = customizersObjectProvider;
@@ -266,6 +271,15 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Disposabl
 	 */
 	public MqttClient getMqttClient() {
 		return client;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		if (clientSessionObjectProvider != null) {
+			this.clientCreator.clientSession(clientSessionObjectProvider.getIfAvailable(DefaultMqttClientSession::new));
+		} else if (clientCreator.getClientSession() == null) {
+			this.clientCreator.clientSession(new DefaultMqttClientSession());
+		}
 	}
 
 	@Override

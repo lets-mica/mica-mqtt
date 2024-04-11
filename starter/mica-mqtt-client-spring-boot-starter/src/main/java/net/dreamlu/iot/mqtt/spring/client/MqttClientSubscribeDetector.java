@@ -41,7 +41,6 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class MqttClientSubscribeDetector implements BeanPostProcessor {
 	private final ApplicationContext applicationContext;
-	private final IMqttClientSession mqttClientSession;
 
 	@Override
 	public Object postProcessAfterInitialization(@NonNull Object bean, String beanName) throws BeansException {
@@ -50,8 +49,9 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 		if (bean instanceof IMqttClientMessageListener) {
 			MqttClientSubscribe subscribe = AnnotationUtils.findAnnotation(userClass, MqttClientSubscribe.class);
 			if (subscribe != null) {
+				IMqttClientSession clientSession = getMqttClientSession(applicationContext, subscribe.clientTemplateBean());
 				String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
-				mqttClientSession.addSubscriptionList(topicFilters, subscribe.qos(), (IMqttClientMessageListener) bean);
+				clientSession.addSubscriptionList(topicFilters, subscribe.qos(), (IMqttClientMessageListener) bean);
 			}
 		} else {
 			// 2. 查找方法上的 MqttClientSubscribe 注解
@@ -79,14 +79,26 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 						throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String and ByteBuffer.");
 					}
 					// 4. 订阅
+					IMqttClientSession clientSession = getMqttClientSession(applicationContext, subscribe.clientTemplateBean());
 					String[] topicFilters = getTopicFilters(applicationContext, subscribe.value());
-					mqttClientSession.addSubscriptionList(topicFilters, subscribe.qos(), (context, topic, message, payload) ->
+					clientSession.addSubscriptionList(topicFilters, subscribe.qos(), (context, topic, message, payload) ->
 						ReflectionUtils.invokeMethod(method, bean, topic, payload)
 					);
 				}
 			}, ReflectionUtils.USER_DECLARED_METHODS);
 		}
 		return bean;
+	}
+
+	/**
+	 * 读取 IMqttClientSession
+	 *
+	 * @param applicationContext ApplicationContext
+	 * @param beanName           beanName
+	 * @return IMqttClientSession
+	 */
+	private static IMqttClientSession getMqttClientSession(ApplicationContext applicationContext, String beanName) {
+		return applicationContext.getBean(beanName, MqttClientTemplate.class).getClientCreator().getClientSession();
 	}
 
 	private static String[] getTopicFilters(ApplicationContext applicationContext, String[] values) {
