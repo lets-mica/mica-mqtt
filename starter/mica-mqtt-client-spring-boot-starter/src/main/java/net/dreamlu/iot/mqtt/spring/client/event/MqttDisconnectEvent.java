@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.spring.client.event;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.tio.core.ChannelContext;
 
 import java.io.Serializable;
 
@@ -33,12 +34,16 @@ import java.io.Serializable;
 public class MqttDisconnectEvent implements Serializable {
 
 	/**
+	 * context
+	 */
+	private ChannelContext context;
+	/**
 	 * 断开原因
 	 */
-	String reason;
+	private String reason;
 	/**
 	 * 是否删除连接
 	 */
-	boolean isRemove;
+	private boolean isRemove;
 
 }

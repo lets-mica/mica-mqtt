@@ -39,11 +39,11 @@ public class SpringEventMqttClientConnectListener implements IMqttClientConnectL
 		} else {
 			log.info("连接 mqtt 服务器成功...");
 		}
-		eventPublisher.publishEvent(new MqttConnectedEvent(isReconnect));
+		eventPublisher.publishEvent(new MqttConnectedEvent(context, isReconnect));
 	}
 
 	@Override
-	public void onDisconnect(ChannelContext channelContext, Throwable throwable, String remark, boolean isRemove) {
+	public void onDisconnect(ChannelContext context, Throwable throwable, String remark, boolean isRemove) {
 		String reason;
 		if (throwable == null) {
 			reason = remark;
@@ -52,7 +52,7 @@ public class SpringEventMqttClientConnectListener implements IMqttClientConnectL
 			reason = remark + " Exception:" + throwable.getMessage();
 			log.error("mqtt 链接断开 remark:{} isRemove:{}", remark, isRemove, throwable);
 		}
-		eventPublisher.publishEvent(new MqttDisconnectEvent(reason, isRemove));
+		eventPublisher.publishEvent(new MqttDisconnectEvent(context, reason, isRemove));
 	}
 
 }

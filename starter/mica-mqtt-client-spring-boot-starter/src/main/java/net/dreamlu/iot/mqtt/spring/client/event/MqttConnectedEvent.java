@@ -19,6 +19,7 @@ package net.dreamlu.iot.mqtt.spring.client.event;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.tio.core.ChannelContext;
 
 import java.io.Serializable;
 
@@ -32,6 +33,10 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class MqttConnectedEvent implements Serializable {
 
+	/**
+	 * context
+	 */
+	private ChannelContext context;
 	/**
 	 * 是否重连
 	 */
