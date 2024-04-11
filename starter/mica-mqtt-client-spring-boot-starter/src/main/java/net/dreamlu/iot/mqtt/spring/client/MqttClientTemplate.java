@@ -18,10 +18,12 @@ package net.dreamlu.iot.mqtt.spring.client;
 
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.*;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.SmartInitializingSingleton;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
@@ -34,30 +36,14 @@ import java.util.List;
  *
  * @author wsq（冷月宫主）
  */
-public class MqttClientTemplate implements SmartInitializingSingleton, InitializingBean, DisposableBean, Ordered {
+public class MqttClientTemplate implements ApplicationContextAware, SmartInitializingSingleton, InitializingBean, DisposableBean, Ordered {
 	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
 	private final MqttClientCreator clientCreator;
-	private final ObjectProvider<IMqttClientSession> clientSessionObjectProvider;
-	private final ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider;
-	private final ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider;
-	private final ObjectProvider<MqttClientCustomizer> customizersObjectProvider;
+	private ApplicationContext applicationContext;
 	private MqttClient client;
 
-	public MqttClientTemplate(MqttClientCreator clientCreator,
-							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider) {
-		this(clientCreator, null, clientConnectListenerObjectProvider, null, null);
-	}
-
-	public MqttClientTemplate(MqttClientCreator clientCreator,
-							  ObjectProvider<IMqttClientSession> clientSessionObjectProvider,
-							  ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
-							  ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider,
-							  ObjectProvider<MqttClientCustomizer> customizersObjectProvider) {
+	public MqttClientTemplate(MqttClientCreator clientCreator) {
 		this.clientCreator = clientCreator;
-		this.clientSessionObjectProvider = clientSessionObjectProvider;
-		this.clientConnectListenerObjectProvider = clientConnectListenerObjectProvider;
-		this.globalMessageListenerObjectProvider = globalMessageListenerObjectProvider;
-		this.customizersObjectProvider = customizersObjectProvider;
 	}
 
 	/**
@@ -274,26 +260,29 @@ public class MqttClientTemplate implements SmartInitializingSingleton, Initializ
 	}
 
 	@Override
+	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+		this.applicationContext = applicationContext;
+	}
+
+	@Override
 	public void afterPropertiesSet() throws Exception {
-		if (clientSessionObjectProvider != null) {
-			this.clientCreator.clientSession(clientSessionObjectProvider.getIfAvailable(DefaultMqttClientSession::new));
-		} else if (clientCreator.getClientSession() == null) {
-			this.clientCreator.clientSession(new DefaultMqttClientSession());
+		// 需要支持注解订阅所以 clientSession 配置的时机要早一些
+		IMqttClientSession clientSession = this.clientCreator.getClientSession();
+		if (clientSession == null) {
+			clientSession = this.applicationContext.getBeanProvider(IMqttClientSession.class)
+				.getIfAvailable(DefaultMqttClientSession::new);
+			this.clientCreator.clientSession(clientSession);
 		}
 	}
 
 	@Override
 	public void afterSingletonsInstantiated() {
 		// 配置客户端连接监听器
-		clientConnectListenerObjectProvider.ifAvailable(clientCreator::connectListener);
+		this.applicationContext.getBeanProvider(IMqttClientConnectListener.class).ifAvailable(clientCreator::connectListener);
 		// 全局监听器
-		if (globalMessageListenerObjectProvider != null) {
-			globalMessageListenerObjectProvider.ifAvailable(clientCreator::globalMessageListener);
-		}
+		this.applicationContext.getBeanProvider(IMqttClientGlobalMessageListener.class).ifAvailable(clientCreator::globalMessageListener);
 		// 自定义处理
-		if (customizersObjectProvider != null) {
-			customizersObjectProvider.ifAvailable(customizer -> customizer.customize(clientCreator));
-		}
+		this.applicationContext.getBeanProvider(MqttClientCustomizer.class).ifAvailable(customizer -> customizer.customize(clientCreator));
 		// 连接超时时间，如果没设置，改成 3s，减少因连不上卡顿时间
 		Integer timeout = clientCreator.getTimeout();
 		if (timeout == null) {

@@ -17,12 +17,12 @@
 package net.dreamlu.iot.mqtt.spring.client.config;
 
 import net.dreamlu.iot.mqtt.codec.MqttTopicSubscription;
-import net.dreamlu.iot.mqtt.core.client.*;
-import net.dreamlu.iot.mqtt.spring.client.MqttClientCustomizer;
+import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
+import net.dreamlu.iot.mqtt.core.client.MqttClient;
+import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientSubscribeDetector;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
 import net.dreamlu.iot.mqtt.spring.client.event.SpringEventMqttClientConnectListener;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -110,12 +110,8 @@ public class MqttClientConfiguration {
 	}
 
 	@Bean
-	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator,
-												 ObjectProvider<IMqttClientSession> clientSessionObjectProvider,
-												 ObjectProvider<IMqttClientConnectListener> clientConnectListenerObjectProvider,
-												 ObjectProvider<IMqttClientGlobalMessageListener> globalMessageListenerObjectProvider,
-												 ObjectProvider<MqttClientCustomizer> customizers) {
-		return new MqttClientTemplate(mqttClientCreator, clientSessionObjectProvider, clientConnectListenerObjectProvider, globalMessageListenerObjectProvider, customizers);
+	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator) {
+		return new MqttClientTemplate(mqttClientCreator);
 	}
 
 	@Bean
