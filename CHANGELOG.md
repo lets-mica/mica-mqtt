@@ -2,6 +2,12 @@
 
 ## 发行版本
 
+### v2.2.10 - 2024-04-13
+- :sparkles: mica-mqtt-client-spring-boot-starter 简化 MqttClientTemplate 构造，方便自定义。
+- :sparkles: mica-mqtt-client-spring-boot-starter 优化 spring event mqtt client 连接监听。
+- :sparkles: mica-mqtt-client-spring-boot-starter 优化注解订阅。
+- :bug: mqtt-client 修复 mqtt5 props 和遗嘱同时配置时连接编码问题。
+
 ### v2.2.10 - 2024-03-23
 - :sparkles: mica-mqtt-client 优化 client publish 时还没有认证的情况。
 - :sparkles: mica-mqtt-client-spring-boot-starter 优化注解订阅，支持 clean session false 重启接收消息。 
