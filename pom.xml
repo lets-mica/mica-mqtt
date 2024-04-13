@@ -13,7 +13,7 @@
 
     <properties>
         <!-- mica-mqtt version -->
-        <revision>2.2.11-SNAPSHOT</revision>
+        <revision>2.2.11</revision>
         <!-- java version -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -25,7 +25,7 @@
         <spring.boot.version>2.7.18</spring.boot.version>
         <fastjson.version>1.2.83</fastjson.version>
         <jfinal.version>5.1.7</jfinal.version>
-        <tinylog.version>2.6.2</tinylog.version>
+        <tinylog.version>2.7.0</tinylog.version>
     </properties>
 
     <modules>
