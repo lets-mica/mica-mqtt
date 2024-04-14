@@ -187,3 +187,49 @@ public class MainService {
 
 }
 ```
+
+## 3. 多个 mqtt client 客户端
+### 3.1 自定义 
+```java
+@Configuration
+public class OtherMqttClientConfiguration {
+
+	@Bean("mqttClientTemplate1")
+	public MqttClientTemplate mqttClientTemplate1() {
+		MqttClientCreator mqttClientCreator1 = MqttClient.create()
+			.ip("mqtt.dreamlu.net")
+			.username("mica")
+			.password("mica");
+		return new MqttClientTemplate(mqttClientCreator1);
+	}
+
+}
+```
+
+### 3.2 修改 starter 自带的 MqttClientTemplate Bean 引入
+由于现在加入了一个新的名为 `mqttClientTemplate1` MqttClientTemplate，老的 starter 内置的 MqttClientTemplate 引入也需要添加 bean name。
+
+```java
+@Autowired
+@Qualifier(MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN)
+private MqttClientTemplate mqttClientTemplate;
+```
+
+### 3.3 新加入的 mqttClientTemplate1 MqttClientTemplate bean 引入
+```java
+@Autowired
+@Qualifier("mqttClientTemplate1")
+private MqttClientTemplate mqttClientTemplate;
+```
+
+### 3.4 新加入的 mqttClientTemplate1 注解订阅
+注意：由于 `@MqttClientSubscribe` clientTemplateBean 默认是 `MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN`，所以新增的 `mqttClientTemplate1` 注解订阅的时候也需要配置。
+```java
+@MqttClientSubscribe(
+    value = "/#", 
+    clientTemplateBean = "mqttClientTemplate1"
+)
+public void sub1(String topic, byte[] payload) {
+    logger.info("topic:{} payload:{}", topic, ByteBufferUtil.toString(payload));
+}
+```
