@@ -189,7 +189,7 @@ public class MainService {
 ```
 
 ## 3. 多个 mqtt client 客户端
-### 3.1 自定义 
+### 3.1 自定义 MqttClientTemplate bean 2.2.11 开始已简化，老版本建议先升级。
 ```java
 @Configuration
 public class OtherMqttClientConfiguration {
