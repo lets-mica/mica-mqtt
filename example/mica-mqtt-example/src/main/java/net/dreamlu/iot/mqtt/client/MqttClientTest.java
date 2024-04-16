@@ -59,7 +59,7 @@ public class MqttClientTest {
 			// 同步连接，也可以使用 connect() 异步（可以避免 broker 没启动照成启动卡住），但是下面的订阅和发布可能还没连接成功。
 			.connectSync();
 
-		client.subQos0("/test/123", new IMqttClientMessageListener() {
+		client.subQos0("/test/#", new IMqttClientMessageListener() {
 			@Override
 			public void onSubscribed(ChannelContext context, String topicFilter, MqttQoS mqttQoS) {
 				// 订阅成功之后触发，可在此处做一些业务逻辑
