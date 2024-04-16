@@ -31,8 +31,8 @@ public class MqttClientProxy {
 			.ip("ip1")
 			.port(1883)
 			.clientId("clientI")
-			.username("admin&admin")
-			.password("6b408b34171b0423160dcb8b70decefe")
+			.username("mica")
+			.password("mica")
 			.debug()
 			.connectSync();
 
@@ -40,8 +40,8 @@ public class MqttClientProxy {
 			.ip("ip2")
 			.port(1883)
 			.clientId("client2")
-			.username("admin&admin")
-			.password("6b408b34171b0423160dcb8b70decefe")
+			.username("mica")
+			.password("mica")
 			.debug()
 			.connectSync();
 
