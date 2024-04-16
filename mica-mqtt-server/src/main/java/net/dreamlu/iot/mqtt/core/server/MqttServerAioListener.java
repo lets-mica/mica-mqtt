@@ -81,7 +81,7 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		// 2. 业务 id
 		String clientId = context.getBsId();
 		// 3. 判断是否正常断开
-		boolean isNotNormalDisconnect = context.isBizStatus();
+		boolean isNotNormalDisconnect = !context.isBizStatus();
 		context.setBizStatus(false);
 		if (isNotNormalDisconnect || throwable != null) {
 			// 避免网络异常时短期照成大量异常打印，会导致内存突增
