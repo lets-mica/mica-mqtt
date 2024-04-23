@@ -159,6 +159,10 @@ public final class MqttServer {
 	public boolean publish(String clientId, String topic, byte[] payload, MqttQoS qos, boolean retain) {
 		// 校验 topic
 		TopicUtil.validateTopicName(topic);
+		// 存储保留消息
+		if (retain) {
+			this.saveRetainMessage(topic, qos, payload);
+		}
 		// 获取 context
 		ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
 		if (context == null || context.isClosed()) {
@@ -188,9 +192,6 @@ public final class MqttServer {
 	private boolean publish(ChannelContext context, String clientId, String topic, byte[] payload, MqttQoS qos, boolean retain) {
 		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
 		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
-		if (retain) {
-			this.saveRetainMessage(topic, qos, payload);
-		}
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
 			.payload(payload)
@@ -255,14 +256,15 @@ public final class MqttServer {
 	public boolean publishAll(String topic, byte[] payload, MqttQoS qos, boolean retain) {
 		// 校验 topic
 		TopicUtil.validateTopicName(topic);
+		// 存储保留消息
+		if (retain) {
+			this.saveRetainMessage(topic, qos, payload);
+		}
 		// 查找订阅该 topic 的客户端
 		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {
 			logger.debug("Mqtt Topic:{} publishAll but subscribe client list is empty.", topic);
 			return false;
-		}
-		if (retain) {
-			this.saveRetainMessage(topic, qos, payload);
 		}
 		for (Subscribe subscribe : subscribeList) {
 			String clientId = subscribe.getClientId();
