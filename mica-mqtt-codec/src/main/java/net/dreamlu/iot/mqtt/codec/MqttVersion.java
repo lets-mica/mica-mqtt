@@ -28,16 +28,18 @@ public enum MqttVersion {
 	/**
 	 * mqtt 协议
 	 */
-	MQTT_3_1("MQIsdp", (byte) 3),
-	MQTT_3_1_1("MQTT", (byte) 4),
-	MQTT_5("MQTT", (byte) 5);
+	MQTT_3_1("MQIsdp", (byte) 3, "MQTT 3.1"),
+	MQTT_3_1_1("MQTT", (byte) 4, "MQTT 3.1.1"),
+	MQTT_5("MQTT", (byte) 5, "MQTT 5.0");
 
 	private final String name;
 	private final byte level;
+	private final String fullName;
 
-	MqttVersion(String protocolName, byte protocolLevel) {
-		name = Objects.requireNonNull(protocolName, "protocolName is null.");
-		level = protocolLevel;
+	MqttVersion(String protocolName, byte protocolLevel, String fullName) {
+		this.name = Objects.requireNonNull(protocolName, "protocolName is null.");
+		this.level = protocolLevel;
+		this.fullName = fullName;
 	}
 
 	public String protocolName() {
@@ -50,6 +52,10 @@ public enum MqttVersion {
 
 	public byte protocolLevel() {
 		return level;
+	}
+
+	public String fullName() {
+		return fullName;
 	}
 
 	public static MqttVersion fromProtocolNameAndLevel(String protocolName, byte protocolLevel) {
