@@ -2,6 +2,11 @@
 
 ## 发行版本
 
+### v2.2.13 - 2024-05-12
+- :sparkles: mica-mqtt-codec MqttVersion 添加版本全名。
+- :sparkles: mica-mqtt-codec MqttConnectReasonCode 添加中文说明。
+- :bug: mica-mqtt-server 保留消息下发时没有订阅也应该先存储 gitee #I9IYX1。
+
 ### v2.2.12 - 2024-04-16
 - :bug: mica-mqtt-server 遗嘱消息发送判断
 
