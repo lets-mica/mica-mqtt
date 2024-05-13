@@ -76,7 +76,7 @@ public class MqttClientSubscribeDetector implements BeanPostProcessor {
 					Class<?> topicParamType = parameterTypes[0];
 					Class<?> payloadParamType = parameterTypes[1];
 					if (String.class != topicParamType || byte[].class != payloadParamType) {
-						throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String and ByteBuffer.");
+						throw new IllegalArgumentException("@MqttClientSubscribe on method " + method + " parameter type must String topic and byte[] payload.");
 					}
 					// 4. 订阅
 					IMqttClientSession clientSession = getMqttClientSession(applicationContext, subscribe.clientTemplateBean());
