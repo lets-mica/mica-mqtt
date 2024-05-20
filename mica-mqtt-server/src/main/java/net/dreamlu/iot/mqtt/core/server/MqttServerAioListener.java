@@ -104,9 +104,7 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		// 6. 会话清理
 		cleanSession(clientId);
 		// 7. 下线事件
-		String username = context.get(MqttConst.USER_NAME_KEY);
-		context.remove(MqttConst.USER_NAME_KEY);
-		notify(context, clientId, username, remark);
+		notify(context, clientId, remark);
 	}
 
 	private void sendWillMessage(String clientId) {
@@ -133,7 +131,8 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		}
 	}
 
-	private void notify(ChannelContext context, String clientId, String username, String remark) {
+	private void notify(ChannelContext context, String clientId, String remark) {
+		String username = context.getUserId();
 		executor.execute(() -> {
 			try {
 				connectStatusListener.offline(context, clientId, username, remark);

@@ -19,7 +19,6 @@ package net.dreamlu.iot.mqtt.core.server.support;
 import net.dreamlu.iot.mqtt.codec.*;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingPublish;
 import net.dreamlu.iot.mqtt.core.common.MqttPendingQos2Publish;
-import net.dreamlu.iot.mqtt.core.server.MqttConst;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
 import net.dreamlu.iot.mqtt.core.server.MqttServerProcessor;
 import net.dreamlu.iot.mqtt.core.server.auth.IMqttServerAuthHandler;
@@ -130,7 +129,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 5. 绑定 uniqueId、保存 username
 		Tio.bindBsId(context, uniqueId);
 		if (StrUtil.isNotBlank(userName)) {
-			context.set(MqttConst.USER_NAME_KEY, userName);
+			Tio.bindUser(context, userName);
 		}
 		// 6. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
 		float keepAliveBackoff = serverCreator.getKeepaliveBackoff();
