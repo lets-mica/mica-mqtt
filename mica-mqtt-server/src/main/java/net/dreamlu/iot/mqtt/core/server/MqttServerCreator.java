@@ -602,7 +602,7 @@ public class MqttServerCreator {
 		// 1. 处理消息
 		TioServerHandler handler = new MqttServerAioHandler(this, serverProcessor);
 		// 2. t-io 监听
-		TioServerListener listener = new MqttServerAioListener(this, mqttExecutor);
+		TioServerListener listener = new MqttServerAioListener(this);
 		// 3. t-io 配置
 		TioServerConfig tioConfig = new TioServerConfig(this.name, handler, listener);
 		tioConfig.setUseQueueDecode(this.useQueueDecode);

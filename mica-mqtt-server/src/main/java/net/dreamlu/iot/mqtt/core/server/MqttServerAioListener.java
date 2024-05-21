@@ -31,7 +31,6 @@ import org.tio.server.DefaultTioServerListener;
 import org.tio.utils.hutool.StrUtil;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
 
 /**
  * mqtt 服务监听
@@ -45,15 +44,13 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 	private final IMqttMessageDispatcher messageDispatcher;
 	private final IMqttConnectStatusListener connectStatusListener;
 	private final MqttMessageInterceptors messageInterceptors;
-	private final ExecutorService executor;
 
-	public MqttServerAioListener(MqttServerCreator serverCreator, ExecutorService executor) {
+	public MqttServerAioListener(MqttServerCreator serverCreator) {
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.messageDispatcher = serverCreator.getMessageDispatcher();
 		this.connectStatusListener = serverCreator.getConnectStatusListener();
 		this.messageInterceptors = serverCreator.getMessageInterceptors();
-		this.executor = executor;
 	}
 
 	@Override
@@ -73,9 +70,8 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 		// 标记认证为 false
 		context.setAccepted(false);
 		// 1. http 请求跳过
-		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
+		boolean isHttpRequest = context.getAndRemove(MqttConst.IS_HTTP) != null;
 		if (isHttpRequest) {
-			context.remove(MqttConst.IS_HTTP);
 			return;
 		}
 		// 2. 业务 id
@@ -133,13 +129,11 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 
 	private void notify(ChannelContext context, String clientId, String remark) {
 		String username = context.getUserId();
-		executor.execute(() -> {
-			try {
-				connectStatusListener.offline(context, clientId, username, remark);
-			} catch (Throwable throwable) {
-				logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
-			}
-		});
+		try {
+			connectStatusListener.offline(context, clientId, username, remark);
+		} catch (Throwable throwable) {
+			logger.error("Mqtt server clientId:{} offline notify error.", clientId, throwable);
+		}
 	}
 
 	@Override
