@@ -139,8 +139,7 @@ public class MqttServerAioListener extends DefaultTioServerListener {
 	@Override
 	public void onAfterSent(ChannelContext context, Packet packet, boolean isSentSuccess) throws Exception {
 		// 1. http 请求处理
-		boolean isHttpRequest = context.get(MqttConst.IS_HTTP) != null;
-		if (isHttpRequest) {
+		if (context.containsKey(MqttConst.IS_HTTP)) {
 			MqttHttpHelper.close(context, packet);
 		} else if (packet instanceof MqttMessage) {
 			messageInterceptors.onAfterSent(context, (MqttMessage) packet, isSentSuccess);
