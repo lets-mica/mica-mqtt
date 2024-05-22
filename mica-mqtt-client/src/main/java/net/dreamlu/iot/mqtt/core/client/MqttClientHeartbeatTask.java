@@ -68,9 +68,6 @@ public class MqttClientHeartbeatTask extends TimerTask {
 		}
 		Set<ChannelContext> set = clientTioConfig.connecteds;
 		long currTime = System.currentTimeMillis();
-		long decodeQueueSizeAll = 0;
-		long handlerQueueSizeAll = 0;
-		long sendQueueSizeAll = 0;
 		try {
 			for (ChannelContext entry : set) {
 				ClientChannelContext channelContext = (ClientChannelContext) entry;
@@ -87,32 +84,17 @@ public class MqttClientHeartbeatTask extends TimerTask {
 						}
 					}
 				}
-				// 客户端队列数据详情
-				int decodeQueueSize = channelContext.getDecodeQueueSize();
-				if (decodeQueueSize > 0) {
-					decodeQueueSizeAll += decodeQueueSize;
-				}
-				int handlerQueueSize = channelContext.getHandlerQueueSize();
-				if (handlerQueueSize > 0) {
-					handlerQueueSizeAll += handlerQueueSize;
-				}
-				int sendQueueSize = channelContext.getSendQueueSize();
-				if (sendQueueSize > 0) {
-					sendQueueSizeAll += sendQueueSize;
-				}
 			}
 			// 打印连接信息
 			if (clientTioConfig.debug && logger.isInfoEnabled()) {
 				if (clientTioConfig.statOn) {
-					logger.info("[{}]: curr:{}, closed:{}, received:({}p)({}b), handled:{}, sent:({}p)({}b), QueueSize[decode:{},handler:{},send:{}]",
+					logger.info("[{}]: curr:{}, closed:{}, received:({}p)({}b), handled:{}, sent:({}p)({}b)]",
 						id, set.size(), clientGroupStat.closed.sum(),
 						clientGroupStat.receivedPackets.sum(), clientGroupStat.receivedBytes.sum(), clientGroupStat.handledPackets.sum(),
-						clientGroupStat.sentPackets.sum(), clientGroupStat.sentBytes.sum(),
-						decodeQueueSizeAll, handlerQueueSizeAll, sendQueueSizeAll);
+						clientGroupStat.sentPackets.sum(), clientGroupStat.sentBytes.sum());
 				} else {
-					logger.info("[{}]: curr:{}, closed:{}, QueueSize[decode:{},handler:{},send:{}]",
-						id, set.size(), clientGroupStat.closed.sum(),
-						decodeQueueSizeAll, handlerQueueSizeAll, sendQueueSizeAll);
+					logger.info("[{}]: curr:{}, closed:{}]",
+						id, set.size(), clientGroupStat.closed.sum());
 				}
 			}
 		} catch (Throwable e) {
