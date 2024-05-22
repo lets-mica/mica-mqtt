@@ -19,8 +19,6 @@ package net.dreamlu.iot.mqtt.broker;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * 设备 C，每 5 秒上报一个数据
@@ -38,13 +36,9 @@ public class DeviceC {
 			.password("123456")
 			.connectSync();
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				client.publish("/a/door/open", "open".getBytes(StandardCharsets.UTF_8));
-			}
-		}, 5000, 5000);
+		client.schedule(() -> {
+			client.publish("/a/door/open", "open".getBytes(StandardCharsets.UTF_8));
+		}, 5000);
 	}
 
 }

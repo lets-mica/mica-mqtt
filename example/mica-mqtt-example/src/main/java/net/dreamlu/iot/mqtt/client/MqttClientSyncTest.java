@@ -49,5 +49,7 @@ public class MqttClientSyncTest {
 
 		// 连接上之后发送消息，注意：连接时出现异常等就不会发出
 		client.publish("/test/client", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
+		// 2.3.0 开始支持，可停止
+//		client.stop();
 	}
 }

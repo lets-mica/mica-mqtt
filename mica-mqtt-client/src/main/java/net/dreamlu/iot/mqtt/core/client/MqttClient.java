@@ -31,9 +31,12 @@ import org.tio.core.Node;
 import org.tio.core.Tio;
 import org.tio.core.intf.Packet;
 import org.tio.utils.thread.ThreadUtils;
+import org.tio.utils.timer.TimerTask;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -54,6 +57,7 @@ public final class MqttClient {
 	private final TioClientConfig clientTioConfig;
 	private final IMqttClientSession clientSession;
 	private final TimerTaskService taskService;
+	private final ExecutorService mqttExecutor;
 	private final IMqttClientMessageIdGenerator messageIdGenerator;
 	private ClientChannelContext context;
 
@@ -66,6 +70,7 @@ public final class MqttClient {
 		this.config = config;
 		this.clientTioConfig = tioClient.getTioClientConfig();
 		this.taskService = config.getTaskService();
+		this.mqttExecutor = config.getMqttExecutor();
 		this.clientSession = config.getClientSession();
 		this.messageIdGenerator = config.getMessageIdGenerator();
 		startHeartbeatTask();
@@ -373,6 +378,81 @@ public final class MqttClient {
 	}
 
 	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay) {
+		return schedule(command, delay, null);
+	}
+
+	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay, Executor executor) {
+		return config.getTaskService().addTask((systemTimer -> new org.tio.utils.timer.TimerTask(delay) {
+			@Override
+			public void run() {
+				try {
+					// 1. 再次添加 任务
+					systemTimer.add(this);
+					// 2. 执行任务
+					if (executor == null) {
+						command.run();
+					} else {
+						executor.execute(command);
+					}
+				} catch (Exception e) {
+					logger.error("Mqtt client schedule error", e);
+				}
+			}
+		}));
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay) {
+		return scheduleOnce(command, delay, null);
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay, Executor executor) {
+		return config.getTaskService().addTask((systemTimer -> new TimerTask(delay) {
+			@Override
+			public void run() {
+				try {
+					if (executor == null) {
+						command.run();
+					} else {
+						executor.execute(command);
+					}
+				} catch (Exception e) {
+					logger.error("Mqtt client schedule once error", e);
+				}
+			}
+		}));
+	}
+
+	/**
 	 * 异步连接
 	 *
 	 * @return TioClient
@@ -456,11 +536,7 @@ public final class MqttClient {
 	 * @return 是否需要重新订阅
 	 */
 	public static boolean isNeedReSub(ChannelContext context) {
-		if (context.containsKey(MQTT_NEED_RE_SUB)) {
-			context.remove(MQTT_NEED_RE_SUB);
-			return true;
-		}
-		return false;
+		return context.getAndRemove(MQTT_NEED_RE_SUB) != null;
 	}
 
 	/**
@@ -492,6 +568,19 @@ public final class MqttClient {
 		this.disconnect();
 		// 3. 停止 tio
 		boolean result = tioClient.stop();
+		// 4. 停止工作线程
+		try {
+			mqttExecutor.shutdown();
+		} catch (Exception e1) {
+			logger.error(e1.getMessage(), e1);
+		}
+		try {
+			// 等待线程池中的任务结束，客户端等待 6 秒基本上足够了
+			result &= mqttExecutor.awaitTermination(6, TimeUnit.SECONDS);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			logger.error(e.getMessage(), e);
+		}
 		logger.info("MqttClient stop result:{}", result);
 		// 4. 清理 session
 		this.clientSession.clean();
@@ -568,58 +657,12 @@ public final class MqttClient {
 	 * mqtt 定时任务：发心跳
 	 */
 	private void startHeartbeatTask() {
-		// 先判断用户是否开启心跳检测
-		final long heartbeatTimeout = TimeUnit.SECONDS.toMillis(config.getKeepAliveSecs());
-		if (heartbeatTimeout <= 0) {
+		final int keepAliveSecs = config.getKeepAliveSecs();
+		if (keepAliveSecs <= 0) {
 			logger.warn("用户取消了 mica-mqtt 的心跳定时发送功能，请用户自己去完成心跳机制");
 			return;
 		}
-		final ClientGroupStat clientGroupStat = (ClientGroupStat) clientTioConfig.groupStat;
-		final TioClientHandler clientHandler = clientTioConfig.getTioClientHandler();
-		final String id = clientTioConfig.getId();
-		new Thread(() -> {
-			while (!clientTioConfig.isStopped()) {
-				try {
-					Set<ChannelContext> set = clientTioConfig.connecteds;
-					long currTime = System.currentTimeMillis();
-					for (ChannelContext entry : set) {
-						ClientChannelContext channelContext = (ClientChannelContext) entry;
-						if (channelContext.isClosed() || channelContext.isRemoved()) {
-							continue;
-						}
-						long interval = currTime - channelContext.stat.latestTimeOfSentPacket;
-						if (interval >= heartbeatTimeout) {
-							Packet packet = clientHandler.heartbeatPacket(channelContext);
-							if (packet != null) {
-								Boolean result = Tio.send(channelContext, packet);
-								if (clientTioConfig.debug && logger.isInfoEnabled()) {
-									logger.info("{} 发送心跳包 result:{}", channelContext, result);
-								}
-							}
-						}
-					}
-					// 打印连接信息
-					if (clientTioConfig.debug && logger.isInfoEnabled()) {
-						if (clientTioConfig.statOn) {
-							logger.info("[{}]: curr:{}, closed:{}, received:({}p)({}b), handled:{}, sent:({}p)({}b)", id, set.size(), clientGroupStat.closed.sum(),
-								clientGroupStat.receivedPackets.sum(), clientGroupStat.receivedBytes.sum(), clientGroupStat.handledPackets.sum(),
-								clientGroupStat.sentPackets.sum(), clientGroupStat.sentBytes.sum());
-						} else {
-							logger.info("[{}]: curr:{}, closed:{}", id, set.size(), clientGroupStat.closed.sum());
-						}
-					}
-				} catch (Throwable e) {
-					logger.error("", e);
-				} finally {
-					try {
-						Thread.sleep(heartbeatTimeout / 3);
-					} catch (Throwable e) {
-						Thread.currentThread().interrupt();
-						logger.error(e.getMessage(), e);
-					}
-				}
-			}
-		}, "mqtt-heartbeat" + id).start();
+		taskService.addTask(systemTimer -> new MqttClientHeartbeatTask(systemTimer, clientTioConfig, keepAliveSecs));
 	}
 
 }

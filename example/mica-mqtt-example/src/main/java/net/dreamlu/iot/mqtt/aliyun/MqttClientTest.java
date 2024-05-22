@@ -19,8 +19,6 @@ package net.dreamlu.iot.mqtt.aliyun;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -57,15 +55,11 @@ public class MqttClientTest {
 			System.out.println(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
 		});
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				int LightSwitch = ThreadLocalRandom.current().nextBoolean() ? 0 : 1;
-				String content = "{\"id\":\"1\",\"version\":\"1.0\",\"params\":{\"LightSwitch\":" + LightSwitch + "}}";
-				client.publish("/sys/" + productKey + "/" + deviceName + "/thing/event/property/post", content.getBytes(StandardCharsets.UTF_8));
-			}
-		}, 3000, 3000);
+		client.schedule(() -> {
+			int LightSwitch = ThreadLocalRandom.current().nextBoolean() ? 0 : 1;
+			String content = "{\"id\":\"1\",\"version\":\"1.0\",\"params\":{\"LightSwitch\":" + LightSwitch + "}}";
+			client.publish("/sys/" + productKey + "/" + deviceName + "/thing/event/property/post", content.getBytes(StandardCharsets.UTF_8));
+		}, 3000);
 	}
 
 }

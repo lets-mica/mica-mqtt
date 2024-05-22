@@ -19,8 +19,6 @@ package net.dreamlu.iot.mqtt.huawei;
 import net.dreamlu.iot.mqtt.core.client.MqttClient;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * 客户端测试
@@ -54,7 +52,7 @@ public class MqttClientTest {
 			.connectSync();
 
 		// 订阅命令下发topic
-		String cmdRequestTopic =  "$oc/devices/" + deviceId + "/sys/commands/#";
+		String cmdRequestTopic = "$oc/devices/" + deviceId + "/sys/commands/#";
 
 		client.subQos0(cmdRequestTopic, (context, topic, message, payload) -> {
 			System.out.println(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
@@ -64,13 +62,9 @@ public class MqttClientTest {
 		String reportTopic = "$oc/devices/" + deviceId + "/sys/properties/report";
 		String jsonMsg = "{\"services\":[{\"service_id\":\"Temperature\", \"properties\":{\"value\":57}},{\"service_id\":\"Battery\",\"properties\":{\"level\":88}}]}";
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				client.publish(reportTopic, jsonMsg.getBytes(StandardCharsets.UTF_8));
-			}
-		}, 3000, 3000);
+		client.schedule(() -> {
+			client.publish(reportTopic, jsonMsg.getBytes(StandardCharsets.UTF_8));
+		}, 3000);
 	}
 
 }

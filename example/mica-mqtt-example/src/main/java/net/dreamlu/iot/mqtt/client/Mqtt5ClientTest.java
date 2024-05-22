@@ -26,8 +26,6 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * 客户端测试
@@ -74,12 +72,8 @@ public class Mqtt5ClientTest {
 		client.publish("/test/client", "mica最牛皮2".getBytes(StandardCharsets.UTF_8));
 		client.publish("/test/client", "mica最牛皮3".getBytes(StandardCharsets.UTF_8));
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				client.publish("/test/client", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
-			}
-		}, 1000, 2000);
+		client.schedule(() -> {
+			client.publish("/test/client", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
+		}, 1000);
 	}
 }
