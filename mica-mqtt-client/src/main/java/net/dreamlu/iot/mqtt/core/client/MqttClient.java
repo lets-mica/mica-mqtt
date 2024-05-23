@@ -490,7 +490,6 @@ public final class MqttClient {
 		}
 	}
 
-
 	/**
 	 * 重连到新的服务端节点
 	 *
