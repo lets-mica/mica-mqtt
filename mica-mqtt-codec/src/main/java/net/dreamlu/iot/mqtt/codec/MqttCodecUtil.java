@@ -98,7 +98,7 @@ public final class MqttCodecUtil {
 			case PUBREL:
 			case SUBSCRIBE:
 			case UNSUBSCRIBE:
-				if (MqttQoS.AT_LEAST_ONCE != mqttFixedHeader.qosLevel()) {
+				if (MqttQoS.QOS1 != mqttFixedHeader.qosLevel()) {
 					throw new DecoderException(mqttFixedHeader.messageType().name() + " message must have QoS 1");
 				}
 				return mqttFixedHeader;
@@ -125,12 +125,12 @@ public final class MqttCodecUtil {
 			case PINGRESP:
 			case DISCONNECT:
 				if (mqttFixedHeader.isDup() ||
-					MqttQoS.AT_MOST_ONCE != mqttFixedHeader.qosLevel() ||
+					MqttQoS.QOS0 != mqttFixedHeader.qosLevel() ||
 					mqttFixedHeader.isRetain()) {
 					return new MqttFixedHeader(
 						mqttFixedHeader.messageType(),
 						false,
-						MqttQoS.AT_MOST_ONCE,
+						MqttQoS.QOS0,
 						false,
 						mqttFixedHeader.remainingLength());
 				}

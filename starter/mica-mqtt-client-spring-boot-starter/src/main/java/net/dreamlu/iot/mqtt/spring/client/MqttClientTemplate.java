@@ -54,7 +54,7 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 * @return MqttClient
 	 */
 	public MqttClient subQos0(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.AT_MOST_ONCE, listener);
+		return client.subscribe(topicFilter, MqttQoS.QOS0, listener);
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 * @return MqttClient
 	 */
 	public MqttClient subQos1(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.AT_LEAST_ONCE, listener);
+		return client.subscribe(topicFilter, MqttQoS.QOS1, listener);
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 * @return MqttClient
 	 */
 	public MqttClient subQos2(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.EXACTLY_ONCE, listener);
+		return client.subscribe(topicFilter, MqttQoS.QOS2, listener);
 	}
 
 	/**
@@ -141,7 +141,7 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, byte[] payload) {
-		return client.publish(topic, payload, MqttQoS.AT_MOST_ONCE);
+		return client.publish(topic, payload, MqttQoS.QOS0);
 	}
 
 	/**

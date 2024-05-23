@@ -128,7 +128,7 @@ public class MqttClientSubscribeListener {
 		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}
 
-	@MqttClientSubscribe(value = "/qos1/#", qos = MqttQoS.AT_LEAST_ONCE)
+	@MqttClientSubscribe(value = "/qos1/#", qos = MqttQoS.QOS1)
 	public void subQos1(String topic, byte[] payload) {
 		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}

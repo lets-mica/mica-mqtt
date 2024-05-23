@@ -231,10 +231,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		int packetId = variableHeader.packetId();
 		logger.debug("Publish - clientId:{} topicName:{} mqttQoS:{} packetId:{}", clientId, topicName, mqttQoS, packetId);
 		switch (mqttQoS) {
-			case AT_MOST_ONCE:
+			case QOS0:
 				invokeListenerForPublish(context, clientId, mqttQoS, topicName, message);
 				break;
-			case AT_LEAST_ONCE:
+			case QOS1:
 				invokeListenerForPublish(context, clientId, mqttQoS, topicName, message);
 				if (packetId != -1) {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck()
@@ -244,9 +244,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					logger.debug("Publish - PubAck send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubAck);
 				}
 				break;
-			case EXACTLY_ONCE:
+			case QOS2:
 				if (packetId != -1) {
-					MqttFixedHeader pubRecFixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
+					MqttFixedHeader pubRecFixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.QOS0, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(pubRecFixedHeader, MqttMessageIdVariableHeader.from(packetId));
 					Boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
@@ -285,7 +285,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		}
 		pendingPublish.onPubAckReceived();
 
-		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.QOS1, false, 0);
 		MqttMessage pubRelMessage = new MqttMessage(fixedHeader, variableHeader);
 		Tio.send(context, pubRelMessage);
 
@@ -309,7 +309,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			sessionManager.removePendingQos2Publish(clientId, messageId);
 		}
 		MqttMessage message = MqttMessageFactory.newMessage(
-			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0),
+			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.QOS0, false, 0),
 			MqttMessageIdVariableHeader.from(messageId), null);
 		Tio.send(context, message);
 	}
@@ -461,7 +461,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		// 1. retain 消息逻辑
 		if (isRetain) {
 			// qos == 0 or payload is none,then clear previous retain message
-			if (MqttQoS.AT_MOST_ONCE == mqttQoS || payload == null || payload.length == 0) {
+			if (MqttQoS.QOS0 == mqttQoS || payload == null || payload.length == 0) {
 				this.messageStore.clearRetainMessage(topicName);
 			} else {
 				Message retainMessage = new Message();

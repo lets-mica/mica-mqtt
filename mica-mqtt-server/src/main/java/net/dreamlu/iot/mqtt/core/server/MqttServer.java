@@ -117,7 +117,7 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String clientId, String topic, byte[] payload) {
-		return publish(clientId, topic, payload, MqttQoS.AT_MOST_ONCE);
+		return publish(clientId, topic, payload, MqttQoS.QOS0);
 	}
 
 	/**
@@ -143,7 +143,7 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String clientId, String topic, byte[] payload, boolean retain) {
-		return publish(clientId, topic, payload, MqttQoS.AT_MOST_ONCE, retain);
+		return publish(clientId, topic, payload, MqttQoS.QOS0, retain);
 	}
 
 	/**
@@ -190,7 +190,7 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	private boolean publish(ChannelContext context, String clientId, String topic, byte[] payload, MqttQoS qos, boolean retain) {
-		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
+		boolean isHighLevelQoS = MqttQoS.QOS1 == qos || MqttQoS.QOS2 == qos;
 		int messageId = isHighLevelQoS ? sessionManager.getMessageId(clientId) : -1;
 		MqttPublishMessage message = MqttMessageBuilders.publish()
 			.topicName(topic)
@@ -217,7 +217,7 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publishAll(String topic, byte[] payload) {
-		return publishAll(topic, payload, MqttQoS.AT_MOST_ONCE);
+		return publishAll(topic, payload, MqttQoS.QOS0);
 	}
 
 	/**
@@ -241,7 +241,7 @@ public final class MqttServer {
 	 * @return 是否发送成功
 	 */
 	public boolean publishAll(String topic, byte[] payload, boolean retain) {
-		return publishAll(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
+		return publishAll(topic, payload, MqttQoS.QOS0, retain);
 	}
 
 	/**

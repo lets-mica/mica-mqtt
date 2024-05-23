@@ -50,7 +50,7 @@ public class MqttClientProxy {
 			"$share/test/link/product2/+/event/+/post",
 			"$share/test/link/product3/+/event/+/post"
 		};
-		client1.subscribe(topics, MqttQoS.AT_MOST_ONCE, (context, topic, message, payload) -> {
+		client1.subscribe(topics, MqttQoS.QOS0, (context, topic, message, payload) -> {
 			client2.publish(topic, payload);
 		});
 	}

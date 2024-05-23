@@ -153,7 +153,7 @@ public class MqttClientProperties {
 		/**
 		 * 遗嘱消息 qos，默认： qos0
 		 */
-		private MqttQoS qos = MqttQoS.AT_MOST_ONCE;
+		private MqttQoS qos = MqttQoS.QOS0;
 		/**
 		 * 遗嘱消息 payload
 		 */

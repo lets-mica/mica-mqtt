@@ -22,14 +22,11 @@ import net.dreamlu.iot.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.client.ClientChannelContext;
-import org.tio.client.ClientGroupStat;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
-import org.tio.client.intf.TioClientHandler;
 import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.core.Tio;
-import org.tio.core.intf.Packet;
 import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.timer.TimerTask;
 import org.tio.utils.timer.TimerTaskService;
@@ -84,7 +81,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos0(String topicFilter, IMqttClientMessageListener listener) {
-		return subscribe(topicFilter, MqttQoS.AT_MOST_ONCE, listener);
+		return subscribe(topicFilter, MqttQoS.QOS0, listener);
 	}
 
 	/**
@@ -95,7 +92,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos1(String topicFilter, IMqttClientMessageListener listener) {
-		return subscribe(topicFilter, MqttQoS.AT_LEAST_ONCE, listener);
+		return subscribe(topicFilter, MqttQoS.QOS1, listener);
 	}
 
 	/**
@@ -106,7 +103,7 @@ public final class MqttClient {
 	 * @return MqttClient
 	 */
 	public MqttClient subQos2(String topicFilter, IMqttClientMessageListener listener) {
-		return subscribe(topicFilter, MqttQoS.EXACTLY_ONCE, listener);
+		return subscribe(topicFilter, MqttQoS.QOS2, listener);
 	}
 
 	/**
@@ -277,7 +274,7 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, byte[] payload) {
-		return publish(topic, payload, MqttQoS.AT_MOST_ONCE);
+		return publish(topic, payload, MqttQoS.QOS0);
 	}
 
 	/**
@@ -301,7 +298,7 @@ public final class MqttClient {
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, byte[] payload, boolean retain) {
-		return publish(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
+		return publish(topic, payload, MqttQoS.QOS0, retain);
 	}
 
 	/**
@@ -344,7 +341,7 @@ public final class MqttClient {
 		// 校验 topic
 		TopicUtil.validateTopicName(topic);
 		// qos 判断
-		boolean isHighLevelQoS = MqttQoS.AT_LEAST_ONCE == qos || MqttQoS.EXACTLY_ONCE == qos;
+		boolean isHighLevelQoS = MqttQoS.QOS1 == qos || MqttQoS.QOS2 == qos;
 		int messageId = isHighLevelQoS ? messageIdGenerator.getId() : -1;
 		MqttMessageBuilders.PublishBuilder publishBuilder = MqttMessageBuilders.publish();
 		// 自定义配置

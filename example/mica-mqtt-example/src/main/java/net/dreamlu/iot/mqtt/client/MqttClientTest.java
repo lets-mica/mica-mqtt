@@ -52,7 +52,7 @@ public class MqttClientTest {
 				builder.topic("/test/offline")
 					.messageText("down")
 					.retain(false)
-					.qos(MqttQoS.AT_MOST_ONCE);    // 遗嘱消息
+					.qos(MqttQoS.QOS0);    // 遗嘱消息
 			})
 			// 同步连接，也可以使用 connect() 异步（可以避免 broker 没启动照成启动卡住），但是下面的订阅和发布可能还没连接成功。
 			.connectSync();

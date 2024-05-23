@@ -51,11 +51,11 @@ public enum MqttSubAckReasonCode implements MqttReasonCode {
 
 	public static MqttSubAckReasonCode qosGranted(MqttQoS qos) {
 		switch (qos) {
-			case AT_MOST_ONCE:
+			case QOS0:
 				return MqttSubAckReasonCode.GRANTED_QOS0;
-			case AT_LEAST_ONCE:
+			case QOS1:
 				return MqttSubAckReasonCode.GRANTED_QOS1;
-			case EXACTLY_ONCE:
+			case QOS2:
 				return MqttSubAckReasonCode.GRANTED_QOS2;
 			case FAILURE:
 				return MqttSubAckReasonCode.UNSPECIFIED_ERROR;

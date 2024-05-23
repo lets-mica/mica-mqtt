@@ -87,7 +87,7 @@ public final class MqttWillMessage {
 		/**
 		 * 默认为 qos 0
 		 */
-		private MqttQoS qos = MqttQoS.AT_MOST_ONCE;
+		private MqttQoS qos = MqttQoS.QOS0;
 		private MqttProperties willProperties;
 
 		public Builder topic(String topic) {

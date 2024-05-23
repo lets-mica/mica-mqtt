@@ -73,7 +73,7 @@ public final class MqttFixedHeader {
 	 * 做 qos 降级，mqtt 规定 qos > 0，messageId 必须大于 0，为了兼容，固做降级处理
 	 */
 	void downgradeQos() {
-		this.qosLevel = MqttQoS.AT_MOST_ONCE;
+		this.qosLevel = MqttQoS.QOS0;
 	}
 
 	public boolean isRetain() {

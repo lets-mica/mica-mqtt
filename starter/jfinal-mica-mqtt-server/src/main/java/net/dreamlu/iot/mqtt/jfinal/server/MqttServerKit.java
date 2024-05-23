@@ -96,7 +96,7 @@ public class MqttServerKit {
 	 * @return 是否发送成功
 	 */
 	public static boolean publishAll(String topic, byte[] payload) {
-		return mqttServer.publishAll(topic, payload, MqttQoS.AT_MOST_ONCE, false);
+		return mqttServer.publishAll(topic, payload, MqttQoS.QOS0, false);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class MqttServerKit {
 	 * @return 是否发送成功
 	 */
 	public static boolean publishAll(String topic, byte[] payload, boolean retain) {
-		return mqttServer.publishAll(topic, payload, MqttQoS.AT_MOST_ONCE, retain);
+		return mqttServer.publishAll(topic, payload, MqttQoS.QOS0, retain);
 	}
 
 	/**

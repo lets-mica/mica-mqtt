@@ -53,7 +53,7 @@ public class MqttSubAckPayload {
 	public List<Integer> grantedQoSLevels() {
 		List<Integer> qosLevels = new ArrayList<>(reasonCodes.size());
 		for (int code : reasonCodes) {
-			if (code > MqttQoS.EXACTLY_ONCE.value()) {
+			if (code > MqttQoS.QOS2.value()) {
 				qosLevels.add(MqttQoS.FAILURE.value());
 			} else {
 				qosLevels.add(code);

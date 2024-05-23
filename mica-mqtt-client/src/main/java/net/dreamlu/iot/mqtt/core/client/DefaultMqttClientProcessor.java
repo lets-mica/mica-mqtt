@@ -236,19 +236,19 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		int packetId = variableHeader.packetId();
 		logger.debug("MqttClient received publish topic:{} qoS:{} packetId:{}", topicName, mqttQoS, packetId);
 		switch (mqttFixedHeader.qosLevel()) {
-			case AT_MOST_ONCE:
+			case QOS0:
 				invokeListenerForPublish(context, topicName, message);
 				break;
-			case AT_LEAST_ONCE:
+			case QOS1:
 				invokeListenerForPublish(context, topicName, message);
 				if (packetId != -1) {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck().packetId(packetId).build();
 					Tio.send(context, messageAck);
 				}
 				break;
-			case EXACTLY_ONCE:
+			case QOS2:
 				if (packetId != -1) {
-					MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.AT_MOST_ONCE, false, 0);
+					MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.QOS0, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(fixedHeader, MqttMessageIdVariableHeader.from(packetId));
 					Boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send topicName:{} mqttQoS:{} packetId:{} result:{}", topicName, mqttQoS, packetId, resultPubRec);
@@ -305,7 +305,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		}
 		pendingPublish.onPubAckReceived();
 
-		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.AT_LEAST_ONCE, false, 0);
+		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.QOS1, false, 0);
 		MqttMessageIdVariableHeader variableHeader = (MqttMessageIdVariableHeader) message.variableHeader();
 		MqttMessage pubRelMessage = new MqttMessage(fixedHeader, variableHeader);
 		Tio.send(context, pubRelMessage);
@@ -326,7 +326,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 			pendingQos2Publish.onPubRelReceived();
 			clientSession.removePendingQos2Publish(messageId);
 		}
-		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.AT_MOST_ONCE, false, 0);
+		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.QOS0, false, 0);
 		MqttMessageIdVariableHeader variableHeader = MqttMessageIdVariableHeader.from(messageId);
 		Tio.send(context, new MqttMessage(fixedHeader, variableHeader));
 	}

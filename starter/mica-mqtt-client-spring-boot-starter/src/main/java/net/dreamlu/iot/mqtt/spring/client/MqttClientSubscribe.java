@@ -42,7 +42,7 @@ public @interface MqttClientSubscribe {
 	 *
 	 * @return MqttQoS
 	 */
-	MqttQoS qos() default MqttQoS.AT_MOST_ONCE;
+	MqttQoS qos() default MqttQoS.QOS0;
 
 	/**
 	 * 客户端 bean 名称

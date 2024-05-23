@@ -55,7 +55,7 @@ public class MqttClientKit {
 	 * @return MqttClient
 	 */
 	public static MqttClient subQos0(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.AT_MOST_ONCE, listener, null);
+		return client.subscribe(topicFilter, MqttQoS.QOS0, listener, null);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public class MqttClientKit {
 	 * @return MqttClient
 	 */
 	public static MqttClient subQos0(String topicFilter, MqttProperties properties, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.AT_MOST_ONCE, listener, properties);
+		return client.subscribe(topicFilter, MqttQoS.QOS0, listener, properties);
 	}
 
 	/**
@@ -78,7 +78,7 @@ public class MqttClientKit {
 	 * @return MqttClient
 	 */
 	public static MqttClient subQos1(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.AT_LEAST_ONCE, listener, null);
+		return client.subscribe(topicFilter, MqttQoS.QOS1, listener, null);
 	}
 
 	/**
@@ -90,7 +90,7 @@ public class MqttClientKit {
 	 * @return MqttClient
 	 */
 	public static MqttClient subQos1(String topicFilter, MqttProperties properties, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.AT_LEAST_ONCE, listener, properties);
+		return client.subscribe(topicFilter, MqttQoS.QOS1, listener, properties);
 	}
 
 	/**
@@ -101,7 +101,7 @@ public class MqttClientKit {
 	 * @return MqttClient
 	 */
 	public static MqttClient subQos2(String topicFilter, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.EXACTLY_ONCE, listener, null);
+		return client.subscribe(topicFilter, MqttQoS.QOS2, listener, null);
 	}
 
 	/**
@@ -113,7 +113,7 @@ public class MqttClientKit {
 	 * @return MqttClient
 	 */
 	public static MqttClient subQos2(String topicFilter, MqttProperties properties, IMqttClientMessageListener listener) {
-		return client.subscribe(topicFilter, MqttQoS.EXACTLY_ONCE, listener, properties);
+		return client.subscribe(topicFilter, MqttQoS.QOS2, listener, properties);
 	}
 
 	/**
