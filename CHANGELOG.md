@@ -2,6 +2,15 @@
 
 ## 发行版本
 
+### v2.3.0 - 2024-05-26
+- :sparkles: mica-mqtt 优化 MqttQoS 枚举，改为 `MqttQoS.QOS0`，方便使用（不兼容）。
+- :sparkles: mica-mqtt-client 同步私服部分功能，支持 stop 完全停止。
+- :sparkles: mica-mqtt-client 同步私服部分功能，MqttClient 都添加了 `schedule`、`scheduleOnce` 方法，（**耗时任务，请务必自定义线程池**）
+- :sparkles: mica-mqtt-server 优化设备离线，简化代码。
+- :sparkles: mica-mqtt-server 用户绑定使用 tio 内置 `Tio.bindUser(context, username)`。
+- :bug: 修复 @MqttClientSubscribe 类型错误时的异常提示。
+- :bug: mica-mqtt-client 修复重连可能失败的问题 gitee #I9RI8E 感谢 `@YYGuo` 反馈。
+
 ### v2.2.13 - 2024-05-12
 - :sparkles: mica-mqtt-codec MqttVersion 添加版本全名。
 - :sparkles: mica-mqtt-codec MqttConnectReasonCode 添加中文说明。
