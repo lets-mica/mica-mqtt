@@ -394,7 +394,7 @@ public final class MqttClient {
 	 * @return TimerTask
 	 */
 	public TimerTask schedule(Runnable command, long delay, Executor executor) {
-		return config.getTaskService().addTask((systemTimer -> new org.tio.utils.timer.TimerTask(delay) {
+		return config.getTaskService().addTask((systemTimer -> new TimerTask(delay) {
 			@Override
 			public void run() {
 				try {
