@@ -36,7 +36,6 @@ mqtt:
     version: mqtt_3_1_1         # mqtt 协议版本，可选 MQTT_3_1、mqtt_3_1_1、mqtt_5，默认：mqtt_3_1_1
     read-buffer-size: 8KB       # 接收数据的 buffer size，默认：8k
     max-bytes-in-message: 10MB  # 消息解析最大 bytes 长度，默认：10M
-    buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
     keep-alive-secs: 60         # keep-alive 时间，单位：秒
     clean-session: true         # mqtt clean session，默认：true
     ssl:
