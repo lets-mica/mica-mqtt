@@ -18,8 +18,6 @@ MqttServer mqttServer = MqttServer.create()
     .messageListener((context, clientId, message) -> {
         logger.info("clientId:{} message:{} payload:{}", clientId, message, new String(message.getPayload(), StandardCharsets.UTF_8));
     })
-    // 堆内存和堆外内存选择，默认：堆内存
-    .bufferAllocator(ByteBufferAllocator.HEAP)
     // 心跳超时时间，默认：120s
     .heartbeatTimeout(120_1000L)
     // ssl 配置
