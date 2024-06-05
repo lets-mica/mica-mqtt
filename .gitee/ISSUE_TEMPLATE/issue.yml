@@ -22,7 +22,7 @@ body:
         - "mica-mqtt-server-spring-boot-starter"
         - "jfinal-mica-mqtt-client"
         - "jfinal-mica-mqtt-server"
-        - "mica-mqtt-broker 经供参考"
+        - "mica-mqtt-broker 仅供参考"
         - "其他"
     validations:
       required: true
