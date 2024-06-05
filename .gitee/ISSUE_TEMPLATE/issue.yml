@@ -6,17 +6,24 @@ body:
     attributes:
       label: mica-mqtt版本
       options:
+        - "2.3.x"
         - "2.2.x"
-        - "老版本存在编解码异常，请先升级"
+        - "老版本存在编解码异常，建议先升级"
     validations:
       required: true
   - type: dropdown
     id: version
     attributes:
-      label: 服务端还是客户端
+      label: 使用的组件
       options:
-        - "mica-mqtt client 客户端"
-        - "mica-mqtt server 服务端"
+        - "mica-mqtt-client"
+        - "mica-mqtt-server"
+        - "mica-mqtt-client-spring-boot-starter"
+        - "mica-mqtt-server-spring-boot-starter"
+        - "jfinal-mica-mqtt-client"
+        - "jfinal-mica-mqtt-server"
+        - "mica-mqtt-broker 经供参考"
+        - "其他"
     validations:
       required: true
   - type: textarea
