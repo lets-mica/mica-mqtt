@@ -78,10 +78,8 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				}
 				// 2. 发布连接通知
 				publishConnectEvent(context);
-				// 3. 如果 session 不存在重连时发送重新订阅，更改 ip、端口之后需要重新发送订阅
-				if (!connAckVariableHeader.isSessionPresent() || MqttClient.isNeedReSub(context)) {
-					reSendSubscription(context);
-				}
+				// 3. 发送订阅，不管服务端是否存在 session 都发送
+				reSendSubscription(context);
 				break;
 			case CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD:
 			case CONNECTION_REFUSED_IDENTIFIER_REJECTED:

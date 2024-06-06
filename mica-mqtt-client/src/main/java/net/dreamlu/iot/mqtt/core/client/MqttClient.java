@@ -45,10 +45,6 @@ import java.util.stream.Collectors;
  */
 public final class MqttClient {
 	private static final Logger logger = LoggerFactory.getLogger(MqttClient.class);
-	/**
-	 * 是否需要重新订阅
-	 */
-	private static final String MQTT_NEED_RE_SUB = "MQTT_NEED_RE_SUB";
 	private final TioClient tioClient;
 	private final MqttClientCreator config;
 	private final TioClientConfig clientTioConfig;
@@ -517,22 +513,11 @@ public final class MqttClient {
 		}
 		try {
 			this.context = tioClient.connect(serverNode, config.getTimeout());
-			this.context.set(MQTT_NEED_RE_SUB, (byte) 1);
 			return true;
 		} catch (Exception e) {
 			logger.error("mqtt client reconnect error", e);
 		}
 		return false;
-	}
-
-	/**
-	 * 是否需要重新订阅
-	 *
-	 * @param context ChannelContext
-	 * @return 是否需要重新订阅
-	 */
-	public static boolean isNeedReSub(ChannelContext context) {
-		return context.getAndRemove(MQTT_NEED_RE_SUB) != null;
 	}
 
 	/**
