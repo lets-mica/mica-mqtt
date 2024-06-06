@@ -349,14 +349,16 @@ public final class MqttServer {
 		try {
 			tioServer.start(this.serverCreator.getIp(), this.serverCreator.getPort());
 		} catch (IOException e) {
-			throw new IllegalStateException("Mica mqtt tcp server start fail.", e);
+			String message = String.format("Mica mqtt tcp server port %d start fail.", this.serverCreator.getPort());
+			throw new IllegalStateException(message, e);
 		}
 		// 3. 启动 mqtt web
 		if (webServer != null) {
 			try {
 				webServer.start();
 			} catch (IOException e) {
-				throw new IllegalStateException("Mica mqtt http/websocket server start fail.", e);
+				String message = String.format("Mica mqtt http/websocket server port %d start fail.", this.serverCreator.getWebPort());
+				throw new IllegalStateException(message, e);
 			}
 		}
 		return true;
