@@ -26,6 +26,13 @@ body:
         - "其他"
     validations:
       required: true
+  - type: input
+    id: usage-scenarios
+    attributes:
+      label: 使用场景
+      description: 简述使用场景
+    validations:
+      required: true
   - type: textarea
     id: desired-solution
     attributes:
