@@ -137,18 +137,6 @@
     </scm>
 
     <repositories>
-        <!--阿里云主仓库，代理了 maven central 和 jcenter 仓库-->
-        <repository>
-            <id>aliyun</id>
-            <name>aliyun</name>
-            <url>https://maven.aliyun.com/repository/public</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
         <!-- 拉取快照版本的 mica-net -->
         <repository>
             <id>sonatype-nexus-snapshots</id>
@@ -236,6 +224,25 @@
     </licenses>
 
     <profiles>
+        <profile>
+            <id>develop</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>aliyun</id>
+                    <name>aliyun</name>
+                    <url>https://maven.aliyun.com/repository/public/</url>
+                    <snapshots>
+                        <enabled>false</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+        </profile>
         <profile>
             <id>snapshot</id>
             <distributionManagement>
