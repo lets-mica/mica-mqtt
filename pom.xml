@@ -24,7 +24,7 @@
         <mica.version>2.7.18.4</mica.version>
         <spring.boot.version>2.7.18</spring.boot.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <jfinal.version>5.1.7</jfinal.version>
+        <jfinal.version>5.1.9</jfinal.version>
         <tinylog.version>2.7.0</tinylog.version>
     </properties>
 
