@@ -14,7 +14,7 @@
     </parent>
 
     <properties>
-        <graalvm.version>23.1.1</graalvm.version>
+        <graalvm.version>24.0.1</graalvm.version>
         <mainClass.server>net.dreamlu.iot.mqtt.server.MqttServerTest</mainClass.server>
         <mainClass.client>net.dreamlu.iot.mqtt.client.MqttClientTest</mainClass.client>
     </properties>
@@ -64,12 +64,12 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.4.1</version>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-assembly-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.7.1</version>
                         <configuration>
                             <archive>
                                 <manifest>

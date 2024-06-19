@@ -17,14 +17,14 @@
         <!-- java version -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
-        <maven-flatten.version>1.2.2</maven-flatten.version>
+        <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
+        <maven-flatten.version>1.6.0</maven-flatten.version>
         <!-- mica-net version -->
         <mica-net.version>1.0.0</mica-net.version>
-        <mica.version>2.7.18.4</mica.version>
+        <mica.version>2.7.18.5</mica.version>
         <spring.boot.version>2.7.18</spring.boot.version>
         <fastjson.version>1.2.83</fastjson.version>
-        <jfinal.version>5.1.7</jfinal.version>
+        <jfinal.version>5.1.9</jfinal.version>
         <tinylog.version>2.7.0</tinylog.version>
     </properties>
 
@@ -156,13 +156,28 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <compilerArgument>-parameters</compilerArgument>
                 </configuration>
+            </plugin>
+            <!-- Source -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-- jar -->
             <plugin>
@@ -256,25 +271,11 @@
             <id>release</id>
             <build>
                 <plugins>
-                    <!-- Source -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-source-plugin</artifactId>
-                        <version>3.2.0</version>
-                        <executions>
-                            <execution>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>jar-no-fork</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
                     <!-- Javadoc -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.2.0</version>
+                        <version>3.7.0</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -288,7 +289,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.2.4</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>

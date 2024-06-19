@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "baseBranches": [
+    "dev"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "^com.alibaba:fastjson$",
+        "^net.dreamlu:mica-bom$",
+        "^org.springframework.boot:spring-boot-dependencies$",
+        "^org.springframework.boot:spring-boot-maven-plugin$"
+      ],
+      "enabled": false
+    }
+  ]
+}
