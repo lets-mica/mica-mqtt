@@ -3,6 +3,9 @@
   "extends": [
     "config:recommended"
   ],
+  "baseBranches": [
+    "dev"
+  ],
   "packageRules": [
     {
       "matchPackagePatterns": [
