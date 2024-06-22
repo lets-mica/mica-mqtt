@@ -45,7 +45,7 @@ public class MqttClientConnectListener {
 	@EventListener
 	public void onDisconnect(MqttDisconnectEvent event) {
 		logger.info("MqttDisconnectEvent:{}", event);
-		// 在断线时更新 clientId、username、password
+		// 在断线时更新 clientId、username、password，只能改这 3 个，不可调用其他方法。
 		mqttClientCreator.clientId("newClient" + System.currentTimeMillis())
 			.username("newUserName")
 			.password("newPassword");
