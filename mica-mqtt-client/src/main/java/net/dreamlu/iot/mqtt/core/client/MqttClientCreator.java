@@ -637,6 +637,8 @@ public final class MqttClientCreator {
 	/**
 	 * 连接测试
 	 *
+	 * @param timeout  timeout
+	 * @param timeUnit TimeUnit
 	 * @return MqttConnectReasonCode
 	 */
 	public MqttConnectReasonCode connectTest(long timeout, TimeUnit timeUnit) {
