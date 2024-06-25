@@ -2,7 +2,7 @@
 
 ## 发行版本
 
-### v2.3.1 - 2024-06-30
+### v2.3.1 - 2024-06-25
 - :sparkles: mica-mqtt-server 重构心跳，心跳检测模式默认为：最后接收的数据时间。gitee #I9R0SN #IA69SM 感谢 `@HY` `@tan90` 反馈。
 - :sparkles: mica-mqtt-server 优化端口占用的异常提示，方便排查。
 - :sparkles: mica-mqtt client 使用 mica-net 内置的心跳检测，内置心跳已重构。
