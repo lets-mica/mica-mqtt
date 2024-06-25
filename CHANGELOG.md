@@ -2,6 +2,15 @@
 
 ## 发行版本
 
+### v2.3.1 - 2024-06-30
+- :sparkles: mica-mqtt-server 重构心跳，心跳检测模式默认为：最后接收的数据时间。
+- :sparkles: mica-mqtt-server 优化端口占用的异常提示，方便排查。
+- :sparkles: mica-mqtt client 使用 mica-net 内置的心跳检测，内置心跳已重构。
+- :sparkles: mica-mqtt-client 重连不管服务端是否存在 session 都发送订阅。
+- :sparkles: 快照版也打 source jar 方便使用。
+- :sparkles: 添加 renovate bot 方便更新依赖和插件版本。
+- :sparkles: 优化 issue.yml 和 github action。
+
 ### v2.3.0 - 2024-05-26
 - :sparkles: mica-mqtt 优化 MqttQoS 枚举，改为 `MqttQoS.QOS0`，方便使用（不兼容）。
 - :sparkles: mica-mqtt-client 同步私服部分功能，支持 stop 完全停止。
