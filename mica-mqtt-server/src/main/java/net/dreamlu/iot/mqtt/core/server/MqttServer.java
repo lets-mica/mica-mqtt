@@ -96,7 +96,7 @@ public final class MqttServer {
 	 * @return the serverTioConfig
 	 */
 	public TioServerConfig getServerConfig() {
-		return this.tioServer.getTioServerConfig();
+		return this.tioServer.getServerConfig();
 	}
 
 	/**

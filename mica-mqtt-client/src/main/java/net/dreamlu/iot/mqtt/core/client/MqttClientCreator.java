@@ -25,6 +25,7 @@ import org.tio.client.intf.TioClientListener;
 import org.tio.core.Node;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.SslConfig;
+import org.tio.core.task.HeartbeatMode;
 import org.tio.utils.buffer.ByteBufferAllocator;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.thread.ThreadUtils;
@@ -579,28 +580,30 @@ public final class MqttClientCreator {
 			reconnConf = new ReconnConf(this.reInterval, this.retryCount);
 		}
 		// 6. tioConfig
-		TioClientConfig tioConfig = new TioClientConfig(clientAioHandler, clientAioListener, reconnConf, tioExecutor, groupExecutor);
-		tioConfig.setName(this.name);
-		// 7. 心跳超时时间，关闭默认的心跳检测，不符合 emqx
-		tioConfig.setHeartbeatTimeout(0);
+		TioClientConfig clientConfig = new TioClientConfig(clientAioHandler, clientAioListener, reconnConf, tioExecutor, groupExecutor);
+		clientConfig.setName(this.name);
+		// 7. 心跳超时时间
+		clientConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
+		// 设置心跳检测模式
+		clientConfig.setHeartbeatMode(HeartbeatMode.LAST_RESP);
 		// 8. mqtt 消息最大长度，小于 1 则使用默认的，可通过 property tio.default.read.buffer.size 设置默认大小
 		if (this.readBufferSize > 0) {
-			tioConfig.setReadBufferSize(this.readBufferSize);
+			clientConfig.setReadBufferSize(this.readBufferSize);
 		}
 		// 9. ssl 证书设置
-		tioConfig.setSslConfig(this.sslConfig);
+		clientConfig.setSslConfig(this.sslConfig);
 		// 10. 是否开启监控
-		tioConfig.statOn = this.statEnable;
+		clientConfig.statOn = this.statEnable;
 		if (this.debug) {
-			tioConfig.debug = true;
+			clientConfig.debug = true;
 		}
 		// 11. 自定义处理
 		if (this.tioConfigCustomize != null) {
-			this.tioConfigCustomize.accept(tioConfig);
+			this.tioConfigCustomize.accept(clientConfig);
 		}
 		// 12. tioClient
 		try {
-			TioClient tioClient = new TioClient(tioConfig);
+			TioClient tioClient = new TioClient(clientConfig);
 			return new MqttClient(tioClient, this);
 		} catch (Exception e) {
 			throw new IllegalStateException("Mica mqtt client start fail.", e);

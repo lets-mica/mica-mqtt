@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.TioConfig;
 import org.tio.core.ssl.ClientAuth;
 import org.tio.core.ssl.SslConfig;
+import org.tio.core.task.HeartbeatMode;
 import org.tio.http.common.HttpConfig;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
@@ -617,6 +618,8 @@ public class MqttServerCreator {
 		if (this.heartbeatTimeout != null) {
 			tioConfig.setHeartbeatTimeout(this.heartbeatTimeout);
 		}
+		tioConfig.setHeartbeatBackoff(this.keepaliveBackoff);
+		tioConfig.setHeartbeatMode(HeartbeatMode.LAST_RESP);
 		if (this.sslConfig != null) {
 			tioConfig.setSslConfig(this.sslConfig);
 		}

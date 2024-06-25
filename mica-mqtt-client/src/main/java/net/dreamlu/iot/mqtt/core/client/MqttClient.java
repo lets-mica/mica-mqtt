@@ -66,7 +66,6 @@ public final class MqttClient {
 		this.mqttExecutor = config.getMqttExecutor();
 		this.clientSession = config.getClientSession();
 		this.messageIdGenerator = config.getMessageIdGenerator();
-		startHeartbeatTask();
 	}
 
 	/**
@@ -451,9 +450,7 @@ public final class MqttClient {
 	 * @return TioClient
 	 */
 	MqttClient start(boolean sync) {
-		// 1. 启动 ack service
-		taskService.start();
-		// 2. 启动 tio
+		// 启动 tio
 		Node node = new Node(config.getIp(), config.getPort());
 		try {
 			if (sync) {
@@ -543,13 +540,11 @@ public final class MqttClient {
 	 * @return 是否停止成功
 	 */
 	public boolean stop() {
-		// 1. 先停止 ack 服务
-		this.taskService.stop();
-		// 2. 断开连接
+		// 1. 断开连接
 		this.disconnect();
-		// 3. 停止 tio
+		// 2. 停止 tio
 		boolean result = tioClient.stop();
-		// 4. 停止工作线程
+		// 3. 停止工作线程
 		try {
 			mqttExecutor.shutdown();
 		} catch (Exception e1) {
@@ -632,18 +627,6 @@ public final class MqttClient {
 	 */
 	public boolean isDisconnected() {
 		return !isConnected();
-	}
-
-	/**
-	 * mqtt 定时任务：发心跳
-	 */
-	private void startHeartbeatTask() {
-		final int keepAliveSecs = config.getKeepAliveSecs();
-		if (keepAliveSecs <= 0) {
-			logger.warn("用户取消了 mica-mqtt 的心跳定时发送功能，请用户自己去完成心跳机制");
-			return;
-		}
-		taskService.addTask(systemTimer -> new MqttClientHeartbeatTask(systemTimer, clientTioConfig, keepAliveSecs));
 	}
 
 }
