@@ -584,8 +584,8 @@ public final class MqttClientCreator {
 		clientConfig.setName(this.name);
 		// 7. 心跳超时时间
 		clientConfig.setHeartbeatTimeout(TimeUnit.SECONDS.toMillis(this.keepAliveSecs));
-		// 设置心跳检测模式
-		clientConfig.setHeartbeatMode(HeartbeatMode.LAST_RESP);
+		// 设置心跳检测模式为 LAST_REQ，keepAliveSecs 周期内，最后发送的时间差
+		clientConfig.setHeartbeatMode(HeartbeatMode.LAST_REQ);
 		// 8. mqtt 消息最大长度，小于 1 则使用默认的，可通过 property tio.default.read.buffer.size 设置默认大小
 		if (this.readBufferSize > 0) {
 			clientConfig.setReadBufferSize(this.readBufferSize);
