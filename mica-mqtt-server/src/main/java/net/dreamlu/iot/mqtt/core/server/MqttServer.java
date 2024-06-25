@@ -343,16 +343,14 @@ public final class MqttServer {
 	 * @return 是否启动
 	 */
 	public boolean start() {
-		// 1. 启动 taskService
-		taskService.start();
-		// 2. 启动 mqtt tcp
+		// 1. 启动 mqtt tcp
 		try {
 			tioServer.start(this.serverCreator.getIp(), this.serverCreator.getPort());
 		} catch (IOException e) {
 			String message = String.format("Mica mqtt tcp server port %d start fail.", this.serverCreator.getPort());
 			throw new IllegalStateException(message, e);
 		}
-		// 3. 启动 mqtt web
+		// 2. 启动 mqtt web
 		if (webServer != null) {
 			try {
 				webServer.start();
@@ -370,9 +368,7 @@ public final class MqttServer {
 	 * @return 是否停止
 	 */
 	public boolean stop() {
-		// 先停止 taskService 服务
-		this.taskService.stop();
-		// 再停止服务
+		// 停止服务
 		boolean result = this.tioServer.stop();
 		logger.info("Mqtt tcp server stop result:{}", result);
 		if (webServer != null) {
