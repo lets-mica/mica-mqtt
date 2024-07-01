@@ -19,6 +19,8 @@ package net.dreamlu.iot.mqtt.core.util;
 import net.dreamlu.iot.mqtt.codec.MqttCodecUtil;
 
 import java.util.List;
+import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 /**
  * Mqtt Topic 工具
@@ -26,6 +28,8 @@ import java.util.List;
  * @author L.cm
  */
 public final class TopicUtil {
+	public static final String TOPIC_LAYER = "/";
+	public static final Pattern VAR_PATTERN = Pattern.compile("\\$\\{(.*?)}");
 
 	/**
 	 * 校验 topicFilter
@@ -165,23 +169,29 @@ public final class TopicUtil {
 		return topicFilterLength + wildcardCharLen + 1 > topicNameLength;
 	}
 
+
 	/**
-	 * 获取处理完成之后的 topic
+	 * 获取处理完成之后的 topic，需要考虑 test/${abc}123 也要替换成 test/+ 而非 test/+123
 	 *
 	 * @param topicTemplate topic 模板
 	 * @return 获取处理完成之后的 topic
 	 */
 	public static String getTopicFilter(String topicTemplate) {
 		// 替换 ${name} 为 +
-		StringBuilder sb = new StringBuilder(topicTemplate.length());
-		int cursor = 0;
-		for (int start, end; (start = topicTemplate.indexOf("${", cursor)) != -1 && (end = topicTemplate.indexOf('}', start)) != -1; ) {
-			sb.append(topicTemplate, cursor, start);
-			sb.append('+');
-			cursor = end + 1;
+		StringTokenizer tokenizer = new StringTokenizer(topicTemplate, "/", true);
+		String token;
+		StringBuilder topicFilterBuilder = new StringBuilder();
+		while (tokenizer.hasMoreTokens()) {
+			token = tokenizer.nextToken();
+			if (TOPIC_LAYER.equals(token)) {
+				topicFilterBuilder.append(token);
+			} else if (VAR_PATTERN.matcher(token).find()) {
+				topicFilterBuilder.append(MqttCodecUtil.TOPIC_WILDCARDS_ONE);
+			} else {
+				topicFilterBuilder.append(token);
+			}
 		}
-		sb.append(topicTemplate.substring(cursor));
-		return sb.toString();
+		return topicFilterBuilder.toString();
 	}
 
 }
