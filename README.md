@@ -17,8 +17,6 @@
 
 [**迁移到 mica-mqtt 2.1.x**](docs/update.md)
 
-承接各种**协议解析(`TCP`、`UDP`)**，￥600起，按复杂度收费，详询：**DreamLuTech**（微信）
-
 ## 🍱 使用场景
 
 - 物联网（云端 mqtt broker）
@@ -146,18 +144,16 @@
 
 [![JetBrains](docs/img/jetbrains.png)](https://www.jetbrains.com/?from=mica-mqtt)
 
-感谢 `如梦技术 VIP` **小伙伴们**的鼎力支持，更多 **VIP** 信息详见：https://www.dreamlu.net/vip/index.html
-
 ## 🍱 捐助
 mica-mqtt 始于一份热爱，也得到不少朋友的认可，为了更好的发展，特推出赞助计划。**知识付费**，让你我走的更远！！！
 
-| 类型   | ￥   | 权益（永久）                                                             |
-|------|-----|--------------------------------------------------------------------|
-| 🏅捐助人 | 199 | **mica-mqtt私服加强版**、mica-net 源码。                                    |
+| 类型   | ￥   | 权益（永久）                                       |
+|------|-----|----------------------------------------------|
+| 🏅捐助人 | 199 | **mica-mqtt私服加强版**、mica-net 源码、专属交流群、技术咨询和建议 |
 
-[**BladeX 物联网平台**](https://iot.bladex.cn)
+**最佳实践：** [**BladeX 物联网平台**](https://iot.bladex.cn?from=mica-mqtt)
 
-**注意：** 捐助人限免加入**mica开源知识星球**，加微信 **DreamLuTech** 详聊。
+**注意：** 捐助人限免永久加入**mica开源知识星球**，加微信 **DreamLuTech** 详聊。
 
 ## 📱 微信
 
