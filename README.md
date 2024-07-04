@@ -110,7 +110,7 @@
 **配置详见**：[mica-mqtt-server 使用文档](mica-mqtt-server/README.md)
 
 ## 📝 文档
-- [mqtt科普、mqttx、mica-mqtt的使用**视频**](https://b23.tv/VJ8yc7v)
+- [mqtt科普、mqttx、mica-mqtt的使用**视频**](https://www.bilibili.com/video/BV1wv4y1F7Av/)
 - [mica-mqtt 快速开始](example/README.md)
 - [jfinal-mica-mqtt-client 使用文档](starter/jfinal-mica-mqtt-client/README.md)
 - [jfinal-mica-mqtt-server 使用文档](starter/jfinal-mica-mqtt-server/README.md)

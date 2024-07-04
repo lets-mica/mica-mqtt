@@ -107,7 +107,7 @@
 **Configuration Details**: [mica-mqtt-server Documentation](mica-mqtt-server/README.md)
 
 ## 📝 Documentation
-- [Introduction to MQTT, mqttx, and mica-mqtt **Video**](https://b23.tv/VJ8yc7v)
+- [Introduction to MQTT, mqttx, and mica-mqtt **Video**](https://www.bilibili.com/video/BV1wv4y1F7Av/)
 - [Getting Started with mica-mqtt](example/README.md)
 - [jfinal-mica-mqtt-client Documentation](starter/jfinal-mica-mqtt-client/README.md)
 - [jfinal-mica-mqtt-server Documentation](starter/jfinal-mica-mqtt-server/README.md)
