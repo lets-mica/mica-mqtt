@@ -109,7 +109,8 @@ public class MqttClientConfiguration {
 		return clientCreator;
 	}
 
-	@Bean
+	@Bean(MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN)
+	@ConditionalOnMissingBean(name = MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN)
 	public MqttClientTemplate mqttClientTemplate(MqttClientCreator mqttClientCreator) {
 		return new MqttClientTemplate(mqttClientCreator);
 	}
