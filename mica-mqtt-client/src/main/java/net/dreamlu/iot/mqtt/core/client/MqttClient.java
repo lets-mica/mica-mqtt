@@ -213,7 +213,7 @@ public final class MqttClient {
 		// 4. 已经连接成功，直接订阅逻辑，未连接成功的添加到订阅列表，连接成功时会重连。
 		ClientChannelContext clientContext = getContext();
 		if (clientContext != null && clientContext.isAccepted()) {
-			Boolean result = Tio.send(clientContext, message);
+			boolean result = Tio.send(clientContext, message);
 			logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
 			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
 			pendingSubscription.startRetransmitTimer(taskService, (msg) -> Tio.send(clientContext, message));
@@ -253,7 +253,7 @@ public final class MqttClient {
 			.messageId(messageId)
 			.build();
 		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilters, message);
-		Boolean result = Tio.send(getContext(), message);
+		boolean result = Tio.send(getContext(), message);
 		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilters, messageId, result);
 		// 4. 启动取消订阅线程
 		clientSession.addPaddingUnSubscribe(messageId, pendingUnSubscription);

@@ -240,7 +240,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					MqttMessage messageAck = MqttMessageBuilders.pubAck()
 						.packetId(packetId)
 						.build();
-					Boolean resultPubAck = Tio.send(context, messageAck);
+					boolean resultPubAck = Tio.send(context, messageAck);
 					logger.debug("Publish - PubAck send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubAck);
 				}
 				break;
@@ -248,7 +248,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				if (packetId != -1) {
 					MqttFixedHeader pubRecFixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.QOS0, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(pubRecFixedHeader, MqttMessageIdVariableHeader.from(packetId));
-					Boolean resultPubRec = Tio.send(context, pubRecMessage);
+					boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					sessionManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);

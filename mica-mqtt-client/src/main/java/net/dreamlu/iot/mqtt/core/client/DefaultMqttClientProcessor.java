@@ -171,7 +171,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		int messageId = messageIdGenerator.getId();
 		MqttSubscribeMessage message = MqttMessageBuilders.subscribe().addSubscriptions(topicSubscriptionList).messageId(messageId).build();
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(reSubscriptionList, message);
-		Boolean result = Tio.send(context, message);
+		boolean result = Tio.send(context, message);
 		logger.info("MQTT subscriptionList:{} messageId:{} resubscribing result:{}", reSubscriptionList, messageId, result);
 		pendingSubscription.startRetransmitTimer(taskService, (msg) -> Tio.send(context, msg));
 		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
@@ -248,7 +248,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 				if (packetId != -1) {
 					MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.QOS0, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(fixedHeader, MqttMessageIdVariableHeader.from(packetId));
-					Boolean resultPubRec = Tio.send(context, pubRecMessage);
+					boolean resultPubRec = Tio.send(context, pubRecMessage);
 					logger.debug("Publish - PubRec send topicName:{} mqttQoS:{} packetId:{} result:{}", topicName, mqttQoS, packetId, resultPubRec);
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					clientSession.addPendingQos2Publish(packetId, pendingQos2Publish);
