@@ -38,6 +38,8 @@ import org.tio.utils.timer.TimerTaskService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * mqtt 服务端
@@ -374,6 +376,20 @@ public final class MqttServer {
 		if (webServer != null) {
 			result &= webServer.stop();
 			logger.info("Mqtt websocket server stop result:{}", result);
+		}
+		// 停止工作线程
+		ExecutorService mqttExecutor = serverCreator.getMqttExecutor();
+		try {
+			mqttExecutor.shutdown();
+		} catch (Exception e1) {
+			logger.error(e1.getMessage(), e1);
+		}
+		try {
+			// 等待线程池中的任务结束，等待 10 分钟
+			result &= mqttExecutor.awaitTermination(10, TimeUnit.MINUTES);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			logger.error(e.getMessage(), e);
 		}
 		try {
 			sessionManager.clean();
