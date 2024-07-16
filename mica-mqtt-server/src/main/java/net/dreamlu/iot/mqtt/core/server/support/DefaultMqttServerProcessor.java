@@ -252,7 +252,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					sessionManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);
-					pendingQos2Publish.startPubRecRetransmitTimer(taskService, msg -> Tio.send(context, msg));
+					pendingQos2Publish.startPubRecRetransmitTimer(taskService, context);
 				}
 				break;
 			case FAILURE:
@@ -290,7 +290,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		Tio.send(context, pubRelMessage);
 
 		pendingPublish.setPubRelMessage(pubRelMessage);
-		pendingPublish.startPubRelRetransmissionTimer(taskService, msg -> Tio.send(context, msg));
+		pendingPublish.startPubRelRetransmissionTimer(taskService, context);
 	}
 
 	@Override

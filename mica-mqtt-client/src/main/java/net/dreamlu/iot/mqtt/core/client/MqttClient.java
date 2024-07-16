@@ -216,7 +216,7 @@ public final class MqttClient {
 			boolean result = Tio.send(clientContext, message);
 			logger.info("MQTT subscriptionList:{} messageId:{} subscribing result:{}", needSubscriptionList, messageId, result);
 			MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(needSubscriptionList, message);
-			pendingSubscription.startRetransmitTimer(taskService, (msg) -> Tio.send(clientContext, message));
+			pendingSubscription.startRetransmitTimer(taskService, clientContext);
 			clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 		} else {
 			clientSession.addSubscriptionList(needSubscriptionList);
@@ -253,11 +253,12 @@ public final class MqttClient {
 			.messageId(messageId)
 			.build();
 		MqttPendingUnSubscription pendingUnSubscription = new MqttPendingUnSubscription(topicFilters, message);
-		boolean result = Tio.send(getContext(), message);
+		ClientChannelContext clientContext = getContext();
+		boolean result = Tio.send(clientContext, message);
 		logger.info("MQTT Topic:{} messageId:{} unSubscribing result:{}", topicFilters, messageId, result);
 		// 4. 启动取消订阅线程
 		clientSession.addPaddingUnSubscribe(messageId, pendingUnSubscription);
-		pendingUnSubscription.startRetransmissionTimer(taskService, msg -> Tio.send(getContext(), msg));
+		pendingUnSubscription.startRetransmissionTimer(taskService, clientContext);
 		return this;
 	}
 
@@ -364,7 +365,7 @@ public final class MqttClient {
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			clientSession.addPendingPublish(messageId, pendingPublish);
-			pendingPublish.startPublishRetransmissionTimer(taskService, msg -> Tio.send(clientContext, msg));
+			pendingPublish.startPublishRetransmissionTimer(taskService, clientContext);
 		}
 		return result;
 	}

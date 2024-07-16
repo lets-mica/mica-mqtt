@@ -206,7 +206,7 @@ public final class MqttServer {
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			sessionManager.addPendingPublish(clientId, messageId, pendingPublish);
-			pendingPublish.startPublishRetransmissionTimer(taskService, msg -> Tio.send(context, msg));
+			pendingPublish.startPublishRetransmissionTimer(taskService, context);
 		}
 		return result;
 	}

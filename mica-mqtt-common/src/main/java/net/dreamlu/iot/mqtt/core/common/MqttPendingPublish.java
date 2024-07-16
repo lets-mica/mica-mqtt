@@ -3,11 +3,14 @@ package net.dreamlu.iot.mqtt.core.common;
 import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.MqttPublishMessage;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 import org.tio.utils.timer.TimerTaskService;
 
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * MqttPendingPublish，参考于 netty-mqtt-client
@@ -15,6 +18,7 @@ import java.util.function.Consumer;
  * @author netty
  */
 public final class MqttPendingPublish {
+	private static final Logger logger = LoggerFactory.getLogger(MqttPendingPublish.class);
 	private final byte[] payload;
 	private final MqttPublishMessage message;
 	private final MqttQoS qos;
@@ -40,9 +44,14 @@ public final class MqttPendingPublish {
 		return qos;
 	}
 
-	public void startPublishRetransmissionTimer(TimerTaskService taskService, Consumer<MqttMessage> sendPacket) {
+	public void startPublishRetransmissionTimer(TimerTaskService taskService, ChannelContext context) {
 		this.pubRetryProcessor.setHandle(((fixedHeader, originalMessage) -> {
-			sendPacket.accept(new MqttPublishMessage(fixedHeader, originalMessage.variableHeader(), this.payload));
+			boolean result = Tio.send(context, new MqttPublishMessage(fixedHeader, originalMessage.variableHeader(), this.payload));
+			if (context.isServer()) {
+				logger.info("retry send Publish msg clientId:{} qos:{} result:{}", context.getBsId(), qos, result);
+			} else {
+				logger.info("retry send Publish msg qos:{} result:{}", qos, result);
+			}
 		}));
 		this.pubRetryProcessor.start(taskService);
 	}
@@ -55,9 +64,15 @@ public final class MqttPendingPublish {
 		this.pubRelRetryProcessor.setOriginalMessage(pubRelMessage);
 	}
 
-	public void startPubRelRetransmissionTimer(TimerTaskService taskService, Consumer<MqttMessage> sendPacket) {
-		this.pubRelRetryProcessor.setHandle((fixedHeader, originalMessage) ->
-			sendPacket.accept(new MqttMessage(fixedHeader, originalMessage.variableHeader())));
+	public void startPubRelRetransmissionTimer(TimerTaskService taskService, ChannelContext context) {
+		this.pubRelRetryProcessor.setHandle((fixedHeader, originalMessage) -> {
+			boolean result = Tio.send(context, new MqttMessage(fixedHeader, originalMessage.variableHeader()));
+			if (context.isServer()) {
+				logger.info("retry send PubRel msg clientId:{} qos:{} result:{}", context.getBsId(), qos, result);
+			} else {
+				logger.info("retry send PubRel msg qos:{} result:{}", qos, result);
+			}
+		});
 		this.pubRelRetryProcessor.start(taskService);
 	}
 
@@ -74,12 +89,13 @@ public final class MqttPendingPublish {
 			return false;
 		}
 		MqttPendingPublish that = (MqttPendingPublish) o;
-		return Objects.equals(payload, that.payload) && Objects.equals(message, that.message) && qos == that.qos;
+		return Arrays.equals(payload, that.payload) && Objects.equals(message, that.message) && qos == that.qos;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(payload, message, qos);
+		int result = Objects.hash(message, qos);
+		result = 31 * result + Arrays.hashCode(payload);
+		return result;
 	}
-
 }

@@ -1,18 +1,21 @@
 package net.dreamlu.iot.mqtt.core.client;
 
-import net.dreamlu.iot.mqtt.codec.MqttMessage;
 import net.dreamlu.iot.mqtt.codec.MqttUnsubscribeMessage;
 import net.dreamlu.iot.mqtt.core.common.RetryProcessor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
 /**
  * MqttPendingSubscription，参考于 netty-mqtt-client
  */
 final class MqttPendingUnSubscription {
+	private static final Logger logger = LoggerFactory.getLogger(MqttPendingUnSubscription.class);
 	private final List<String> topics;
 	private final RetryProcessor<MqttUnsubscribeMessage> retryProcessor = new RetryProcessor<>();
 
@@ -21,17 +24,19 @@ final class MqttPendingUnSubscription {
 		this.retryProcessor.setOriginalMessage(unSubscribeMessage);
 	}
 
-	protected List<String> getTopics() {
+	List<String> getTopics() {
 		return topics;
 	}
 
-	protected void startRetransmissionTimer(TimerTaskService taskService, Consumer<MqttMessage> sendPacket) {
-		this.retryProcessor.setHandle((fixedHeader, originalMessage) ->
-			sendPacket.accept(new MqttUnsubscribeMessage(fixedHeader, originalMessage.variableHeader(), originalMessage.payload())));
+	void startRetransmissionTimer(TimerTaskService taskService, ChannelContext context) {
+		this.retryProcessor.setHandle((fixedHeader, originalMessage) -> {
+			boolean result = Tio.send(context, new MqttUnsubscribeMessage(fixedHeader, originalMessage.variableHeader(), originalMessage.payload()));
+			logger.info("retry send Unsubscribe topics:{} result:{}", topics, result);
+		});
 		this.retryProcessor.start(taskService);
 	}
 
-	protected void onUnSubAckReceived() {
+	void onUnSubAckReceived() {
 		this.retryProcessor.stop();
 	}
 

@@ -173,7 +173,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		MqttPendingSubscription pendingSubscription = new MqttPendingSubscription(reSubscriptionList, message);
 		boolean result = Tio.send(context, message);
 		logger.info("MQTT subscriptionList:{} messageId:{} resubscribing result:{}", reSubscriptionList, messageId, result);
-		pendingSubscription.startRetransmitTimer(taskService, (msg) -> Tio.send(context, msg));
+		pendingSubscription.startRetransmitTimer(taskService, context);
 		clientSession.addPaddingSubscribe(messageId, pendingSubscription);
 	}
 
@@ -252,7 +252,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 					logger.debug("Publish - PubRec send topicName:{} mqttQoS:{} packetId:{} result:{}", topicName, mqttQoS, packetId, resultPubRec);
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
 					clientSession.addPendingQos2Publish(packetId, pendingQos2Publish);
-					pendingQos2Publish.startPubRecRetransmitTimer(taskService, msg -> Tio.send(context, msg));
+					pendingQos2Publish.startPubRecRetransmitTimer(taskService, context);
 				}
 				break;
 			case FAILURE:
@@ -309,7 +309,7 @@ public class DefaultMqttClientProcessor implements IMqttClientProcessor {
 		Tio.send(context, pubRelMessage);
 
 		pendingPublish.setPubRelMessage(pubRelMessage);
-		pendingPublish.startPubRelRetransmissionTimer(taskService, (msg) -> Tio.send(context, msg));
+		pendingPublish.startPubRelRetransmissionTimer(taskService, context);
 	}
 
 	@Override
