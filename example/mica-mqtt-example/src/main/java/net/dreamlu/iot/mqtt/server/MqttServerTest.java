@@ -21,8 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * mqtt 服务端测试
@@ -66,13 +64,12 @@ public class MqttServerTest {
 			.debug()
 			.start();
 
-		Timer timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				String message = "mica最牛皮 " + System.currentTimeMillis();
-				mqttServer.publishAll("/test/123", message.getBytes(StandardCharsets.UTF_8));
-			}
-		}, 1000, 2000);
+		mqttServer.getTioServer().schedule(() -> {
+			String message = "mica最牛皮 " + System.currentTimeMillis();
+			mqttServer.publishAll("/test/123", message.getBytes(StandardCharsets.UTF_8));
+		}, 2000);
+
+		// 2.3.2 开始支持 stop 关闭
+//		mqttServer.stop();
 	}
 }
