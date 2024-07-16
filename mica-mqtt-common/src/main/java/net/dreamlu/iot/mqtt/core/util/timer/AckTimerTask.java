@@ -59,10 +59,11 @@ public class AckTimerTask extends TimerTask {
 	@Override
 	public void run() {
 		if (++count <= maxRetryCount + 1) {
+			// 收先添加任务，保证后续执行
+			timer.add(this);
+			log.debug("Mqtt ack task retry running count：{}.", count);
 			try {
-				log.info("Mqtt ack task retry running.");
 				command.run();
-				timer.add(this);
 			} catch (Exception e) {
 				log.error("Mqtt ack task error ", e);
 			}
