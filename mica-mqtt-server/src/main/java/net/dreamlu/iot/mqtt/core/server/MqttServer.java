@@ -34,10 +34,12 @@ import org.tio.core.Tio;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.timer.TimerTask;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -318,6 +320,52 @@ public final class MqttServer {
 		retainMessage.setTimestamp(System.currentTimeMillis());
 		retainMessage.setNode(serverCreator.getNodeName());
 		this.messageStore.addRetainMessage(topic, retainMessage);
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay) {
+		return this.tioServer.schedule(command, delay);
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay, Executor executor) {
+		return this.tioServer.schedule(command, delay, executor);
+	}
+
+	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay) {
+		return this.tioServer.scheduleOnce(command, delay, null);
+	}
+
+	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay, Executor executor) {
+		return this.tioServer.scheduleOnce(command, delay, executor);
 	}
 
 	/**

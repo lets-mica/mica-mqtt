@@ -64,7 +64,7 @@ public class MqttServerTest {
 			.debug()
 			.start();
 
-		mqttServer.getTioServer().schedule(() -> {
+		mqttServer.schedule(() -> {
 			String message = "mica最牛皮 " + System.currentTimeMillis();
 			mqttServer.publishAll("/test/123", message.getBytes(StandardCharsets.UTF_8));
 		}, 2000);
