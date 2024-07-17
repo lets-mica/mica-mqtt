@@ -46,7 +46,8 @@ public class RedisMqttMessageDispatcher implements IMqttMessageDispatcher {
 		// 手动序列化和反序列化，避免 redis 序列化不一致问题
 		String topic = message.getTopic();
 		String key = topic == null ? message.getClientId() : topic;
-		streamTemplate.send(channel, key, message, messageSerializer::serialize);
+		long maxLen = 10_0000;
+		streamTemplate.send(channel, key, message, messageSerializer::serialize, maxLen);
 		return true;
 	}
 
