@@ -2,7 +2,7 @@
 
 ## 发行版本
 
-### v2.3.2 - 2024-07-20
+### v2.3.2 - 2024-07-19
 - :sparkles: mica-mqtt-server 可停止，同步捐助版。
 - :sparkles: mica-mqtt-server 添加 schedule 系列方法，同步捐助版。
 - :sparkles: mica-mqtt 代码优化 TopicUtil 优化 getTopicFilter 方法。
