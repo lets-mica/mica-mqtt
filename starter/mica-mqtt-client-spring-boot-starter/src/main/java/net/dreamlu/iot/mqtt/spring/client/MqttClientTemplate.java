@@ -16,6 +16,9 @@
 
 package net.dreamlu.iot.mqtt.spring.client;
 
+import lombok.Getter;
+import net.dreamlu.iot.mqtt.codec.MqttMessageBuilders;
+import net.dreamlu.iot.mqtt.codec.MqttProperties;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.client.*;
 import org.springframework.beans.BeansException;
@@ -28,8 +31,11 @@ import org.springframework.core.Ordered;
 import org.tio.client.ClientChannelContext;
 import org.tio.client.TioClient;
 import org.tio.client.TioClientConfig;
+import org.tio.utils.timer.TimerTask;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 /**
  * mqtt client 模板
@@ -38,6 +44,7 @@ import java.util.List;
  */
 public class MqttClientTemplate implements ApplicationContextAware, SmartInitializingSingleton, InitializingBean, DisposableBean, Ordered {
 	public static final String DEFAULT_CLIENT_TEMPLATE_BEAN = "mqttClientTemplate";
+	@Getter
 	private final MqttClientCreator clientCreator;
 	private ApplicationContext applicationContext;
 	private MqttClient client;
@@ -88,7 +95,32 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 * @return MqttClient
 	 */
 	public MqttClient subscribe(MqttQoS mqttQoS, String topicFilter, IMqttClientMessageListener listener) {
+		return client.subscribe(mqttQoS, topicFilter, listener);
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param mqttQoS     MqttQoS
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener) {
 		return client.subscribe(topicFilter, mqttQoS, listener);
+	}
+
+	/**
+	 * 订阅
+	 *
+	 * @param mqttQoS     MqttQoS
+	 * @param topicFilter topicFilter
+	 * @param listener    MqttMessageListener
+	 * @param properties  MqttProperties
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String topicFilter, MqttQoS mqttQoS, IMqttClientMessageListener listener, MqttProperties properties) {
+		return client.subscribe(topicFilter, mqttQoS, listener, properties);
 	}
 
 	/**
@@ -104,6 +136,19 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	}
 
 	/**
+	 * 订阅
+	 *
+	 * @param topicFilters topicFilter 数组
+	 * @param mqttQoS      MqttQoS
+	 * @param listener     MqttMessageListener
+	 * @param properties   MqttProperties
+	 * @return MqttClient
+	 */
+	public MqttClient subscribe(String[] topicFilters, MqttQoS mqttQoS, IMqttClientMessageListener listener, MqttProperties properties) {
+		return client.subscribe(topicFilters, mqttQoS, listener, properties);
+	}
+
+	/**
 	 * 批量订阅
 	 *
 	 * @param subscriptionList 订阅集合
@@ -114,13 +159,24 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	}
 
 	/**
-	 * 取消订阅
+	 * 批量订阅
 	 *
-	 * @param topicFilter topicFilter
+	 * @param subscriptionList 订阅集合
+	 * @param properties       MqttProperties
 	 * @return MqttClient
 	 */
-	public MqttClient unSubscribe(String... topicFilter) {
-		return client.unSubscribe(topicFilter);
+	public MqttClient subscribe(List<MqttClientSubscription> subscriptionList, MqttProperties properties) {
+		return client.subscribe(subscriptionList, properties);
+	}
+
+	/**
+	 * 取消订阅
+	 *
+	 * @param topicFilters topicFilter 集合
+	 * @return MqttClient
+	 */
+	public MqttClient unSubscribe(String... topicFilters) {
+		return client.unSubscribe(topicFilters);
 	}
 
 	/**
@@ -153,7 +209,19 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 * @return 是否发送成功
 	 */
 	public boolean publish(String topic, byte[] payload, MqttQoS qos) {
-		return client.publish(topic, payload, qos, false);
+		return client.publish(topic, payload, qos);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息内容
+	 * @param retain  是否在服务器上保留消息
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, byte[] payload, boolean retain) {
+		return client.publish(topic, payload, retain);
 	}
 
 	/**
@@ -167,6 +235,79 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 */
 	public boolean publish(String topic, byte[] payload, MqttQoS qos, boolean retain) {
 		return client.publish(topic, payload, qos, retain);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic      topic
+	 * @param payload    消息体
+	 * @param qos        MqttQoS
+	 * @param retain     是否在服务器上保留消息
+	 * @param properties MqttProperties
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, byte[] payload, MqttQoS qos, boolean retain, MqttProperties properties) {
+		return client.publish(topic, payload, qos, retain, properties);
+	}
+
+	/**
+	 * 发布消息
+	 *
+	 * @param topic   topic
+	 * @param payload 消息体
+	 * @param qos     MqttQoS
+	 * @param builder PublishBuilder
+	 * @return 是否发送成功
+	 */
+	public boolean publish(String topic, byte[] payload, MqttQoS qos, Consumer<MqttMessageBuilders.PublishBuilder> builder) {
+		return client.publish(topic, payload, qos, builder);
+	}
+
+	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay) {
+		return client.schedule(command, delay);
+	}
+
+	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay, Executor executor) {
+		return client.schedule(command, delay, executor);
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay) {
+		return client.scheduleOnce(command, delay);
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay, Executor executor) {
+		return client.scheduleOnce(command, delay, executor);
 	}
 
 	/**
@@ -203,15 +344,6 @@ public class MqttClientTemplate implements ApplicationContextAware, SmartInitial
 	 */
 	public TioClient getTioClient() {
 		return client.getTioClient();
-	}
-
-	/**
-	 * 获取配置
-	 *
-	 * @return MqttClientCreator
-	 */
-	public MqttClientCreator getClientCreator() {
-		return clientCreator;
 	}
 
 	/**
