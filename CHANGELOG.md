@@ -2,14 +2,15 @@
 
 ## 发行版本
 
-### v2.3.2 - 2024-07-19
+### v2.3.3 - 2024-07-22
 - :sparkles: mica-mqtt-server 可停止，同步捐助版。
 - :sparkles: mica-mqtt-server 添加 schedule 系列方法，同步捐助版。
 - :sparkles: mica-mqtt 代码优化 TopicUtil 优化 getTopicFilter 方法。
 - :sparkles: mica-mqtt 优化 AckTimerTask 和 retry 重发日志。gitee #IABQ7L 感谢 `@tan90` 反馈。
 - :sparkles: mica-mqtt-client-spring-boot-starter 更加方便自定义 MqttClientTemplate。
 - :sparkles: mica-mqtt-client-spring-boot-starter MqttClientTemplate 暴露更多方法，方便使用。
-- :bug: mica-mqtt-client 修复 ssl 服务端重启问题 gitee #IA9FFW 感谢 `@geekerstar` 反馈。
+- :sparkles: mica-mqtt-example 添加 ssl 测试代码
+- :bug: mica-mqtt-client 修复 ssl 服务端重启问题 gitee #IA9FFW #IAEHOD 感谢 `@geekerstar` `@hangrj` 反馈。
 
 ### v2.3.1 - 2024-06-25
 - :sparkles: mica-mqtt-server 重构心跳，心跳检测模式默认为：最后接收的数据时间。gitee #I9R0SN #IA69SM 感谢 `@HY` `@tan90` 反馈。
