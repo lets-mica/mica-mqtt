@@ -94,7 +94,12 @@ public class InMemoryMqttSessionManager implements IMqttSessionManager {
 		} else if (filterType == TopicFilterType.QUEUE) {
 			map = queueSubscribeStore.get(topicFilter);
 		} else {
-			map = shareSubscribeStore.get(TopicFilterType.getShareGroupName(topicFilter)).get(topicFilter);
+			String groupName = TopicFilterType.getShareGroupName(topicFilter);
+			Map<String, Map<String, Integer>> groupMap = shareSubscribeStore.get(groupName);
+			if (groupMap == null) {
+				return;
+			}
+			map = groupMap.get(topicFilter);
 		}
 		if (map == null) {
 			return;
