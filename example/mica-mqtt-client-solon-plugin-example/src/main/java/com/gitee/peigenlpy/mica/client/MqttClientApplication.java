@@ -2,7 +2,6 @@ package com.gitee.peigenlpy.mica.client;
 
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Configuration;
-import org.noear.solon.annotation.Import;
 
 /**
  * @author wsq
