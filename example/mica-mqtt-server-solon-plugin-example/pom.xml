@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <artifactId>mica-mqtt</artifactId>
+        <groupId>net.dreamlu</groupId>
+        <version>${revision}</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>mica-mqtt-server-solon-plugin-example</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.dreamlu</groupId>
+            <artifactId>mica-mqtt-server-solon-plugin</artifactId>
+        </dependency>
+        <!-- 简单的本地定时任务调度 -->
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.scheduling.simple</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.logging.logback</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

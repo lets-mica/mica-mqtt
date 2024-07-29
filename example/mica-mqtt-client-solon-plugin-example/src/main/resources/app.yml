@@ -1,0 +1,29 @@
+server:
+  port: 30303
+# mqtt-client 配置
+mqtt:
+  client:
+    enabled: true               # 是否开启客户端，默认：true
+    ip: 127.0.0.1               # 连接的服务端 ip ，默认：127.0.0.1
+    port: 18889                  # 端口：默认：1883
+    name: Mica-Mqtt-Client      # 名称，默认：Mica-Mqtt-Client
+#    clientId: 000001            # 客户端Id（非常重要，一般为设备 sn，不可重复）
+#    user-name: mica             # 认证的用户名
+#    password: mica            # 认证的密码
+#    timeout: 5                  # 超时时间，单位：秒，默认：5秒
+#    reconnect: true             # 是否重连，默认：true
+#    re-interval: 5000           # 重连时间，默认 5000 毫秒
+#    version: mqtt_3_1_1         # mqtt 协议版本，可选 MQTT_3_1、mqtt_3_1_1、mqtt_5，默认：mqtt_3_1_1
+#    read-buffer-size: 8KB       # 接收数据的 buffer size，默认：8k
+#    max-bytes-in-message: 10MB  # 消息解析最大 bytes 长度，默认：10M
+#    buffer-allocator: heap      # 堆内存和堆外内存，默认：堆内存
+#    keep-alive-secs: 60         # keep-alive 时间，单位：秒
+#    clean-session: true         # mqtt clean session，默认：true
+#    ssl:
+#      enabled: false            # 是否开启 ssl 认证，2.1.0 开始支持双向认证
+#      keystore-path:            # 可选参数：ssl 双向认证 keystore 目录，支持 classpath:/ 路径。
+#      keystore-pass:            # 可选参数：ssl 双向认证 keystore 密码
+#      truststore-path:          # 可选参数：ssl 双向认证 truststore 目录，支持 classpath:/ 路径。
+#      truststore-pass:          # 可选参数：ssl 双向认证 truststore 密码
+
+topic1: /test/#
