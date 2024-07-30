@@ -59,11 +59,11 @@ public class MqttServerProperties {
 	/**
 	 * 接收数据的 buffer size，默认：8k
 	 */
-	private DataSize readBufferSize = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_READ_BUFFER_SIZE);
+	private String readBufferSize = "8k";
 	/**
 	 * 消息解析最大 bytes 长度，默认：10M
 	 */
-	private DataSize maxBytesInMessage = DataSize.ofBytes(MqttConstant.DEFAULT_MAX_BYTES_IN_MESSAGE);
+	private String maxBytesInMessage = "10M";
 	/**
 	 * 堆内存和堆外内存
 	 */
