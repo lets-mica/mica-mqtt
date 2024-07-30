@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * <b>(MqttClientPluginImpl)</b>
@@ -117,7 +118,7 @@ public class MqttClientPluginImpl implements Plugin {
 		// 1. 替换 solon cfg 变量
 		// 2. 替换订阅中的其他变量
 		return Arrays.stream(anno.value())
-			.map(Solon.cfg()::getByTmpl)
+			.map((x) -> Optional.ofNullable(Solon.cfg().getByTmpl(x)).orElse(x))
 			.map(TopicUtil::getTopicFilter)
 			.toArray(String[]::new);
 	}
