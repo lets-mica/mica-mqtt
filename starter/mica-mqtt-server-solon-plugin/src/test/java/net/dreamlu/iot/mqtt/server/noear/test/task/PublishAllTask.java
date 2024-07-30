@@ -1,4 +1,4 @@
-package com.gitee.peigenlpy.mica.server.test.task;
+package net.dreamlu.iot.mqtt.server.noear.test.task;
 
 import net.dreamlu.iot.mqtt.server.noear.MqttServerTemplate;
 import org.noear.solon.annotation.Component;

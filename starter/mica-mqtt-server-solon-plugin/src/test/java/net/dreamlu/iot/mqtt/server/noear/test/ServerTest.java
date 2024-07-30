@@ -1,4 +1,4 @@
-package com.gitee.peigenlpy.mica.server.test;
+package net.dreamlu.iot.mqtt.server.noear.test;
 
 import org.noear.solon.Solon;
 import org.noear.solon.scheduling.annotation.EnableScheduling;

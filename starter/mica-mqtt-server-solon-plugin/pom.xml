@@ -25,26 +25,26 @@
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-net-http</artifactId>
         </dependency>
+        <!-- 简单的本地定时任务调度 -->
         <dependency>
-            <groupId>com.alibaba</groupId>
-            <artifactId>fastjson</artifactId>
-            <scope>provided</scope>
+            <groupId>org.noear</groupId>
+            <artifactId>solon-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <scope>provided</scope>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.scheduling.simple</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.noear</groupId>
+            <artifactId>solon.logging.simple</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <!-- 简单的本地定时任务调度 -->
-        <dependency>
-            <groupId>org.noear</groupId>
-            <artifactId>solon.scheduling.simple</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

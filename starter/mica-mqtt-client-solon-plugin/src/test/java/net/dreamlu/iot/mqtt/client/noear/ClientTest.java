@@ -1,4 +1,4 @@
-package com.gitee.peigenlpy.mica.client;
+package net.dreamlu.iot.mqtt.noear;
 
 import net.dreamlu.iot.mqtt.client.noear.MqttClientTemplate;
 import org.noear.solon.Solon;
