@@ -1,5 +1,6 @@
 package com.gitee.peigenlpy.mica.client;
 
+import net.dreamlu.iot.mqtt.client.noear.MqttClientTemplate;
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.annotation.Inject;
@@ -22,7 +23,7 @@ public class ClientTest implements EventListener<AppLoadEndEvent> {
 	}
 
 	@Inject
-	MqttClientTemplate client;
+    MqttClientTemplate client;
 
 	@Override
 	public void onEvent(AppLoadEndEvent event) throws Throwable {

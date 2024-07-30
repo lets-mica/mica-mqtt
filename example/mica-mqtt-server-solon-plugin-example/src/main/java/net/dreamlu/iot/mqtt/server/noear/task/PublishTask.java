@@ -1,4 +1,4 @@
-package com.gitee.peigenlpy.mica.server.test.task;
+package net.dreamlu.iot.mqtt.server.noear.task;
 
 import net.dreamlu.iot.mqtt.server.noear.MqttServerTemplate;
 import org.noear.solon.annotation.Component;
@@ -11,14 +11,13 @@ import java.nio.charset.StandardCharsets;
  * @author wsq
  */
 @Component
-public class PublishAllTask {
+public class PublishTask {
 	@Inject
 	private MqttServerTemplate mqttServerTemplate;
 
 	@Scheduled(fixedDelay = 1000)
-	public void run() {
+	public void publish() {
 		boolean b = mqttServerTemplate.publishAll("/test/123", "mica最牛皮".getBytes(StandardCharsets.UTF_8));
-		System.out.println(b);
 	}
 
 }

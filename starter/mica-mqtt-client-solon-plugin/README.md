@@ -1,12 +1,12 @@
 # mica-mqtt-client-solon-plugin 使用文档
-本插件是完全基于[mica-mqtt](https://gitee.com/596392912/mica-mqtt)，是适用于[Solon](https://gitee.com/noear/solon)的插件。
-开源项目不容易，如果觉得本项目对您的工作还是有帮助的话，请在帮忙在[mica-mqtt-solon-plugin](https://gitee.com/peigenlpy/mica-mqtt-solon-plugin)点一下Star(页面右上角)，谢谢。
+
+本插件基于 https://gitee.com/peigenlpy/mica-mqtt-solon-plugin 调整合并到官方（已经过作者同意）。
 
 ## 一、添加依赖
 
 ```xml
 <dependency>
-    <groupId>com.gitee.peigenlpy</groupId>
+    <groupId>net.dreamlu</groupId>
     <artifactId>mica-mqtt-client-solon-plugin-parent</artifactId>
     <version>${version}</version>
 </dependency>
