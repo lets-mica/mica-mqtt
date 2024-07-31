@@ -10,8 +10,9 @@ printf "\n"
 
 ## 3. 环境
 profile=${1:"release"}
+printf "profile %s \n" "$profile"
 
-## 4. deploy
+## 4. modules
 modules="mica-mqtt-codec,mica-mqtt-common,"
 modules="$modules mica-mqtt-client,mica-mqtt-server,"
 modules="$modules starter/mica-mqtt-client-spring-boot-starter,"
@@ -20,6 +21,9 @@ modules="$modules starter/mica-mqtt-client-solon-plugin,"
 modules="$modules starter/mica-mqtt-server-solon-plugin,"
 modules="$modules starter/mica-mqtt-client-jfinal-plugin,"
 modules="$modules starter/mica-mqtt-server-jfinal-plugin"
+printf "modules %s \n" "$modules"
+
+## 5. deploy
 if [ "$profile" == "snapshot" ]; then
     mvn clean package deploy -P!develop,snapshot -pl "$modules"
 else
