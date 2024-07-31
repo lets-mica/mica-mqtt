@@ -21,7 +21,7 @@ modules="$modules starter/mica-mqtt-server-solon-plugin,"
 modules="$modules starter/mica-mqtt-client-jfinal-plugin,"
 modules="$modules starter/mica-mqtt-server-jfinal-plugin"
 if [ "$profile" == "snapshot" ]; then
-    mvn clean package deploy -Psnapshot,!develop -pl "$modules"
+    mvn clean package deploy -P!develop,snapshot -pl "$modules"
 else
     mvn clean package deploy -Prelease -pl "$modules"
 fi

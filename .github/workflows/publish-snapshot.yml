@@ -23,9 +23,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSWORD
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
       - name: Publish to the Maven Central Repository
-        run: |
-          chmod +x ./deploy.sh
-          ./deploy.sh snapshot
+        run: chmod +x ./deploy.sh && ./deploy.sh snapshot
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
