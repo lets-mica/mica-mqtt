@@ -22,6 +22,7 @@
         <dependency>
             <groupId>org.noear</groupId>
             <artifactId>solon-api</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.noear</groupId>
