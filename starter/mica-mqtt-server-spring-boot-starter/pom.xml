@@ -8,9 +8,8 @@
 
     <parent>
         <groupId>net.dreamlu</groupId>
-        <artifactId>mica-mqtt</artifactId>
+        <artifactId>starter</artifactId>
         <version>${revision}</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <dependencies>

@@ -6,7 +6,7 @@
 ```xml
 <dependency>
 	<groupId>net.dreamlu</groupId>
-	<artifactId>jfinal-mica-mqtt-server</artifactId>
+	<artifactId>mica-mqtt-server-jfinal-plugin</artifactId>
 	<version>${最新版本}</version>
 </dependency>
 ```

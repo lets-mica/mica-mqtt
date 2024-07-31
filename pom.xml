@@ -35,17 +35,8 @@
         <module>mica-mqtt-client</module>
         <module>mica-mqtt-server</module>
         <module>mica-mqtt-broker</module>
-        <module>starter/mica-mqtt-client-spring-boot-starter</module>
-        <module>starter/mica-mqtt-server-spring-boot-starter</module>
-        <module>starter/mica-mqtt-client-solon-plugin</module>
-        <module>starter/mica-mqtt-server-solon-plugin</module>
-        <module>starter/jfinal-mica-mqtt-client</module>
-        <module>starter/jfinal-mica-mqtt-server</module>
-        <module>example/mica-mqtt-example</module>
-        <module>example/mica-mqtt-client-spring-boot-example</module>
-        <module>example/mica-mqtt-server-spring-boot-example</module>
-        <module>example/mica-mqtt-client-solon-plugin-example</module>
-        <module>example/mica-mqtt-server-solon-plugin-example</module>
+        <module>example</module>
+        <module>starter</module>
     </modules>
 
     <dependencyManagement>

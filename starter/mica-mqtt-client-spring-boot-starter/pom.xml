@@ -7,10 +7,9 @@
     <name>${project.artifactId}</name>
 
     <parent>
-        <artifactId>mica-mqtt</artifactId>
         <groupId>net.dreamlu</groupId>
+        <artifactId>starter</artifactId>
         <version>${revision}</version>
-        <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <dependencies>

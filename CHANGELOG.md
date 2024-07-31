@@ -2,6 +2,11 @@
 
 ## 发行版本
 
+### v2.3.4 - 2024-08-10
+- :sparkles: mica-mqtt 合入 `mica-mqtt-client-solon-plugin` 和 `mica-mqtt-server-solon-plugin` 感谢 `@peigenlpy`
+- :sparkles: jfinal 插件重命名为 `mica-mqtt-client-jfinal-plugin` 和 `mica-mqtt-server-jfinal-plugin`
+- :bug: mica-mqtt-server 修复分组订阅删除，感谢 `@tangjj` 反馈。
+
 ### v2.3.3 - 2024-07-22
 - :sparkles: mica-mqtt-server 可停止，同步捐助版。
 - :sparkles: mica-mqtt-server 添加 schedule 系列方法，同步捐助版。
