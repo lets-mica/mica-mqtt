@@ -8,7 +8,10 @@ printf "\n"
 mvn -version
 printf "\n"
 
-## 3. deploy
+## 3. 环境
+profile=${1:"release"}
+
+## 4. deploy
 modules="mica-mqtt-codec,mica-mqtt-common,"
 modules="$modules mica-mqtt-client,mica-mqtt-server,"
 modules="$modules starter/mica-mqtt-client-spring-boot-starter,"
@@ -17,4 +20,8 @@ modules="$modules starter/mica-mqtt-client-solon-plugin,"
 modules="$modules starter/mica-mqtt-server-solon-plugin,"
 modules="$modules starter/mica-mqtt-client-jfinal-plugin,"
 modules="$modules starter/mica-mqtt-server-jfinal-plugin"
-mvn clean package deploy -Prelease -pl "$modules"
+if [ "$profile" == "snapshot" ]; then
+    mvn clean package deploy -Psnapshot,!develop -pl "$modules"
+else
+    mvn clean package deploy -Prelease -pl "$modules"
+fi

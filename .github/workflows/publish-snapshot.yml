@@ -24,7 +24,8 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
       - name: Publish to the Maven Central Repository
         run: |
-          mvn clean package deploy -Psnapshot,!develop -pl mica-mqtt-codec,mica-mqtt-common,mica-mqtt-client,mica-mqtt-server,starter/mica-mqtt-client-spring-boot-starter,starter/mica-mqtt-server-spring-boot-starter,starter/jfinal-mica-mqtt-client,starter/jfinal-mica-mqtt-server
+          chmod +x ./deploy.sh
+          ./deploy.sh snapshot
         env:
           MAVEN_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.OSSRH_TOKEN }}
