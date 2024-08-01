@@ -85,7 +85,53 @@
 
 **配置详见**：[mica-mqtt-server-spring-boot-starter 使用文档](starter/mica-mqtt-server-spring-boot-starter/README.md)
 
-### 非 Spring boot 项目
+### solon 项目
+**客户端：**
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-client-solon-plugin</artifactId>
+  <version>${mica-mqtt.version}</version>
+</dependency>
+```
+
+**配置详见**：[mica-mqtt-client-solon-plugin 使用文档](starter/mica-mqtt-client-solon-plugin/README.md)
+
+**服务端：**
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-server-solon-plugin</artifactId>
+  <version>${mica-mqtt.version}</version>
+</dependency>
+```
+
+**配置详见**：[mica-mqtt-server-solon-plugin 使用文档](starter/mica-mqtt-server-solon-plugin/README.md)
+
+### JFinal 项目
+**客户端：**
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-client-jfinal-plugin</artifactId>
+  <version>${mica-mqtt.version}</version>
+</dependency>
+```
+
+**配置详见**：[mica-mqtt-client-jfinal-plugin 使用文档](starter/mica-mqtt-client-jfinal-plugin/README.md)
+
+**服务端：**
+```xml
+<dependency>
+  <groupId>net.dreamlu</groupId>
+  <artifactId>mica-mqtt-server-jfinal-plugin</artifactId>
+  <version>${mica-mqtt.version}</version>
+</dependency>
+```
+
+**配置详见**：[mica-mqtt-server-jfinal-plugin 使用文档](starter/mica-mqtt-server-jfinal-plugin/README.md)
+
+### 其他项目
 
 ### 客户端
 ```xml
