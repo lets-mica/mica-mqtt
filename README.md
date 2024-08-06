@@ -158,8 +158,6 @@
 ## 📝 文档
 - [mqtt科普、mqttx、mica-mqtt的使用**视频**](https://www.bilibili.com/video/BV1wv4y1F7Av/)
 - [mica-mqtt 快速开始](example/README.md)
-- [jfinal-mica-mqtt-client 使用文档](starter/jfinal-mica-mqtt-client/README.md)
-- [jfinal-mica-mqtt-server 使用文档](starter/jfinal-mica-mqtt-server/README.md)
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt 发行版本](CHANGELOG.md)

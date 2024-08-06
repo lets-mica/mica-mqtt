@@ -109,8 +109,6 @@
 ## 📝 Documentation
 - [Introduction to MQTT, mqttx, and mica-mqtt **Video**](https://www.bilibili.com/video/BV1wv4y1F7Av/)
 - [Getting Started with mica-mqtt](example/README.md)
-- [jfinal-mica-mqtt-client Documentation](starter/jfinal-mica-mqtt-client/README.md)
-- [jfinal-mica-mqtt-server Documentation](starter/jfinal-mica-mqtt-server/README.md)
 - [mica-mqtt HTTP API Documentation](docs/http-api.md)
 - [Frequently Asked Questions about mica-mqtt Usage](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt Release Versions](CHANGELOG.md)
