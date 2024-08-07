@@ -40,7 +40,7 @@
 - [x] Support for custom message (MQ) processing and forwarding to achieve clustering.
 - [x] MQTT client **Alibaba Cloud MQTT**、**HuaWei MQTT** connection demo.
 - [x] Support for GraalVM compilation into native executable programs.
-- [x] Support for rapid access to Spring Boot projects.
+- [x] Support for rapid access to Spring Boot、Solon and JFinal projects.
 - [x] Support for integration with Prometheus + Grafana for monitoring.
 - [x] Cluster implementation based on Redis pub/sub, see [mica-mqtt-broker module](mica-mqtt-broker) for details.
 

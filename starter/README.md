@@ -13,4 +13,4 @@
 ## JFinal
 
 - [mica-mqtt-client-jfinal-plugin 使用文档](mica-mqtt-client-jfinal-plugin/README.md)
-- [mica-mqtt-jfinal-solon-plugin 使用文档](mica-mqtt-server-jfinal-plugin/README.md)
+- [mica-mqtt-server-jfinal-plugin 使用文档](mica-mqtt-server-jfinal-plugin/README.md)
