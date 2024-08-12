@@ -43,7 +43,7 @@ public class MqttClientProperties {
 	 */
 	public static final String PREFIX = "mqtt.client";
 	/**
-	 * 是否启用，默认：false
+	 * 是否启用，默认：true
 	 */
 	private boolean enabled = true;
 	/**
