@@ -45,7 +45,7 @@ public class MqttClientProperties {
 	/**
 	 * 是否启用，默认：false
 	 */
-	private boolean enabled = false;
+	private boolean enabled = true;
 	/**
 	 * 名称，默认：Mica-Mqtt-Client
 	 */
