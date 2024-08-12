@@ -85,7 +85,7 @@
 
 ### Non-Spring Boot Project
 
-### Client
+**Client:**
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
@@ -96,7 +96,7 @@
 
 **Configuration Details**: [mica-mqtt-client Documentation](mica-mqtt-client/README.md)
 
-### Server
+**Server:**
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>

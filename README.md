@@ -136,7 +136,7 @@
 
 ### 其他项目
 
-### 客户端
+**客户端：**
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
@@ -147,7 +147,7 @@
 
 **配置详见**：[mica-mqtt-client 使用文档](mica-mqtt-client/README.md)
 
-### 服务端
+**服务端：**
 ```xml
 <dependency>
   <groupId>net.dreamlu</groupId>
