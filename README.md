@@ -4,7 +4,7 @@
 [![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/net.dreamlu/mica-mqtt-codec.svg?style=flat-square)](https://central.sonatype.com/artifact/net.dreamlu/mica-mqtt-codec/versions)
 [![Mica-mqtt maven snapshots](https://img.shields.io/nexus/s/https/oss.sonatype.org/net.dreamlu/mica-mqtt-codec.svg?style=flat-square)](https://oss.sonatype.org/content/repositories/snapshots/net/dreamlu/mica-mqtt-codec/)
 
-[![Gitcode Repo star](https://img.shields.io/badge/GitCode-GStar-red)](https://gitcode.com/mica/mica-mqtt/star)
+[![Gitcode Repo star](https://img.shields.io/badge/GitCode-GStar-red)](https://gitcode.com/mica/mica-mqtt)
 [![Gitee Repo star](https://gitee.com/596392912/mica-mqtt/badge/star.svg?theme=dark)](https://gitee.com/596392912/mica-mqtt/stargazers)
 [![GitHub Repo stars](https://img.shields.io/github/stars/lets-mica/mica-mqtt?label=Github%20Stars)](https://github.com/lets-mica/mica-mqtt)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/30dad82f79f34e41bafbc3cef6b68fc3)](https://www.codacy.com/gh/lets-mica/mica-mqtt/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=lets-mica/mica-mqtt&amp;utm_campaign=Badge_Grade)
@@ -16,9 +16,7 @@
 
 `mica-mqtt` **低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
 
-[**老版本迁移到 mica-mqtt 2.1.x**](docs/update.md)
-
-**✨最佳实践✨：** [**BladeX 物联网平台**](https://iot.bladex.cn?from=mica-mqtt)
+✨✨✨**最佳实践**✨✨✨ [**BladeX 物联网平台**](https://iot.bladex.cn?from=mica-mqtt)
 
 ## 🍱 使用场景
 
@@ -164,6 +162,7 @@
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt 发行版本](CHANGELOG.md)
+- [老版本迁移到 mica-mqtt 2.1.x](docs/update.md)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
 
 ## 💡 参考vs借鉴
