@@ -57,13 +57,13 @@ public class MqttServerProperties {
 	 */
 	private float keepaliveBackoff = 0.75F;
 	/**
-	 * 接收数据的 buffer size，默认：8k
+	 * 接收数据的 buffer size，默认：8KB
 	 */
-	private String readBufferSize = "8k";
+	private String readBufferSize = "8KB";
 	/**
-	 * 消息解析最大 bytes 长度，默认：10M
+	 * 消息解析最大 bytes 长度，默认：10MB
 	 */
-	private String maxBytesInMessage = "10M";
+	private String maxBytesInMessage = "10MB";
 	/**
 	 * 堆内存和堆外内存
 	 */
