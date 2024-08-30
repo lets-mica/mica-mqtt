@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.3.4 - 2024-09-01
+- :sparkles: 新增 `SSLEngineCustomizer`，用于自定义 tls 协议版本和加密套件。
+- :sparkles: !20 修改了 solon 插件的默认配置数值，感谢 `@peigen` pr。
+
 ### v2.3.4 - 2024-08-10
 - :sparkles: mica-mqtt 合入 `mica-mqtt-client-solon-plugin` 和 `mica-mqtt-server-solon-plugin` 感谢 `@peigenlpy`
 - :sparkles: jfinal 插件重命名为 `mica-mqtt-client-jfinal-plugin` 和 `mica-mqtt-server-jfinal-plugin`
