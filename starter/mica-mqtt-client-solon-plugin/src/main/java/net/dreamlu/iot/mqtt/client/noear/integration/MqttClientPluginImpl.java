@@ -2,14 +2,14 @@
 
 package net.dreamlu.iot.mqtt.client.noear.integration;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.client.noear.MqttClientCustomizer;
 import net.dreamlu.iot.mqtt.client.noear.MqttClientSubscribe;
 import net.dreamlu.iot.mqtt.client.noear.MqttClientTemplate;
 import net.dreamlu.iot.mqtt.client.noear.config.MqttClientConfiguration;
 import net.dreamlu.iot.mqtt.client.noear.config.MqttClientProperties;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientConnectListener;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientMessageListener;
 import net.dreamlu.iot.mqtt.core.client.IMqttClientSession;
@@ -19,6 +19,8 @@ import org.noear.solon.Solon;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.BeanWrap;
 import org.noear.solon.core.Plugin;
+import org.tio.core.ssl.SSLEngineCustomizer;
+import org.tio.core.ssl.SslConfig;
 import org.tio.utils.mica.ExceptionUtils;
 
 import java.lang.reflect.Method;
@@ -54,6 +56,7 @@ public class MqttClientPluginImpl implements Plugin {
 		context.lifecycle(-9, () -> {
 			context.beanMake(MqttClientProperties.class);
 			context.beanMake(MqttClientConfiguration.class);
+			MqttClientProperties properties = context.getBean(MqttClientProperties.class);
 			MqttClientCreator clientCreator = context.getBean(MqttClientCreator.class);
 
 			// MqttClientTemplate init
@@ -64,6 +67,15 @@ public class MqttClientPluginImpl implements Plugin {
 			context.putWrap(MqttClientTemplate.DEFAULT_CLIENT_TEMPLATE_BEAN, mqttClientTemplateWrap);
 			context.putWrap(MqttClientTemplate.class, mqttClientTemplateWrap);
 
+			// ssl 自定义配置
+			SslConfig sslConfig = clientCreator.getSslConfig();
+			if (sslConfig != null) {
+				SSLEngineCustomizer sslCustomizer = context.getBean(SSLEngineCustomizer.class);
+				if (sslCustomizer != null) {
+					sslConfig.setSslEngineCustomizer(sslCustomizer);
+				}
+			}
+
 			// 客户端 session
 			IMqttClientSession clientSession = context.getBean(IMqttClientSession.class);
 			clientCreator.clientSession(clientSession);
@@ -71,7 +83,6 @@ public class MqttClientPluginImpl implements Plugin {
 			// 添加启动时的临时订阅
 			subscribeDetector();
 
-			MqttClientProperties properties = context.getBean(MqttClientProperties.class);
 			// connect
 			if (properties.isEnabled()) {
 				clientTemplate.connect();

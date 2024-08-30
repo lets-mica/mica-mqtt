@@ -22,50 +22,50 @@ import org.noear.solon.annotation.Configuration;
 @Configuration
 public class MqttServerConfiguration {
 
-    @Bean
-    @Condition(onMissingBean = IMqttConnectStatusListener.class)
-    public IMqttConnectStatusListener connectStatusListener() {
-        return new SolonEventMqttConnectStatusListener();
-    }
+	@Bean
+	@Condition(onMissingBean = IMqttConnectStatusListener.class)
+	public IMqttConnectStatusListener connectStatusListener() {
+		return new SolonEventMqttConnectStatusListener();
+	}
 
-    @Bean
-    @Condition(onMissingBean = IMqttMessageListener.class)
-    public IMqttMessageListener messageListener() {
-        return new SolonEventMqttMessageListener();
-    }
+	@Bean
+	@Condition(onMissingBean = IMqttMessageListener.class)
+	public IMqttMessageListener messageListener() {
+		return new SolonEventMqttMessageListener();
+	}
 
-    @Bean
-    public MqttServerCreator mqttServerCreator(MqttServerProperties properties) {
-        MqttServerCreator serverCreator = MqttServer.create()
-                .name(properties.getName())
-                .ip(properties.getIp())
-                .port(properties.getPort())
-                .heartbeatTimeout(properties.getHeartbeatTimeout())
-                .keepaliveBackoff(properties.getKeepaliveBackoff())
-                .readBufferSize((int) DataSize.parse(properties.getReadBufferSize()).getBytes())
-                .maxBytesInMessage((int) DataSize.parse(properties.getMaxBytesInMessage()).getBytes())
-                .bufferAllocator(properties.getBufferAllocator())
-                .maxClientIdLength(properties.getMaxClientIdLength())
-                .webPort(properties.getWebPort())
-                .websocketEnable(properties.isWebsocketEnable())
-                .httpEnable(properties.isHttpEnable())
-                .nodeName(properties.getNodeName())
-                .statEnable(properties.isStatEnable());
-        if (properties.isDebug()) {
-            serverCreator.debug();
-        }
+	@Bean
+	public MqttServerCreator mqttServerCreator(MqttServerProperties properties) {
+		MqttServerCreator serverCreator = MqttServer.create()
+			.name(properties.getName())
+			.ip(properties.getIp())
+			.port(properties.getPort())
+			.heartbeatTimeout(properties.getHeartbeatTimeout())
+			.keepaliveBackoff(properties.getKeepaliveBackoff())
+			.readBufferSize((int) DataSize.parse(properties.getReadBufferSize()).getBytes())
+			.maxBytesInMessage((int) DataSize.parse(properties.getMaxBytesInMessage()).getBytes())
+			.bufferAllocator(properties.getBufferAllocator())
+			.maxClientIdLength(properties.getMaxClientIdLength())
+			.webPort(properties.getWebPort())
+			.websocketEnable(properties.isWebsocketEnable())
+			.httpEnable(properties.isHttpEnable())
+			.nodeName(properties.getNodeName())
+			.statEnable(properties.isStatEnable());
+		if (properties.isDebug()) {
+			serverCreator.debug();
+		}
 
-        // http 认证
-        MqttServerProperties.HttpBasicAuth httpBasicAuth = properties.getHttpBasicAuth();
-        if (serverCreator.isHttpEnable() && httpBasicAuth.isEnable()) {
-            serverCreator.httpBasicAuth(httpBasicAuth.getUsername(), httpBasicAuth.getPassword());
-        }
-        MqttServerProperties.Ssl ssl = properties.getSsl();
-        // ssl 配置
-        if (ssl.isEnabled()) {
-            serverCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass(), ssl.getClientAuth());
-        }
-        return serverCreator;
-    }
+		// http 认证
+		MqttServerProperties.HttpBasicAuth httpBasicAuth = properties.getHttpBasicAuth();
+		if (serverCreator.isHttpEnable() && httpBasicAuth.isEnable()) {
+			serverCreator.httpBasicAuth(httpBasicAuth.getUsername(), httpBasicAuth.getPassword());
+		}
+		MqttServerProperties.Ssl ssl = properties.getSsl();
+		// ssl 配置
+		if (ssl.isEnabled()) {
+			serverCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass(), ssl.getClientAuth());
+		}
+		return serverCreator;
+	}
 
 }

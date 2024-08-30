@@ -16,10 +16,6 @@
 
 package net.dreamlu.iot.mqtt.server.noear.integration;
 
-import net.dreamlu.iot.mqtt.server.noear.MqttServerCustomizer;
-import net.dreamlu.iot.mqtt.server.noear.MqttServerTemplate;
-import net.dreamlu.iot.mqtt.server.noear.config.MqttServerConfiguration;
-import net.dreamlu.iot.mqtt.server.noear.config.MqttServerProperties;
 import lombok.extern.slf4j.Slf4j;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import net.dreamlu.iot.mqtt.core.server.MqttServerCreator;
@@ -35,8 +31,14 @@ import net.dreamlu.iot.mqtt.core.server.interceptor.IMqttMessageInterceptor;
 import net.dreamlu.iot.mqtt.core.server.session.IMqttSessionManager;
 import net.dreamlu.iot.mqtt.core.server.store.IMqttMessageStore;
 import net.dreamlu.iot.mqtt.core.server.support.DefaultMqttServerAuthHandler;
+import net.dreamlu.iot.mqtt.server.noear.MqttServerCustomizer;
+import net.dreamlu.iot.mqtt.server.noear.MqttServerTemplate;
+import net.dreamlu.iot.mqtt.server.noear.config.MqttServerConfiguration;
+import net.dreamlu.iot.mqtt.server.noear.config.MqttServerProperties;
 import org.noear.solon.core.AppContext;
 import org.noear.solon.core.Plugin;
+import org.tio.core.ssl.SSLEngineCustomizer;
+import org.tio.core.ssl.SslConfig;
 
 import java.util.Objects;
 
@@ -49,100 +51,107 @@ import java.util.Objects;
  */
 @Slf4j
 public class MqttServerPluginImpl implements Plugin {
-    private volatile boolean running = false;
-    private AppContext context;
+	private volatile boolean running = false;
+	private AppContext context;
 
-    @Override
-    public void start(AppContext context) throws Throwable {
-        this.context = context; //todo: 去掉 Solon.context() 写法，可同时兼容 2.5 之前与之后的版本
+	@Override
+	public void start(AppContext context) throws Throwable {
+		this.context = context; //todo: 去掉 Solon.context() 写法，可同时兼容 2.5 之前与之后的版本
 
-        context.lifecycle(-9, () -> {
-            context.beanMake(MqttServerProperties.class);
-            context.beanMake(MqttServerConfiguration.class);
+		context.lifecycle(-9, () -> {
+			context.beanMake(MqttServerProperties.class);
+			context.beanMake(MqttServerConfiguration.class);
+			MqttServerProperties properties = context.getBean(MqttServerProperties.class);
+			MqttServerCreator serverCreator = context.getBean(MqttServerCreator.class);
 
-            MqttServerCreator serverCreator = context.getBean(MqttServerCreator.class);
-            MqttServerProperties properties = context.getBean(MqttServerProperties.class);
-            IMqttServerAuthHandler authHandlerImpl = context.getBean(IMqttServerAuthHandler.class);
-            IMqttServerUniqueIdService uniqueIdService = context.getBean(IMqttServerUniqueIdService.class);
-            IMqttServerSubscribeValidator subscribeValidator = context.getBean(IMqttServerSubscribeValidator.class);
-            IMqttServerPublishPermission publishPermission = context.getBean(IMqttServerPublishPermission.class);
-            IMqttMessageDispatcher messageDispatcher = context.getBean(IMqttMessageDispatcher.class);
-            IMqttMessageStore messageStore = context.getBean(IMqttMessageStore.class);
-            IMqttSessionManager sessionManager = context.getBean(IMqttSessionManager.class);
-            IMqttSessionListener sessionListener = context.getBean(IMqttSessionListener.class);
-            IMqttMessageListener messageListener = context.getBean(IMqttMessageListener.class);
-            IMqttConnectStatusListener connectStatusListener = context.getBean(IMqttConnectStatusListener.class);
-            IMqttMessageInterceptor messageInterceptor = context.getBean(IMqttMessageInterceptor.class);
-            MqttServerCustomizer customizers = context.getBean(MqttServerCustomizer.class);
+			IMqttServerAuthHandler authHandlerImpl = context.getBean(IMqttServerAuthHandler.class);
+			IMqttServerUniqueIdService uniqueIdService = context.getBean(IMqttServerUniqueIdService.class);
+			IMqttServerSubscribeValidator subscribeValidator = context.getBean(IMqttServerSubscribeValidator.class);
+			IMqttServerPublishPermission publishPermission = context.getBean(IMqttServerPublishPermission.class);
+			IMqttMessageDispatcher messageDispatcher = context.getBean(IMqttMessageDispatcher.class);
+			IMqttMessageStore messageStore = context.getBean(IMqttMessageStore.class);
+			IMqttSessionManager sessionManager = context.getBean(IMqttSessionManager.class);
+			IMqttSessionListener sessionListener = context.getBean(IMqttSessionListener.class);
+			IMqttMessageListener messageListener = context.getBean(IMqttMessageListener.class);
+			IMqttConnectStatusListener connectStatusListener = context.getBean(IMqttConnectStatusListener.class);
+			IMqttMessageInterceptor messageInterceptor = context.getBean(IMqttMessageInterceptor.class);
+			MqttServerCustomizer customizers = context.getBean(MqttServerCustomizer.class);
+			// ssl 自定义配置
+			SslConfig sslConfig = serverCreator.getSslConfig();
+			if (sslConfig != null) {
+				SSLEngineCustomizer sslCustomizer = context.getBean(SSLEngineCustomizer.class);
+				if (sslCustomizer != null) {
+					sslConfig.setSslEngineCustomizer(sslCustomizer);
+				}
+			}
+			// 自定义消息监听
+			serverCreator.messageListener(messageListener);
+			// 认证处理器
+			MqttServerProperties.MqttAuth mqttAuth = properties.getAuth();
+			if (Objects.isNull(authHandlerImpl)) {
+				IMqttServerAuthHandler authHandler = mqttAuth.isEnable() ? new DefaultMqttServerAuthHandler(mqttAuth.getUsername(), mqttAuth.getPassword()) : null;
+				serverCreator.authHandler(authHandler);
+			} else {
+				serverCreator.authHandler(authHandlerImpl);
+			}
+			// mqtt 内唯一id
+			if (Objects.nonNull(uniqueIdService)) {
+				serverCreator.uniqueIdService(uniqueIdService);
+			}
+			// 订阅校验
+			if (Objects.nonNull(subscribeValidator)) {
+				serverCreator.subscribeValidator(subscribeValidator);
+			}
+			// 订阅权限校验
+			if (Objects.nonNull(publishPermission)) {
+				serverCreator.publishPermission(publishPermission);
+			}
+			// 消息转发
+			if (Objects.nonNull(messageDispatcher)) {
+				serverCreator.messageDispatcher(messageDispatcher);
+			}
+			// 消息存储
+			if (Objects.nonNull(messageStore)) {
+				serverCreator.messageStore(messageStore);
+			}
+			// session 管理
+			if (Objects.nonNull(sessionManager)) {
+				serverCreator.sessionManager(sessionManager);
+			}
+			// session 监听
+			if (Objects.nonNull(sessionListener)) {
+				serverCreator.sessionListener(sessionListener);
+			}
+			// 状态监听
+			if (Objects.nonNull(connectStatusListener)) {
+				serverCreator.connectStatusListener(connectStatusListener);
+			}
+			// 消息监听器
+			if (Objects.nonNull(messageInterceptor)) {
+				serverCreator.addInterceptor(messageInterceptor);
+			}
+			// 自定义处理
+			if (Objects.nonNull(customizers)) {
+				customizers.customize(serverCreator);
+			}
 
-            // 自定义消息监听
-            serverCreator.messageListener(messageListener);
-            // 认证处理器
-            MqttServerProperties.MqttAuth mqttAuth = properties.getAuth();
-            if (Objects.isNull(authHandlerImpl)) {
-                IMqttServerAuthHandler authHandler = mqttAuth.isEnable() ? new DefaultMqttServerAuthHandler(mqttAuth.getUsername(), mqttAuth.getPassword()) : null;
-                serverCreator.authHandler(authHandler);
-            } else {
-                serverCreator.authHandler(authHandlerImpl);
-            }
-            // mqtt 内唯一id
-            if (Objects.nonNull(uniqueIdService)) {
-                serverCreator.uniqueIdService(uniqueIdService);
-            }
-            // 订阅校验
-            if (Objects.nonNull(subscribeValidator)) {
-                serverCreator.subscribeValidator(subscribeValidator);
-            }
-            // 订阅权限校验
-            if (Objects.nonNull(publishPermission)) {
-                serverCreator.publishPermission(publishPermission);
-            }
-            // 消息转发
-            if (Objects.nonNull(messageDispatcher)) {
-                serverCreator.messageDispatcher(messageDispatcher);
-            }
-            // 消息存储
-            if (Objects.nonNull(messageStore)) {
-                serverCreator.messageStore(messageStore);
-            }
-            // session 管理
-            if (Objects.nonNull(sessionManager)) {
-                serverCreator.sessionManager(sessionManager);
-            }
-            // session 监听
-            if (Objects.nonNull(sessionListener)) {
-                serverCreator.sessionListener(sessionListener);
-            }
-            // 状态监听
-            if (Objects.nonNull(connectStatusListener)) {
-                serverCreator.connectStatusListener(connectStatusListener);
-            }
-            // 消息监听器
-            if (Objects.nonNull(messageInterceptor)) {
-                serverCreator.addInterceptor(messageInterceptor);
-            }
-            // 自定义处理
-            if (Objects.nonNull(customizers)) {
-                customizers.customize(serverCreator);
-            }
+			MqttServer mqttServer = serverCreator.build();
+			MqttServerTemplate mqttServerTemplate = new MqttServerTemplate(mqttServer);
+			context.wrapAndPut(MqttServerTemplate.class, mqttServerTemplate);
 
-            MqttServer mqttServer = serverCreator.build();
-            MqttServerTemplate mqttServerTemplate = new MqttServerTemplate(mqttServer);
-            context.wrapAndPut(MqttServerTemplate.class, mqttServerTemplate);
+			if (properties.isEnabled() && !running) {
+				running = mqttServerTemplate.getMqttServer().start();
+				log.info("mqtt server start...");
+			}
+		});
+	}
 
-            if (properties.isEnabled() && !running) {
-                running = mqttServerTemplate.getMqttServer().start();
-                log.info("mqtt server start...");
-            }
-        });
-    }
-
-    @Override
-    public void stop() {
-        if (running) {
-            MqttServerTemplate mqttServerTemplate = context.getBean(MqttServerTemplate.class);
-            mqttServerTemplate.getMqttServer().stop();
-            log.info("mqtt server stop...");
-        }
-    }
+	@Override
+	public void stop() {
+		if (running) {
+			MqttServerTemplate mqttServerTemplate = context.getBean(MqttServerTemplate.class);
+			mqttServerTemplate.getMqttServer().stop();
+			log.info("mqtt server stop...");
+		}
+	}
 }

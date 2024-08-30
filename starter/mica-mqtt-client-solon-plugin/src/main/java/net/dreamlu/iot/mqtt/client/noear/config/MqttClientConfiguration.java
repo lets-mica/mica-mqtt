@@ -33,7 +33,6 @@ import java.nio.charset.StandardCharsets;
  * @author L.cm
  */
 @Configuration
-//@Import(scanPackages={"com.gitee.peigenlpy.mica"}) //todo: 看上去这个导入扫描没必要，用 context.beanMake(MqttClientProperties.class) 性能更好。by noear,2023-09-15
 public class MqttClientConfiguration {
 
 	@Bean

@@ -23,6 +23,7 @@ import net.dreamlu.iot.mqtt.core.client.MqttClientCreator;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientSubscribeDetector;
 import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
 import net.dreamlu.iot.mqtt.spring.client.event.SpringEventMqttClientConnectListener;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,6 +32,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.util.StringUtils;
+import org.tio.core.ssl.SSLEngineCustomizer;
+import org.tio.core.ssl.SslConfig;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -57,7 +60,7 @@ public class MqttClientConfiguration {
 	}
 
 	@Bean
-	public MqttClientCreator mqttClientCreator(MqttClientProperties properties) {
+	public MqttClientCreator mqttClientCreator(MqttClientProperties properties, ObjectProvider<SSLEngineCustomizer> sslCustomizers) {
 		MqttClientCreator clientCreator = MqttClient.create()
 			.name(properties.getName())
 			.ip(properties.getIp())
@@ -87,7 +90,9 @@ public class MqttClientConfiguration {
 		// 开启 ssl
 		MqttClientProperties.Ssl ssl = properties.getSsl();
 		if (ssl.isEnabled()) {
-			clientCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass());
+			SslConfig sslConfig = SslConfig.forClient(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass());
+			clientCreator.sslConfig(sslConfig);
+			sslCustomizers.ifAvailable(sslConfig::setSslEngineCustomizer);
 		}
 		// 构造遗嘱消息
 		MqttClientProperties.WillMessage willMessage = properties.getWillMessage();

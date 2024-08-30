@@ -41,6 +41,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.tio.core.ssl.SSLEngineCustomizer;
+import org.tio.core.ssl.SslConfig;
 
 /**
  * mqtt server 配置
@@ -82,6 +84,7 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttMessageListener> messageListenerObjectProvider,
 											   ObjectProvider<IMqttConnectStatusListener> connectStatusListenerObjectProvider,
 											   ObjectProvider<IMqttMessageInterceptor> messageInterceptorObjectProvider,
+											   ObjectProvider<SSLEngineCustomizer> sslCustomizers,
 											   ObjectProvider<MqttServerCustomizer> customizers) {
 		MqttServerCreator serverCreator = MqttServer.create()
 			.name(properties.getName())
@@ -110,7 +113,9 @@ public class MqttServerConfiguration {
 		MqttServerProperties.Ssl ssl = properties.getSsl();
 		// ssl 配置
 		if (ssl.isEnabled()) {
-			serverCreator.useSsl(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass(), ssl.getClientAuth());
+			SslConfig sslConfig = SslConfig.forServer(ssl.getKeystorePath(), ssl.getKeystorePass(), ssl.getTruststorePath(), ssl.getTruststorePass(), ssl.getClientAuth());
+			serverCreator.sslConfig(sslConfig);
+			sslCustomizers.ifAvailable(sslConfig::setSslEngineCustomizer);
 		}
 		// 自定义消息监听
 		messageListenerObjectProvider.ifAvailable(serverCreator::messageListener);
