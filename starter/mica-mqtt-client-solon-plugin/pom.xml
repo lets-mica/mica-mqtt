@@ -22,7 +22,7 @@
         </dependency>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon-api</artifactId>
+            <artifactId>solon-web</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

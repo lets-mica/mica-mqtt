@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>org.noear</groupId>
-            <artifactId>solon-api</artifactId>
+            <artifactId>solon-web</artifactId>
         </dependency>
         <dependency>
             <groupId>net.dreamlu</groupId>
