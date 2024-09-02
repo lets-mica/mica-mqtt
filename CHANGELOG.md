@@ -2,7 +2,7 @@
 
 ## 发行版本
 
-### v2.3.4 - 2024-09-01
+### v2.3.5 - 2024-09-01
 - :sparkles: 新增 `SSLEngineCustomizer`，用于自定义 tls 协议版本和加密套件。
 - :sparkles: !20 修改了 solon 插件的默认配置数值，感谢 `@peigen` pr。
 
