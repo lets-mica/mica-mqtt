@@ -440,8 +440,6 @@ public final class MqttServer {
 			Thread.currentThread().interrupt();
 			logger.error(e.getMessage(), e);
 		}
-		// 清理线程池静态变量
-		ThreadUtils.clearThreadPool();
 		try {
 			sessionManager.clean();
 		} catch (Throwable e) {

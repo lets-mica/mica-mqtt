@@ -61,7 +61,7 @@ public final class MqttClient {
 	MqttClient(TioClient tioClient, MqttClientCreator config) {
 		this.tioClient = tioClient;
 		this.config = config;
-		this.clientTioConfig = tioClient.getTioClientConfig();
+		this.clientTioConfig = tioClient.getClientConfig();
 		this.taskService = config.getTaskService();
 		this.mqttExecutor = config.getMqttExecutor();
 		this.clientSession = config.getClientSession();
@@ -558,8 +558,6 @@ public final class MqttClient {
 			Thread.currentThread().interrupt();
 			logger.error(e.getMessage(), e);
 		}
-		// 清理线程池静态变量
-		ThreadUtils.clearThreadPool();
 		logger.info("MqttClient stop result:{}", result);
 		// 4. 清理 session
 		this.clientSession.clean();
