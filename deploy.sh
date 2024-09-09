@@ -29,7 +29,7 @@ printf "modules [%s] \n" "$modules"
 
 ## 5. deploy
 if [ "$profile" = "snapshot" ]; then
-    mvn clean package deploy -P!develop,snapshot -pl "$modules"
+    mvn clean package deploy -U -P!develop,snapshot -pl "$modules"
 else
     mvn clean package deploy -Prelease -pl "$modules"
 fi
