@@ -558,6 +558,8 @@ public final class MqttClient {
 			Thread.currentThread().interrupt();
 			logger.error(e.getMessage(), e);
 		}
+		// 清理线程池静态变量
+		ThreadUtils.clearThreadPool();
 		logger.info("MqttClient stop result:{}", result);
 		// 4. 清理 session
 		this.clientSession.clean();

@@ -34,6 +34,7 @@ import org.tio.core.Tio;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.timer.TimerTask;
 import org.tio.utils.timer.TimerTaskService;
 
@@ -439,6 +440,8 @@ public final class MqttServer {
 			Thread.currentThread().interrupt();
 			logger.error(e.getMessage(), e);
 		}
+		// 清理线程池静态变量
+		ThreadUtils.clearThreadPool();
 		try {
 			sessionManager.clean();
 		} catch (Throwable e) {
