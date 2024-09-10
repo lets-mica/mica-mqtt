@@ -33,13 +33,14 @@ import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
+import org.tio.server.intf.TioServerListener;
 import org.tio.utils.hutool.StrUtil;
-import org.tio.utils.thread.ThreadUtils;
 import org.tio.utils.timer.TimerTask;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -419,6 +420,8 @@ public final class MqttServer {
 	 * @return 是否停止
 	 */
 	public boolean stop() {
+		// 停止通知
+		onBeforeClose(this.tioServer);
 		// 停止服务
 		boolean result = this.tioServer.stop();
 		logger.info("Mqtt tcp server stop result:{}", result);
@@ -446,6 +449,24 @@ public final class MqttServer {
 			logger.error("MqttServer stop session clean error.", e);
 		}
 		return result;
+	}
+
+	/**
+	 * 停止之前，触发停止通知
+	 *
+	 * @param tioServer TioServer
+	 */
+	private static void onBeforeClose(TioServer tioServer) {
+		TioServerConfig serverConfig = tioServer.getServerConfig();
+		TioServerListener serverListener = serverConfig.getTioServerListener();
+		Set<ChannelContext> contextSet = Tio.getAll(serverConfig);
+		for (ChannelContext context : contextSet) {
+			try {
+				serverListener.onBeforeClose(context, null, "Mqtt server stop", true);
+			} catch (Throwable e) {
+				logger.error(e.getMessage(), e);
+			}
+		}
 	}
 
 }
