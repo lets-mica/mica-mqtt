@@ -140,8 +140,6 @@ Thanks to JetBrains for providing a free open-source license:
 
 [![JetBrains](docs/img/jetbrains.png)](https://www.jetbrains.com/?from=mica-mqtt)
 
-Thanks to **VIP members** of `DreamLuTech` for their strong support. For more **VIP** information, please visit: [https://www.dreamlu.net/vip/index.html](https://www.dreamlu.net/vip/index.html)
-
 ## 📱 WeChat
 
 ![DreamLuTech](docs/img/dreamlu-weixin.jpg)
