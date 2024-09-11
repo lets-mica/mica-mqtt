@@ -171,8 +171,8 @@
 - [iot-mqtt-server](https://gitee.com/recallcode/iot-mqtt-server)
 - [netty-mqtt-client](https://github.com/jetlinks/netty-mqtt-client)
 
-## 🏗️ mqtt 客户端工具
-- [mqttx 优雅的跨平台 MQTT 5.0 客户端工具](https://mqttx.app)
+## 🏗️ mqtt 桌面工具
+- [mqttx 优雅的跨平台 MQTT 5.0 GUI工具](https://mqttx.app)
 
 ## 🍻 开源推荐
 - `Avue` 基于 vue 可配置化的前端框架：[https://gitee.com/smallweigit/avue](https://gitee.com/smallweigit/avue)
