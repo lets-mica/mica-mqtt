@@ -124,7 +124,6 @@
 ## 🏗️ MQTT Client Tools
 - [Mqttx: An Elegant Cross-platform MQTT 5.0 Client Tool](https://mqttx.app/)
 - [MQTT WebSocket Debugging](http://tools.emqx.io/)
-- [MQTT.fx MQTT Client](http://mqttfx.org/)
 
 ## 🍻 Open Source Recommendations
 - `Avue`: A Vue-based configurable front-end framework: [https://gitee.com/smallweigit/avue](https://gitee.com/smallweigit/avue)
