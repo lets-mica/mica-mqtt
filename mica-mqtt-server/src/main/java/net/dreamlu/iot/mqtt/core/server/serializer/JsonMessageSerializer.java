@@ -16,24 +16,24 @@
 
 package net.dreamlu.iot.mqtt.core.server.serializer;
 
-import com.alibaba.fastjson.JSON;
 import net.dreamlu.iot.mqtt.core.server.model.Message;
+import org.tio.utils.json.JsonUtil;
 
 /**
  * fastjson 序列化
  *
  * @author L.cm
  */
-public class FastJsonMessageSerializer implements IMessageSerializer {
+public class JsonMessageSerializer implements IMessageSerializer {
 
 	@Override
 	public byte[] serialize(Message message) {
-		return JSON.toJSONBytes(message);
+		return JsonUtil.toJsonBytes(message);
 	}
 
 	@Override
 	public Message deserialize(byte[] data) {
-		return JSON.parseObject(data, Message.class);
+		return JsonUtil.readValue(data, Message.class);
 	}
 
 }
