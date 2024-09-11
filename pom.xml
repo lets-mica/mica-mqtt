@@ -255,6 +255,32 @@
                 </executions>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.moditect</groupId>
+                    <artifactId>moditect-maven-plugin</artifactId>
+                    <version>1.2.2.Final</version>
+                    <executions>
+                        <execution>
+                            <id>add-module-info</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>add-module-info</goal>
+                            </goals>
+                            <configuration>
+                                <jvmVersion>9</jvmVersion>
+                                <module>
+                                    <moduleInfoFile>${project.basedir}/src/main/moditect/module-info.java</moduleInfoFile>
+                                </module>
+                                <!-- Overwrite the previously generated JAR file, if any -->
+                                <overwriteExistingFiles>true</overwriteExistingFiles>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <licenses>

@@ -21,4 +21,13 @@
         <module>mica-mqtt-server-jfinal-plugin</module>
     </modules>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>
