@@ -5,6 +5,7 @@
 ### v2.3.6 - 2024-09-14
 - :sparkles: mica-mqtt server 和 client 优化 stop，支持 stop 后重新配置再启动（注意：需要重新配置，因为老的线程池已经停止）。
 - :sparkles: mica-mqtt server 和 client Spring boot starter 支持 Spring boot devtools 热启动。
+- :sparkles: 添加 `module-info.java` 方便模块化。
 
 ### v2.3.5 - 2024-09-01
 - :sparkles: 新增 `SSLEngineCustomizer`，用于自定义 tls 协议版本和加密套件。
