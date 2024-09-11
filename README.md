@@ -37,7 +37,7 @@
 - [x] 支持 http rest api，[http api 文档详见](docs/http-api.md)。
 - [x] 支持 MQTT client 客户端。
 - [x] 支持 MQTT server 服务端。
-- [x] 支持 MQTT client、server 共享订阅支持（捐助VIP版采用 topic 树存储，跟 topic 数无关，百万 topic 性能依旧）。
+- [x] 支持 MQTT client、server 共享订阅支持（私服加强版采用 topic 树存储，跟 topic 数无关，百万 topic 性能依旧）。
 - [x] 支持 MQTT 遗嘱消息。
 - [x] 支持 MQTT 保留消息。
 - [x] 支持自定义消息（mq）处理转发实现集群。
@@ -174,7 +174,6 @@
 ## 🏗️ mqtt 客户端工具
 - [mqttx 优雅的跨平台 MQTT 5.0 客户端工具](https://mqttx.app/cn/)
 - [mqtt websocket 调试](http://tools.emqx.io/)
-- [mqttx.fx mqtt 客户端](http://mqttfx.org/)
 
 ## 🍻 开源推荐
 - `Avue` 基于 vue 可配置化的前端框架：[https://gitee.com/smallweigit/avue](https://gitee.com/smallweigit/avue)
