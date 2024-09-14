@@ -378,7 +378,7 @@ public final class MqttClient {
 	 * @return TimerTask
 	 */
 	public TimerTask schedule(Runnable command, long delay) {
-		return schedule(command, delay, null);
+		return this.tioClient.schedule(command, delay);
 	}
 
 	/**
@@ -390,23 +390,7 @@ public final class MqttClient {
 	 * @return TimerTask
 	 */
 	public TimerTask schedule(Runnable command, long delay, Executor executor) {
-		return config.getTaskService().addTask((systemTimer -> new TimerTask(delay) {
-			@Override
-			public void run() {
-				try {
-					// 1. 再次添加 任务
-					systemTimer.add(this);
-					// 2. 执行任务
-					if (executor == null) {
-						command.run();
-					} else {
-						executor.execute(command);
-					}
-				} catch (Exception e) {
-					logger.error("Mqtt client schedule error", e);
-				}
-			}
-		}));
+		return this.tioClient.schedule(command, delay, executor);
 	}
 
 	/**
@@ -417,7 +401,7 @@ public final class MqttClient {
 	 * @return TimerTask
 	 */
 	public TimerTask scheduleOnce(Runnable command, long delay) {
-		return scheduleOnce(command, delay, null);
+		return this.tioClient.scheduleOnce(command, delay);
 	}
 
 	/**
@@ -429,20 +413,7 @@ public final class MqttClient {
 	 * @return TimerTask
 	 */
 	public TimerTask scheduleOnce(Runnable command, long delay, Executor executor) {
-		return config.getTaskService().addTask((systemTimer -> new TimerTask(delay) {
-			@Override
-			public void run() {
-				try {
-					if (executor == null) {
-						command.run();
-					} else {
-						executor.execute(command);
-					}
-				} catch (Exception e) {
-					logger.error("Mqtt client schedule once error", e);
-				}
-			}
-		}));
+		return this.tioClient.scheduleOnce(command, delay, executor);
 	}
 
 	/**
