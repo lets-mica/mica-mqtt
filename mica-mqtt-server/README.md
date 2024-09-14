@@ -76,4 +76,4 @@ mqttServer.stop();
 </dependency>
 ```
 
-另外 http api 需要项目带有 jackson、fastjson、fastjson2、gson、hutool-json 这些json工具其一。
+另外 http api 需要项目带有 jackson、fastjson、fastjson2、gson、hutool-json、snack3（mica-mqtt 2.3.4开始支持） 这些json工具其一。
