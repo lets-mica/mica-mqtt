@@ -60,3 +60,4 @@ logging:
     root: info
     server: info # t-io 服务端默认日志
     org.tio: info # t-io 服务端默认日志
+    net.dreamlu.iot.mqtt: info # mica-mqtt 日志
