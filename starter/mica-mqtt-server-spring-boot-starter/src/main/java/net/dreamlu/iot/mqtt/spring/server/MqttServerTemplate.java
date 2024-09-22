@@ -20,6 +20,9 @@ import lombok.RequiredArgsConstructor;
 import net.dreamlu.iot.mqtt.codec.MqttQoS;
 import net.dreamlu.iot.mqtt.core.server.MqttServer;
 import org.tio.core.ChannelContext;
+import org.tio.utils.timer.TimerTask;
+
+import java.util.concurrent.Executor;
 
 /**
  * mqtt Server 模板
@@ -128,6 +131,52 @@ public class MqttServerTemplate {
 	 */
 	public boolean publishAll(String topic, byte[] payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publishAll(topic, payload, qos, retain);
+	}
+
+	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay) {
+		return mqttServer.schedule(command, delay);
+	}
+
+	/**
+	 * 添加定时任务，注意：如果抛出异常，会终止后续任务，请自行处理异常
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask schedule(Runnable command, long delay, Executor executor) {
+		return mqttServer.schedule(command, delay, executor);
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command runnable
+	 * @param delay   delay
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay) {
+		return mqttServer.scheduleOnce(command, delay);
+	}
+
+	/**
+	 * 添加定时任务
+	 *
+	 * @param command  runnable
+	 * @param delay    delay
+	 * @param executor 用于自定义线程池，处理耗时业务
+	 * @return TimerTask
+	 */
+	public TimerTask scheduleOnce(Runnable command, long delay, Executor executor) {
+		return mqttServer.scheduleOnce(command, delay, executor);
 	}
 
 	/**
