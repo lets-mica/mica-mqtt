@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.3.7 - 2024-09-22
+- :sparkles: 优化 Mqtt server starter 添加 schedule 系列方法。
+- :sparkles: MqttClient schedule 系列方法下层到底层，方法改造。
+
 ### v2.3.6 - 2024-09-14
 - :sparkles: mica-mqtt server 和 client 优化 stop，支持 stop 后重新配置再启动（注意：需要重新配置，因为老的线程池已经停止）。
 - :sparkles: mica-mqtt server 和 client Spring boot starter 支持 Spring boot devtools 热启动。
