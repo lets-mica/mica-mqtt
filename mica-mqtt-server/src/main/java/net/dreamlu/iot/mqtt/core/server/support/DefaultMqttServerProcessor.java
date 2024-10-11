@@ -39,6 +39,7 @@ import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Node;
 import org.tio.core.Tio;
+import org.tio.core.TioConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.timer.TimerTaskService;
 
@@ -53,10 +54,6 @@ import java.util.concurrent.ExecutorService;
  */
 public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	private static final Logger logger = LoggerFactory.getLogger(DefaultMqttServerProcessor.class);
-	/**
-	 * 默认的超时时间
-	 */
-	private static final long DEFAULT_HEARTBEAT_TIMEOUT = 120_000L;
 	/**
 	 * 2 倍客户端 keepAlive 时间
 	 */
@@ -80,7 +77,7 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 									  TimerTaskService taskService,
 									  ExecutorService executor) {
 		this.serverCreator = serverCreator;
-		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? DEFAULT_HEARTBEAT_TIMEOUT : serverCreator.getHeartbeatTimeout();
+		this.heartbeatTimeout = serverCreator.getHeartbeatTimeout() == null ? TioConfig.DEFAULT_HEARTBEAT_TIMEOUT : serverCreator.getHeartbeatTimeout();
 		this.messageStore = serverCreator.getMessageStore();
 		this.sessionManager = serverCreator.getSessionManager();
 		this.authHandler = serverCreator.getAuthHandler();
