@@ -132,11 +132,10 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			Tio.bindUser(context, userName);
 		}
 		// 6. 心跳超时时间，当然这个值如果小于全局配置（默认：120s），定时检查的时间间隔还是以全局为准，只是在判断时用此值
-		float keepAliveBackoff = serverCreator.getKeepaliveBackoff();
 		MqttConnectVariableHeader variableHeader = mqttMessage.variableHeader();
 		int keepAliveSeconds = variableHeader.keepAliveTimeSeconds();
 		// keepAlive * keepAliveBackoff * 2 时间作为服务端心跳超时时间，如果配置同全局默认不设置，节约内存
-		long keepAliveTimeout = (long) (keepAliveSeconds * keepAliveBackoff * KEEP_ALIVE_UNIT);
+		long keepAliveTimeout = keepAliveSeconds * KEEP_ALIVE_UNIT;
 		if (keepAliveSeconds > 0 && heartbeatTimeout != keepAliveTimeout) {
 			context.setHeartbeatTimeout(keepAliveTimeout);
 		}
