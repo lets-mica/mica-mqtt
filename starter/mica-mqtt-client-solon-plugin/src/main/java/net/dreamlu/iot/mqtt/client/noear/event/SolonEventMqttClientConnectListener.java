@@ -36,7 +36,7 @@ public class SolonEventMqttClientConnectListener implements IMqttClientConnectLi
 		} else {
 			log.info("连接 mqtt 服务器成功...");
 		}
-		EventBus.push(new MqttConnectedEvent(isReconnect));
+		EventBus.publish(new MqttConnectedEvent(isReconnect));
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class SolonEventMqttClientConnectListener implements IMqttClientConnectLi
 			reason = remark + " Exception:" + throwable.getMessage();
 			log.error("mqtt 链接断开 remark:{} isRemove:{}", remark, isRemove, throwable);
 		}
-		EventBus.push(new MqttDisconnectEvent(reason, isRemove));
+		EventBus.publish(new MqttDisconnectEvent(reason, isRemove));
 	}
 
 }
