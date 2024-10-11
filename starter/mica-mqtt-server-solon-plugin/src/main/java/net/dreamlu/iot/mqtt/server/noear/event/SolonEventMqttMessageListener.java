@@ -41,7 +41,7 @@ public class SolonEventMqttMessageListener implements IMqttMessageListener {
 		if (log.isDebugEnabled()) {
 			log.debug("mqtt server receive message clientId:{} message:{} payload:{}", clientId, message, new String(message.getPayload(), StandardCharsets.UTF_8));
 		}
-		EventBus.push(message);
+		EventBus.publish(message);
 	}
 
 	@Override

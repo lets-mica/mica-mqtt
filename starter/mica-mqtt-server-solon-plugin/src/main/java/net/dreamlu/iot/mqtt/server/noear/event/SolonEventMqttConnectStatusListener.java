@@ -46,7 +46,7 @@ public class SolonEventMqttConnectStatusListener implements IMqttConnectStatusLi
 		long keepalive = context.heartbeatTimeout == null ? 60L : TimeUnit.MILLISECONDS.toSeconds(context.heartbeatTimeout);
 		onlineEvent.setKeepalive(keepalive);
 		onlineEvent.setTs(context.stat.timeCreated);
-		EventBus.push(onlineEvent);
+		EventBus.publish(onlineEvent);
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class SolonEventMqttConnectStatusListener implements IMqttConnectStatusLi
 		offlineEvent.setUsername(username);
 		offlineEvent.setReason(reason);
 		offlineEvent.setTs(context.stat.timeClosed);
-		EventBus.push(offlineEvent);
+		EventBus.publish(offlineEvent);
 	}
 
 }
