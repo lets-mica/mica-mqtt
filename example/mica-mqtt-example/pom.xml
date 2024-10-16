@@ -13,7 +13,7 @@
     </parent>
 
     <properties>
-        <graalvm.version>24.1.0</graalvm.version>
+        <graalvm.version>24.1.1</graalvm.version>
         <mainClass.server>net.dreamlu.iot.mqtt.server.MqttServerTest</mainClass.server>
         <mainClass.client>net.dreamlu.iot.mqtt.client.MqttClientTest</mainClass.client>
     </properties>
