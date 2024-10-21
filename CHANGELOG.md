@@ -4,7 +4,7 @@
 
 ### v2.3.8 - 2024-09-26
 - :sparkles: 升级到 solon v3, 调整 solon 版本兼容
-- :bug: mica-net 心跳支持了 `keepAliveBackoff`，mica-mqtt 漏改规则（影响范围：开源版，私服版无此问题。） gitee #IAW9FC 感谢 `tan90` 反馈。
+- :bug: mica-net 心跳支持了 `keepAliveBackoff`，mica-mqtt 漏改规则（影响范围：mica-mqtt server 开源版，私服版无此问题。） gitee #IAW9FC 感谢 `tan90` 反馈。
 
 ### v2.3.7 - 2024-09-22
 - :sparkles: 优化 Mqtt server starter 添加 schedule 系列方法。
