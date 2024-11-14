@@ -2,6 +2,12 @@
 
 本插件基于 https://gitee.com/peigenlpy/mica-mqtt-solon-plugin 调整合并到官方（已经过作者同意）。
 
+## 版本兼容
+| 要求  | Solon 版本 |
+|-----|-----------|
+| 最高  | 3.x   |
+| 最低  | 2.8.0 |
+
 ## 一、添加依赖
 
 ```xml
