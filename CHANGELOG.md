@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.3.9 - 2024-11-16
+- :sparkles: ssl 支持 **PKCS12** 证书，根据文件后缀自动判断 `.jks、.keystore` 识别为 **JKS证书**，`.p12、.pfx` 识别成 **PKCS12证书**。其他默认成**JKS**
+- :sparkles: 优化 **Solon** 版本依赖（仅编译依赖），兼容 `2.8.0` 和 `2.8.0` 以上版本。
+
 ### v2.3.8 - 2024-09-26
 - :sparkles: 升级到 solon v3, 调整 solon 版本兼容
 - :bug: mica-net 心跳支持了 `keepAliveBackoff`，mica-mqtt 漏改规则（影响范围：mica-mqtt server 开源版，私服版无此问题。） gitee #IAW9FC 感谢 `tan90` 反馈。
