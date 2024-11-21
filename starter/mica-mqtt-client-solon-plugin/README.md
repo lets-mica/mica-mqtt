@@ -12,7 +12,7 @@
 
 ```xml
 <dependency>
-    <groupId>net.dreamlu</groupId>
+    <groupId>org.dromara.mica-mqtt</groupId>
     <artifactId>mica-mqtt-client-solon-plugin-parent</artifactId>
     <version>${version}</version>
 </dependency>

@@ -5,9 +5,9 @@
 #### 1. 添加依赖
 ```xml
 <dependency>
-	<groupId>net.dreamlu</groupId>
-	<artifactId>mica-mqtt-client-jfinal-plugin</artifactId>
-	<version>${最新版本}</version>
+    <groupId>org.dromara.mica-mqtt</groupId>
+    <artifactId>mica-mqtt-client-jfinal-plugin</artifactId>
+    <version>${最新版本}</version>
 </dependency>
 ```
 
@@ -16,9 +16,9 @@
 #### 3. 添加 slf4j-log4j12
 ```xml
 <dependency>
-	<groupId>org.slf4j</groupId>
-	<artifactId>slf4j-log4j12</artifactId>
-	<version>1.7.33</version>
+    <groupId>org.slf4j</groupId>
+    <artifactId>slf4j-log4j12</artifactId>
+    <version>1.7.33</version>
 </dependency>
 ```
 
