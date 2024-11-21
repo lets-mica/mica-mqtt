@@ -3,8 +3,8 @@
 ## 迁移到 mica-mqtt 2.1.x
 
 - `mica-mqtt-core` 拆分成了 `mica-mqtt-client` 和 `mica-mqtt-server`，避免一些依赖引用问题。
-- `ByteBufferUtil` 由 `net.dreamlu.iot.mqtt.codec.ByteBufferUtil` 移动到了 `org.tio.utils.buffer.ByteBufferUtil`。
-- `HexUtil` 由 `net.dreamlu.iot.mqtt.core.util.HexUtil` 移动到了 `org.tio.utils.mica.HexUtils`。
+- `ByteBufferUtil` 由 `org.dromara.mica.mqtt.codec.ByteBufferUtil` 移动到了 `org.tio.utils.buffer.ByteBufferUtil`。
+- `HexUtil` 由 `org.dromara.mica.mqtt.core.util.HexUtil` 移动到了 `org.tio.utils.mica.HexUtils`。
 
 ### 1. 客户端
 

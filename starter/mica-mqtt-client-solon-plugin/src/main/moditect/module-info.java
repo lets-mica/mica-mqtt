@@ -1,9 +1,9 @@
-open module net.dreamlu.mica.mqtt.client.solon.plugin {
+open module org.dromara.mica.mqtt.client.solon.plugin {
 	requires solon;
 	requires lombok;
 	requires transitive net.dreamlu.mica.mqtt.client;
-	exports net.dreamlu.iot.mqtt.client.noear;
-	exports net.dreamlu.iot.mqtt.client.noear.event;
-	exports net.dreamlu.iot.mqtt.client.noear.config;
-	provides org.noear.solon.core.Plugin with net.dreamlu.iot.mqtt.client.noear.integration.MqttClientPluginImpl;
+	exports org.dromara.mica.mqtt.client.solon;
+	exports org.dromara.mica.mqtt.client.solon.event;
+	exports org.dromara.mica.mqtt.client.solon.config;
+	provides org.noear.solon.core.Plugin with org.dromara.mica.mqtt.client.solon.integration.MqttClientPluginImpl;
 }

@@ -5,7 +5,7 @@ open module net.dreamlu.mica.mqtt.client.spring.boot.starter {
 	requires spring.boot;
 	requires spring.boot.autoconfigure;
 	requires transitive net.dreamlu.mica.mqtt.client;
-	exports net.dreamlu.iot.mqtt.spring.client;
-	exports net.dreamlu.iot.mqtt.spring.client.config;
-	exports net.dreamlu.iot.mqtt.spring.client.event;
+	exports org.dromara.mica.mqtt.spring.client;
+	exports org.dromara.mica.mqtt.spring.client.config;
+	exports org.dromara.mica.mqtt.spring.client.event;
 }

@@ -114,11 +114,9 @@ public class MqttServerCustomizerConfiguration {
 
 ```java
 
-import net.dreamlu.iot.mqtt.spring.server.MqttServerTemplate;
+import org.dromara.mica.mqtt.spring.server.MqttServerTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.nio.ByteBuffer;
 
 /**
  * @author wsq

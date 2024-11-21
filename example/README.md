@@ -20,7 +20,7 @@
 | TioConfig name    | Mica-Mqtt-Server                                                   |
 | Started at        | 2021-07-05 20:42:36                                                |
 | Listen on         | 127.0.0.1:1883                                                     |
-| Main Class        | net.dreamlu.iot.mqtt.server.MqttServerTest                         |
+| Main Class        | org.dromara.mica.mqtt.server.MqttServerTest                         |
 | Jvm start time    | 2715ms                                                             |
 | Tio start time    | 16ms                                                               |
 | Pid               | 3588                                                               |

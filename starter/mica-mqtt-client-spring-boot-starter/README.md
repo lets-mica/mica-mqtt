@@ -154,13 +154,12 @@ mica-mqtt 支持两种**共享订阅**方式：
 
 ```java
 
-import net.dreamlu.iot.mqtt.spring.client.MqttClientTemplate;
+import org.dromara.mica.mqtt.spring.client.MqttClientTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 /**
