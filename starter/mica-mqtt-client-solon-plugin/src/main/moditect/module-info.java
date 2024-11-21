@@ -1,7 +1,7 @@
 open module org.dromara.mica.mqtt.client.solon.plugin {
 	requires solon;
 	requires lombok;
-	requires transitive net.dreamlu.mica.mqtt.client;
+	requires transitive org.dromara.mica.mqtt.client;
 	exports org.dromara.mica.mqtt.client.solon;
 	exports org.dromara.mica.mqtt.client.solon.event;
 	exports org.dromara.mica.mqtt.client.solon.config;

@@ -1,5 +1,5 @@
-open module net.dreamlu.mica.mqtt.server {
-	requires transitive net.dreamlu.mica.mqtt.common;
+open module org.dromara.mica.mqtt.server {
+	requires transitive org.dromara.mica.mqtt.common;
 	requires transitive net.dreamlu.mica.net.http;
 	requires java.management;
 
