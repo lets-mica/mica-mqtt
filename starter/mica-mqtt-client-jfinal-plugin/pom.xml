@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.dreamlu</groupId>
+        <groupId>org.dromara.mica-mqtt</groupId>
         <artifactId>starter</artifactId>
         <version>${revision}</version>
     </parent>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.dreamlu</groupId>
+            <groupId>org.dromara.mica-mqtt</groupId>
             <artifactId>mica-mqtt-client</artifactId>
         </dependency>
         <dependency>

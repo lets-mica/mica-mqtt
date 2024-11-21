@@ -8,14 +8,14 @@
     <url>https://www.dreamlu.net</url>
 
     <parent>
-        <groupId>net.dreamlu</groupId>
+        <groupId>org.dromara.mica-mqtt</groupId>
         <artifactId>example</artifactId>
         <version>${revision}</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>net.dreamlu</groupId>
+            <groupId>org.dromara.mica-mqtt</groupId>
             <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
         </dependency>
         <dependency>

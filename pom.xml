@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>net.dreamlu</groupId>
+    <groupId>org.dromara.mica-mqtt</groupId>
     <artifactId>mica-mqtt</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -13,7 +13,7 @@
 
     <properties>
         <!-- mica-mqtt version -->
-        <revision>2.3.10-SNAPSHOT</revision>
+        <revision>2.4.0-SNAPSHOT</revision>
         <!-- java version -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -96,42 +96,42 @@
                 <version>${jfinal.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-codec</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-common</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-client</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-server</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-client-solon-plugin</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>net.dreamlu</groupId>
+                <groupId>org.dromara.mica-mqtt</groupId>
                 <artifactId>mica-mqtt-server-solon-plugin</artifactId>
                 <version>${revision}</version>
             </dependency>
