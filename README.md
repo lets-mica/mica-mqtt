@@ -6,7 +6,6 @@
 [![Gitcode Repo star](https://img.shields.io/badge/GitCode-GStar-red)](https://gitcode.com/dromara/mica-mqtt)
 [![star](https://gitee.com/dromara/mica-mqtt/badge/star.svg?theme=dark)](https://gitee.com/dromara/mica-mqtt/stargazers)
 [![GitHub Repo stars](https://img.shields.io/github/stars/dromara/mica-mqtt?label=Github%20Stars)](https://github.com/dromara/mica-mqtt)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/30dad82f79f34e41bafbc3cef6b68fc3)](https://www.codacy.com/gh/dromara/mica-mqtt/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dromara/mica-mqtt&amp;utm_campaign=Badge_Grade)
 [![GitHub](https://img.shields.io/github/license/dromara/mica-mqtt.svg?style=flat-square)](https://github.com/dromara/mica-mqtt/blob/master/LICENSE)
 
 ---
