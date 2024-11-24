@@ -28,6 +28,7 @@ public class RedisUtil {
 	/**
 	 * 转换成 redis 的 pattern 规则
 	 *
+	 * @param topicFilter topicFilter
 	 * @return pattern
 	 */
 	public static String getTopicPattern(String topicFilter) {

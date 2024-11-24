@@ -33,11 +33,11 @@ public enum RedisKeys {
 	 */
 	SERVER_NODES("mqtt:server:nodes:"),
 	/**
-	 * mqtt <-> redis pug/sub 集群内消息交互
+	 * mqtt 到 redis pug/sub 集群内消息交互
 	 */
 	REDIS_CHANNEL_EXCHANGE(RedisKeys.REDIS_CHANNEL_EXCHANGE_KEY),
 	/**
-	 * 云端 -> 设备 redis pug/sub 下行数据通道，广播到 mqtt 集群
+	 * 云端 到 设备 redis pug/sub 下行数据通道，广播到 mqtt 集群
 	 */
 	REDIS_CHANNEL_DOWN(RedisKeys.REDIS_CHANNEL_DOWN_KEY),
 	/**
