@@ -1,7 +1,7 @@
 # 🌐 mica mqtt 组件
 [![Java CI](https://github.com/dromara/mica-mqtt/workflows/Java%20CI/badge.svg)](https://github.com/dromara/mica-mqtt/actions)
 ![JAVA 8](https://img.shields.io/badge/JDK-1.8+-brightgreen.svg)
-[![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/org.dromara.mica-mqtt/mica-mqtt-codec.svg?style=flat-square)](https://central.sonatype.com/artifact/net.dreamlu/mica-mqtt-codec/versions)
+[![Mica Maven release](https://img.shields.io/nexus/r/https/oss.sonatype.org/org.dromara.mica-mqtt/mica-mqtt-codec.svg?style=flat-square)](https://central.sonatype.com/artifact/org.dromara.mica-mqtt/mica-mqtt-codec/versions)
 
 [![Gitcode Repo star](https://img.shields.io/badge/GitCode-GStar-red)](https://gitcode.com/dromara/mica-mqtt)
 [![star](https://gitee.com/dromara/mica-mqtt/badge/star.svg?theme=dark)](https://gitee.com/dromara/mica-mqtt/stargazers)
@@ -65,7 +65,7 @@
 **客户端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-client-spring-boot-starter</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
@@ -76,7 +76,7 @@
 **服务端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-server-spring-boot-starter</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
@@ -88,7 +88,7 @@
 **客户端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-client-solon-plugin</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
@@ -99,7 +99,7 @@
 **服务端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-server-solon-plugin</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
@@ -111,7 +111,7 @@
 **客户端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-client-jfinal-plugin</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
@@ -122,7 +122,7 @@
 **服务端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-server-jfinal-plugin</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
@@ -135,7 +135,7 @@
 **客户端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-client</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
@@ -146,7 +146,7 @@
 **服务端：**
 ```xml
 <dependency>
-  <groupId>net.dreamlu</groupId>
+  <groupId>org.dromara.mica-mqtt</groupId>
   <artifactId>mica-mqtt-server</artifactId>
   <version>${mica-mqtt.version}</version>
 </dependency>
