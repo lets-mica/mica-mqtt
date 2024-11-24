@@ -2,7 +2,7 @@
 
 ## 发行版本
 
-### v2.3.9 - 2024-11-24
+### v2.4.0-M1 - 2024-11-24
 - :sparkles: 调整 groupId 到 org.dromara.mica-mqtt
 - :truck: 切换包名到 org.dromara
 - :truck: 切换到 central sonatype， central sonatype 不支持快照版
