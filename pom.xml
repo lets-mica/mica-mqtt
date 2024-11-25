@@ -157,9 +157,9 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git@gitee.com/596392912/mica-mqtt</connection>
-        <developerConnection>scm:git:git@gitee.com/596392912/mica-mqtt.git</developerConnection>
-        <url>git@gitee.com/596392912/mica-mqtt.git</url>
+        <connection>scm:git:git@gitee.com/dromara/mica-mqtt</connection>
+        <developerConnection>scm:git:git@gitee.com/dromara/mica-mqtt.git</developerConnection>
+        <url>git@gitee.com/dromara/mica-mqtt.git</url>
     </scm>
 
     <build>
