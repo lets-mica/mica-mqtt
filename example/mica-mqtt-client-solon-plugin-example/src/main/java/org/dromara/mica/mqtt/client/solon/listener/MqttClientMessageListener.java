@@ -1,4 +1,4 @@
-package org.dromara.mica.mqtt.client.noear.listener;
+package org.dromara.mica.mqtt.client.solon.listener;
 
 import org.dromara.mica.mqtt.client.solon.MqttClientSubscribe;
 import org.dromara.mica.mqtt.codec.MqttPublishMessage;
@@ -20,7 +20,7 @@ public class MqttClientMessageListener implements IMqttClientMessageListener {
 
 	@Override
 	public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
-		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
+		logger.info("MqttClientMessageListener,topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}
 }
 

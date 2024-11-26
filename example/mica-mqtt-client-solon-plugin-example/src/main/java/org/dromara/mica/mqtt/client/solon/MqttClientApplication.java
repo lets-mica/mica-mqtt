@@ -1,4 +1,4 @@
-package org.dromara.mica.mqtt.client.noear;
+package org.dromara.mica.mqtt.client.solon;
 
 import org.noear.solon.Solon;
 import org.noear.solon.annotation.Configuration;

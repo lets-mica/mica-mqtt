@@ -1,4 +1,4 @@
-package org.dromara.mica.mqtt.client.noear.listener;
+package org.dromara.mica.mqtt.client.solon.listener;
 
 import org.dromara.mica.mqtt.client.solon.MqttClientSubscribe;
 import org.dromara.mica.mqtt.codec.MqttQoS;
@@ -19,7 +19,7 @@ public class MqttClientSubscribeListener {
 
 	@MqttClientSubscribe("/test/#")
 	public void subQos0(String topic, byte[] payload) {
-		logger.info("topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
+		logger.info("MqttClientSubscribeListener.subQos0,topic:{} payload:{}", topic, new String(payload, StandardCharsets.UTF_8));
 	}
 
 	@MqttClientSubscribe(value = "/qos1/#", qos = MqttQoS.QOS1)

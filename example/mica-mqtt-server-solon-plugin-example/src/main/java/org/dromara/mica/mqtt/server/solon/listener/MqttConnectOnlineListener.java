@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package org.dromara.mica.mqtt.server.noear.listener;
+package org.dromara.mica.mqtt.server.solon.listener;
 
-import org.dromara.mica.mqtt.server.solon.event.MqttClientOfflineEvent;
+import org.dromara.mica.mqtt.server.solon.event.MqttClientOnlineEvent;
 import org.noear.solon.annotation.Component;
 import org.noear.solon.core.event.EventListener;
 import org.slf4j.Logger;
@@ -28,11 +28,11 @@ import org.slf4j.LoggerFactory;
  * @author L.cm
  */
 @Component
-public class MqttConnectOfflineListener implements EventListener<MqttClientOfflineEvent> {
-	private static final Logger logger = LoggerFactory.getLogger(MqttConnectOfflineListener.class);
+public class MqttConnectOnlineListener implements EventListener<MqttClientOnlineEvent> {
+	private static final Logger logger = LoggerFactory.getLogger(MqttConnectOnlineListener.class);
 
 	@Override
-	public void onEvent(MqttClientOfflineEvent mqttClientOfflineEvent) throws Throwable {
-		logger.info("MqttClientOnlineEvent:{}", mqttClientOfflineEvent);
+	public void onEvent(MqttClientOnlineEvent mqttClientOnlineEvent) throws Throwable {
+		logger.info("MqttClientOnlineEvent:{}", mqttClientOnlineEvent);
 	}
 }

@@ -1,7 +1,7 @@
-package org.dromara.mica.mqtt.client.noear.controller;
+package org.dromara.mica.mqtt.client.solon.controller;
 
 
-import org.dromara.mica.mqtt.client.noear.service.ClientService;
+import org.dromara.mica.mqtt.client.solon.service.ClientService;
 import org.noear.solon.annotation.*;
 
 @Mapping("/mqtt/client")

@@ -1,4 +1,4 @@
-package org.dromara.mica.mqtt.server.noear.service;
+package org.dromara.mica.mqtt.server.solon.service;
 
 import org.dromara.mica.mqtt.server.solon.MqttServerTemplate;
 import org.noear.solon.annotation.Component;

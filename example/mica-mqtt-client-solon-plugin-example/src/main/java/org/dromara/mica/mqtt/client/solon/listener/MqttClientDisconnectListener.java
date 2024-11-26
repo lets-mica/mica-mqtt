@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dromara.mica.mqtt.client.noear.listener;
+package org.dromara.mica.mqtt.client.solon.listener;
 
 import org.dromara.mica.mqtt.client.solon.event.MqttDisconnectEvent;
 import org.dromara.mica.mqtt.core.client.MqttClientCreator;

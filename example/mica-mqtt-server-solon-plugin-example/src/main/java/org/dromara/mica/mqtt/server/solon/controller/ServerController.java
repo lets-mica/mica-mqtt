@@ -1,7 +1,7 @@
-package org.dromara.mica.mqtt.server.noear.controller;
+package org.dromara.mica.mqtt.server.solon.controller;
 
 
-import org.dromara.mica.mqtt.server.noear.service.ServerService;
+import org.dromara.mica.mqtt.server.solon.service.ServerService;
 import org.noear.solon.annotation.Controller;
 import org.noear.solon.annotation.Inject;
 import org.noear.solon.annotation.Mapping;

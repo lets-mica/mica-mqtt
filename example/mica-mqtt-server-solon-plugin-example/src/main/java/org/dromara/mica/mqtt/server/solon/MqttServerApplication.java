@@ -1,4 +1,4 @@
-package org.dromara.mica.mqtt.server.noear;
+package org.dromara.mica.mqtt.server.solon;
 
 
 import org.noear.solon.Solon;

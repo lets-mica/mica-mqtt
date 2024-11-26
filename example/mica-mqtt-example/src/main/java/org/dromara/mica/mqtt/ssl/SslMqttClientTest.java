@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dromara.mica.mqtt;
+package org.dromara.mica.mqtt.ssl;
 
 import org.dromara.mica.mqtt.core.client.MqttClient;
 import org.slf4j.Logger;

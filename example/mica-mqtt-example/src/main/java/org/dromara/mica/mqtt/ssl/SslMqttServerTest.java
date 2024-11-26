@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.dromara.mica.mqtt;
+package org.dromara.mica.mqtt.ssl;
 
 import org.dromara.mica.mqtt.core.server.MqttServer;
 import org.dromara.mica.mqtt.server.MqttConnectStatusListener;

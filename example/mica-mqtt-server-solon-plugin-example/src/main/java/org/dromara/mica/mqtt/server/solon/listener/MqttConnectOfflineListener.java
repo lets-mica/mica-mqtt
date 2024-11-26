@@ -14,30 +14,25 @@
  * limitations under the License.
  */
 
-package org.dromara.mica.mqtt.client.noear.listener;
+package org.dromara.mica.mqtt.server.solon.listener;
 
-import org.dromara.mica.mqtt.client.solon.event.MqttConnectedEvent;
-import org.dromara.mica.mqtt.core.client.MqttClientCreator;
+import org.dromara.mica.mqtt.server.solon.event.MqttClientOfflineEvent;
 import org.noear.solon.annotation.Component;
-import org.noear.solon.annotation.Inject;
 import org.noear.solon.core.event.EventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 客户端连接状态监听
+ * mqtt 连接状态，使用 spring boot event 方式，性能有损耗
  *
  * @author L.cm
  */
 @Component
-public class MqttClientConnectedListener implements EventListener<MqttConnectedEvent> {
-	private static final Logger logger = LoggerFactory.getLogger(MqttClientConnectedListener.class);
-
-	@Inject
-	private MqttClientCreator mqttClientCreator;
+public class MqttConnectOfflineListener implements EventListener<MqttClientOfflineEvent> {
+	private static final Logger logger = LoggerFactory.getLogger(MqttConnectOfflineListener.class);
 
 	@Override
-	public void onEvent(MqttConnectedEvent mqttConnectedEvent) throws Throwable {
-		logger.info("MqttConnectedEvent:{}", mqttConnectedEvent);
+	public void onEvent(MqttClientOfflineEvent mqttClientOfflineEvent) throws Throwable {
+		logger.info("MqttClientOnlineEvent:{}", mqttClientOfflineEvent);
 	}
 }

@@ -1,4 +1,4 @@
-package org.dromara.mica.mqtt.client.noear.service;
+package org.dromara.mica.mqtt.client.solon.service;
 
 
 import org.dromara.mica.mqtt.client.solon.MqttClientTemplate;
