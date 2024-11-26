@@ -20,23 +20,30 @@ import org.dromara.mica.mqtt.codec.MqttMessageBuilders;
 import org.dromara.mica.mqtt.codec.MqttPublishMessage;
 import org.dromara.mica.mqtt.codec.MqttQoS;
 import org.dromara.mica.mqtt.core.common.MqttPendingPublish;
+import org.dromara.mica.mqtt.core.server.model.ClientInfo;
 import org.dromara.mica.mqtt.core.server.session.IMqttSessionManager;
 import org.dromara.mica.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tio.core.ChannelContext;
 import org.tio.core.Tio;
+import org.tio.core.TioConfig;
+import org.tio.core.stat.vo.StatVo;
 import org.tio.server.TioServer;
 import org.tio.server.TioServerConfig;
 import org.tio.utils.hutool.StrUtil;
+import org.tio.utils.page.Page;
+import org.tio.utils.page.PageUtils;
 import org.tio.utils.timer.TimerTask;
 import org.tio.utils.timer.TimerTaskService;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * mqtt 服务端
@@ -315,6 +322,101 @@ public final class MqttServer {
 		retainMessage.setTimestamp(System.currentTimeMillis());
 		retainMessage.setNode(serverCreator.getNodeName());
 		this.messageStore.addRetainMessage(topic, retainMessage);
+	}
+
+	/**
+	 * 获取客户端信息
+	 *
+	 * @param clientId clientId
+	 * @return ClientInfo
+	 */
+	public ClientInfo getClientInfo(String clientId) {
+		ChannelContext context = Tio.getByBsId(this.getServerConfig(), clientId);
+		if (context == null) {
+			return null;
+		}
+		return ClientInfo.form(serverCreator, context, ClientInfo::new);
+	}
+
+	/**
+	 * 获取客户端信息
+	 *
+	 * @param context ChannelContext
+	 * @return ClientInfo
+	 */
+	public ClientInfo getClientInfo(ChannelContext context) {
+		return ClientInfo.form(serverCreator, context, ClientInfo::new);
+	}
+
+	/**
+	 * 获取所有的客户端
+	 *
+	 * @return 客户端列表
+	 */
+	public List<ClientInfo> getClients() {
+		return getClients(this.serverCreator, this.getServerConfig());
+	}
+
+	/**
+	 * 分页获取所有的客户端
+	 *
+	 * @param serverCreator MqttServerCreator
+	 * @param tioConfig     TioConfig
+	 * @return 客户端列表
+	 */
+	public static List<ClientInfo> getClients(MqttServerCreator serverCreator, TioConfig tioConfig) {
+		return Tio.getAll(tioConfig)
+			.stream()
+			.filter(MqttServer::isMqtt)
+			.map(context -> ClientInfo.form(serverCreator, context, ClientInfo::new))
+			.collect(Collectors.toList());
+	}
+
+	/**
+	 * 分页获取所有的客户端
+	 *
+	 * @param pageIndex pageIndex，默认为 1
+	 * @param pageSize  pageSize，默认为所有
+	 * @return 分页
+	 */
+	public Page<ClientInfo> getClients(Integer pageIndex, Integer pageSize) {
+		return getClients(this.serverCreator, this.getServerConfig(), pageIndex, pageSize);
+	}
+
+	/**
+	 * 分页获取所有的客户端
+	 *
+	 * @param serverCreator MqttServerCreator
+	 * @param tioConfig     TioConfig
+	 * @param pageIndex     pageIndex，默认为 1
+	 * @param pageSize      pageSize，默认为所有
+	 * @return 分页
+	 */
+	public static Page<ClientInfo> getClients(MqttServerCreator serverCreator, TioConfig tioConfig, Integer pageIndex, Integer pageSize) {
+		Set<ChannelContext> contextSet = Tio.getAll(tioConfig)
+			.stream()
+			.filter(MqttServer::isMqtt)
+			.collect(Collectors.toSet());
+		return PageUtils.fromSet(contextSet, pageIndex, pageSize, context -> ClientInfo.form(serverCreator, context, ClientInfo::new));
+	}
+
+	/**
+	 * 获取统计数据
+	 *
+	 * @return StatVo
+	 */
+	public StatVo getStat() {
+		return tioServer.getServerConfig().getStat();
+	}
+
+	/**
+	 * 判断是否 mqtt 连接
+	 *
+	 * @param context ChannelContext
+	 * @return 是否 mqtt
+	 */
+	private static boolean isMqtt(ChannelContext context) {
+		return StrUtil.isNotBlank(context.getBsId());
 	}
 
 	/**

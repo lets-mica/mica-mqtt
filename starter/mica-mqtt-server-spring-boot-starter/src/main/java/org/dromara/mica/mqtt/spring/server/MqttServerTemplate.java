@@ -19,9 +19,13 @@ package org.dromara.mica.mqtt.spring.server;
 import lombok.RequiredArgsConstructor;
 import org.dromara.mica.mqtt.codec.MqttQoS;
 import org.dromara.mica.mqtt.core.server.MqttServer;
+import org.dromara.mica.mqtt.core.server.model.ClientInfo;
 import org.tio.core.ChannelContext;
+import org.tio.core.stat.vo.StatVo;
+import org.tio.utils.page.Page;
 import org.tio.utils.timer.TimerTask;
 
+import java.util.List;
 import java.util.concurrent.Executor;
 
 /**
@@ -131,6 +135,54 @@ public class MqttServerTemplate {
 	 */
 	public boolean publishAll(String topic, byte[] payload, MqttQoS qos, boolean retain) {
 		return mqttServer.publishAll(topic, payload, qos, retain);
+	}
+
+	/**
+	 * 获取客户端信息
+	 *
+	 * @param clientId clientId
+	 * @return ClientInfo
+	 */
+	public ClientInfo getClientInfo(String clientId) {
+		return mqttServer.getClientInfo(clientId);
+	}
+
+	/**
+	 * 获取客户端信息
+	 *
+	 * @param context ChannelContext
+	 * @return ClientInfo
+	 */
+	public ClientInfo getClientInfo(ChannelContext context) {
+		return mqttServer.getClientInfo(context);
+	}
+
+	/**
+	 * 获取所有的客户端
+	 *
+	 * @return 客户端列表
+	 */
+	public List<ClientInfo> getClients() {
+		return mqttServer.getClients();
+	}
+
+	/**
+	 * 分页获取所有的客户端
+	 *
+	 * @param pageIndex pageIndex，默认为 1
+	 * @param pageSize  pageSize，默认为所有
+	 * @return 分页
+	 */
+	public Page<ClientInfo> getClients(Integer pageIndex, Integer pageSize) {
+		return mqttServer.getClients(pageIndex, pageSize);
+	}
+
+	/**
+	 * 获取统计数据
+	 * @return StatVo
+	 */
+	public StatVo getStat() {
+		return mqttServer.getStat();
 	}
 
 	/**
