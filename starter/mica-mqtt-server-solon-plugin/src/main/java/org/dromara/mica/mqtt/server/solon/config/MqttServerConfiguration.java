@@ -2,12 +2,12 @@
 
 package org.dromara.mica.mqtt.server.solon.config;
 
-import org.dromara.mica.mqtt.server.solon.event.SolonEventMqttConnectStatusListener;
-import org.dromara.mica.mqtt.server.solon.event.SolonEventMqttMessageListener;
 import org.dromara.mica.mqtt.core.server.MqttServer;
 import org.dromara.mica.mqtt.core.server.MqttServerCreator;
 import org.dromara.mica.mqtt.core.server.event.IMqttConnectStatusListener;
 import org.dromara.mica.mqtt.core.server.event.IMqttMessageListener;
+import org.dromara.mica.mqtt.server.solon.event.SolonEventMqttConnectStatusListener;
+import org.dromara.mica.mqtt.server.solon.event.SolonEventMqttMessageListener;
 import org.noear.solon.annotation.Bean;
 import org.noear.solon.annotation.Condition;
 import org.noear.solon.annotation.Configuration;

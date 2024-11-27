@@ -205,13 +205,15 @@ public final class MqttServer {
 			.retained(retain)
 			.messageId(messageId)
 			.build();
-		boolean result = Tio.send(context, message);
-		logger.debug("MQTT Topic:{} qos:{} retain:{} publish clientId:{} result:{}", topic, qos, retain, clientId, result);
+		// 先启动高 qos 的重试
 		if (isHighLevelQoS) {
 			MqttPendingPublish pendingPublish = new MqttPendingPublish(payload, message, qos);
 			sessionManager.addPendingPublish(clientId, messageId, pendingPublish);
 			pendingPublish.startPublishRetransmissionTimer(taskService, context);
 		}
+		// 发送消息
+		boolean result = Tio.send(context, message);
+		logger.debug("MQTT Topic:{} qos:{} retain:{} publish clientId:{} result:{}", topic, qos, retain, clientId, result);
 		return result;
 	}
 

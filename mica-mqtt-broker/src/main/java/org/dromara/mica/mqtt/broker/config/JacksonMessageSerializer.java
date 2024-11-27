@@ -16,9 +16,9 @@
 
 package org.dromara.mica.mqtt.broker.config;
 
+import net.dreamlu.mica.core.utils.JsonUtil;
 import org.dromara.mica.mqtt.core.server.model.Message;
 import org.dromara.mica.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.mica.core.utils.JsonUtil;
 
 /**
  * jackson 消息序列化

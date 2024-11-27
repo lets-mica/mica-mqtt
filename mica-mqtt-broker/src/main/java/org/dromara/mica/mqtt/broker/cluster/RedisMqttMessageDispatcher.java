@@ -16,10 +16,10 @@
 
 package org.dromara.mica.mqtt.broker.cluster;
 
+import net.dreamlu.mica.redis.stream.RStreamTemplate;
 import org.dromara.mica.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import org.dromara.mica.mqtt.core.server.model.Message;
 import org.dromara.mica.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.mica.redis.stream.RStreamTemplate;
 
 import java.util.Objects;
 

@@ -16,6 +16,8 @@
 
 package org.dromara.mica.mqtt.broker.config;
 
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
+import net.dreamlu.mica.redis.stream.RStreamTemplate;
 import org.dromara.mica.mqtt.broker.cluster.*;
 import org.dromara.mica.mqtt.broker.enums.RedisKeys;
 import org.dromara.mica.mqtt.broker.listener.RedisMqttConnectStatusListener;
@@ -24,8 +26,6 @@ import org.dromara.mica.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import org.dromara.mica.mqtt.core.server.event.IMqttConnectStatusListener;
 import org.dromara.mica.mqtt.core.server.serializer.IMessageSerializer;
 import org.dromara.mica.mqtt.core.server.store.IMqttMessageStore;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
-import net.dreamlu.mica.redis.stream.RStreamTemplate;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

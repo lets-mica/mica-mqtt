@@ -17,10 +17,10 @@
 package org.dromara.mica.mqtt.broker.listener;
 
 import lombok.RequiredArgsConstructor;
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.dromara.mica.mqtt.broker.enums.RedisKeys;
 import org.dromara.mica.mqtt.core.server.MqttServerCreator;
 import org.dromara.mica.mqtt.core.server.event.IMqttConnectStatusListener;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.context.ApplicationContext;

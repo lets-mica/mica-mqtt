@@ -17,13 +17,13 @@
 package org.dromara.mica.mqtt.broker.cluster;
 
 import lombok.RequiredArgsConstructor;
+import net.dreamlu.mica.redis.cache.MicaRedisCache;
 import org.dromara.mica.mqtt.broker.enums.RedisKeys;
 import org.dromara.mica.mqtt.broker.util.RedisUtil;
 import org.dromara.mica.mqtt.core.server.model.Message;
 import org.dromara.mica.mqtt.core.server.serializer.IMessageSerializer;
 import org.dromara.mica.mqtt.core.server.store.IMqttMessageStore;
 import org.dromara.mica.mqtt.core.util.TopicUtil;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
 
 import java.util.ArrayList;
 import java.util.List;

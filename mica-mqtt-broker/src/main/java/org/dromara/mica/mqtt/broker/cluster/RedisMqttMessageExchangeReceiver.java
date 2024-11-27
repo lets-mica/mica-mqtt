@@ -16,20 +16,16 @@
 
 package org.dromara.mica.mqtt.broker.cluster;
 
+import net.dreamlu.mica.redis.stream.MessageModel;
+import net.dreamlu.mica.redis.stream.RStreamListener;
 import org.dromara.mica.mqtt.broker.enums.RedisKeys;
 import org.dromara.mica.mqtt.core.server.MqttServer;
 import org.dromara.mica.mqtt.core.server.cluster.MqttClusterMessageListener;
 import org.dromara.mica.mqtt.core.server.model.Message;
 import org.dromara.mica.mqtt.core.server.serializer.IMessageSerializer;
-import net.dreamlu.mica.redis.cache.MicaRedisCache;
-import net.dreamlu.mica.redis.stream.MessageModel;
-import net.dreamlu.mica.redis.stream.RStreamListener;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.connection.stream.MapRecord;
 
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * 监听集群消息，上行和内部集群通道

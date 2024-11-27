@@ -17,6 +17,8 @@
 package org.dromara.mica.mqtt.core.server.support;
 
 import org.dromara.mica.mqtt.codec.*;
+import org.dromara.mica.mqtt.core.common.MqttPendingPublish;
+import org.dromara.mica.mqtt.core.common.MqttPendingQos2Publish;
 import org.dromara.mica.mqtt.core.server.MqttServerCreator;
 import org.dromara.mica.mqtt.core.server.MqttServerProcessor;
 import org.dromara.mica.mqtt.core.server.auth.IMqttServerAuthHandler;
@@ -31,9 +33,6 @@ import org.dromara.mica.mqtt.core.server.event.IMqttSessionListener;
 import org.dromara.mica.mqtt.core.server.model.Message;
 import org.dromara.mica.mqtt.core.server.session.IMqttSessionManager;
 import org.dromara.mica.mqtt.core.server.store.IMqttMessageStore;
-import org.dromara.mica.mqtt.codec.*;
-import org.dromara.mica.mqtt.core.common.MqttPendingPublish;
-import org.dromara.mica.mqtt.core.common.MqttPendingQos2Publish;
 import org.dromara.mica.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,11 +244,13 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 				if (packetId != -1) {
 					MqttFixedHeader pubRecFixedHeader = new MqttFixedHeader(MqttMessageType.PUBREC, false, MqttQoS.QOS0, false, 0);
 					MqttMessage pubRecMessage = new MqttMessage(pubRecFixedHeader, MqttMessageIdVariableHeader.from(packetId));
-					boolean resultPubRec = Tio.send(context, pubRecMessage);
-					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
 					MqttPendingQos2Publish pendingQos2Publish = new MqttPendingQos2Publish(message, pubRecMessage);
+					// 添加重试
 					sessionManager.addPendingQos2Publish(clientId, packetId, pendingQos2Publish);
 					pendingQos2Publish.startPubRecRetransmitTimer(taskService, context);
+					// 发送消息
+					boolean resultPubRec = Tio.send(context, pubRecMessage);
+					logger.debug("Publish - PubRec send clientId:{} topicName:{} mqttQoS:{} packetId:{} result:{}", clientId, topicName, mqttQoS, packetId, resultPubRec);
 				}
 				break;
 			case FAILURE:
@@ -281,13 +282,14 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			return;
 		}
 		pendingPublish.onPubAckReceived();
-
 		MqttFixedHeader fixedHeader = new MqttFixedHeader(MqttMessageType.PUBREL, false, MqttQoS.QOS1, false, 0);
 		MqttMessage pubRelMessage = new MqttMessage(fixedHeader, variableHeader);
-		Tio.send(context, pubRelMessage);
 
 		pendingPublish.setPubRelMessage(pubRelMessage);
 		pendingPublish.startPubRelRetransmissionTimer(taskService, context);
+
+		boolean result = Tio.send(context, pubRelMessage);
+		logger.debug("Publish - PubRel send clientId:{} packetId:{} result:{}", clientId, messageId, result);
 	}
 
 	@Override
@@ -308,7 +310,9 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		MqttMessage message = MqttMessageFactory.newMessage(
 			new MqttFixedHeader(MqttMessageType.PUBCOMP, false, MqttQoS.QOS0, false, 0),
 			MqttMessageIdVariableHeader.from(messageId), null);
-		Tio.send(context, message);
+
+		boolean result = Tio.send(context, message);
+		logger.debug("Publish - PubComp send clientId:{} packetId:{} result:{}", clientId, messageId, result);
 	}
 
 	@Override
@@ -355,7 +359,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 			.addGrantedQosList(grantedQosList)
 			.packetId(messageId)
 			.build();
-		Tio.send(context, subAckMessage);
+		boolean result = Tio.send(context, subAckMessage);
+		logger.debug("Subscribe - Aco send clientId:{} packetId:{} result:{}", clientId, messageId, result);
 		// 4. 发送保留消息
 		for (String topic : subscribedTopicList) {
 			executor.submit(() -> {
@@ -403,7 +408,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 		MqttMessage unSubMessage = MqttMessageBuilders.unsubAck()
 			.packetId(messageId)
 			.build();
-		Tio.send(context, unSubMessage);
+		boolean result = Tio.send(context, unSubMessage);
+		logger.debug("UnSubscribe - Ack send clientId:{} result:{}", clientId, result);
 	}
 
 	/**
@@ -429,8 +435,8 @@ public class DefaultMqttServerProcessor implements MqttServerProcessor {
 	@Override
 	public void processPingReq(ChannelContext context) {
 		String clientId = context.getBsId();
-		logger.debug("PingReq - clientId:{}", clientId);
-		Tio.send(context, MqttMessage.PINGRESP);
+		boolean result = Tio.send(context, MqttMessage.PINGRESP);
+		logger.debug("PingReq - PingResp send clientId:{} result:{}", clientId, result);
 	}
 
 	@Override
