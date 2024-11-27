@@ -70,6 +70,45 @@ public class MqttClientTest {
 			}
 		});
 
+		client.subQos0("/test/1", new IMqttClientMessageListener() {
+			@Override
+			public void onSubscribed(ChannelContext context, String topicFilter, MqttQoS mqttQoS) {
+				// 订阅成功之后触发，可在此处做一些业务逻辑
+				logger.info("topicFilter:{} MqttQoS:{} 订阅成功！！！", topicFilter, mqttQoS);
+			}
+
+			@Override
+			public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
+				logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
+			}
+		});
+
+		client.subQos0("/test/2", new IMqttClientMessageListener() {
+			@Override
+			public void onSubscribed(ChannelContext context, String topicFilter, MqttQoS mqttQoS) {
+				// 订阅成功之后触发，可在此处做一些业务逻辑
+				logger.info("topicFilter:{} MqttQoS:{} 订阅成功！！！", topicFilter, mqttQoS);
+			}
+
+			@Override
+			public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
+				logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
+			}
+		});
+
+		client.subQos0("/test/3", new IMqttClientMessageListener() {
+			@Override
+			public void onSubscribed(ChannelContext context, String topicFilter, MqttQoS mqttQoS) {
+				// 订阅成功之后触发，可在此处做一些业务逻辑
+				logger.info("topicFilter:{} MqttQoS:{} 订阅成功！！！", topicFilter, mqttQoS);
+			}
+
+			@Override
+			public void onMessage(ChannelContext context, String topic, MqttPublishMessage message, byte[] payload) {
+				logger.info(topic + '\t' + new String(payload, StandardCharsets.UTF_8));
+			}
+		});
+
 		client.publish("/test/client", "mica最牛皮1".getBytes(StandardCharsets.UTF_8));
 		client.publish("/test/client", "mica最牛皮2".getBytes(StandardCharsets.UTF_8));
 		client.publish("/test/client", "mica最牛皮3".getBytes(StandardCharsets.UTF_8));
