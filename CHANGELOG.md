@@ -2,6 +2,10 @@
 
 ## 发行版本
 
+### v2.4.0-M2 - 2024-12-01
+- :sparkles: mica-mqtt-server 暴露获取 clientId 和状态统计接口
+- :bug: 修复订阅发送时机问题 gitee #IB72L6 感谢 `@江上烽` 反馈
+
 ### v2.4.0-M1 - 2024-11-24
 - :sparkles: 调整 groupId 到 org.dromara.mica-mqtt
 - :truck: 切换包名到 org.dromara
