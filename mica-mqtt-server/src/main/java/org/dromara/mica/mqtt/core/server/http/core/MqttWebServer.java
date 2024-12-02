@@ -225,7 +225,7 @@ public class MqttWebServer {
 	private final HttpRequestHandler httpRequestHandler;
 	private final HttpConfig httpConfig;
 	private final TioServerConfig serverTioConfig;
-	private final org.dromara.mica.mqtt.core.server.http.core.MqttWebServerAioHandler mqttWebServerAioHandler;
+	private final MqttWebServerAioHandler mqttWebServerAioHandler;
 	private final TioServer tioServer;
 
 	public MqttWebServer(MqttServerCreator serverCreator, TioServerConfig mqttServerConfig, IWsMsgHandler wsMsgHandler) {
@@ -239,7 +239,7 @@ public class MqttWebServer {
 		this.httpConfig.setName(serverCreator.getName() + "-HTTP/Websocket");
 		this.httpConfig.setCheckHost(false);
 		this.httpConfig.setHttpRequestHandler(this.httpRequestHandler);
-		this.mqttWebServerAioHandler = new org.dromara.mica.mqtt.core.server.http.core.MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
+		this.mqttWebServerAioHandler = new MqttWebServerAioHandler(httpConfig, this.httpRequestHandler, wsMsgHandler);
 		this.serverTioConfig = new TioServerConfig(this.httpConfig.getName(), mqttWebServerAioHandler, serverAioListener, tioExecutor, groupExecutor);
 		this.serverTioConfig.setSslConfig(serverCreator.getSslConfig());
 		this.serverTioConfig.setHeartbeatTimeout(0);
@@ -256,7 +256,7 @@ public class MqttWebServer {
 		return httpRequestHandler;
 	}
 
-	public org.dromara.mica.mqtt.core.server.http.core.MqttWebServerAioHandler getMqttWebServerAioHandler() {
+	public MqttWebServerAioHandler getMqttWebServerAioHandler() {
 		return mqttWebServerAioHandler;
 	}
 

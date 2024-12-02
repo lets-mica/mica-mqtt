@@ -27,15 +27,15 @@ import java.util.*;
  * @author L.cm
  */
 public final class MqttHttpRoutes {
-	private static final LinkedList<org.dromara.mica.mqtt.core.server.http.handler.HttpFilter> FILTERS = new LinkedList<>();
-	private static final Map<org.dromara.mica.mqtt.core.server.http.handler.RouteInfo, HttpHandler> ROUTS = new HashMap<>();
+	private static final LinkedList<HttpFilter> FILTERS = new LinkedList<>();
+	private static final Map<RouteInfo, HttpHandler> ROUTS = new HashMap<>();
 
 	/**
 	 * 注册 filter 到 first
 	 *
 	 * @param filter HttpFilter
 	 */
-	public static void addFirstFilter(org.dromara.mica.mqtt.core.server.http.handler.HttpFilter filter) {
+	public static void addFirstFilter(HttpFilter filter) {
 		FILTERS.addFirst(filter);
 	}
 
@@ -44,7 +44,7 @@ public final class MqttHttpRoutes {
 	 *
 	 * @param filter HttpFilter
 	 */
-	public static void addFilter(org.dromara.mica.mqtt.core.server.http.handler.HttpFilter filter) {
+	public static void addFilter(HttpFilter filter) {
 		FILTERS.add(filter);
 	}
 
@@ -54,7 +54,7 @@ public final class MqttHttpRoutes {
 	 * @param index  index
 	 * @param filter HttpFilter
 	 */
-	public static void addFilter(int index, org.dromara.mica.mqtt.core.server.http.handler.HttpFilter filter) {
+	public static void addFilter(int index, HttpFilter filter) {
 		FILTERS.add(index, filter);
 	}
 
@@ -63,7 +63,7 @@ public final class MqttHttpRoutes {
 	 *
 	 * @return 过滤器集合
 	 */
-	public static List<org.dromara.mica.mqtt.core.server.http.handler.HttpFilter> getFilters() {
+	public static List<HttpFilter> getFilters() {
 		return Collections.unmodifiableList(FILTERS);
 	}
 
@@ -75,7 +75,7 @@ public final class MqttHttpRoutes {
 	 * @param handler HttpHandler
 	 */
 	public static void register(Method method, String path, HttpHandler handler) {
-		ROUTS.put(new org.dromara.mica.mqtt.core.server.http.handler.RouteInfo(path, method), handler);
+		ROUTS.put(new RouteInfo(path, method), handler);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public final class MqttHttpRoutes {
 	public static HttpHandler getHandler(RequestLine requestLine) {
 		String path = requestLine.getPath();
 		Method method = requestLine.getMethod();
-		return ROUTS.get(new org.dromara.mica.mqtt.core.server.http.handler.RouteInfo(path, method));
+		return ROUTS.get(new RouteInfo(path, method));
 	}
 
 	/**
@@ -95,7 +95,7 @@ public final class MqttHttpRoutes {
 	 *
 	 * @return 路由信息
 	 */
-	public static Map<org.dromara.mica.mqtt.core.server.http.handler.RouteInfo, HttpHandler> getRouts() {
+	public static Map<RouteInfo, HttpHandler> getRouts() {
 		return Collections.unmodifiableMap(ROUTS);
 	}
 

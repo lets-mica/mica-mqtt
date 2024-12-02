@@ -21,7 +21,7 @@ package org.dromara.mica.mqtt.core.server.http.api.form;
  *
  * @author L.cm
  */
-public class PublishForm extends org.dromara.mica.mqtt.core.server.http.api.form.BaseForm {
+public class PublishForm extends BaseForm {
 
 	/**
 	 * 消息正文

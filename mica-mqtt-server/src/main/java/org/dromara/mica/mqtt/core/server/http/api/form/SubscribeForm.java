@@ -21,7 +21,7 @@ package org.dromara.mica.mqtt.core.server.http.api.form;
  *
  * @author L.cm
  */
-public class SubscribeForm extends org.dromara.mica.mqtt.core.server.http.api.form.BaseForm {
+public class SubscribeForm extends BaseForm {
 
 	/**
 	 * QoS 等级 0

@@ -20,9 +20,13 @@ import org.dromara.mica.mqtt.codec.MqttMessageBuilders;
 import org.dromara.mica.mqtt.codec.MqttPublishMessage;
 import org.dromara.mica.mqtt.codec.MqttQoS;
 import org.dromara.mica.mqtt.core.common.MqttPendingPublish;
+import org.dromara.mica.mqtt.core.server.enums.MessageType;
+import org.dromara.mica.mqtt.core.server.http.core.MqttWebServer;
 import org.dromara.mica.mqtt.core.server.model.ClientInfo;
+import org.dromara.mica.mqtt.core.server.model.Message;
 import org.dromara.mica.mqtt.core.server.model.Subscribe;
 import org.dromara.mica.mqtt.core.server.session.IMqttSessionManager;
+import org.dromara.mica.mqtt.core.server.store.IMqttMessageStore;
 import org.dromara.mica.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,17 +58,17 @@ import java.util.stream.Collectors;
 public final class MqttServer {
 	private static final Logger logger = LoggerFactory.getLogger(MqttServer.class);
 	private final TioServer tioServer;
-	private final org.dromara.mica.mqtt.core.server.http.core.MqttWebServer webServer;
+	private final MqttWebServer webServer;
 	private final MqttServerCreator serverCreator;
 	private final IMqttSessionManager sessionManager;
-	private final org.dromara.mica.mqtt.core.server.store.IMqttMessageStore messageStore;
+	private final IMqttMessageStore messageStore;
 	/**
 	 * taskService
 	 */
 	private final TimerTaskService taskService;
 
 	MqttServer(TioServer tioServer,
-			   org.dromara.mica.mqtt.core.server.http.core.MqttWebServer webServer,
+			   MqttWebServer webServer,
 			   MqttServerCreator serverCreator,
 			   TimerTaskService taskService) {
 		this.tioServer = tioServer;
@@ -93,7 +97,7 @@ public final class MqttServer {
 	 *
 	 * @return MqttWebServer
 	 */
-	public org.dromara.mica.mqtt.core.server.http.core.MqttWebServer getWebServer() {
+	public MqttWebServer getWebServer() {
 		return webServer;
 	}
 
@@ -270,12 +274,12 @@ public final class MqttServer {
 			this.saveRetainMessage(topic, qos, payload);
 		}
 		// 查找订阅该 topic 的客户端
-		List<org.dromara.mica.mqtt.core.server.model.Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
+		List<Subscribe> subscribeList = sessionManager.searchSubscribe(topic);
 		if (subscribeList.isEmpty()) {
 			logger.debug("Mqtt Topic:{} publishAll but subscribe client list is empty.", topic);
 			return false;
 		}
-		for (org.dromara.mica.mqtt.core.server.model.Subscribe subscribe : subscribeList) {
+		for (Subscribe subscribe : subscribeList) {
 			String clientId = subscribe.getClientId();
 			ChannelContext context = Tio.getByBsId(getServerConfig(), clientId);
 			if (context == null || context.isClosed()) {
@@ -296,7 +300,7 @@ public final class MqttServer {
 	 * @param message Message
 	 * @return 是否成功
 	 */
-	public boolean sendToClient(String topic, org.dromara.mica.mqtt.core.server.model.Message message) {
+	public boolean sendToClient(String topic, Message message) {
 		// 客户端id
 		String clientId = message.getClientId();
 		MqttQoS mqttQoS = MqttQoS.valueOf(message.getQos());
@@ -315,11 +319,11 @@ public final class MqttServer {
 	 * @param payload ByteBuffer
 	 */
 	private void saveRetainMessage(String topic, MqttQoS mqttQoS, byte[] payload) {
-		org.dromara.mica.mqtt.core.server.model.Message retainMessage = new org.dromara.mica.mqtt.core.server.model.Message();
+		Message retainMessage = new Message();
 		retainMessage.setTopic(topic);
 		retainMessage.setQos(mqttQoS.value());
 		retainMessage.setPayload(payload);
-		retainMessage.setMessageType(org.dromara.mica.mqtt.core.server.enums.MessageType.DOWN_STREAM);
+		retainMessage.setMessageType(MessageType.DOWN_STREAM);
 		retainMessage.setRetain(true);
 		retainMessage.setDup(false);
 		retainMessage.setTimestamp(System.currentTimeMillis());

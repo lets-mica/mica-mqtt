@@ -40,9 +40,9 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 	public HttpResponse handler(HttpRequest request) {
 		RequestLine requestLine = request.getRequestLine();
 		// 1. 处理过滤器
-		List<org.dromara.mica.mqtt.core.server.http.handler.HttpFilter> httpFilters = org.dromara.mica.mqtt.core.server.http.handler.MqttHttpRoutes.getFilters();
+		List<HttpFilter> httpFilters = MqttHttpRoutes.getFilters();
 		try {
-			for (org.dromara.mica.mqtt.core.server.http.handler.HttpFilter filter : httpFilters) {
+			for (HttpFilter filter : httpFilters) {
 				if (!filter.filter(request)) {
 					return filter.response(request);
 				}
@@ -51,7 +51,7 @@ public class MqttHttpRequestHandler implements HttpRequestHandler {
 			return resp500(request, requestLine, e);
 		}
 		// 2. 路由处理
-		HttpHandler handler = org.dromara.mica.mqtt.core.server.http.handler.MqttHttpRoutes.getHandler(requestLine);
+		HttpHandler handler = MqttHttpRoutes.getHandler(requestLine);
 		if (handler == null) {
 			return resp404(request, requestLine);
 		}

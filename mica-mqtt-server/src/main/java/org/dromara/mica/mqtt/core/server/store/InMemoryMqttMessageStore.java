@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentMap;
  *
  * @author L.cm
  */
-public class InMemoryMqttMessageStore implements org.dromara.mica.mqtt.core.server.store.IMqttMessageStore {
+public class InMemoryMqttMessageStore implements IMqttMessageStore {
 	/**
 	 * 遗嘱消息 clientId: Message
 	 */
