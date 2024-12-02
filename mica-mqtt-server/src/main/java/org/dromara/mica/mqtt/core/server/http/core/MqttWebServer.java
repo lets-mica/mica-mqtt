@@ -289,7 +289,7 @@ public class MqttWebServer {
 			// 1.1 http-api 用到 json
 			serverCreator.jsonAdapter(JsonUtil.getJsonAdapter(serverCreator.getJsonAdapter()));
 			// 1.2 http 路由配置
-			MqttHttpApi httpApi = new MqttHttpApi(serverCreator);
+			MqttHttpApi httpApi = new MqttHttpApi(serverCreator, mqttServerConfig);
 			httpApi.register();
 			// 1.3 认证配置
 			String username = serverCreator.getHttpBasicUsername();

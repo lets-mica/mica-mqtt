@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.dromara.mica.mqtt.codec.MqttQoS;
 import org.dromara.mica.mqtt.core.server.MqttServer;
 import org.dromara.mica.mqtt.core.server.model.ClientInfo;
+import org.dromara.mica.mqtt.core.server.model.Subscribe;
 import org.tio.core.ChannelContext;
 import org.tio.core.stat.vo.StatVo;
 import org.tio.utils.page.Page;
@@ -183,6 +184,16 @@ public class MqttServerTemplate {
 	 */
 	public StatVo getStat() {
 		return mqttServer.getStat();
+	}
+
+	/**
+	 * 获取客户端订阅情况
+	 *
+	 * @param clientId clientId
+	 * @return 订阅集合
+	 */
+	public List<Subscribe> getSubscriptions(String clientId) {
+		return mqttServer.getSubscriptions(clientId);
 	}
 
 	/**

@@ -21,6 +21,7 @@ import org.dromara.mica.mqtt.codec.MqttPublishMessage;
 import org.dromara.mica.mqtt.codec.MqttQoS;
 import org.dromara.mica.mqtt.core.common.MqttPendingPublish;
 import org.dromara.mica.mqtt.core.server.model.ClientInfo;
+import org.dromara.mica.mqtt.core.server.model.Subscribe;
 import org.dromara.mica.mqtt.core.server.session.IMqttSessionManager;
 import org.dromara.mica.mqtt.core.util.TopicUtil;
 import org.slf4j.Logger;
@@ -409,6 +410,16 @@ public final class MqttServer {
 	 */
 	public StatVo getStat() {
 		return tioServer.getServerConfig().getStat();
+	}
+
+	/**
+	 * 获取客户端订阅情况
+	 *
+	 * @param clientId clientId
+	 * @return 订阅集合
+	 */
+	public List<Subscribe> getSubscriptions(String clientId) {
+		return serverCreator.getSessionManager().getSubscriptions(clientId);
 	}
 
 	/**

@@ -99,14 +99,14 @@ $ curl -i --basic -u mica:mica "http://localhost:8083/api/v1/endpoints"
 
 **Parameters (json):**
 
-| Name     | Type    | Required | Default | Description                                                 |
-| -------- | ------- | -------- | ------- | ----------------------------------------------------------- |
-| topic    | String  | Required |         | 主题                                                         |
-| clientId | String  | Required |         | 客户端标识符                                                  |
-| payload  | String  | Required |         | 消息正文                                                      |
+| Name     | Type    | Required | Default | Description                                    |
+| -------- | ------- | -------- | ------- |------------------------------------------------|
+| topic    | String  | Required |         | 主题，消息会按 topic 订阅投递                             |
+| clientId | String  | Required |         | 客户端标识符，不为空参数即可，无实际意义，建议可以取名 httpApi            |
+| payload  | String  | Required |         | 消息正文                                           |
 | encoding | String  | Optional | plain   | 消息正文使用的编码方式，目前仅支持 目前仅支持 `plain`、`hex`、`base64` |
-| qos      | Integer | Optional | 0       | QoS 等级                                                    |
-| retain   | Boolean | Optional | false   | 是否为保留消息                                              |
+| qos      | Integer | Optional | 0       | QoS 等级                                         |
+| retain   | Boolean | Optional | false   | 是否为保留消息                                        |
 
 **Success Response Body (JSON):**
 
@@ -187,14 +187,14 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubs
 
 **Parameters (json):**
 
-| Name         | Type    | Required | Default | Description                                                 |
-| ------------ | ------- | -------- | ------- | ----------------------------------------------------------- |
-| [0].topic    | String  | Required |         | 主题                                                         |
-| [0].clientId | String  | Required |         | 客户端标识符                                                |
-| [0].payload  | String  | Required |         | 消息正文                                                    |
+| Name         | Type    | Required | Default | Description                              |
+| ------------ | ------- | -------- | ------- |------------------------------------------|
+| [0].topic    | String  | Required |         | 主题，消息按订阅投递                               |
+| [0].clientId | String  | Required |         | 客户端标识符，不为空参数即可，无实际意义，建议可以取名 httpApi      |
+| [0].payload  | String  | Required |         | 消息正文                                     |
 | [0].encoding | String  | Optional | plain   | 消息正文使用的编码方式，目前仅支持 `plain`、`hex`、`base64` |
-| [0].qos      | Integer | Optional | 0       | QoS 等级                                                    |
-| [0].retain   | Boolean | Optional | false   | 是否为保留消息                                              |
+| [0].qos      | Integer | Optional | 0       | QoS 等级                                   |
+| [0].retain   | Boolean | Optional | false   | 是否为保留消息                                  |
 
 **Success Response Body (JSON):**
 
@@ -265,6 +265,78 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/subscr
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubscribe/batch" -d '[{"topic":"a","clientId":"example"},{"topic":"b","clientId":"example"}]'
 
 {"code":1}
+```
+
+## 获取客户端详情
+
+### GET /api/v1/clients/info
+
+**Query Parameters:**
+
+| Name     | Type   | Required | Description |
+| -------- | ------ | -------- | ----------- |
+| clientId | String | True     | ClientID    |
+
+**Success Response Body (JSON):**
+
+| Name      | Type    | Description |
+|-----------|---------|-------------|
+| code      | Integer | 0           |
+| clientId  | String  | clientId    |
+| username  | String  | 用户名         |
+| connected | Boolen  | 是否已经连接      |
+| createdAt | Long  | 连接的时间       |
+| connectedAt | Long    | 连接成功时间      |
+
+**Examples:**
+
+踢除指定客户端
+
+```bash
+$ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients/info?clientId=mqttx_5fe4cfcf"
+
+{"code":1,"data":{"clientId":"mqttx_5fe4cfcf","connected":true,"connectedAt":1681792417835,"createdAt":1681792417835,"ipAddress":"127.0.0.1","port":11852,"protoName":"MQTT","protoVer":5}}
+```
+
+## 分页获取客户端
+
+### GET /api/v1/clients
+
+**Query Parameters:**
+
+| Name   | Type | Required | Description  |
+|--------|------|----------|--------------|
+| _page  | int  | False    | Page 默认1     |
+| _limit | int  | False    | 分页大小 默认10000 |
+
+**Success Response Body (JSON):**
+
+| Name | Type    | Description |
+| ---- | ------- | ----------- |
+| code | Integer | 0           |
+
+**Success Response Body (JSON):**
+
+| Name | Type    | Description |
+| ---- | ------- |-------------|
+| code | Integer | 0           |
+| pageNumber | Integer | 当前页码        |
+| pageSize | Integer | 分页大小        |
+| totalRow | Integer | 分页数         |
+| clientId  | String  | clientId    |
+| username  | String  | 用户名         |
+| connected | Boolen  | 是否已经连接      |
+| createdAt | Long  | 连接的时间       |
+| connectedAt | Long    | 连接成功时间      |
+
+**Examples:**
+
+踢除指定客户端
+
+```bash
+$ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients?_page=1&_limit=100"
+
+{"data":{"list":[{"clientId":"mqttx_5fe4cfcf","connected":true,"protoName":"MQTT","protoVer":5,"ipAddress":"127.0.0.1","port":11852,"connectedAt":1681792417835,"createdAt":1681792417835}],"pageNumber":1,"pageSize":1,"totalRow":1},"code":1}
 ```
 
 ## 踢除指定客户端

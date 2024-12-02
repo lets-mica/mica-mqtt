@@ -16,8 +16,8 @@
 
 package org.dromara.mica.mqtt.core.server.http.api;
 
+import org.dromara.mica.mqtt.core.server.MqttServer;
 import org.dromara.mica.mqtt.core.server.MqttServerCreator;
-import org.dromara.mica.mqtt.core.server.dispatcher.IMqttMessageDispatcher;
 import org.dromara.mica.mqtt.core.server.enums.MessageType;
 import org.dromara.mica.mqtt.core.server.http.api.code.ResultCode;
 import org.dromara.mica.mqtt.core.server.http.api.form.BaseForm;
@@ -25,15 +25,18 @@ import org.dromara.mica.mqtt.core.server.http.api.form.PublishForm;
 import org.dromara.mica.mqtt.core.server.http.api.form.SubscribeForm;
 import org.dromara.mica.mqtt.core.server.http.api.result.Result;
 import org.dromara.mica.mqtt.core.server.http.handler.MqttHttpRoutes;
+import org.dromara.mica.mqtt.core.server.model.ClientInfo;
 import org.dromara.mica.mqtt.core.server.model.Message;
 import org.dromara.mica.mqtt.core.server.model.Subscribe;
-import org.dromara.mica.mqtt.core.server.session.IMqttSessionManager;
 import org.dromara.mica.mqtt.core.util.PayloadEncode;
 import org.dromara.mica.mqtt.core.util.TopicUtil;
+import org.tio.core.ChannelContext;
+import org.tio.core.Tio;
 import org.tio.http.common.HttpConst;
 import org.tio.http.common.HttpRequest;
 import org.tio.http.common.HttpResponse;
 import org.tio.http.common.Method;
+import org.tio.server.TioServerConfig;
 import org.tio.utils.hutool.StrUtil;
 import org.tio.utils.json.JsonUtil;
 
@@ -46,12 +49,12 @@ import java.util.function.Function;
  * @author L.cm
  */
 public class MqttHttpApi {
-	private final IMqttMessageDispatcher messageDispatcher;
-	private final IMqttSessionManager sessionManager;
+	private final MqttServerCreator serverCreator;
+	private final TioServerConfig mqttServerConfig;
 
-	public MqttHttpApi(MqttServerCreator serverCreator) {
-		this.messageDispatcher = serverCreator.getMessageDispatcher();
-		this.sessionManager = serverCreator.getSessionManager();
+	public MqttHttpApi(MqttServerCreator serverCreator, TioServerConfig mqttServerConfig) {
+		this.serverCreator = serverCreator;
+		this.mqttServerConfig = mqttServerConfig;
 	}
 
 	/**
@@ -64,6 +67,18 @@ public class MqttHttpApi {
 	 */
 	public HttpResponse endpoints(HttpRequest request) {
 		return Result.ok(request, MqttHttpRoutes.getRouts().keySet());
+	}
+
+	/**
+	 * 获取 api 列表
+	 * <p>
+	 * GET /api/v1/stats
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse stats(HttpRequest request) {
+		return Result.ok(request, this.mqttServerConfig.getStat());
 	}
 
 	/**
@@ -132,7 +147,7 @@ public class MqttHttpApi {
 		if (StrUtil.isNotBlank(payload)) {
 			message.setPayload(PayloadEncode.decode(payload, form.getEncoding()));
 		}
-		messageDispatcher.send(message);
+		serverCreator.getMessageDispatcher().send(message);
 	}
 
 	/**
@@ -256,6 +271,43 @@ public class MqttHttpApi {
 	}
 
 	/**
+	 * 获取取客户端信息
+	 *
+	 * <p>
+	 * GET /api/v1/clients/info
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse getClientInfo(HttpRequest request) {
+		String clientId = request.getParam("clientId");
+		if (StrUtil.isBlank(clientId)) {
+			return Result.fail(request, ResultCode.E101);
+		}
+		ChannelContext context = Tio.getByBsId(this.mqttServerConfig, clientId);
+		if (context == null) {
+			return Result.fail(request, ResultCode.E101);
+		}
+		ClientInfo clientInfo = ClientInfo.form(serverCreator, context);
+		return Result.ok(request, clientInfo);
+	}
+
+	/**
+	 * 分页拉取客户端列表
+	 *
+	 * <p>
+	 * GET /api/v1/clients?_page=1&amp;_limit=10
+	 *
+	 * @param request HttpRequest
+	 * @return HttpResponse
+	 */
+	public HttpResponse getClients(HttpRequest request) {
+		int page = request.getInt("_page", 1);
+		int limit = request.getInt("_limit", 10000);
+		return Result.ok(request, MqttServer.getClients(serverCreator, mqttServerConfig, page, limit));
+	}
+
+	/**
 	 * 踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
 	 * <p>
 	 * POST /api/v1/clients/delete
@@ -271,7 +323,7 @@ public class MqttHttpApi {
 		Message message = new Message();
 		message.setClientId(clientId);
 		message.setMessageType(MessageType.DISCONNECT);
-		messageDispatcher.send(message);
+		serverCreator.getMessageDispatcher().send(message);
 		return Result.ok();
 	}
 
@@ -288,7 +340,7 @@ public class MqttHttpApi {
 		if (StrUtil.isBlank(clientId)) {
 			return Result.fail(request, ResultCode.E101);
 		}
-		List<Subscribe> subscribeList = sessionManager.getSubscriptions(clientId);
+		List<Subscribe> subscribeList = serverCreator.getSessionManager().getSubscriptions(clientId);
 		return Result.ok(new HttpResponse(request), subscribeList);
 	}
 
@@ -302,7 +354,7 @@ public class MqttHttpApi {
 		} else {
 			message.setMessageType(MessageType.UNSUBSCRIBE);
 		}
-		messageDispatcher.send(message);
+		serverCreator.getMessageDispatcher().send(message);
 	}
 
 	/**
@@ -357,12 +409,15 @@ public class MqttHttpApi {
 	public void register() {
 		// @formatter:off
 		MqttHttpRoutes.register(Method.GET, "/api/v1/endpoints", this::endpoints);
+		MqttHttpRoutes.register(Method.GET, "/api/v1/stats", this::stats);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/publish", this::publish);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/publish/batch", this::publishBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/subscribe", this::subscribe);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/subscribe/batch", this::subscribeBatch);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe", this::unsubscribe);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/mqtt/unsubscribe/batch", this::unsubscribeBatch);
+		MqttHttpRoutes.register(Method.GET, "/api/v1/clients/info", this::getClientInfo);
+		MqttHttpRoutes.register(Method.GET, "/api/v1/clients", this::getClients);
 		MqttHttpRoutes.register(Method.POST, "/api/v1/clients/delete", this::deleteClients);
 		MqttHttpRoutes.register(Method.GET, "/api/v1/client/subscriptions", this::getClientSubscriptions);
 		// @formatter:on
