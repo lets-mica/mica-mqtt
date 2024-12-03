@@ -2,6 +2,15 @@
 
 ## 发行版本
 
+### v2.4.0 - 2024-12-07
+- :sparkles: http api 添加 `stats`、`clients` 列表和 `client详情` 接口。
+- :sparkles: MqttServer 和 MqttServerTemplate 添加 `getClientInfo` `getClients` 系列客户端信息接口。
+- :sparkles: MqttServer 和 MqttServerTemplate 添加 `getSubscriptions` 获取客户端订阅列表接口。
+- :sparkles: MqttServer 和 MqttServerTemplate 添加 `getStat` 统计接口。
+- :truck: 调整 maven groupId 到 `org.dromara.mica-mqtt` 切换包名到 `org.dromara`。其他均保持不变。
+- :truck: 切换到 central sonatype，central sonatype 不支持快照版，mica-mqtt 不再发布快照版。
+- :bug: 修复订阅发送时机问题 gitee #IB72L6 感谢 `@江上烽` 反馈
+
 ### v2.4.0-M2 - 2024-12-01
 - :sparkles: mica-mqtt-server 暴露获取 clientId 和状态统计接口
 - :bug: 修复订阅发送时机问题 gitee #IB72L6 感谢 `@江上烽` 反馈
