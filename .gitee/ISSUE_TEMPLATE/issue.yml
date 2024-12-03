@@ -6,9 +6,8 @@ body:
     attributes:
       label: mica-mqtt版本
       options:
-        - "2.3.x"
-        - "2.2.x"
-        - "老版本存在编解码异常，建议先升级"
+        - "2.4.x"
+        - "老版本建议先升级"
     validations:
       required: true
   - type: dropdown
@@ -31,8 +30,8 @@ body:
   - type: input
     id: usage-scenarios
     attributes:
-      label: 使用场景
-      description: 简述使用场景
+      label: 具体版本号和使用场景
+      description: 简述具体版本号和使用场景
     validations:
       required: true
   - type: textarea
