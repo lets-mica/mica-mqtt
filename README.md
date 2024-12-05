@@ -160,7 +160,7 @@
 - [mica-mqtt http api 文档详见](docs/http-api.md)
 - [mica-mqtt 使用常见问题汇总](https://gitee.com/596392912/mica-mqtt/issues/I45GO7)
 - [mica-mqtt 发行版本](CHANGELOG.md)
-- [老版本迁移到 mica-mqtt 2.1.x](docs/update.md)
+- [老版本迁移到 mica-mqtt 新版](docs/update.md)
 - [mqtt 协议文档](https://github.com/mcxiaoke/mqtt)
 
 ## 💡 参考vs借鉴
