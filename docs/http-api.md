@@ -49,45 +49,57 @@
 $ curl -i --basic -u mica:mica "http://localhost:8083/api/v1/endpoints"
 
 {
-  "code": 1,
-  "data": [
-    {
-      "method": "POST",
-      "path": "/api/v1/mqtt/subscribe"
-    },
-    {
-      "method": "POST",
-      "path": "/api/v1/mqtt/unsubscribe/batch"
-    },
-    {
-      "method": "GET",
-      "path": "/api/v1/client/subscriptions"
-    },
-    {
-      "method": "POST",
-      "path": "/api/v1/clients/delete"
-    },
-    {
-      "method": "GET",
-      "path": "/api/v1/endpoints"
-    },
-    {
-      "method": "POST",
-      "path": "/api/v1/mqtt/publish"
-    },
-    {
-      "method": "POST",
-      "path": "/api/v1/mqtt/publish/batch"
-    },
-    {
-      "method": "POST",
-      "path": "/api/v1/mqtt/subscribe/batch"
-    },
-    {
-      "method": "POST",
-      "path": "/api/v1/mqtt/unsubscribe"
-    }
-  ]
+    "data": [
+        {
+            "method": "GET",
+            "path": "/api/v1/endpoints"
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/clients"
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/mqtt/unsubscribe"
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/clients/info"
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/stats"
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/mqtt/publish/batch"
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/mqtt/subscribe/batch"
+        },
+        {
+            "method": "GET",
+            "path": "/api/v1/client/subscriptions"
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/mqtt/publish"
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/mqtt/unsubscribe/batch"
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/mqtt/subscribe"
+        },
+        {
+            "method": "POST",
+            "path": "/api/v1/clients/delete"
+        }
+    ],
+    "code": 1
 }
 ```
 
