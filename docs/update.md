@@ -2,9 +2,10 @@
 
 **mica-mqtt** 尽量减少对 api 的改动已保证老版本的平滑升级，但是有些大版本不得不改动。希望此文档对大家有所帮助。
 
-## 迁移到 mica-mqtt 2.4.x
+## 迁移到 mica-mqtt 2.4.x 以上版本
 
-- :truck: 调整 maven groupId 到 `org.dromara.mica-mqtt` 切换包名到 `org.dromara`。其他均保持不变。
+- :truck: 调整 maven groupId `net.dreamlu` 到新的 `org.dromara.mica-mqtt`。
+- :truck: 调整包名 `net.dreamlu.iot.mqtt` 到新的 `org.dromara.mica.mqtt`，其他均保持不变。
 - :truck: 切换到 central sonatype，central sonatype 不支持快照版，mica-mqtt 不再发布快照版。
 
 ## 迁移到 mica-mqtt 2.1.x

@@ -7,7 +7,8 @@
 - :sparkles: MqttServer 和 MqttServerTemplate 添加 `getClientInfo` `getClients` 系列客户端信息接口。
 - :sparkles: MqttServer 和 MqttServerTemplate 添加 `getSubscriptions` 获取客户端订阅列表接口。
 - :sparkles: MqttServer 和 MqttServerTemplate 添加 `getStat` 统计接口。
-- :truck: 调整 maven groupId 到 `org.dromara.mica-mqtt` 切换包名到 `org.dromara`。其他均保持不变。
+- :truck: 调整 maven groupId `net.dreamlu` 到新的 `org.dromara.mica-mqtt`。
+- :truck: 调整包名 `net.dreamlu.iot.mqtt` 到新的 `org.dromara.mica.mqtt`，其他均保持不变。
 - :truck: 切换到 central sonatype，central sonatype 不支持快照版，mica-mqtt 不再发布快照版。
 - :bug: 修复订阅发送时机问题 gitee #IB72L6 感谢 `@江上烽` 反馈
 
