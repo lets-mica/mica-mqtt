@@ -20,11 +20,6 @@
             <groupId>net.dreamlu</groupId>
             <artifactId>mica-net-core</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <scope>provided</scope>
-        </dependency>
         <!-- tinylog 用于测试  -->
         <dependency>
             <groupId>org.tinylog</groupId>
