@@ -302,8 +302,6 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/mqtt/unsubs
 
 **Examples:**
 
-踢除指定客户端
-
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients/info?clientId=mqttx_5fe4cfcf"
 
@@ -343,19 +341,17 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients/inf
 
 **Examples:**
 
-踢除指定客户端
-
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients?_page=1&_limit=100"
 
 {"data":{"list":[{"clientId":"mqttx_5fe4cfcf","connected":true,"protoName":"MQTT","protoVer":5,"ipAddress":"127.0.0.1","port":11852,"connectedAt":1681792417835,"createdAt":1681792417835}],"pageNumber":1,"pageSize":1,"totalRow":1},"code":1}
 ```
 
-## 踢除指定客户端
+## 踢出指定客户端
 
 ### POST /api/v1/clients/delete
 
-踢除指定客户端。注意踢除客户端操作会将连接与会话一并终结。
+踢出指定客户端。注意踢出客户端操作会将连接与会话一并终结。
 
 **Query Parameters:**
 
@@ -371,7 +367,7 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients?_pa
 
 **Examples:**
 
-踢除指定客户端
+由于客户端可能会重连，所以还会连上了。如果需要永久踢出需要自行开发黑名单。
 
 ```bash
 $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients/delete?clientId=123"
@@ -402,8 +398,6 @@ $ curl -i --basic -u mica:mica -X POST "http://localhost:8083/api/v1/clients/del
 | mqttQoS | Integer | 0           |
 
 **Examples:**
-
-踢除指定客户端
 
 ```bash
 $ curl -i --basic -u mica:mica "http://127.0.0.1:8083/api/v1/client/subscriptions?clientId=123"
