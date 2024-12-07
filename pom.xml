@@ -13,7 +13,7 @@
 
     <properties>
         <!-- mica-mqtt version -->
-        <revision>2.4.0</revision>
+        <revision>2.4.1-M1</revision>
         <!-- java version -->
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,7 +24,7 @@
         <mica.version>2.7.18.9</mica.version>
         <spring.boot.version>2.7.18</spring.boot.version>
         <gson.version>2.11.0</gson.version>
-        <solon.version>3.0.4</solon.version>
+        <solon.version>3.0.4.1</solon.version>
         <jfinal.version>5.2.3</jfinal.version>
         <tinylog.version>2.7.0</tinylog.version>
     </properties>
