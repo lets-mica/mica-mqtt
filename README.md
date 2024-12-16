@@ -1,4 +1,4 @@
-# 🌐 mica mqtt 组件
+# 🌐 Dromara mica mqtt 组件
 [![Java CI](https://github.com/dromara/mica-mqtt/workflows/Java%20CI/badge.svg)](https://github.com/dromara/mica-mqtt/actions)
 ![JAVA 8](https://img.shields.io/badge/JDK-1.8+-brightgreen.svg)
 [![Mica Maven release](https://img.shields.io/maven-central/v/org.dromara.mica-mqtt/mica-mqtt-codec?style=flat-square)](https://central.sonatype.com/artifact/org.dromara.mica-mqtt/mica-mqtt-codec/versions)
@@ -12,7 +12,7 @@
 
 📖简体中文 | [📖English](README.en.md)
 
-`mica-mqtt` **低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
+Dromara `mica-mqtt` **低延迟**、**高性能**的 `mqtt` 物联网组件。更多使用方式详见： **mica-mqtt-example** 模块。
 
 ✨✨✨**最佳实践**✨✨✨ [**BladeX 物联网平台（基于 mica-mqtt 加强版）**](https://iot.bladex.cn?from=mica-mqtt) 
 

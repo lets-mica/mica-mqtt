@@ -1,4 +1,4 @@
-# 🌐 mica mqtt
+# 🌐 Dromara mica mqtt
 [![Java CI](https://github.com/dromara/mica-mqtt/workflows/Java%20CI/badge.svg)](https://github.com/dromara/mica-mqtt/actions)
 ![JAVA 8](https://img.shields.io/badge/JDK-1.8+-brightgreen.svg)
 [![Mica Maven release](https://img.shields.io/maven-central/v/org.dromara.mica-mqtt/mica-mqtt-codec?style=flat-square)](https://central.sonatype.com/artifact/org.dromara.mica-mqtt/mica-mqtt-codec/versions)
@@ -12,7 +12,7 @@
 
 📖English | [📖简体中文](README.md)
 
-`mica-mqtt` is a **low-latency** and **high-performance** `mqtt` Internet of Things component. For more usage details, please refer to the **mica-mqtt-example** module.
+Dromara `mica-mqtt` is a **low-latency** and **high-performance** `mqtt` Internet of Things component. For more usage details, please refer to the **mica-mqtt-example** module.
 
 ## 🍱 Use Cases
 
