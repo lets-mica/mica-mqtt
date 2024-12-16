@@ -214,6 +214,10 @@ public class MqttServerCreator {
 	 * json 处理器
 	 */
 	private JsonAdapter jsonAdapter;
+	/**
+	 * 开启代理协议支持
+	 */
+	private boolean proxyProtocolOn = false;
 
 	public String getName() {
 		return name;
@@ -568,6 +572,19 @@ public class MqttServerCreator {
 		return this;
 	}
 
+	public boolean isProxyProtocolEnabled() {
+		return proxyProtocolOn;
+	}
+
+	public MqttServerCreator proxyProtocolEnable() {
+		return proxyProtocolEnable(true);
+	}
+
+	public MqttServerCreator proxyProtocolEnable(boolean proxyProtocolOn) {
+		this.proxyProtocolOn = proxyProtocolOn;
+		return this;
+	}
+
 	public MqttServer build() {
 		// 默认的节点名称，用于集群
 		if (StrUtil.isBlank(this.nodeName)) {
@@ -612,6 +629,8 @@ public class MqttServerCreator {
 		}
 		// 5. 是否开启监控
 		tioConfig.statOn = this.statEnable;
+		// 是否开启代理协议
+		tioConfig.enableProxyProtocol(this.proxyProtocolOn);
 		// 6. 设置 t-io 心跳 timeout
 		if (this.heartbeatTimeout != null) {
 			tioConfig.setHeartbeatTimeout(this.heartbeatTimeout);

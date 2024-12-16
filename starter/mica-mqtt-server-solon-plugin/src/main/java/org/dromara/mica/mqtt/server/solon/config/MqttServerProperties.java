@@ -104,6 +104,10 @@ public class MqttServerProperties {
 	 * 是否开启监控，不开启可节省内存，默认：true
 	 */
 	private boolean statEnable = true;
+	/**
+	 * 开启代理协议，支持 nginx proxy_protocol    on;
+	 */
+	private boolean proxyProtocolOn = false;
 
 	@Getter
 	@Setter

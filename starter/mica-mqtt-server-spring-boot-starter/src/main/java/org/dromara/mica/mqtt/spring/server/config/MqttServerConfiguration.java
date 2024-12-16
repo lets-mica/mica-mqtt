@@ -100,7 +100,8 @@ public class MqttServerConfiguration {
 			.websocketEnable(properties.isWebsocketEnable())
 			.httpEnable(properties.isHttpEnable())
 			.nodeName(properties.getNodeName())
-			.statEnable(properties.isStatEnable());
+			.statEnable(properties.isStatEnable())
+			.proxyProtocolEnable(properties.isProxyProtocolOn());
 		if (properties.isDebug()) {
 			serverCreator.debug();
 		}
