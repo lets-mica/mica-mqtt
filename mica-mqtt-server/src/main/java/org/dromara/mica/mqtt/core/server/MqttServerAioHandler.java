@@ -25,6 +25,7 @@ import org.tio.core.TioConfig;
 import org.tio.core.exception.TioDecodeException;
 import org.tio.core.intf.Packet;
 import org.tio.server.intf.TioServerHandler;
+import org.tio.server.proxy.ProxyProtocolDecoder;
 import org.tio.utils.buffer.ByteBufferAllocator;
 
 import java.nio.ByteBuffer;
@@ -59,7 +60,7 @@ public class MqttServerAioHandler implements TioServerHandler {
 	 */
 	@Override
 	public Packet decode(ByteBuffer buffer, int limit, int position, int readableLength, ChannelContext context) throws TioDecodeException {
-		return mqttDecoder.doDecode(context, buffer, readableLength);
+		return ProxyProtocolDecoder.decodeIfEnable(context, buffer, readableLength, mqttDecoder::doDecode);
 	}
 
 	/**
