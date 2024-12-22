@@ -13,7 +13,7 @@
 ```xml
 <dependency>
     <groupId>org.dromara.mica-mqtt</groupId>
-    <artifactId>mica-mqtt-server-solon-plugin-parent</artifactId>
+    <artifactId>mica-mqtt-server-solon-plugin</artifactId>
     <version>${version}</version>
 </dependency>
 ```
