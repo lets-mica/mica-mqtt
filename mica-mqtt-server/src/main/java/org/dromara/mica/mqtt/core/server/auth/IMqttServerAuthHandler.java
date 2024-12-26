@@ -43,7 +43,7 @@ public interface IMqttServerAuthHandler {
 		try {
 			return authenticate(context, uniqueId, clientId, userName, password);
 		} catch (Throwable e) {
-			logger.error("Mqtt authenticate validator error", e);
+			logger.error("Mqtt client node:{} authenticate error uniqueId:{} clientId:{} username:{} password:{}", context.getClientNode(), uniqueId, clientId, userName, password, e);
 			return false;
 		}
 	}

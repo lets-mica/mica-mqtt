@@ -43,7 +43,7 @@ public interface IMqttServerPublishPermission {
 		try {
 			return hasPermission(context, clientId, topic, qoS, isRetain);
 		} catch (Throwable e) {
-			logger.error("Mqtt publish permission validator error", e);
+			logger.error("Mqtt client node:{} publish permission error clientId:{} topic:{} qos:{}", context.getClientNode(), clientId, topic, qoS, e);
 			return false;
 		}
 	}
