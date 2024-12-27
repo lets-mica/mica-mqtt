@@ -42,7 +42,7 @@ public interface IMqttServerSubscribeValidator {
 		try {
 			return isValid(context, clientId, topicFilter, qoS);
 		} catch (Throwable e) {
-			logger.error("Mqtt client node:{} subscribe error clientId:{} topicFilter:{} qos:{}", context.getClientNode(), clientId, topicFilter, qoS, e);
+			logger.error("Mqtt client node:{} subscribe error clientId:{} username:{} topicFilter:{} qos:{}", context.getClientNode(), clientId, context.getUserId(), topicFilter, qoS, e);
 			return false;
 		}
 	}
