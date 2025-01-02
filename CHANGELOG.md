@@ -4,7 +4,7 @@
 
 ### v2.4.1 - 2025-01-04
 - :sparkles: mqtt server 统一 topic 订阅、发布认证日志方便排查问题。
-- :sparkles: mqtt server 支持 nginx 开启 tcp proxy_protocol on; 时转发源 ip 信息。
+- :sparkles: mqtt server 添加 PROXY protocol v1 支持，nginx 可开启 tcp proxy_protocol on; 时转发源 ip 信息。
 - :memo: 修复文档 maven 坐标错误。
 
 ### v2.4.0 - 2024-12-07
