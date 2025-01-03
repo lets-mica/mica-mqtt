@@ -21,6 +21,7 @@ import org.dromara.mica.mqtt.core.client.IMqttClientConnectListener;
 import org.dromara.mica.mqtt.core.client.MqttClient;
 import org.dromara.mica.mqtt.core.client.MqttClientCreator;
 import org.dromara.mica.mqtt.spring.client.MqttClientSubscribeDetector;
+import org.dromara.mica.mqtt.spring.client.MqttClientSubscribeLazyFilter;
 import org.dromara.mica.mqtt.spring.client.MqttClientTemplate;
 import org.dromara.mica.mqtt.spring.client.event.SpringEventMqttClientConnectListener;
 import org.springframework.beans.factory.ObjectProvider;
@@ -123,6 +124,11 @@ public class MqttClientConfiguration {
 	@Bean
 	public MqttClientSubscribeDetector mqttClientSubscribeDetector(ApplicationContext applicationContext) {
 		return new MqttClientSubscribeDetector(applicationContext);
+	}
+
+	@Bean
+	public MqttClientSubscribeLazyFilter mqttClientSubscribeLazyFilter() {
+		return new MqttClientSubscribeLazyFilter();
 	}
 
 }
