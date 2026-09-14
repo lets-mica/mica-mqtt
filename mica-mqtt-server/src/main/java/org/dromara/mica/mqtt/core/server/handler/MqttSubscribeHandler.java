@@ -87,7 +87,7 @@ public class MqttSubscribeHandler extends AbstractMqttMessageHandler {
 		int packetId = message.variableHeader().messageId();
 		// MQTT 5.0 Subscription Identifier：spec 3.8.4 / 3.3.2.3.5 允许在 SUBSCRIBE 一级
 		// properties 中携带 varint（1 ~ 268,435,455）。该 id 关联到本次 SUBSCRIBE 的所有 topic filter。
-		Integer subscribeSubscriptionId = extractSubscribeSubscriptionId(context, message);
+		int subscribeSubscriptionId = extractSubscribeSubscriptionId(context, message);
 		List<MqttTopicSubscription> topicSubscriptionList = message.payload().topicSubscriptions();
 		List<MqttSubAckReasonCode> reasonCodeList = new ArrayList<>();
 		List<String> subscribedTopicList = new ArrayList<>();

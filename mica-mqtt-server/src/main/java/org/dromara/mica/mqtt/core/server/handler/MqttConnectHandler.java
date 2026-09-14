@@ -114,36 +114,43 @@ public class MqttConnectHandler extends AbstractMqttMessageHandler {
 		// 2. uniqueId 不能为空
 		if (StrUtil.isBlank(uniqueId)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_IDENTIFIER_REJECTED,
-				0, false, requestProblemInformation, requestResponseInformation);
+				0, false, false, requestProblemInformation, requestResponseInformation);
 			return;
 		}
 		// 3. 认证
 		if (authHandler != null && !authHandler.verifyAuthenticate(context, uniqueId, clientId, userName, password)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_BAD_USER_NAME_OR_PASSWORD,
-				0, false, requestProblemInformation, requestResponseInformation);
+				0, false, false, requestProblemInformation, requestResponseInformation);
 			return;
 		}
 		if (hasInvalidReceiveMaximum(context, variableHeader)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_PROTOCOL_ERROR,
-				0, false, requestProblemInformation, requestResponseInformation);
+				0, false, false, requestProblemInformation, requestResponseInformation);
 			return;
 		}
 		if (hasInvalidClientMaxPacketSize(context, variableHeader, clientId)) {
 			connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_REFUSED_PACKET_TOO_LARGE,
-				0, false, requestProblemInformation, requestResponseInformation);
+				0, false, false, requestProblemInformation, requestResponseInformation);
 			return;
 		}
 		// 认证成功
 		context.setAccepted(true);
 		// 4. 互踢逻辑
 		ChannelContext otherContext = Tio.getByBsId(context.getTioConfig(), uniqueId);
+		// spec 3.2.2.1.1 Session Present：
+		//   Clean Start = true  → Session Present = 0
+		//   Clean Start = false → 服务端已存在该 ClientID 的 session 时为 1，否则为 0
+		// 判定时机必须在互踢 / cleanSession 之前，否则旧 session 状态会被清掉。
+		boolean cleanStart = variableHeader.isCleanStart();
+		boolean sessionPresent = !cleanStart
+			&& (sessionManager.hasSession(uniqueId) || otherContext != null);
 		if (otherContext != null) {
 			Tio.unbindBsId(otherContext);
 			cleanSession(uniqueId);
 			String remark = String.format("uniqueId:[%s] clientId:[%s] 被踢出，请检查是否有相同 clientId 互踢，新 contextId:[%s]",
 				uniqueId, clientId, context.getId());
 			Tio.remove(otherContext, remark, ChannelContext.CloseCode.KICK_EACH_OTHER);
-		} else if (MqttCodecUtil.isMqtt5(context) && variableHeader.isCleanStart()) {
+		} else if (MqttCodecUtil.isMqtt5(context) && cleanStart) {
 			// PR9：MQTT 5 客户端声明 Clean Start=true 且无活跃连接 → 清理可能存在的旧 session 状态。
 			// MQTT 3.x 客户端保持原 cleanSession 行为（默认 true，已通过 cleanSession(uniqueId) 在原代码处理）。
 			// spec 3.1.2.4: MQTT 3.x 的 Clean Session 字段位置不同于 MQTT 5 的 Clean Start；本处理仅针对 5.0。
@@ -158,15 +165,13 @@ public class MqttConnectHandler extends AbstractMqttMessageHandler {
 			MqttConnectProperties connectProps = new MqttConnectProperties(variableHeader.properties());
 			Integer sessionExpirySeconds = connectProps.getSessionExpiryInterval();
 			int sessionExpiryValue = sessionExpirySeconds == null ? 0 : sessionExpirySeconds;
-			boolean cleanStart = variableHeader.isCleanStart();
 			sessionManager.setSessionExpiryInterval(uniqueId, sessionExpiryValue, cleanStart);
 		} else {
 			// MQTT 3.x Clean Session=false is a persistent session. Record the same
 			// normalized state used by the cluster layer so disconnect does not erase
 			// its owner and subscriptions on peer nodes.
-			boolean cleanSession = variableHeader.isCleanStart();
 			sessionManager.setSessionExpiryInterval(uniqueId,
-				cleanSession ? 0 : Integer.MAX_VALUE, cleanSession);
+				cleanStart ? 0 : Integer.MAX_VALUE, cleanStart);
 		}
 		// 5. 绑定 uniqueId / username
 		Tio.bindBsId(context, uniqueId);
@@ -191,16 +196,13 @@ public class MqttConnectHandler extends AbstractMqttMessageHandler {
 		if (serverKeepAliveSeconds > 0) {
 			context.setHeartbeatTimeout(serverKeepAliveSeconds * KEEP_ALIVE_UNIT);
 		}
-		// 7. session 处理，先默认全部连接关闭时清除，mqtt5 为 CleanStart，
-		// 按照 mqtt 协议的规则是下一次连接时清除，emq 是添加了全局 session 超时，关闭时激活 session 有效期倒计时
-//		boolean cleanSession = variableHeader.isCleanSession();
-//		if (cleanSession) {
-//			// TODO L.cm 考虑 session 处理 可参数： https://www.emqx.com/zh/blog/mqtt-session
-//			// mqtt v5.0 会话超时时间
-//			MqttProperties properties = variableHeader.properties();
-//			Integer sessionExpiryInterval = properties.getPropertyValue(MqttProperties.MqttPropertyType.SESSION_EXPIRY_INTERVAL);
-//			System.out.println(sessionExpiryInterval);
-//		}
+		// 7. session 处理
+		// Session Expiry Interval + Clean Start 已在上方通过 setSessionExpiryInterval 记录。
+		// 断开时由 MqttDisConnectHandler（正常 DISCONNECT）与 MqttServerAioListener.onBeforeClose
+		// （底层 channel 断开）根据 cleanStart 与 expiry 决定是立即清理还是调度过期：
+		//   - cleanStart=true 或 expiry=0 → 立即 sessionManager.remove
+		//   - cleanStart=false 且 expiry>0 → SessionExpireScheduler.scheduleExpire，到期后清理
+		// Session Present 标志已在互踢逻辑前按 spec 3.2.2.1.1 计算并用于 CONNACK。
 		// 8. 存储遗嘱消息
 		boolean willFlag = variableHeader.isWillFlag();
 		if (willFlag) {
@@ -227,7 +229,8 @@ public class MqttConnectHandler extends AbstractMqttMessageHandler {
 		}
 		// 9. 返回 ack
 		connAckByReturnCode(clientId, uniqueId, context, MqttConnectReasonCode.CONNECTION_ACCEPTED,
-			serverKeepAliveSeconds, assignedClientId, requestProblemInformation, requestResponseInformation);
+			serverKeepAliveSeconds, assignedClientId, sessionPresent,
+			requestProblemInformation, requestResponseInformation);
 		// 10. 在线通知
 		final String finalUniqueId = uniqueId;
 		executor.execute(() -> {
@@ -297,8 +300,8 @@ public class MqttConnectHandler extends AbstractMqttMessageHandler {
 	}
 
 	private void connAckByReturnCode(String clientId, String uniqueId, ChannelContext context, MqttConnectReasonCode returnCode,
-									 int serverKeepAlive, boolean assignedClientId, boolean requestProblemInformation,
-									 boolean requestResponseInformation) {
+									 int serverKeepAlive, boolean assignedClientId, boolean sessionPresent,
+									 boolean requestProblemInformation, boolean requestResponseInformation) {
 		if (returnCode.isAccepted() && MqttCodecUtil.isMqtt5(context)) {
 			// 解码器必须使用与 CONNACK 宣告一致的入站 Topic Alias 上限。
 			MqttCodecUtil.setInboundTopicAliasMaximum(context,
@@ -306,7 +309,8 @@ public class MqttConnectHandler extends AbstractMqttMessageHandler {
 		}
 		MqttConnAckMessage message = MqttConnAckMessage.builder()
 			.returnCode(returnCode)
-			.sessionPresent(false)
+			// spec 3.2.2.1.1：失败 CONNACK 固定为 false；成功 CONNACK 由调用方按 Clean Start / 既有 session 计算。
+			.sessionPresent(returnCode.isAccepted() && sessionPresent)
 			.properties(buildConnAckProperties(uniqueId, returnCode, serverKeepAlive, assignedClientId,
 				requestProblemInformation, requestResponseInformation).getProperties())
 			.build();

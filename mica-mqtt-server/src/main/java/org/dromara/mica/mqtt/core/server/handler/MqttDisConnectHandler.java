@@ -24,6 +24,7 @@ import org.dromara.mica.mqtt.codec.codes.MqttDisconnectReasonCode;
 import org.dromara.mica.mqtt.codec.message.MqttMessage;
 import org.dromara.mica.mqtt.codec.message.header.MqttReasonCodeAndPropertiesVariableHeader;
 import org.dromara.mica.mqtt.core.server.MqttServerCreator;
+import org.dromara.mica.mqtt.core.server.session.SessionExpireScheduler;
 import org.dromara.mica.mqtt.core.server.will.WillDelayScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ import java.util.concurrent.ExecutorService;
 public class MqttDisConnectHandler extends AbstractMqttMessageHandler {
 	private static final Logger logger = LoggerFactory.getLogger(MqttDisConnectHandler.class);
 	private final WillDelayScheduler willDelayScheduler;
-	private final org.dromara.mica.mqtt.core.server.session.SessionExpireScheduler sessionExpireScheduler;
+	private final SessionExpireScheduler sessionExpireScheduler;
 
 	public MqttDisConnectHandler(MqttServerCreator serverCreator,
 							 ExecutorService executor,
