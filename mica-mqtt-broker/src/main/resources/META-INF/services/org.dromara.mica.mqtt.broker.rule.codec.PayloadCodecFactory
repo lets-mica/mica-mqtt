@@ -1,0 +1,3 @@
+org.dromara.mica.mqtt.broker.rule.codec.RawPayloadCodecFactory
+org.dromara.mica.mqtt.broker.rule.codec.StringPayloadCodecFactory
+org.dromara.mica.mqtt.broker.rule.codec.JsonPayloadCodecFactory

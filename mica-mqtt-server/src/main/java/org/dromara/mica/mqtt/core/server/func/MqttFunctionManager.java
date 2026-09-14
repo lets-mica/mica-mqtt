@@ -154,6 +154,40 @@ public class MqttFunctionManager {
 	}
 
 	/**
+	 * 取消注册监听（引用比较），并回收空的 trie 末端节点
+	 *
+	 * @param topicFilter topicFilter
+	 * @param listener    listener
+	 * @return 是否移除成功
+	 */
+	public boolean unregister(String topicFilter, IMqttFunctionMessageListener listener) {
+		String[] topicParts = TopicUtil.getTopicParts(topicFilter);
+		Node[] path = new Node[topicParts.length];
+		Node prev = root;
+		for (int i = 0; i < topicParts.length; i++) {
+			prev = prev.addChildIfAbsent(topicParts[i]);
+			path[i] = prev;
+		}
+		boolean removed = prev.listeners.remove(listener);
+		// 自下而上清理无 listener 且无子节点的 trie 节点
+		if (removed) {
+			for (int i = path.length - 1; i >= 0; i--) {
+				Node n = path[i];
+				if (n.listeners.isEmpty() && n.children.isEmpty()) {
+					if (i == 0) {
+						root.children.remove(topicParts[0]);
+					} else {
+						path[i - 1].children.remove(topicParts[i]);
+					}
+				} else {
+					break;
+				}
+			}
+		}
+		return removed;
+	}
+
+	/**
 	 * 递归查找监听器
 	 *
 	 * @param node         node

@@ -17,6 +17,11 @@
             <groupId>org.dromara.mica-mqtt</groupId>
             <artifactId>mica-mqtt-server</artifactId>
         </dependency>
+        <!-- 直接依赖 codec 以便在 broker 模块使用 codec 类型（MqttPublishMessage / MqttProperties 等） -->
+        <dependency>
+            <groupId>org.dromara.mica-mqtt</groupId>
+            <artifactId>mica-mqtt-codec</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2-mvstore</artifactId>
@@ -24,7 +29,6 @@
 		<dependency>
 			<groupId>org.dromara.mica-mqtt</groupId>
 			<artifactId>mica-mqtt-client</artifactId>
-			<scope>test</scope>
 		</dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

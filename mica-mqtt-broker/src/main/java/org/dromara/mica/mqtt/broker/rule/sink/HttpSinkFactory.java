@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) 2019-2029, Dreamlu 卢春梦 (596392912@qq.com & dreamlu.net).
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.dromara.mica.mqtt.broker.rule.sink;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * {@link HttpSink} 工厂。
+ *
+ * @author L.cm
+ */
+public class HttpSinkFactory implements SinkFactory {
+
+	public static final String TYPE = "http";
+
+	@Override
+	public String getType() {
+		return TYPE;
+	}
+
+	@Override
+	public Sink create(SinkRef ref) {
+		String name = ref.getName();
+		String url = MqttSink.stringProp(ref, "url");
+		if (url == null || url.isEmpty()) {
+			throw new IllegalArgumentException("HttpSink requires 'url' prop");
+		}
+		String method = MqttSink.stringProp(ref, "method");
+		String contentType = MqttSink.stringProp(ref, "contentType");
+		int timeoutMs = MqttSink.intProp(ref, "timeoutMs", 3000);
+
+		Map<String, String> headers = null;
+		Object h = ref.getProps().get("headers");
+		if (h instanceof Map) {
+			Map<?, ?> raw = (Map<?, ?>) h;
+			headers = new HashMap<>(raw.size());
+			for (Map.Entry<?, ?> e : raw.entrySet()) {
+				if (e.getKey() != null) {
+					headers.put(e.getKey().toString(),
+						e.getValue() == null ? "" : e.getValue().toString());
+				}
+			}
+		}
+		return new HttpSink(name, url, method, contentType, timeoutMs, headers);
+	}
+}
