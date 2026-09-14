@@ -222,8 +222,15 @@ public class MqttServerProperties {
 	@Setter
 	public static class HttpListener extends Listener {
 		/**
-		 * basic 认证
+		 * http api 认证
 		 */
+		private HttpAuth auth = new HttpAuth();
+		/**
+		 * 兼容旧字段,等价于 {@link HttpAuth}。
+		 *
+		 * @deprecated since 2.6.10, use {@link HttpAuth} instead.
+		 */
+		@Deprecated
 		private HttpBasicAuth basicAuth = new HttpBasicAuth();
 		/**
 		 * mcp 配置
@@ -244,6 +251,37 @@ public class MqttServerProperties {
 		private boolean enable = false;
 	}
 
+	@Getter
+	@Setter
+	public static class HttpAuth {
+		/**
+		 * 是否启用，默认：关闭
+		 */
+		private boolean enable = false;
+		/**
+		 * 认证 scheme:Basic / Bearer / 自定义,默认 Basic
+		 */
+		private String scheme = "Basic";
+		/**
+		 * token 所在的请求头,默认 authorization
+		 */
+		private String headerName = "authorization";
+		/**
+		 * http Basic 认证账号(scheme = Basic / Bearer 时使用)
+		 */
+		private String username;
+		/**
+		 * http Basic 认证密码(scheme = Basic / Bearer 时使用)
+		 */
+		private String password;
+	}
+
+	/**
+	 * 兼容旧字段,等价于 {@link HttpAuth}。
+	 *
+	 * @deprecated since 2.6.10, use {@link HttpAuth} instead.
+	 */
+	@Deprecated
 	@Getter
 	@Setter
 	public static class HttpBasicAuth {

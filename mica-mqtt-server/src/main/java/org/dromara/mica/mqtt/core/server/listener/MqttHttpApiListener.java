@@ -32,6 +32,8 @@ import net.dreamlu.mica.net.server.TioServerConfig;
 import org.dromara.mica.mqtt.core.server.MqttServerCreator;
 import org.dromara.mica.mqtt.core.server.http.api.MqttHttpApi;
 import org.dromara.mica.mqtt.core.server.http.api.auth.BasicAuthFilter;
+import org.dromara.mica.mqtt.core.server.http.api.auth.ITokenValidator;
+import org.dromara.mica.mqtt.core.server.http.api.auth.TokenAuthFilter;
 import org.dromara.mica.mqtt.core.server.http.mcp.MqttMcp;
 import org.dromara.mica.mqtt.core.server.protocol.MqttProtocol;
 
@@ -162,6 +164,30 @@ public class MqttHttpApiListener implements IMqttProtocolListener {
 
 		public Builder basicAuth(String username, String password) {
 			return this.authFilter(new BasicAuthFilter(username, password));
+		}
+
+		/**
+		 * 使用 Bearer Token 认证,token 校验由 {@link ITokenValidator} 自行实现。
+		 * <p>
+		 * 可对接 OAuth2 / JWT / 自建 token 服务等任意第三方校验。
+		 *
+		 * @param tokenValidator token 校验器
+		 * @return Builder
+		 */
+		public Builder tokenAuth(ITokenValidator tokenValidator) {
+			return this.tokenAuth(new TokenAuthFilter(tokenValidator));
+		}
+
+		/**
+		 * 使用 Bearer Token 认证,token 校验由 {@link ITokenValidator} 自行实现。
+		 * <p>
+		 * 可对接 OAuth2 / JWT / 自建 token 服务等任意第三方校验。
+		 *
+		 * @param tokenAuthFilter token filter
+		 * @return Builder
+		 */
+		public Builder tokenAuth(TokenAuthFilter tokenAuthFilter) {
+			return this.authFilter(tokenAuthFilter);
 		}
 
 		public Builder mcpServer() {

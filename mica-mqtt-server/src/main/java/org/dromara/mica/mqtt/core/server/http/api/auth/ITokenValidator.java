@@ -16,15 +16,24 @@
 
 package org.dromara.mica.mqtt.core.server.http.api.auth;
 
+import net.dreamlu.mica.net.http.common.HttpRequest;
+
 /**
- * Basic 认证,内部委托给 {@link TokenAuthFilter} + {@link BasicAuthValidator}。
+ * Token 校验器，用于 OAuth2 / JWT / 自建 token 服务等场景。
+ * <p>
+ * 用户可自行实现该接口,在实现中调用第三方校验服务(同步或异步)。
  *
  * @author L.cm
  */
-public class BasicAuthFilter extends TokenAuthFilter {
-	public static final String SCHEME = "Basic";
+@FunctionalInterface
+public interface ITokenValidator {
 
-	public BasicAuthFilter(String username, String password) {
-		super(TokenAuthFilter.AUTHORIZATION_HEADER_NAME, SCHEME, new BasicAuthValidator(username, password));
-	}
+	/**
+	 * 校验 token
+	 *
+	 * @param request 当前 HTTP 请求,便于读取 header / param 等附加信息
+	 * @param token   从 Authorization: Bearer xxx 中提取的 token
+	 * @return 是否校验通过
+	 */
+	boolean validate(HttpRequest request, String token);
 }

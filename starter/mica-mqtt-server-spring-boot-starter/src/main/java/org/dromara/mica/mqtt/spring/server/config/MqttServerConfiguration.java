@@ -34,6 +34,9 @@ import org.dromara.mica.mqtt.core.server.event.IMqttMessageListener;
 import org.dromara.mica.mqtt.core.server.event.IMqttSessionListener;
 import org.dromara.mica.mqtt.core.server.func.MqttFunctionManager;
 import org.dromara.mica.mqtt.core.server.func.MqttFunctionMessageListener;
+import org.dromara.mica.mqtt.core.server.http.api.auth.BasicAuthValidator;
+import org.dromara.mica.mqtt.core.server.http.api.auth.ITokenValidator;
+import org.dromara.mica.mqtt.core.server.http.api.auth.TokenAuthFilter;
 import org.dromara.mica.mqtt.core.server.interceptor.IMqttMessageInterceptor;
 import org.dromara.mica.mqtt.core.server.session.IMqttSessionManager;
 import org.dromara.mica.mqtt.core.server.store.IMqttMessageStore;
@@ -85,6 +88,7 @@ public class MqttServerConfiguration {
 											   ObjectProvider<IMqttServerSubscribeValidator> subscribeValidatorObjectProvider,
 											   ObjectProvider<IMqttServerPublishPermission> publishPermissionObjectProvider,
 											   ObjectProvider<HttpFilter> httpFilterObjectProvider,
+											   ObjectProvider<ITokenValidator> tokenValidatorObjectProvider,
 											   ObjectProvider<IMqttMessageStore> messageStoreObjectProvider,
 											   ObjectProvider<IMqttSessionManager> sessionManagerObjectProvider,
 											   ObjectProvider<IMqttSessionListener> sessionListenerObjectProvider,
@@ -164,13 +168,25 @@ public class MqttServerConfiguration {
 		MqttServerProperties.HttpListener httpListener = mqttServerProperties.getHttpListener();
 		if (httpListener.isEnable()) {
 			Node serverNode = httpListener.getServerNode();
-			MqttServerProperties.HttpBasicAuth basicAuth = httpListener.getBasicAuth();
+			MqttServerProperties.HttpAuth auth = resolveHttpAuth(httpListener);
 			MqttServerProperties.Mcp mcp = httpListener.getMcp();
 			MqttServerProperties.HttpSsl ssl = httpListener.getSsl();
 			serverCreator.enableMqttHttpApi(builder -> {
 				builder.serverNode(serverNode);
-				if (basicAuth.isEnable()) {
-					builder.basicAuth(basicAuth.getUsername(), basicAuth.getPassword());
+				if (auth.isEnable()) {
+					// 1. 优先使用用户注入的 HttpFilter
+					HttpFilter customFilter = httpFilterObjectProvider.getIfAvailable();
+					if (customFilter != null) {
+						builder.authFilter(customFilter);
+					} else {
+						// 2. 其次使用 ITokenValidator,scheme/headerName 走配置
+						ITokenValidator tokenValidator = tokenValidatorObjectProvider.getIfAvailable();
+						if (tokenValidator == null) {
+							// 3. 最后回退到配置文件 username/password
+							tokenValidator = new BasicAuthValidator(auth.getUsername(), auth.getPassword());
+						}
+						builder.authFilter(new TokenAuthFilter(auth.getHeaderName(), auth.getScheme(), tokenValidator));
+					}
 				}
 				if (mcp.isEnable()) {
 					McpServer mcpServer = new McpServer();
@@ -181,8 +197,6 @@ public class MqttServerConfiguration {
 				if (ssl.isEnable()) {
 					builder.sslConfig(createSslConfig(ssl));
 				}
-				// 认证处理
-				httpFilterObjectProvider.ifAvailable(builder::authFilter);
 				return builder.build();
 			});
 		}
@@ -227,6 +241,29 @@ public class MqttServerConfiguration {
 		sslConfig.setCipherSuites(ssl.getCipherSuites());
 		sslConfig.setUseCipherSuitesOrder(ssl.getUseCipherSuitesOrder());
 		return sslConfig;
+	}
+
+	/**
+	 * 解析 HTTP API 认证配置,优先 {@link MqttServerProperties.HttpAuth},
+	 * 回退到旧字段 {@link MqttServerProperties.HttpBasicAuth}。
+	 *
+	 * @param httpListener http 监听器配置
+	 * @return HttpAuth
+	 */
+	private static MqttServerProperties.HttpAuth resolveHttpAuth(MqttServerProperties.HttpListener httpListener) {
+		MqttServerProperties.HttpAuth auth = httpListener.getAuth();
+		if (auth.isEnable()) {
+			return auth;
+		}
+		MqttServerProperties.HttpBasicAuth basicAuth = httpListener.getBasicAuth();
+		if (basicAuth.isEnable()) {
+			MqttServerProperties.HttpAuth fallback = new MqttServerProperties.HttpAuth();
+			fallback.setEnable(true);
+			fallback.setUsername(basicAuth.getUsername());
+			fallback.setPassword(basicAuth.getPassword());
+			return fallback;
+		}
+		return auth;
 	}
 
 	@Bean

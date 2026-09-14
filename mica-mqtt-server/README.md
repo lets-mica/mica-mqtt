@@ -90,3 +90,79 @@ mqttServer.stop();
 ```
 
 另外 http api 需要项目带有 jackson、fastjson、fastjson2、gson、hutool-json、snack3（mica-mqtt 2.3.4开始支持） 这些json工具其一。
+
+## HTTP API 认证
+
+HTTP API 通过 `MqttHttpApiListener` 暴露,支持 Basic / Bearer / 自定义 scheme 三种认证方式(2.6.10 开始支持)。框架提供两个开箱即用的 `HttpFilter` 和一个 `ITokenValidator` 抽象校验器,用户可以任选其一。
+
+### 1. Basic 认证(配置账号密码)
+
+```java
+MqttServer.create()
+    .httpApiListener(builder -> builder
+        .serverNode(18083)
+        .basicAuth("mica", "mica")  // 注入 BasicAuthFilter
+    )
+    .start();
+```
+
+请求示例:
+
+```bash
+curl -u mica:mica http://localhost:18083/mqtt/publish?topic=/test&message=hello
+```
+
+### 2. Bearer Token(对接 OAuth2 / 自建服务 / JWT)
+
+实现 `ITokenValidator`,在 `validate` 方法里调用第三方校验服务,框架不绑定具体实现。
+
+```java
+public class OAuthTokenValidator implements ITokenValidator {
+    @Override
+    public boolean validate(HttpRequest request, String token) {
+        // 示例:调用 OAuth2 introspection 端点
+        return oauthClient.introspect(token).isActive();
+    }
+}
+```
+
+注册:
+
+```java
+MqttServer.create()
+    .httpApiListener(builder -> builder
+        .serverNode(18083)
+        .tokenAuth(new OAuthTokenValidator())  // 注入 TokenAuthFilter + 自定义校验器
+    )
+    .start();
+```
+
+请求示例:
+
+```bash
+curl -H "Authorization: Bearer xxx" http://localhost:18083/mqtt/publish?topic=/test&message=hello
+```
+
+### 3. 自定义 header + scheme(网关透传 token)
+
+支持自定义请求头名和 scheme 前缀,适用于网关已经将 token 放到 `X-API-Key` 等自定义头部的场景。
+
+```java
+MqttServer.create()
+    .httpApiListener(builder -> builder
+        .serverNode(18083)
+        .authFilter(new TokenAuthFilter("X-API-Key", "", myValidator))  // X-API-Key: xxx
+    )
+    .start();
+```
+
+构造器签名:
+
+| 构造器 | 解析形式 | 说明 |
+| --- | --- | --- |
+| `new TokenAuthFilter(validator)` | `Authorization: Bearer xxx` | 默认 header + Bearer |
+| `new TokenAuthFilter(headerName, validator)` | `<headerName>: Bearer xxx` | 自定义 header + Bearer |
+| `new TokenAuthFilter(headerName, scheme, validator)` | `<headerName>: <scheme> xxx` | 完全自定义 |
+| `new BasicAuthFilter(username, password)` | `Authorization: Basic base64` | Basic 等价于 `TokenAuthFilter("authorization", "Basic", BasicAuthValidator)` |
+
+校验失败返回 401,并设置 `WWW-Authenticate: <scheme> realm="Mica mqtt realm"` 响应头。

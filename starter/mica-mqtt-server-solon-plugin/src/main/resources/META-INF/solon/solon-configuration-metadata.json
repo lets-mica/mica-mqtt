@@ -40,20 +40,60 @@
       "description": "心跳超时时间(单位: 毫秒 默认: 1000 * 120)，如果用户不希望框架层面做心跳相关工作，请把此值设为0或负数"
     },
     {
+      "name": "mqtt.server.http-listener.auth.enable",
+      "type": "java.lang.Boolean",
+      "description": "是否启用 http api 认证，默认：关闭（2.6.10 开始支持）",
+      "defaultValue": "false"
+    },
+    {
+      "name": "mqtt.server.http-listener.auth.header-name",
+      "type": "java.lang.String",
+      "description": "token 所在的请求头，默认：authorization（2.6.10 开始支持）",
+      "defaultValue": "authorization"
+    },
+    {
+      "name": "mqtt.server.http-listener.auth.password",
+      "type": "java.lang.String",
+      "description": "scheme = Basic 时使用的密码（2.6.10 开始支持）"
+    },
+    {
+      "name": "mqtt.server.http-listener.auth.scheme",
+      "type": "java.lang.String",
+      "description": "认证 scheme: Basic / Bearer / 自定义，默认：Basic（2.6.10 开始支持）",
+      "defaultValue": "Basic"
+    },
+    {
+      "name": "mqtt.server.http-listener.auth.username",
+      "type": "java.lang.String",
+      "description": "scheme = Basic 时使用的账号（2.6.10 开始支持）"
+    },
+    {
       "name": "mqtt.server.http-listener.basic-auth.enable",
       "type": "java.lang.Boolean",
       "description": "是否启用，默认：关闭",
-      "defaultValue": "false"
+      "defaultValue": "false",
+      "deprecation": {
+        "replacement": "mqtt.server.http-listener.auth.enable",
+        "reason": "2.6.10 标记为 @Deprecated,将在后续版本移除,请改用 mqtt.server.http-listener.auth.*"
+      }
     },
     {
       "name": "mqtt.server.http-listener.basic-auth.password",
       "type": "java.lang.String",
-      "description": "http Basic 认证密码"
+      "description": "http Basic 认证密码",
+      "deprecation": {
+        "replacement": "mqtt.server.http-listener.auth.password",
+        "reason": "2.6.10 标记为 @Deprecated,将在后续版本移除,请改用 mqtt.server.http-listener.auth.*"
+      }
     },
     {
       "name": "mqtt.server.http-listener.basic-auth.username",
       "type": "java.lang.String",
-      "description": "http Basic 认证账号"
+      "description": "http Basic 认证账号",
+      "deprecation": {
+        "replacement": "mqtt.server.http-listener.auth.username",
+        "reason": "2.6.10 标记为 @Deprecated,将在后续版本移除,请改用 mqtt.server.http-listener.auth.*"
+      }
     },
     {
       "name": "mqtt.server.http-listener.enable",

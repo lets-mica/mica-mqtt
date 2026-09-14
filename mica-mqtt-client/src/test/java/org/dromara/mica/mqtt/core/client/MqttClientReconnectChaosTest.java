@@ -149,14 +149,21 @@ class MqttClientReconnectChaosTest {
 			//     to maximize the chance of hitting the publish()/reconnect() race the CI sees.
 			chaosPool = startChaosPublishers(client, concurrentThreads, "/test/chaos/" + round + "/");
 
-			// 3. start a new broker on the same port and verify the client reconnects.
-			FakeBroker secondBroker = FakeBroker.createOnPort(port)
+			// 3. 模拟 EMQX 重启：旧 broker 关闭后，client 通过 reconnect(node) 切到一个全新的 broker
+			//    （新端口）。这样可以避免同端口复用导致的 accept/socket fd 残留竞态，
+			//    也更接近真实重启切换节点的语义。
+			FakeBroker secondBroker = FakeBroker.create()
 				.next(new ConnAckAndHoldHandler());
 			secondBroker.start();
+			int secondPort = secondBroker.getPort();
+			Assertions.assertNotEquals(port, secondPort, "[round " + round + "] second broker should bind a new port");
+			// 让 mica-net 切到新节点：MqttClient.reconnect(Node) 通过 setServerNode + 关闭旧连接
+			// 触发 mica-net 内部 ReconnConf 重连到新的 ip:port。
+			client.reconnect("127.0.0.1", secondPort);
 			try {
-				Assertions.assertTrue(secondBroker.awaitConnectPackets(1, 10_000), "[round " + round + "] broker should receive reconnect CONNECT after restart");
-				Assertions.assertTrue(listener.awaitConnectedCount(connectedAtStart + 1, 10_000), "[round " + round + "] client should reconnect after broker restart");
+				Assertions.assertTrue(listener.awaitConnectedCount(connectedAtStart + 1, 10_000), "[round " + round + "] client should reconnect to the new broker");
 				Assertions.assertTrue(client.isConnected(), "[round " + round + "] client should be accepted after restart CONNACK");
+				Assertions.assertTrue(secondBroker.awaitConnectPackets(1, 10_000), "[round " + round + "] new broker should receive reconnect CONNECT after restart");
 				// 关键断言：broker 重启之后的 publish 必须成功。
 				// 同时也校验 chaos 注入的 publish 结果：未连上时入队（开启 pendingPublishQueueEnabled），
 				// 连上之后发送失败应被视为问题（QA 已在 CI 复现一次失败）。

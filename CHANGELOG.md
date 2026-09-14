@@ -2,18 +2,22 @@
 
 ## 发行版本
 
-### v2.6.9 - 2026-08-01
-- ✨ mqtt-client 实现 MQTT 5.0 Topic Alias 自动维护功能，提升大数据量场景下发布性能。
-- ✨ mqtt-server 落地 MQTT 5.0 Receive Maximum 基础运行时流控（P1.7 部分完成）。#196
-- ✨ mqtt-server 强化 MQTT 5.0 Subscribe 能力协商逻辑（#197），并落地 PR7~PR10 相关特性及若干 review bug 修复。
-- ✨ mqtt-server 和 mqtt-client 的 solon、Spring boot starter 添加 yml ssl tls 协议版本等参数配置。
-- ✨ mica-mqtt-broker（cluster）支持持久会话标记并增强消息路由与集群兼容性。
-- ✨ mica-mqtt-broker（cluster）实现双向集群客户端数据处理并补充集成测试覆盖。
-- ✨ mica-mqtt-broker（cluster）增强集群消息分发与会话管理功能。
-- ♻️ mqtt-server 重构 mqtt 内部消息处理流水线，支持按类型多处理器链路扩展。
-- ♻️ mqtt-server session 优化客户端接收最大值（Receive Maximum）的存储逻辑。
-- ♻️ mqtt-client 调整 PubComp 处理日志级别为 debug，减少噪音。
-- ⬆️ mica-net 升级到 2.0.12。
+### v2.6.10 - 2026-09-11
+- feat(client): MqttClientPublish 主题占位符支持方法参数，新增 @TopicParam 参数注解，配合 resolveTopic(Function) 按需取值。 (gitee #IKED1S) 感谢 @humlzy 反馈。
+- fix(mica-mqtt-client): getContext() 校验缓存 context 活体，失效时重新获取。
+- docs(readme): 更新 mqtt服务器 MCP 协议 文档 streamable http 和 sse 端点说明。
+- chore(deps): 更新 mica-net 到 2.0.15，支持 MCP 协议到 2026-07-28。
+
+### v2.6.9.1 - 2026-08-10
+- feat(auth): mica-mqtt-server 优化 HTTP API 认证支持多种方案。
+- refactor(cluster): mica-mqtt-broker 优化 H2InflightStore 的异步写入线程池。
+- 🐛 升级到 mica-net 2.0.14，修复 v2.0.13 中 `Tio.close` 将 `tryLock` 改为阻塞 `lock` 导致的 TOCTOU 竞态。
+
+### v2.6.9 - 2026-08-05
+- ✨ mica-mqtt SSL 支持 TLS 协议版本列表（如 TLSv1.2、TLSv1.3）等配置，简化使用。
+- ✨ 添加 Spring Boot、Solon SSL 对 TLS 协议版本等配置项的配置。
+- ♻️ mica-mqtt-client 移除内置的 `MqttSSLEngineCustomizer`，改为配置参数驱动。
+- ⬆️ 升级到 mica-net 2.0.13
 
 ### v2.6.8.3 - 2026-07-23
 - 🐛 升级到 mica-net 2.0.12 优化异步 Accept 注册逻辑，提前注册下一次监听以避免连接初始化阻塞后续接入和优化异常后的接入，gitee #IK377S 感谢 `@scafel` 反馈。
